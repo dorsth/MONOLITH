@@ -1,5 +1,11 @@
 # MONOLITH changelog
 
+## 0.9.99
+- Match stats: a hit is no longer missed when it is the first health change of a player (a one-shot kill could count nothing). Who dealt a hit is decided a frame later, so another player's damage no longer goes to whoever hit that player before.
+- Stats boards: every column as wide as its widest entry plus the same gap; names take only the room they need.
+- The match board is smaller and sits bottom left, clear of the podium and its sign.
+- The game's FPS and ping texts are off while a board is up.
+
 ## 0.9.98
 - Tab screen: kills, deaths and damage of the match so far over each name.
 - Round-end screen: only the round board, no labels over the names (one set of numbers per screen).

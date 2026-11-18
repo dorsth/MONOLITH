@@ -82,21 +82,24 @@ namespace Monolith
             {
                 if (!On.Value || __instance == null) return;
                 int key = __instance.GetInstanceID();
-                float before;
-                bool seen = Known.TryGetValue(key, out before);
-                Known[key] = value;
-                if (!seen) return;                                                        // the first value of a player on this map: nothing to compare with
-                if (before <= 0f && value <= 0f) return;                                   // already dead
                 float full = __instance.fullHealth > 0f ? __instance.fullHealth : 100f;
+                float before;
+                // a player spawns at full health without the game sending it: the first value seen is compared with full
+                // health (a one-shot kill can be the first value there is)
+                if (!Known.TryGetValue(key, out before)) before = full;
+                Known[key] = value;
+                if (before <= 0f && value <= 0f) return;                                   // already dead
                 float drop = Mathf.Min(before, full) - value;
                 if (drop <= 0.01f) return;
                 int victim = Id(__instance); if (victim < 0) return;
                 var hit = new Hit { Victim = victim, Dmg = Mathf.Min(drop, Mathf.Min(before, full)) * 100f / full, Lethal = value <= 0f, Frame = Time.frameCount };
                 if (__instance.fellVoid || __instance.suicide) { Credit(hit, -1); return; }
-                int atk;
-                if (KillerOf.TryGetValue(key, out atk)) { Credit(hit, atk); return; }
+                // Who hit them is decided a frame later, not now: the game can send the new health just before the new
+                // attacker, and the attacker on record would still be whoever hit this player before.
+                Hit earlier;
+                if (Waiting.TryGetValue(key, out earlier)) Credit(earlier, Attacker(key));
                 Waiting[key] = hit;
-                if (Waiting.Count > 0) Board.Me.Wait();
+                Board.Me.Wait();
             }
             catch (Exception e) { Quiet(e); }
         }
@@ -115,12 +118,14 @@ namespace Monolith
             catch (Exception e) { Quiet(e); }
         }
 
-        // health that came without a killer in time: nobody gets it
+        private static int Attacker(int key) { int a; return KillerOf.TryGetValue(key, out a) ? a : -1; }
+
+        // hits from an earlier frame: to the attacker on record now (set by then, if the game sent one)
         internal static void Flush()
         {
             if (Waiting.Count == 0) return;
             List<int> done = null;
-            foreach (var kv in Waiting) if (kv.Value.Frame < Time.frameCount - 1) { Credit(kv.Value, -1); (done ?? (done = new List<int>())).Add(kv.Key); }
+            foreach (var kv in Waiting) if (kv.Value.Frame < Time.frameCount) { Credit(kv.Value, Attacker(kv.Key)); (done ?? (done = new List<int>())).Add(kv.Key); }
             if (done != null) foreach (int k in done) Waiting.Remove(k);
         }
 
@@ -382,9 +387,9 @@ namespace Monolith
             // the match board keeps the headers every FPS scoreboard uses (k, d, adr) and writes out its own: it has to stay
             // clear of the podium on the victory screen. The round board has room for whole words.
             private static readonly string[] FullHead = { "player", "k", "d", "adr", "taken", "first kills", "trade", "multi", "clutch", "survived" };
-            private static readonly float[] FullW = { 300f, 70f, 70f, 80f, 100f, 140f, 90f, 90f, 100f, 120f };
             private static readonly string[] RoundHead = { "player", "kills", "deaths", "damage" };
-            private static readonly float[] RoundW = { 250f, 80f, 90f, 100f };
+            private const float Gap = 28f, NameMax = 300f;   // the same gap between all columns; a longer name shrinks, then ends in "…"
+            private TextMeshProUGUI _measure;
             private static readonly Color Mint = new Color32(0xB4, 0xF2, 0xB4, 0xFF), White = new Color32(0xF8, 0xF8, 0xF8, 0xFF);
 
             internal void Show(bool full)
@@ -402,22 +407,30 @@ namespace Monolith
                     if (pm != null && ColorUtility.TryParseHtmlString("#" + (pm.enemyNameLogColor ?? "").TrimStart('#'), out c)) enemy = c;
                 }
                 catch { }
-                string[] head = full ? FullHead : RoundHead; float[] w = full ? FullW : RoundW;
-                float size = full ? 26f : 20f, rowH = full ? 40f : 22f, pad = 0f, width = 0f;
-                foreach (float f in w) width += f;
+                string[] head = full ? FullHead : RoundHead;
+                float size = full ? 22f : 20f, rowH = full ? 32f : 22f, pad = 0f;
                 var rows = Sorted();
                 if (!full) rows.Sort((a, b) => Team(a.Key) != Team(b.Key) ? Team(a.Key).CompareTo(Team(b.Key)) : b.Value.RK != a.Value.RK ? b.Value.RK.CompareTo(a.Value.RK) : b.Value.RDmg.CompareTo(a.Value.RDmg));
-                int cell = 0;
-                Row(ref cell, 0, head, w, size, rowH, pad, Mint, Mint);
-                for (int r = 0; r < rows.Count; r++)
+                var lines = new List<string[]> { head }; var names = new List<Color> { Mint };
+                foreach (var kv in rows)
                 {
-                    P p = rows[r].Value; int t = Math.Max(1, p.Takes);
-                    Color name = me >= 0 && Team(rows[r].Key) == Team(me) ? self : enemy;
-                    string[] v = full
+                    P p = kv.Value; int t = Math.Max(1, p.Takes);
+                    lines.Add(full
                         ? new[] { p.Name, p.Kills.ToString(), p.Deaths.ToString(), Num(p.Dmg / t), Num(p.Taken), p.OpenK + "-" + p.OpenD, p.Trades.ToString(), p.Multi.ToString(), p.Clutch.ToString(), p.Survived + "/" + p.Takes }
-                        : new[] { p.Name, p.RK.ToString(), p.RD.ToString(), Num(p.RDmg) };
-                    Row(ref cell, r + 1, v, w, size, rowH, pad, name, White);
+                        : new[] { p.Name, p.RK.ToString(), p.RD.ToString(), Num(p.RDmg) });
+                    names.Add(me >= 0 && Team(kv.Key) == Team(me) ? self : enemy);
                 }
+                // each column as wide as its widest entry, plus the same gap: even spacing whatever the numbers are
+                float[] w = new float[head.Length];
+                if (_font != null) _measure.font = _font;
+                _measure.fontSize = size;
+                foreach (string[] l in lines)
+                    for (int i = 0; i < l.Length && i < w.Length; i++)
+                        w[i] = Mathf.Max(w[i], _measure.GetPreferredValues(l[i] ?? "").x);
+                w[0] = Mathf.Min(w[0], NameMax);
+                for (int i = 0; i < w.Length; i++) w[i] += Gap;
+                int cell = 0;
+                for (int r = 0; r < lines.Count; r++) Row(ref cell, r, lines[r], w, size, rowH, pad, names[r], r == 0 ? Mint : White);
                 for (int i = cell; i < _cells.Count; i++) _cells[i].gameObject.SetActive(false);
                 // the panel fits the text as drawn: from the names' left edge to the right edge of the widest last number,
                 // the same padding on every side
@@ -432,9 +445,10 @@ namespace Monolith
                 float height = (rows.Count + 1) * (rowH + 4f) - 4f;
                 _back.anchoredPosition = new Vector2(-Pad, Pad); _back.sizeDelta = new Vector2(right + 2f * Pad, height + 2f * Pad);
                 _root.sizeDelta = new Vector2(right, height);
-                if (full) { _root.anchorMin = _root.anchorMax = _root.pivot = new Vector2(0f, 1f); _root.anchoredPosition = new Vector2(Edge + Pad, -150f); }   // left: the podium is on the right
+                if (full) { _root.anchorMin = _root.anchorMax = Vector2.zero; _root.pivot = new Vector2(0f, 1f); _root.anchoredPosition = new Vector2(Edge + Pad, 110f + Pad + height); }   // bottom left, over the floor: the podium and its sign are in the middle
                 else { _root.anchorMin = _root.anchorMax = _root.pivot = new Vector2(0f, 1f); _root.anchoredPosition = new Vector2(Edge + Pad, -(Edge + Pad)); }   // the panel ends above the dark band of the round-end screen
                 _canvas.SetActive(true);
+                Counters(false);
                 enabled = true;
             }
 
@@ -482,6 +496,8 @@ namespace Monolith
                 var go = new GameObject("board"); go.transform.SetParent(_canvas.transform, false);
                 _root = go.AddComponent<RectTransform>();
                 // one dark see-through panel behind the whole board, like the game's own boxes (kill feed, Tab screen)
+                var mg = new GameObject("measure"); mg.transform.SetParent(_canvas.transform, false); mg.SetActive(false);
+                _measure = mg.AddComponent<TextMeshProUGUI>(); _measure.enableWordWrapping = false; _measure.richText = false;
                 var back = new GameObject("backdrop"); back.transform.SetParent(_root, false);
                 var bi = back.AddComponent<Image>(); bi.color = new Color(0f, 0f, 0f, 0.45f); bi.raycastTarget = false;
                 _back = bi.rectTransform; _back.anchorMin = _back.anchorMax = _back.pivot = new Vector2(0f, 1f);
@@ -506,7 +522,23 @@ namespace Monolith
                 _canvas.SetActive(false);
             }
 
-            internal void Hide() { if (_canvas != null) _canvas.SetActive(false); if (!_waitOnly) enabled = false; }
+            internal void Hide() { if (_canvas != null) _canvas.SetActive(false); Counters(true); if (!_waitOnly) enabled = false; }
+
+            // the game's small FPS and ping texts sit in the same corner: off while a board is up, back as they were after
+            // (one you hid yourself stays hidden)
+            private readonly List<Behaviour> _counters = new List<Behaviour>();
+            private void Counters(bool back)
+            {
+                try
+                {
+                    if (back) { foreach (Behaviour b in _counters) if (b != null) b.enabled = true; _counters.Clear(); return; }
+                    PauseManager pm = PauseManager.Instance;
+                    if (pm == null) return;
+                    foreach (Behaviour b in new Behaviour[] { pm.minimalFpsText, pm.minimalPingText })
+                        if (b != null && b.enabled && !_counters.Contains(b)) { b.enabled = false; _counters.Add(b); }
+                }
+                catch (Exception e) { Quiet(e); }
+            }
             internal void Wait() { if (!enabled) { _waitOnly = true; enabled = true; } }
 
             private void Update()
