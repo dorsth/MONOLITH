@@ -39,6 +39,8 @@ namespace Monolith
         public string Empty;                // Entry (text): what an empty value reads as
         public bool Bind;                   // Entry (text): a key, mouse button or wheel direction, set by pressing it
         public bool Fixed;                  // Entry (text): Options are all the choices (no empty one first)
+        public Action Hover, Unhover;       // a row a mod made with Mod Menu's API: told when the cursor is on it
+        public Func<string> Says;           // what that mod puts in the line under the page while it is
     }
 
     internal sealed class MenuPage
@@ -152,8 +154,8 @@ namespace Monolith
         ///    icon.png and manifest.json are looked for the way Mod Menu does: only in the mod's own folder under plugins;
         ///  * settings it hid from Mod Menu (ModMenuCustomisation.HideEntry/HideEntries) are hidden here too;
         ///  * every section as a heading, the settings in the order of the mod's config, each named by its key.
-        /// Not shown: what a mod adds through Mod Menu's content builder (RegisterContentBuilder), which makes Mod Menu's own
-        /// Unity objects. One thing Mod Menu does not have: a text setting whose description lists its choices in quotes is
+        ///  * what a mod adds with Mod Menu's content builder (RegisterContentBuilder), where it puts it: with MONOLITH's
+        ///    stand-in for Mod Menu (ModMenu.dll) installed, see Built. One thing Mod Menu does not have: a text setting whose description lists its choices in quotes is
         /// a list to pick from (Named).
         /// MONOLITH itself and the mods inside it are left out (they are the rest of this menu). Built when the menu is built
         /// (every mod is loaded by then); nothing per frame.</summary>
@@ -192,7 +194,7 @@ namespace Monolith
             {
                 PluginInfo pi = kv.Value;
                 var mod = new MenuPage(page, kv.Key, about[pi]);
-                string sec = null; int shown = 0;
+                string sec = null;
                 ConfigFile f = pi.Instance.Config;
                 if (f != null)
                     foreach (var ce in f)
@@ -204,12 +206,140 @@ namespace Monolith
                         if (e.SettingType == typeof(UnityEngine.KeyCode) || e.SettingType == typeof(KeyboardShortcut)) mod.Key(e.Definition.Key, e, "none");
                         else if ((named = Named(e)) != null) mod.Rows.Add(new MenuRow { Kind = RowKind.Entry, Label = e.Definition.Key, Entry = e, Options = () => named, Fixed = true });
                         else mod.Set(e.Definition.Key, e);
-                        shown++;
                     }
-                string v = shown == 0 ? Lang.T("no options") : pi.Metadata.Version != null ? "v" + pi.Metadata.Version : "";
+                // as Mod Menu: a content builder runs for a mod that has settings, on the list of its setting rows
+                if (f != null && f.Count > 0) Built(pi.Metadata.GUID, mod);
+                string v = mod.Rows.Count == 0 ? Lang.T("no options") : pi.Metadata.Version != null ? "v" + pi.Metadata.Version : "";
                 page.Go(mod, () => v);
             }
             return page.Rows.Count > 0 ? page : null;
+        }
+
+        // ---- a mod's own rows, made with Mod Menu's API (RegisterContentBuilder)
+
+        private static MethodInfo _run;
+        private static ConfigFile _mirror;
+        private static readonly Dictionary<ConfigEntryBase, Action<object>> Write = new Dictionary<ConfigEntryBase, Action<object>>();
+        private static bool _syncing;
+        private static MethodInfo _bind;
+
+        /// <summary>Runs the mod's content builder through MONOLITH's stand-in for Mod Menu and puts its rows among the
+        /// mod's setting rows, in the order Mod Menu would show them. Headers, text, buttons and values (a value is
+        /// a setting of its own here that reads and writes through the mod's getter and setter). Nothing happens with
+        /// kestrel's Mod Menu installed: then its own window shows these.</summary>
+        private static void Built(string guid, MenuPage mod)
+        {
+            try
+            {
+                if (_run == null)
+                {
+                    Type pages = AccessTools.TypeByName("ModMenu.Pages");
+                    if (pages == null) return;
+                    _run = AccessTools.Method(pages, "Run");
+                }
+                var rows = _run.Invoke(null, new object[] { guid, mod.Rows.Count }) as List<Dictionary<string, object>>;
+                if (rows == null || rows.Count == 0) return;
+                var cfg = new List<MenuRow>(mod.Rows);
+                mod.Rows.Clear();
+                int n = 0;
+                foreach (Dictionary<string, object> r in rows)
+                {
+                    string kind = r["kind"] as string;
+                    if (kind == "config") { mod.Rows.Add(cfg[(int)r["index"]]); continue; }
+                    MenuRow row = Row(guid, n++, kind, r);
+                    if (row == null) continue;
+                    var active = (Func<bool>)r["active"];
+                    Func<bool> was = row.If;
+                    row.If = was == null ? active : () => active() && was();
+                    row.Hover = (Action)r["hover"]; row.Unhover = (Action)r["unhover"]; row.Says = (Func<string>)r["info"];
+                    mod.Rows.Add(row);
+                }
+            }
+            catch (Exception e) { if (BundlePlugin.Log != null) BundlePlugin.Log.LogWarning("Mods: the page " + guid + " made with Mod Menu could not be shown: " + (e.InnerException ?? e).Message); }
+        }
+
+        private static MenuRow Row(string guid, int n, string kind, Dictionary<string, object> r)
+        {
+            string label = r["label"] as string ?? "";
+            switch (kind)
+            {
+                case "header": return new MenuRow { Kind = RowKind.Header, Label = label };
+                case "text": return new MenuRow { Kind = RowKind.Action, Label = label, Info = label };
+                case "button":
+                {
+                    var click = (Action)r["click"]; var text = (Func<string>)r["button"];
+                    return new MenuRow { Kind = RowKind.Action, Label = label, Dyn = text, Take = s => { click(); return null; } };
+                }
+                case "value": return Value(guid, n, label, r);
+            }
+            return null;
+        }
+
+        // A value is shown as a setting: a ConfigEntry of its own, in a config file that is never saved, kept equal to
+        // the mod's getter while the row is on screen and written to the mod's setter when it is changed.
+        private static MenuRow Value(string guid, int n, string label, Dictionary<string, object> r)
+        {
+            Type t = (Type)r["type"];
+            var get = (Func<object>)r["get"]; var set = (Action<object>)r["set"];
+            object min, max; bool slider = r.TryGetValue("min", out min) & r.TryGetValue("max", out max);
+            // numbers as int or float, the two the menu can slide
+            Type shown = t;
+            if (IsNumber(t)) shown = t == typeof(int) || t == typeof(long) || t == typeof(short) || t == typeof(byte) || t == typeof(uint) || t == typeof(ulong) || t == typeof(ushort) || t == typeof(sbyte) ? typeof(int) : typeof(float);
+            if (!TomlTypeConverter.CanConvert(shown)) return null;
+
+            if (_mirror == null)
+            {
+                _mirror = new ConfigFile(System.IO.Path.Combine(Paths.CachePath, "MONOLITH.modmenu.cfg"), false) { SaveOnConfigSet = false };
+                _mirror.SettingChanged += (s, a) =>
+                {
+                    Action<object> w;
+                    if (_syncing || a == null || !Write.TryGetValue(a.ChangedSetting, out w)) return;
+                    try { w(a.ChangedSetting.BoxedValue); } catch (Exception e) { if (BundlePlugin.Log != null) BundlePlugin.Log.LogWarning("Mods: " + e.Message); }
+                };
+            }
+            object now = To(Safe(get), shown) ?? (shown.IsValueType ? Activator.CreateInstance(shown) : shown == typeof(string) ? "" : null);
+            object def = To(r["default"], shown) ?? now;
+            AcceptableValueBase range = null;
+            if (slider && (shown == typeof(int) || shown == typeof(float)))
+                range = (AcceptableValueBase)Activator.CreateInstance(typeof(AcceptableValueRange<>).MakeGenericType(shown), To(min, shown), To(max, shown));
+            if (_bind == null)
+                foreach (MethodInfo m in typeof(ConfigFile).GetMethods())
+                {
+                    ParameterInfo[] ps = m.GetParameters();
+                    if (m.Name == "Bind" && m.IsGenericMethodDefinition && ps.Length == 3 && ps[0].ParameterType == typeof(ConfigDefinition) && ps[2].ParameterType == typeof(ConfigDescription)) { _bind = m; break; }
+                }
+            MethodInfo bind = _bind;
+            var entry = (ConfigEntryBase)bind.MakeGenericMethod(shown).Invoke(_mirror, new object[] { new ConfigDefinition(guid, "row " + n), def, new ConfigDescription("", range) });
+            _syncing = true; try { entry.BoxedValue = now; } finally { _syncing = false; }
+            Write[entry] = v => set(To(v, t));
+
+            int frame = -1;
+            Func<bool> sync = () =>
+            {
+                // once a frame, while the menu shows the row: the mod may have changed it itself
+                if (frame == UnityEngine.Time.frameCount) return true;
+                frame = UnityEngine.Time.frameCount;
+                object v = To(Safe(get), shown);
+                if (v != null && !v.Equals(entry.BoxedValue)) { _syncing = true; try { entry.BoxedValue = v; } catch { } finally { _syncing = false; } }
+                return true;
+            };
+            return new MenuRow { Kind = RowKind.Entry, Label = label, Entry = entry, If = sync, Tip = "",
+                Bind = shown == typeof(UnityEngine.KeyCode) || shown == typeof(KeyboardShortcut), Empty = "none" };
+        }
+
+        private static object Safe(Func<object> get) { try { return get(); } catch { return null; } }
+
+        private static bool IsNumber(Type t)
+        {
+            return t == typeof(int) || t == typeof(long) || t == typeof(short) || t == typeof(byte) || t == typeof(uint) || t == typeof(ulong) || t == typeof(ushort) || t == typeof(sbyte)
+                || t == typeof(float) || t == typeof(double) || t == typeof(decimal);
+        }
+
+        private static object To(object v, Type t)
+        {
+            if (v == null) return null;
+            if (t.IsInstanceOfType(v)) return v;
+            try { return t.IsEnum ? Enum.ToObject(t, v) : Convert.ChangeType(v, t, System.Globalization.CultureInfo.InvariantCulture); } catch { return null; }
         }
 
         // As Mod Menu: the mod's own folder directly under plugins (none for a dll lying in plugins itself), searched for

@@ -1,12 +1,17 @@
 #!/bin/sh
 # Builds MONOLITH.dll: every mod under mods/ compiled together into one plugin file.
 # The mods' own sources are used as they are; only their [assembly: ...] lines are left out (the bundle has its own).
-# Needs the .NET SDK and three paths:
-#   LIB = <game>/STRAFTAT_Data/Managed   BEP = <game>/BepInEx/core   MODMENU = Mod Menu's dll (only to compile against)
+# Also builds modmenu/ModMenu.dll, the stand-in for Mod Menu's API that ships next to it.
+# Needs the .NET SDK and two paths:
+#   LIB = <game>/STRAFTAT_Data/Managed   BEP = <game>/BepInEx/core
 cd "$(dirname "$0")"
-: "${LIB:?set LIB to <game>/STRAFTAT_Data/Managed}" "${BEP:?set BEP to <game>/BepInEx/core}" "${MODMENU:?set MODMENU to ModMenu.dll}"
+: "${LIB:?set LIB to <game>/STRAFTAT_Data/Managed}" "${BEP:?set BEP to <game>/BepInEx/core}"
 CSC=$(ls /usr/lib/dotnet/sdk/*/Roslyn/bincore/csc.dll /usr/share/dotnet/sdk/*/Roslyn/bincore/csc.dll 2>/dev/null | head -1)
-refs=$(ls "$LIB"/*.dll "$BEP"/*.dll "$MODMENU" | grep -v Mono.Cecil | awk -F/ '!seen[$NF]++' | sed 's/^/-r:/')
+base=$(ls "$LIB"/*.dll "$BEP"/*.dll | grep -v Mono.Cecil | awk -F/ '!seen[$NF]++' | sed 's/^/-r:/')
+rm -f modmenu/ModMenu.dll
+dotnet "$CSC" -nologo -target:library -out:modmenu/ModMenu.dll -nostdlib -langversion:10 -optimize+ -debug- -deterministic -nowarn:CS0436,CS1701,CS1702 $base modmenu/src/*.cs 2>&1 | grep -E "error" | head -20
+[ -f modmenu/ModMenu.dll ] || { echo "modmenu/ModMenu.dll not built"; exit 1; }
+refs="$base -r:modmenu/ModMenu.dll"
 # the menu's Russian: checked against the room each text has, then written out as Russian.cs
 python3 lang/make.py || { echo "lang/make.py: a Russian text does not fit or is missing, not built"; exit 1; }
 rm -rf obj && mkdir -p obj

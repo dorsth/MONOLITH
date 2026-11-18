@@ -1,5 +1,9 @@
 # MONOLITH changelog
 
+## 0.9.74
+- Replaces Mod Menu. `ModMenu.dll` in the MONOLITH folder gives other mods Mod Menu's API, so a mod made for Mod Menu works the same way: hidden settings stay hidden, its description shows, and the rows it adds itself (headers, text, buttons, values) are on its page under Other mods, in the same order.
+- Works on macOS ARM64: no asset bundles.
+
 ## 0.9.73
 - Swap weapons shows the game's own binding (the scroll wheel) and a key set there replaces it. Scroll while it asks for a key: back to the wheel.
 - Extra jump and Extra jump 2 are named Second jump key and Third jump key.

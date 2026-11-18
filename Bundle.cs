@@ -10,7 +10,7 @@ using ComputerysModdingUtilities;
 
 [assembly: AssemblyTitle("MONOLITH")]
 [assembly: AssemblyDescription("Every Dorsth mod for STRAFTAT in one file. Dorsth was here.")]
-[assembly: AssemblyVersion("0.9.73.0")]
+[assembly: AssemblyVersion("0.9.74.0")]
 // only changes things on your own screen: fine to play with people who don't have it
 [assembly: StraftatMod(isVanillaCompatible: true)]
 
@@ -20,7 +20,7 @@ namespace Monolith
     [BepInDependency(ModMenuGuid, BepInDependency.DependencyFlags.SoftDependency)]
     public sealed class BundlePlugin : BaseUnityPlugin
     {
-        public const string Guid = "dorsth.straftat.monolith", Name = "MONOLITH", Version = "0.9.73";
+        public const string Guid = "dorsth.straftat.monolith", Name = "MONOLITH", Version = "0.9.74";
         // filled in by build.sh: the mods and versions this file was built from
         internal const string Contents = "@CONTENTS@";
 
@@ -68,6 +68,7 @@ namespace Monolith
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
         private void ModMenuPage()
         {
+            if (HarmonyLib.AccessTools.TypeByName("ModMenu.Pages") != null) return;   // MONOLITH's own stand-in: no window of its own
             System.Type manager = HarmonyLib.AccessTools.TypeByName("ModMenu.ModMenuManager");
             MethodInfo init = manager != null ? HarmonyLib.AccessTools.Method(manager, "Init") : null;
             _mods = manager != null ? HarmonyLib.AccessTools.Field(manager, "mods") : null;
