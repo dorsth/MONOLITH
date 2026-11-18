@@ -1,5 +1,8 @@
 # MONOLITH changelog
 
+## 0.9.82
+- Reset works while a setting is being edited (a key being set, a list or the colors open): it stops the edit and resets.
+
 ## 0.9.81
 - Reset sits right after the default in the box under the page. Key rows show their default too.
 - Descriptions rewritten as plain sentences ("Scroll: back to the wheel" and similar shorthand is gone). Configs are called configs everywhere.

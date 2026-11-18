@@ -339,6 +339,16 @@ namespace Monolith
 
             if (_bindRow != null) PollBind();
             bool binding = _bindRow != null || Time.frameCount - _bindEnd <= 1;
+            // Reset under the page works in every state: it ends whatever is being edited, then resets
+            if (ev.type == EventType.MouseDown && ev.button == 0 && _resetRow != null && _resetRect.Contains(ev.mousePosition))
+            {
+                MenuRow r = _resetRow;
+                if (_pop != null) PopClose(false);
+                if (_bindRow != null) { _bindRow = null; _bindEnd = Time.frameCount; }
+                _editRow = null; _capture = false; _dragRow = null;
+                Default(r);
+                ev.Use(); return;
+            }
             if (_pop != null)
             {
                 // a pop-up is open: everything goes to it
@@ -964,7 +974,6 @@ namespace Monolith
         private void Click(Vector2 m, MenuPage page, int button)
         {
             if (_editRow != null) { _editRow = null; _capture = false; }
-            if (button == 0 && _resetRow != null && _resetRect.Contains(m)) { Default(_resetRow); return; }
             if (_navR.Contains(m))
             {
                 int i = Mathf.FloorToInt((m.y - _navY0) / _navStep);
