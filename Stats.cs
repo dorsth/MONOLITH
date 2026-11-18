@@ -118,6 +118,14 @@ namespace Monolith
             catch (Exception e) { Quiet(e); }
         }
 
+        private static string Who(int id)
+        {
+            if (id < 0) return "nobody";
+            ClientInstance ci; P p;
+            if (ClientInstance.playerInstances.TryGetValue(id, out ci) && ci != null) return Untag(ci.PlayerName);
+            return All.TryGetValue(id, out p) && p.Name.Length > 0 ? p.Name : "player " + (id + 1);
+        }
+
         private static int Attacker(int key) { int a; return KillerOf.TryGetValue(key, out a) ? a : -1; }
 
         // hits from an earlier frame: to the attacker on record now (set by then, if the game sent one)
@@ -133,6 +141,9 @@ namespace Monolith
         {
             P v = Get(h.Victim);
             if (atk == h.Victim) atk = -1;
+            // one line per hit, to check the counting against the kill feed (until it is known to be right)
+            if (BundlePlugin.Log != null)
+                BundlePlugin.Log.LogInfo("Stats hit: " + Who(atk) + " -> " + Who(h.Victim) + " " + Num(h.Dmg) + (h.Lethal ? " (kill)" : "") + (atk >= 0 && Team(atk) == Team(h.Victim) ? " (teammate, not counted)" : ""));
             v.Taken += h.Dmg;
             P a = atk >= 0 ? Get(atk) : null;
             if (a != null && Team(atk) != Team(h.Victim)) { a.Dmg += h.Dmg; a.RDmg += h.Dmg; }
@@ -388,7 +399,7 @@ namespace Monolith
             // clear of the podium on the victory screen. The round board has room for whole words.
             private static readonly string[] FullHead = { "player", "k", "d", "adr", "first kills", "trade", "2k", "clutch", "survived" };
             private static readonly string[] RoundHead = { "player", "kills", "deaths", "damage" };
-            private const float Gap = 28f, NameMax = 300f;   // the same gap between all columns; a longer name shrinks, then ends in "…"
+            private const float Gap = 28f;   // the same gap between all columns
             private static readonly Color Mint = new Color32(0xB4, 0xF2, 0xB4, 0xFF), White = new Color32(0xF8, 0xF8, 0xF8, 0xFF);
 
             internal void Show(bool full)
@@ -419,42 +430,21 @@ namespace Monolith
                         : new[] { p.Name, p.RK.ToString(), p.RD.ToString(), Num(p.RDmg) });
                     names.Add(me >= 0 && Team(kv.Key) == Team(me) ? self : enemy);
                 }
-                // each column as wide as its widest entry, plus the same gap: even spacing whatever the numbers are.
-                // Measured on the cells themselves (drawn once wide, then laid out again at the measured widths).
-                _canvas.SetActive(true);   // text is only measured right on an active canvas
+                // fixed widths worked out from the text, not measured: the longest entry of a column at this font's average
+                // letter width, plus the same gap for every column. Names get a fixed column; a long one shrinks, then "…".
                 int cols = head.Length, cell = 0;
                 float[] w = new float[cols];
-                for (int i = 0; i < cols; i++) w[i] = i == 0 ? NameMax : 400f;
-                for (int r = 0; r < lines.Count; r++) Row(ref cell, r, lines[r], w, size, rowH, pad, names[r], r == 0 ? Mint : White);
-                for (int i = 0; i < cols; i++) w[i] = 0f;
-                for (int k = 0; k < cell; k++)
-                {
-                    TextMeshProUGUI t = _cells[k]; t.ForceMeshUpdate();
-                    int col = k % cols;
-                    w[col] = Mathf.Max(w[col], t.GetPreferredValues(t.text, 9999f, 100f).x);
-                }
-                // never narrower than the longest entry at an average letter width (if measuring failed, this still fits)
                 for (int i = 0; i < cols; i++)
                 {
                     int chars = 0;
                     foreach (string[] l in lines) if (i < l.Length && l[i] != null) chars = Math.Max(chars, l[i].Length);
-                    w[i] = Mathf.Max(w[i], chars * size * 0.5f);
+                    w[i] = (i == 0 ? (full ? 260f : 220f) : chars * size * 0.6f) + Gap;
                 }
-                w[0] = Mathf.Min(w[0], NameMax);
-                for (int i = 0; i < cols; i++) w[i] += Gap;
-                cell = 0;
+                _canvas.SetActive(true);
                 for (int r = 0; r < lines.Count; r++) Row(ref cell, r, lines[r], w, size, rowH, pad, names[r], r == 0 ? Mint : White);
                 for (int i = cell; i < _cells.Count; i++) _cells[i].gameObject.SetActive(false);
-                // the panel fits the text as drawn: from the names' left edge to the right edge of the widest last number,
-                // the same padding on every side
-                float right = 0f;
-                for (int i = 0; i < cell; i++)
-                {
-                    TextMeshProUGUI t = _cells[i]; RectTransform rt = t.rectTransform;
-                    float tw = Mathf.Min(t.preferredWidth, rt.sizeDelta.x);
-                    float end = t.alignment == TextAlignmentOptions.BaselineLeft ? rt.anchoredPosition.x + tw : rt.anchoredPosition.x + (rt.sizeDelta.x + tw) * 0.5f;
-                    if (end > right) right = end;
-                }
+                // the panel ends half a gap after the last column, so the padding matches the gap on the left of the names
+                float right = 0f; foreach (float f in w) right += f; right -= Gap * 0.5f;
                 float height = (rows.Count + 1) * (rowH + 4f) - 4f;
                 _back.anchoredPosition = new Vector2(-Pad, Pad); _back.sizeDelta = new Vector2(right + 2f * Pad, height + 2f * Pad);
                 _root.sizeDelta = new Vector2(right, height);

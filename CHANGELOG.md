@@ -1,5 +1,9 @@
 # MONOLITH changelog
 
+## 0.10.2
+- Stats boards: fixed column widths worked out from the text, the same gap between every column (no measuring, which squeezed the columns).
+- Each counted hit is written to the BepInEx log ("Stats hit: ..."), to check the counting.
+
 ## 0.10.1
 - Fixed the stats boards squeezing all columns together: columns are measured on the board's own text, and never narrower than their longest entry.
 
