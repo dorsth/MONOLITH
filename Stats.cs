@@ -384,9 +384,9 @@ namespace Monolith
             private TMP_FontAsset _font; private Material _mat;
             private readonly List<TextMeshProUGUI> _cells = new List<TextMeshProUGUI>();
 
-            // the match board keeps the headers every FPS scoreboard uses (k, d, adr) and writes out its own: it has to stay
+            // the match board keeps the short headers players know (k, d, adr, 2k) and writes out the rest: it has to stay
             // clear of the podium on the victory screen. The round board has room for whole words.
-            private static readonly string[] FullHead = { "player", "k", "d", "adr", "taken", "first kills", "trade", "multi", "clutch", "survived" };
+            private static readonly string[] FullHead = { "player", "k", "d", "adr", "first kills", "trade", "2k", "clutch", "survived" };
             private static readonly string[] RoundHead = { "player", "kills", "deaths", "damage" };
             private const float Gap = 28f, NameMax = 300f;   // the same gap between all columns; a longer name shrinks, then ends in "…"
             private TextMeshProUGUI _measure;
@@ -416,7 +416,7 @@ namespace Monolith
                 {
                     P p = kv.Value; int t = Math.Max(1, p.Takes);
                     lines.Add(full
-                        ? new[] { p.Name, p.Kills.ToString(), p.Deaths.ToString(), Num(p.Dmg / t), Num(p.Taken), p.OpenK + "-" + p.OpenD, p.Trades.ToString(), p.Multi.ToString(), p.Clutch.ToString(), p.Survived + "/" + p.Takes }
+                        ? new[] { p.Name, p.Kills.ToString(), p.Deaths.ToString(), Num(p.Dmg / t), p.OpenK + "-" + p.OpenD, p.Trades.ToString(), p.Multi.ToString(), p.Clutch.ToString(), p.Survived + "/" + p.Takes }
                         : new[] { p.Name, p.RK.ToString(), p.RD.ToString(), Num(p.RDmg) });
                     names.Add(me >= 0 && Team(kv.Key) == Team(me) ? self : enemy);
                 }

@@ -1,5 +1,8 @@
 # MONOLITH changelog
 
+## 0.10.0
+- Match board: no damage taken column; multi is called 2k again.
+
 ## 0.9.99
 - Match stats: a hit is no longer missed when it is the first health change of a player (a one-shot kill could count nothing). Who dealt a hit is decided a frame later, so another player's damage no longer goes to whoever hit that player before.
 - Stats boards: every column as wide as its widest entry plus the same gap; names take only the room they need.
