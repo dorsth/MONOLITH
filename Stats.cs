@@ -442,7 +442,7 @@ namespace Monolith
                 float height = (rows.Count + 1) * (rowH + 4f) - 4f;
                 _back.anchoredPosition = new Vector2(-Pad, Pad); _back.sizeDelta = new Vector2(right + 2f * Pad, height + 2f * Pad);
                 _root.sizeDelta = new Vector2(right, height);
-                if (full) { _root.anchorMin = _root.anchorMax = _root.pivot = new Vector2(0.5f, 0.5f); _root.anchoredPosition = Vector2.zero; }   // the middle of the screen, like STRAFTH's boards
+                if (full) { _root.anchorMin = _root.anchorMax = new Vector2(0.5f, 0f); _root.pivot = new Vector2(0.5f, 1f); _root.anchoredPosition = new Vector2(0f, 130f + Pad + height); }   // centered below the 1st/2nd panel and the rematch signs, above the health line
                 else { _root.anchorMin = _root.anchorMax = _root.pivot = new Vector2(0f, 1f); _root.anchoredPosition = new Vector2(Edge + Pad, -(Edge + Pad)); }   // the panel ends above the dark band of the round-end screen
                 _canvas.SetActive(true);
                 Counters(false);
@@ -450,7 +450,15 @@ namespace Monolith
             }
 
             private string _digit;
-            private string Shown(int r, int i, string v) { return r > 0 && i > 0 && _digit != null ? _digit + v + "</mspace>" : v; }
+            // digits only: a "-" or "/" as wide as a digit made "4-0" read as "4 - 0"
+            private string Shown(int r, int i, string v)
+            {
+                if (r == 0 || i == 0 || _digit == null) return v;
+                int cut = v.IndexOfAny(Separators);
+                if (cut < 0) return _digit + v + "</mspace>";
+                return _digit + v.Substring(0, cut) + "</mspace>" + v[cut] + _digit + v.Substring(cut + 1) + "</mspace>";
+            }
+            private static readonly char[] Separators = { '-', '/' };
 
             private void Row(ref int cell, int r, string[] v, float[] w, float size, float rowH, float pad, Color name, Color num)
             {

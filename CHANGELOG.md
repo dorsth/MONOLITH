@@ -1,5 +1,9 @@
 # MONOLITH changelog
 
+## 1.0.1
+- The match board sits below the 1st/2nd panel again, so it covers neither the panel nor the rematch signs.
+- Stats boards: "-" and "/" keep their normal width ("4-0" read as "4 - 0").
+
 ## 1.0.0
 - First public release.
 
