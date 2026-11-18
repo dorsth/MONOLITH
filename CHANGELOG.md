@@ -1,5 +1,8 @@
 # MONOLITH changelog
 
+## 0.9.88
+- Tab screen: the kills are added to the name shown, not to the player's name itself. Rows keep their avatars, buttons and places again.
+
 ## 0.9.87
 - Match stats is one switch on the HUD page (the round board and match board no longer have their own).
 
