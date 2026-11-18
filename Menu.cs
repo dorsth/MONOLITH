@@ -235,8 +235,6 @@ namespace Monolith
             _vis.Clear();
             if (p.Parent != null) _vis.Add(UpRow);
             foreach (MenuRow r in p.Rows) if (Shows(r)) _vis.Add(r);
-            MenuRow reset = _searching ? null : PageReset(p);   // not on search results: they are from many pages
-            if (reset != null) _vis.Add(reset);
             // a heading with nothing under it
             for (int i = _vis.Count - 1; i >= 0; i--)
                 if (_vis[i].Kind == RowKind.Header && (i == _vis.Count - 1 || _vis[i + 1].Kind == RowKind.Header)) _vis.RemoveAt(i);
@@ -411,9 +409,23 @@ namespace Monolith
             Rect info = new Rect(_navR.x, _navR.yMax + _ch * 0.5f, _win.width - _cw, _ch * 3.6f);
             Box(info, null, false);
             bool said = _say != null && Time.unscaledTime < _sayUntil;
+            MenuRow told = said ? null : over >= 0 && over < _vis.Count ? _vis[over] : overCat >= 0 || !pageOn ? null : ci >= 0 && ci < _vis.Count ? _vis[ci] : null;
             string text = said ? _say : over >= 0 && over < _vis.Count ? Describe(_vis[over]) : overCat >= 0 ? Lang.T(_cats[overCat].Info) : !pageOn ? Lang.T(_cats[_cat].Info) : ci >= 0 ? Describe(_vis[ci]) : _searching && _query.Length > 0 ? Lang.T("Nothing found.") : "";
-            string[] lines = Wrap(text, (int)(info.width / _cw) - 4, 3);
+            // the mouse went from a row down to this box (to click Reset): the box keeps telling about that row
+            if (!said && info.Contains(mouse) && _told != null && _vis.Contains(_told)) { told = _told; text = Describe(told); }
+            else _told = told;
+            // a changed setting: "Reset" at the end of the box, where its default is read (R does the same)
+            _resetRow = told != null && Changed(told) ? told : null;
+            string reset = Lang.T("Reset");
+            int width = (int)(info.width / _cw) - 4;
+            string[] lines = Wrap(text, _resetRow != null ? width - reset.Length - 3 : width, 3);
             for (int i = 0; i < lines.Length; i++) Line(info.x + _cw * 1.5f, info.y + _ch * 0.3f + i * _ch, "<color=" + (said ? Mint : Txt) + ">" + Esc(lines[i]) + "</color>");
+            if (_resetRow != null)
+            {
+                _resetRect = new Rect(info.xMax - (reset.Length + 2.5f) * _cw, info.y + _ch * 0.3f + 2 * _ch, (reset.Length + 1) * _cw, _ch);
+                if (_resetRect.Contains(mouse)) Fill(_resetRect, Hover);
+                Line(_resetRect.x + _cw * 0.5f, _resetRect.y, "<color=" + Hot + ">" + reset + "</color>");
+            }
 
             // the key bar
             Rect kb = new Rect(_win.x, _win.yMax - _ch, _win.width, _ch);
@@ -819,25 +831,6 @@ namespace Monolith
             if (_page != null && _page.Parent != null) _page = _page.Parent; else _inNav = true;
         }
 
-        // One "Reset this page" row per page, shown at its end while any setting on the page is changed (Enter twice).
-        private static readonly Dictionary<MenuPage, MenuRow> Resets = new Dictionary<MenuPage, MenuRow>();
-
-        private static MenuRow PageReset(MenuPage p)
-        {
-            bool any = false;
-            foreach (MenuRow r in p.Rows) if ((r.Kind == RowKind.Entry || r.Kind == RowKind.Group) && Changed(r)) { any = true; break; }
-            if (!any) return null;
-            MenuRow row;
-            if (!Resets.TryGetValue(p, out row))
-            {
-                MenuPage page = p;
-                row = new MenuRow { Kind = RowKind.Action, Label = "Reset this page", Info = "Puts every setting on this page back to its default.", Confirm = true,
-                    Take = s => { foreach (MenuRow r in page.Rows) Default(r); return Lang.T("Page reset."); } };
-                Resets[p] = row;
-            }
-            return row;
-        }
-
         // R resets the row under the mouse when there is one, else the row the cursor is on
         private MenuRow ResetTarget(Vector2 mouse, MenuPage page, MenuRow cursor)
         {
@@ -959,9 +952,13 @@ namespace Monolith
             ev.Use();
         }
 
+        private MenuRow _resetRow, _told;
+        private Rect _resetRect;
+
         private void Click(Vector2 m, MenuPage page, int button)
         {
             if (_editRow != null) { _editRow = null; _capture = false; }
+            if (button == 0 && _resetRow != null && _resetRect.Contains(m)) { Default(_resetRow); return; }
             if (_navR.Contains(m))
             {
                 int i = Mathf.FloorToInt((m.y - _navY0) / _navStep);

@@ -1,5 +1,9 @@
 # MONOLITH changelog
 
+## 0.9.79
+- A changed setting shows Reset in the box under the page, next to its default. Click it, or press R.
+- Reset this page is gone.
+
 ## 0.9.78
 - R resets the setting under the mouse, else the selected one.
 
