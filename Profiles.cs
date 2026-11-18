@@ -214,7 +214,7 @@ namespace Monolith
         internal static string SaveAs(string name)
         {
             name = Clean(name);
-            if (name.Length == 0) return Lang.T("No name, nothing saved.");
+            if (name.Length == 0) return Lang.T("No name given, nothing saved.");
             bool was = Find(name) != null;
             Put(Capture(name)); Write();
             return Lang.T(was ? "Overwrote " : "Saved ") + name + ".";
@@ -340,7 +340,7 @@ namespace Monolith
             string text;
             try { text = GUIUtility.systemCopyBuffer; } catch (Exception e) { return Lang.T("Could not reach the clipboard: ") + e.Message; }
             Profile p = Decode(text);
-            if (p == null) return Lang.T("No profile on the clipboard. Copy the whole line, from MONOLITH: to its end.");
+            if (p == null) return Lang.T("No config on the clipboard. Copy the whole line, from MONOLITH: to the end.");
             int kept = KeepMyExperimental(p);
             if (string.Equals(p.Name, Before, StringComparison.OrdinalIgnoreCase)) p.Name = "imported";
             // what you had is kept, so one Load brings it back
@@ -370,7 +370,7 @@ namespace Monolith
         internal static MenuPage Page()
         {
             Read();
-            if (_page == null) _page = new MenuPage(null, "Configs", "Save, load and share a config. Sensitivity and keys are never in one.");
+            if (_page == null) _page = new MenuPage(null, "Configs", "Save, load and share configs. Sensitivity and keys are not included.");
             Fill();
             return _page;
         }
@@ -381,13 +381,13 @@ namespace Monolith
             pg.Rows.Clear(); pg.Cur = null;
             pg.Rows.Add(new MenuRow { Kind = RowKind.Action, Label = "Copy my config to clipboard", Info = "Your config as one line of text. Paste it to a friend.", Take = s => ExportNow() });
             pg.Rows.Add(new MenuRow { Kind = RowKind.Action, Label = "Import from clipboard", Info = "Copy a line from a friend (it starts with MONOLITH:), then press Enter here. Yours is kept as \"" + Before + "\".", Take = s => { string r = Import(); Fill(); return r; } });
-            pg.Rows.Add(new MenuRow { Kind = RowKind.Action, Label = "Save my config as", Ask = "name", Info = "Type a name, then Enter. An existing name is overwritten.", Take = s => { string r = SaveAs(s); Fill(); return r; } });
+            pg.Rows.Add(new MenuRow { Kind = RowKind.Action, Label = "Save my config as", Ask = "name", Info = "Type a name and press Enter. A config with the same name is replaced.", Take = s => { string r = SaveAs(s); Fill(); return r; } });
             foreach (Profile each in All)
             {
                 Profile p = each;
                 var sub = new MenuPage(pg, p.Name, Lang.Count(p.Values.Count, " setting differs from the defaults.", " settings differ from the defaults.", "Differences from the defaults: ") + (Lang.Ru ? "." : ""));
                 sub.Rows.Add(new MenuRow { Kind = RowKind.Action, Label = "Load", Info = "Loads everything except sensitivity and keys.", Take = s => { string r = Load(p); Fill(); return r; } });
-                sub.Rows.Add(new MenuRow { Kind = RowKind.Action, Label = "Copy to clipboard", Info = "This profile as one line of text. Paste it to a friend.", Take = s => Export(p) });
+                sub.Rows.Add(new MenuRow { Kind = RowKind.Action, Label = "Copy to clipboard", Info = "This config as one line of text. Paste it to a friend.", Take = s => Export(p) });
                 sub.Rows.Add(new MenuRow { Kind = RowKind.Action, Label = "Overwrite with current config", Confirm = true, Info = "Saves your current config under this name.", Take = s => { string r = SaveAs(p.Name); Fill(); return r; } });
                 sub.Rows.Add(new MenuRow { Kind = RowKind.Action, Label = "Delete", Confirm = true, Info = "", Take = s => { string r = Delete(p); Fill(); return r; } });
                 pg.Go(sub);

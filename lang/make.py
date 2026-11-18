@@ -5,7 +5,7 @@ here = os.path.dirname(os.path.abspath(__file__)); sys.path.insert(0, here)
 import ru
 INFO_W, INFO_LINES = 75, 3            # the box under the pages: 3 lines of 75 cells
 BAR_W = 79                            # the key bar: it starts on cell 2 and must end before cell 80
-DEFAULT_TAIL = ' По умолчанию: #FFFFFFFF.'   # the longest thing a row adds after its own line
+DEFAULT_TAIL = ' По умолчанию: #FFFFFFFF. Сброс'   # the longest thing a row adds after its own line
 
 def wrap(s, width=INFO_W):
     lines, cur = [], ''
@@ -24,7 +24,7 @@ for en, r, check in ru.T:
     m = re.fullmatch(r'[LW](\d+)', check)
     if m and len(r) > int(m.group(1)): bad.append('%s over %s: %s (%d)' % (check[0], m.group(1), r, len(r)))
     if check in ('tip', 'tipb', 'info'):
-        text = r + (DEFAULT_TAIL if check == 'tip' else '')
+        text = r + (DEFAULT_TAIL if check in ('tip', 'tipb') else '')
         n = len(wrap(text))
         if n > INFO_LINES: bad.append('%d lines: %s' % (n, r))
         if max(len(w) for w in text.split(' ')) > INFO_W: bad.append('a word over the box: ' + r)

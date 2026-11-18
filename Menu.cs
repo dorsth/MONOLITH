@@ -417,14 +417,21 @@ namespace Monolith
             // a changed setting: "Reset" at the end of the box, where its default is read (R does the same)
             _resetRow = told != null && Changed(told) ? told : null;
             string reset = Lang.T("Reset");
-            int width = (int)(info.width / _cw) - 4;
-            string[] lines = Wrap(text, _resetRow != null ? width - reset.Length - 3 : width, 3);
-            for (int i = 0; i < lines.Length; i++) Line(info.x + _cw * 1.5f, info.y + _ch * 0.3f + i * _ch, "<color=" + (said ? Mint : Txt) + ">" + Esc(lines[i]) + "</color>");
-            if (_resetRow != null)
+            string[] lines = Wrap(_resetRow != null ? text + " " + reset : text, (int)(info.width / _cw) - 4, 3);
+            int last = lines.Length - 1;
+            bool link = _resetRow != null && last >= 0 && lines[last].EndsWith(reset, StringComparison.Ordinal);
+            if (!link) _resetRow = null;
+            for (int i = 0; i < lines.Length; i++)
             {
-                _resetRect = new Rect(info.xMax - (reset.Length + 2.5f) * _cw, info.y + _ch * 0.3f + 2 * _ch, (reset.Length + 1) * _cw, _ch);
-                if (_resetRect.Contains(mouse)) Fill(_resetRect, Hover);
-                Line(_resetRect.x + _cw * 0.5f, _resetRect.y, "<color=" + Hot + ">" + reset + "</color>");
+                float y = info.y + _ch * 0.3f + i * _ch;
+                string l = link && i == last ? lines[i].Substring(0, lines[i].Length - reset.Length) : lines[i];
+                Line(info.x + _cw * 1.5f, y, "<color=" + (said ? Mint : Txt) + ">" + Esc(l) + "</color>");
+                if (link && i == last)
+                {
+                    _resetRect = new Rect(info.x + _cw * (1.5f + l.Length) - _cw * 0.5f, y, (reset.Length + 1) * _cw, _ch);
+                    if (_resetRect.Contains(mouse)) Fill(_resetRect, Hover);
+                    Line(info.x + _cw * (1.5f + l.Length), y, "<color=" + Hot + ">" + reset + "</color>");
+                }
             }
 
             // the key bar
@@ -698,8 +705,7 @@ namespace Monolith
                 {
                     ConfigEntryBase e = row.Entry;
                     string d = row.Tip != null ? Lang.T(row.Tip) : Short(e.Description != null ? e.Description.Description ?? "" : "");
-                    if (row.Bind) return d;
-                    string def = Lang.T("Default: ") + ShowDefault(e) + ".";
+                    string def = Lang.T("Default: ") + (row.Bind && e.SettingType == typeof(string) ? Lang.T(Monolith.Keys.Name((string)e.DefaultValue, row.Empty)) : ShowDefault(e)) + ".";
                     return d.Length == 0 ? def : d + " " + def;
                 }
                 default: return "";

@@ -1,5 +1,9 @@
 # MONOLITH changelog
 
+## 0.9.81
+- Reset sits right after the default in the box under the page. Key rows show their default too.
+- Descriptions rewritten as plain sentences ("Scroll: back to the wheel" and similar shorthand is gone). Configs are called configs everywhere.
+
 ## 0.9.80
 - The Menu page is General. Fewer UI animations moved there from HUD.
 - No near miss vignette moved from Camera to Effects, Screen.

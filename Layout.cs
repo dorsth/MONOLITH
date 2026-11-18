@@ -395,9 +395,9 @@ namespace Monolith
                 ConfigEntryBase on = E(Cross, "Crosshair", "Enabled"), hit = E(Cross, "Crosshair", "Hit Color");
                 Func<bool> own = () => On(on);
                 p.Set("Custom crosshair", on, null, "Off: the game crosshair.")
-                 .Set("Style", E(Cross, "Crosshair", "Crosshair"), own, "Each PNG in plugins/MONOLITH/Crosshairs is one. Add yours there; read at start.")
-                 .Set("Color", E(Cross, "Crosshair", "Color"), own, "White: no tint.")
-                 .Set("Size", E(Cross, "Crosshair", "Scale"), own, "1 is the picture size at 1080p.")
+                 .Set("Style", E(Cross, "Crosshair", "Crosshair"), own, "Every PNG in plugins/MONOLITH/Crosshairs. Add your own there and restart the game.")
+                 .Set("Color", E(Cross, "Crosshair", "Color"), own, "White keeps the picture's own colors.")
+                 .Set("Size", E(Cross, "Crosshair", "Scale"), own, "1 is the picture's own size at 1080p.")
                  .Set("Show when scoped", E(Cross, "Crosshair", "Show While Scoped"), own, "")
                  .Set("Hit color", hit, own, "The crosshair changes color for a moment on a hit.")
                  .Set("  color", E(Cross, "Crosshair", "Hit Color Value"), () => On(on) && On(hit), "");
@@ -419,7 +419,7 @@ namespace Monolith
                  .Set("Bob", E(View, "Viewmodel", "Viewmodel Bob Scale"), seen, "Bob when you walk and stand. 0 is none.")
                  .Set("No viewmodel climb", E(Tweaks, "Viewmodel", "No Viewmodel Climb"), seen, "No upward drift of the gun while you spray.")
                  .Set("Hide arms", E(View, "Viewmodel", "Invisible Arms"), seen, "")
-                 .Set("Hide viewmodel", gone, null, "Weapon and arms.");
+                 .Set("Hide viewmodel", gone, null, "Hides your weapon and arms.");
 
                 // per weapon: the ones you added, and one empty row to add the next
                 var per = new MenuPage(p, "Per weapon", "A weapon listed here uses its own FOV and position.");
@@ -436,7 +436,7 @@ namespace Monolith
                     int me = i; string s = "Weapon " + (i + 1); ConfigEntryBase pick = picks[i];
                     Func<bool> used = () => !Is(pick, "None");
                     var slot = new MenuPage(per, s, null);
-                    slot.Set("Weapon", pick, null, "None: this place is free.")
+                    slot.Set("Weapon", pick, null, "None leaves this slot empty.")
                         .Set("FOV", E(View, s, "Viewmodel FOV"), used, "")
                         .Set("Left / right", E(View, s, "Viewmodel X Offset"), used, "")
                         .Set("Down / up", E(View, s, "Viewmodel Y Offset"), used, "")
@@ -457,7 +457,7 @@ namespace Monolith
             {
                 var p = new MenuPage(null, "Camera", "Tilt, shake, recoil.");
                 p.Set("No tilt", E(Cam, "Camera", "NoTilt"), null, "No roll when you strafe, slide or turn.")
-                 .Set("Better recoil", E(Cam, "Camera", "BetterRecoil"), null, "The AR, AK and warden kick your aim instead of the camera.")
+                 .Set("Better recoil", E(Cam, "Camera", "BetterRecoil"), null, "With the AR, AK and Warden, recoil moves your aim instead of shaking the camera.")
                  .Set("No landing shake", E(Cam, "Camera", "NoFallShake"), null, "")
                  .Set("No jump shake", E(Cam, "Camera", "NoJumpShake"), null, "Slide jumps, wall jumps and ceiling hits.")
                  .Set("No vault shake", E(Cam, "Camera", "NoVaultShake"), null, "");
@@ -476,7 +476,7 @@ namespace Monolith
                   .Set("Length", E(Tweaks, "HUD", "Hitmarker Length"), shown, "")
                   .Set("Thickness", E(Tweaks, "HUD", "Hitmarker Width"), shown, "")
                   .Set("Gap", E(Tweaks, "HUD", "Hitmarker Gap"), shown, "")
-                  .Set("Static hitmarkers", still, shown, "No pop: they only fade out.")
+                  .Set("Static hitmarkers", still, shown, "They fade out without popping.")
                   .Set("Animation size", E(Tweaks, "HUD", "Hitmarker Animation"), () => !On(noHm) && !On(still), "How far they pop.")
                   .Set("Same headshot animation", E(Tweaks, "HUD", "Same Headshot Animation"), () => !On(noHm) && !On(still), "Headshots pop like bodyshots.")
                   .Set("Bodyshot color", E(Tweaks, "HUD", "Hitmarker Bodyshot Color"), shown, "")
@@ -488,7 +488,7 @@ namespace Monolith
                 ConfigEntryBase noPick = E(Tweaks, "Interaction", "Hide Pickup Prompts"), noUse = E(Tweaks, "Interaction", "Hide Interaction Prompts");
                 Func<bool> some = () => !(On(noPick) && On(noUse));
                 pr.All("Hide prompts", "On weapons, doors and buttons.", null, noPick, noUse)
-                  .Set("Hide the key in a prompt", E(Tweaks, "Interaction", "Hide Key Prompt"), some, "The [f] after a prompt.")
+                  .Set("Hide the key in a prompt", E(Tweaks, "Interaction", "Hide Key Prompt"), some, "Hides the [F] after a prompt.")
                   .Set("Color", E(Tweaks, "Interaction", "Prompt Color"), some, "")
                   .Set("Size", E(Tweaks, "Interaction", "Prompt Scale"), some, "")
                   .Set("Left / right", E(Tweaks, "Interaction", "Prompt X Offset"), some, "")
@@ -506,8 +506,8 @@ namespace Monolith
                  .Go(ms, () => Stats.On != null && !Stats.On.Value ? "off" : "")
                  .Set("Hide FPS", E(Tweaks, "HUD", "Hide FPS"), null, "")
                  .Set("Hide ping", E(Tweaks, "HUD", "Hide Ping"), null, "")
-                 .Set("Slide cooldown timer", E(Tweaks, "HUD", "Slide Cooldown Timer"), null, "Time until you can slide again, under the crosshair. Text or a bar.")
-                 .Set("Minimal HUD color", E(Tweaks, "HUD", "Minimal HUD Color"), null, "Minimal HUD, speedometer and slide cooldown timer.");
+                 .Set("Slide cooldown timer", E(Tweaks, "HUD", "Slide Cooldown Timer"), null, "Shows the time until you can slide again under the crosshair, as text or a bar.")
+                 .Set("Minimal HUD color", E(Tweaks, "HUD", "Minimal HUD Color"), null, "Color of the minimal HUD, speedometer and slide cooldown timer.");
                 if (p.Rows.Count > 0) cats.Add(p);
             }
 
@@ -520,16 +520,16 @@ namespace Monolith
                 p.Head("Tracers")
                  .Set("Hide my tracers", mine, null, "")
                  .Set("Hide other players tracers", others, null, "")
-                 .Set("Color", E(Tweaks, "Bullet Trails", "Trail Color"), trails, "White: the color of each gun.")
+                 .Set("Color", E(Tweaks, "Bullet Trails", "Trail Color"), trails, "White keeps each gun's own color.")
                  .Set("Width", E(Tweaks, "Bullet Trails", "Trail Width"), trails, "")
                  .Set("Opacity", E(Tweaks, "Bullet Trails", "Trail Opacity"), trails, "Lower is fainter.")
                  .Head("Weapon")
                  .Set("No bullet casings", E(Tweaks, "Viewmodel", "No Bullet Casings"), null, "No casings from any gun, yours or other players. No casing sound.")
                  .Head("Bodies and blood")
-                 .Set("Hide bodies", bodies, null, "No ragdolls, gibs or dropped hats. Off: pick which.")
+                 .Set("Hide bodies", bodies, null, "Hides ragdolls, gibs and shot-off hats. Turn it off to pick which.")
                  .Set("  Hide ragdolls", E(Gore, "Bodies", "Hide Ragdolls"), () => Off(bodies), "")
                  .Set("  Hide hats", E(Gore, "Bodies", "Hide Hats"), () => Off(bodies), "Hats that were shot off.")
-                 .Set("No blood", blood, null, "Off: pick which.")
+                 .Set("No blood", blood, null, "Turn it off to pick which.")
                  .Set("  No hit blood", E(Gore, "Blood", "No Hit Blood"), () => Off(blood), "")
                  .Set("  No death blood", E(Gore, "Blood", "No Death Blood"), () => Off(blood), "")
                  .Set("  No blood decals", E(Gore, "Blood", "No Blood Stains"), () => Off(blood), "")
@@ -544,14 +544,14 @@ namespace Monolith
                 p.Head("Enemies")
                  .Pick("Suit", Players.EnemyOutfit, Players.Outfits, "their own", "")
                  .Pick("Hat", Players.EnemyHat, Players.Hats, "their own", "")
-                 .Set("Outline color", Players.EnemyOutline, null, "Same setting as in the game. Lobbies with enemy outlines on.")
+                 .Set("Outline color", Players.EnemyOutline, null, "The same setting as in the game. Only in lobbies with enemy outlines on.")
                  .Head("Teammates")
                  .Pick("Suit", Players.TeamOutfit, Players.Outfits, "their own", "")
                  .Pick("Hat", Players.TeamHat, Players.Hats, "their own", "")
-                 .Set("Outline color", Players.TeamOutline, null, "Same setting as in the game.")
+                 .Set("Outline color", Players.TeamOutline, null, "The same setting as in the game.")
                  .Head("Lobby")
-                 .Set("Enemy outlines when I host", Players.HostOutlines, null, "The game lobby option, remembered between launches. In other lobbies the host decides.")
-                 .Set("Join message", E(Tweaks, "Menus", "Join Message"), null, "Replaces your lobby join line for everyone. {name} is your name. Empty: the game default.")
+                 .Set("Enemy outlines when I host", Players.HostOutlines, null, "The game's lobby option, kept between launches. In other lobbies the host decides.")
+                 .Set("Join message", E(Tweaks, "Menus", "Join Message"), null, "The line everyone sees when you join a lobby. {name} is your name. Leave it empty for the game's line.")
                  .Set("Hide default playlists", E(Tweaks, "Menus", "Hide Default Playlists"), null, "Only your own playlists show when you host.");
                 if (p.Rows.Count > 2) { p.Draw = r => BundleMenu.I.PlayersPreview(r); p.SideCols = 24; p.SideRows = 14; p.SideTitle = "preview"; cats.Add(p); }
             }
@@ -565,7 +565,7 @@ namespace Monolith
                 {
                     string s = named[i];
                     ConfigEntryBase pick = E(Sounds, "Sounds", s);
-                    p.Set(named[i + 1], pick, null, "You hear each one in the list. Add yours: a sound file in plugins/MONOLITH/" + s.Replace(" ", "") + "s.")
+                    p.Set(named[i + 1], pick, null, "You hear each one as you go through the list. Add your own sound files to plugins/MONOLITH/" + s.Replace(" ", "") + "s.")
                      .Set("  volume", E(Sounds, "Sounds", s + " Volume"), () => !Is(pick, "None"), "");
                 }
                 p.Set("Gun sound volume", E(Sounds, "Guns", "Gun Sound Volume"), null, "Shots, reloads, clicks, casings.");
@@ -574,23 +574,23 @@ namespace Monolith
 
             // ---------------------------------------------------------------- controls: sensitivity, and keys the game has no setting for
             {
-                var p = new MenuPage(null, "Controls", "Sensitivity in cm/360, and keys missing from the game settings.");
+                var p = new MenuPage(null, "Controls", "Sensitivity in cm/360, extra keys, taunts.");
                 ConfigEntryBase on = E(Sens, "Sensitivity", "Enabled");
                 Func<bool> own = () => On(on);
                 p.Head("Mouse")
-                 .Set("Sensitivity in cm/360", on, null, "Off: the game sensitivity.")
+                 .Set("Sensitivity in cm/360", on, null, "Turn it off to use the game's sensitivity.")
                  .Set("Mouse DPI", E(Sens, "Sensitivity", "Mouse DPI"), own, "The DPI of your mouse.")
-                 .Set("cm/360", E(Sens, "Sensitivity", "cm/360"), own, "Mouse travel for one full turn.")
-                 .Set("ADS multiplier", E(Sens, "Sensitivity", "ADS Multiplier"), own, "1 matches your normal aim.")
-                 .Set("Scoped multiplier", E(Sens, "Sensitivity", "Scoped Multiplier"), own, "1 matches your normal aim.");
-                const string how = " Enter, then a key, mouse button or wheel. R resets.";
+                 .Set("cm/360", E(Sens, "Sensitivity", "cm/360"), own, "How far you move the mouse for one full turn.")
+                 .Set("ADS multiplier", E(Sens, "Sensitivity", "ADS Multiplier"), own, "1 feels the same as hip fire.")
+                 .Set("Scoped multiplier", E(Sens, "Sensitivity", "Scoped Multiplier"), own, "1 feels the same as hip fire.");
+                const string how = " Press Enter, then a key, mouse button or scroll.";
                 p.Head("Keys")
-                 .Key("Second jump key", Keys.Jump1, "not set", "Next to your own jump key." + how)
-                 .Key("Third jump key", Keys.Jump2, "not set", "Scroll up on one and scroll down on the other: jump on the whole wheel." + how)
-                 .Key("Swap weapons", Keys.Swap, "scroll wheel", "The game's own Swap key, the same as in its settings. Enter, then a key or mouse button. Scroll: back to the wheel.");
+                 .Key("Second jump key", Keys.Jump1, "not set", "Works next to your own jump key." + how)
+                 .Key("Third jump key", Keys.Jump2, "not set", "Put scroll up on one and scroll down on the other to jump with the whole wheel." + how)
+                 .Key("Swap weapons", Keys.Swap, "scroll wheel", "Same as Swap in the game's settings. Press Enter, then a key or mouse button, or scroll to use the wheel.");
                 if (p.Rows.Count > 0 && p.Rows[p.Rows.Count - 1].Entry == Keys.Swap) p.Rows[p.Rows.Count - 1].If = Keys.SyncSwap;   // shows what the game's settings have now
                 var t = new MenuPage(p, "Taunts", "Move a taunt to another key, or switch it off.");
-                for (int i = 0; i < Keys.Taunt.Length; i++) t.Key("Taunt " + (i + 1), Keys.Taunt[i], "key " + ((i + 1) % 10), "Press Enter, then its new key. Enter twice: no key. R: its number key.");
+                for (int i = 0; i < Keys.Taunt.Length; i++) t.Key("Taunt " + (i + 1), Keys.Taunt[i], "key " + ((i + 1) % 10), "Press Enter, then its new key. Press Enter twice for no key.");
                 p.Go(t, () => { int n = 0; foreach (var e in Keys.Taunt) if (e != null && e.Value.Length > 0) n++; return n == 0 ? "number keys" : Lang.Count(n, " changed", " changed", "changed: "); });
                 if (p.Rows.Count > 2) cats.Add(p);
             }
@@ -599,11 +599,11 @@ namespace Monolith
             {
                 var p = new MenuPage(null, "Performance", "More FPS, steadier frames.");
                 p.Set("Reduce VFX+", E(Tweaks, "World", "Reduce VFX+"), null, "No shadows, rain, light rays or screen effects. Fewer lights and particles. No sparks, debris or smoke from explosions. No glass shards or broken off pieces.")
-                 .Set("No post-processing", E(Tweaks, "World", "No Post-Processing"), null, "No color grading either, plainer rendering. Menus lose their blur. The brightness slider stops working.")
-                 .Set("Lower textures", E(Tweaks, "World", "Lower Textures"), null, "Like picmip. 0 is off, 3 is the smallest.")
-                 .Set("Ultimate tweaks", E(Tweaks, "World", "Ultimate Tweaks"), null, "Fixes to the game code, fewer worker threads, no voice key freeze, code compiled at start.")
-                 .Set("Performance viewmodel", E(View, "Experimental", "One Camera"), null, "The main camera draws your weapon; the second camera is off. Slightly more FPS. Off while you hold a melee weapon.")
-                 .Set("FPS cap", FrameCap.On, null, "Replaces the game FPS cap, which lands frames up to 1 ms early or late. This one waits on a precise timer, so every frame takes the same time. Not in the main menu.")
+                 .Set("No post-processing", E(Tweaks, "World", "No Post-Processing"), null, "Turns off color grading and screen effects. Menus lose their blur and the brightness slider stops working.")
+                 .Set("Lower textures", E(Tweaks, "World", "Lower Textures"), null, "Like picmip. 0 is full quality, 3 is the lowest.")
+                 .Set("Ultimate tweaks", E(Tweaks, "World", "Ultimate Tweaks"), null, "Fixes slow game code, uses fewer worker threads, removes the voice key freeze and compiles code at start.")
+                 .Set("Performance viewmodel", E(View, "Experimental", "One Camera"), null, "One camera draws everything, your weapon included. Slightly more FPS. Not used while you hold a melee weapon.")
+                 .Set("FPS cap", FrameCap.On, null, "Replaces the game's FPS cap, which can be up to 1 ms off per frame. This one keeps every frame the same length. Not in the main menu.")
                  .Set("  Max FPS", FrameCap.Fps, () => On(FrameCap.On), "Set it a bit below what your PC holds on busy maps.");
                 if (p.Rows.Count > 3) cats.Add(p);
             }
@@ -614,7 +614,7 @@ namespace Monolith
             {
                 var p = new MenuPage(null, "General", "Language, the key that opens this menu, menu animations.");
                 p.Set("Language / Язык", Lang.Pick, null, "")
-                 .Set("Open this menu", BundleMenu.Key, null, "Press Enter, then the key. R: F2.")
+                 .Set("Open this menu", BundleMenu.Key, null, "Press Enter, then the key.")
                  .Set("Fewer UI animations", E(Tweaks, "Menus", "Reduce UI Animations"), null, "No animations in menus and on the HUD. No logo screen at start.");
                 if (p.Rows.Count > 0) cats.Add(p);
             }
