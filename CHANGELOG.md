@@ -1,5 +1,8 @@
 # MONOLITH changelog
 
+## 0.9.94
+- The label over each name says kills and deaths ("kills 7   deaths 3"), in the color of the Tab screen's map line, a little bigger, and shows for every player (also one with nothing counted yet).
+
 ## 0.9.93
 - The kill labels only move when their name moves (no canvas rebuild every frame), and the list of Tab rows they keep is emptied on every map.
 

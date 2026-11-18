@@ -10,7 +10,7 @@ using ComputerysModdingUtilities;
 
 [assembly: AssemblyTitle("MONOLITH")]
 [assembly: AssemblyDescription("Every Dorsth mod for STRAFTAT in one file. Dorsth was here.")]
-[assembly: AssemblyVersion("0.9.93.0")]
+[assembly: AssemblyVersion("0.9.94.0")]
 // only changes things on your own screen: fine to play with people who don't have it
 [assembly: StraftatMod(isVanillaCompatible: true)]
 
@@ -20,7 +20,7 @@ namespace Monolith
     [BepInDependency(ModMenuGuid, BepInDependency.DependencyFlags.SoftDependency)]
     public sealed class BundlePlugin : BaseUnityPlugin
     {
-        public const string Guid = "dorsth.straftat.monolith", Name = "MONOLITH", Version = "0.9.93";
+        public const string Guid = "dorsth.straftat.monolith", Name = "MONOLITH", Version = "0.9.94";
         // filled in by build.sh: the mods and versions this file was built from
         internal const string Contents = "@CONTENTS@";
 

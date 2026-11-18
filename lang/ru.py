@@ -133,7 +133,7 @@ T = [
 ('  Max FPS', '  Макс. FPS', 'L38'),
 ('Set it a bit below what your PC holds on busy maps.', 'Ставьте немного ниже того, что ваш ПК держит на тяжёлых картах.', 'tip'),
 ('Match stats', 'Статистика матча', 'L52'),
-('Kills, deaths and damage of each round on the round-end screen, match kills over each name there and on the Tab screen, and a full board after the match.', 'Убийства, смерти и урон за раунд на экране конца раунда, убийства за матч над именами там и на экране Tab, и полная таблица после матча.', 'tip'),
+('Kills, deaths and damage of each round on the round-end screen, match kills and deaths over each name there and on the Tab screen, and a full board after the match.', 'Убийства, смерти и урон за раунд на экране конца раунда, убийства и смерти за матч над именами там и на экране Tab, и полная таблица после матча.', 'tip'),
 ('Counted for every player. Shown only between rounds and after the match.', 'Для каждого игрока. Видна только между раундами и после матча.', 'tip'),
 ('Round board', 'Таблица раунда', 'L52'),
 ('Kills, deaths and damage of that round on the round-end screen. Match kills next to each name there and on the Tab screen.', 'Убийства, смерти и урон за этот раунд на экране конца раунда. Убийства за матч рядом с каждым именем там и на экране Tab.', 'tip'),

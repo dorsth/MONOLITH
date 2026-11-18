@@ -204,7 +204,7 @@ namespace Monolith
             catch (Exception e) { Quiet(e); }
         }
 
-        // ---- "kills: 7" over a name on the round-end screen and the Tab screen
+        // ---- "kills 7   deaths 3" over a name on the round-end screen and the Tab screen
         // The game's name texts are not changed (they wrap, and other mods find rows by them): each gets a small label of
         // its own, a child of the name, that sits just over where the name's letters are and moves with it.
 
@@ -246,11 +246,15 @@ namespace Monolith
 
         internal sealed class KillTag : MonoBehaviour
         {
-            private TMP_Text _name; private TextMeshProUGUI _t; private int _id = -1, _shown = -1;
+            private static readonly AccessTools.FieldRef<TabScreen, TextMeshProUGUI> MapText = AccessTools.FieldRefAccess<TabScreen, TextMeshProUGUI>("mapText");
+            private static Color _mint = new Color32(0xA8, 0xE6, 0xB4, 0xFF);   // until the Tab screen's map line is found
+            private TMP_Text _name; private TextMeshProUGUI _t; private int _id = -1, _k = -1, _d = -1;
 
             internal static void Put(TMP_Text name, int id)
             {
                 if (name == null) return;
+                // the color of the Tab screen's "current map" line, for both screens
+                try { TabScreen ts = name.GetComponentInParent<TabScreen>(true); if (ts != null && MapText(ts) != null) _mint = MapText(ts).color; } catch { }
                 KillTag tag = name.GetComponentInChildren<KillTag>(true);
                 if (tag == null)
                 {
@@ -259,27 +263,26 @@ namespace Monolith
                     var t = tag._t = go.AddComponent<TextMeshProUGUI>();
                     t.raycastTarget = false; t.enableWordWrapping = false; t.overflowMode = TextOverflowModes.Overflow; t.richText = false;
                     t.font = name.font; t.fontSharedMaterial = name.fontSharedMaterial; t.alignment = TextAlignmentOptions.BottomLeft;
-                    RectTransform rt = t.rectTransform; rt.anchorMin = rt.anchorMax = new Vector2(0.5f, 0.5f); rt.pivot = Vector2.zero; rt.sizeDelta = new Vector2(300f, 40f);
+                    RectTransform rt = t.rectTransform; rt.anchorMin = rt.anchorMax = new Vector2(0.5f, 0.5f); rt.pivot = Vector2.zero; rt.sizeDelta = new Vector2(400f, 40f);
                 }
-                tag._id = id; tag._shown = -2;
+                tag._id = id; tag._k = tag._d = -1;
             }
 
             private void LateUpdate()
             {
-                P p;
-                bool show = _id >= 0 && _name != null && On.Value && All.TryGetValue(_id, out p) && _name.text.Length > 0;
-                if (!show) { if (_t.text.Length > 0) _t.text = ""; _shown = -1; return; }
-                p = All[_id];
-                if (_shown != p.Kills) { _shown = p.Kills; _t.text = "kills: " + p.Kills.ToString(CultureInfo.InvariantCulture); }
-                _t.fontSize = Mathf.Max(14f, _name.fontSize * 0.4f);
-                _t.color = _name.color;
-                // just over the first letter of the name as drawn (its bounds, in the name's own space)
+                bool show = _id >= 0 && _name != null && On.Value && _name.text.Length > 0 && ClientInstance.playerInstances.ContainsKey(_id);
+                if (!show) { if (_t.text.Length > 0) _t.text = ""; _k = _d = -1; return; }
+                P p; All.TryGetValue(_id, out p);
+                int k = p != null ? p.Kills : 0, d = p != null ? p.Deaths : 0;
+                if (k != _k || d != _d) { _k = k; _d = d; _t.text = "kills " + k.ToString(CultureInfo.InvariantCulture) + "   deaths " + d.ToString(CultureInfo.InvariantCulture); }
+                _t.fontSize = Mathf.Max(16f, _name.fontSize * 0.5f);
+                _t.color = _mint;
+                // on the name's left edge as drawn, one fixed gap above its letters
                 Bounds b = _name.textBounds;
                 if (b.size.x <= 0f) return;
-                // moved only when the name moved: moving a UI element makes its canvas build again
-                Vector3 at = new Vector3(b.min.x, b.max.y + _t.fontSize * 0.15f, 0f);
+                Vector3 at = new Vector3(b.min.x, b.max.y + _t.fontSize * 0.2f, 0f);
                 Transform tr = _t.transform;
-                if ((tr.localPosition - at).sqrMagnitude > 0.01f) tr.localPosition = at;
+                if ((tr.localPosition - at).sqrMagnitude > 0.01f) tr.localPosition = at;   // moved only when the name moved: a move makes the canvas build again
             }
         }
 
