@@ -48,7 +48,7 @@ namespace Monolith
         private static readonly Dictionary<int, float> Known = new Dictionary<int, float>();            // health by PlayerHealth instance
         private static readonly Dictionary<int, int> KillerOf = new Dictionary<int, int>();             // victim instance -> attacker id
         private static readonly Dictionary<int, int> IdOfKiller = new Dictionary<int, int>();           // killer transform -> player id
-        private struct Hit { public int Victim, Frame; public float Dmg; public bool Lethal; }
+        private struct Hit { public int Victim, Frame; public float Dmg; public bool Lethal; public PlayerHealth Ph; }
         private static readonly Dictionary<int, Hit> Waiting = new Dictionary<int, Hit>();
         private static readonly Dictionary<int, int> IdOf = new Dictionary<int, int>();                 // instance -> player id
         private struct Death { public int Victim, Killer; public float At; }
@@ -92,12 +92,12 @@ namespace Monolith
                 float drop = Mathf.Min(before, full) - value;
                 if (drop <= 0.01f) return;
                 int victim = Id(__instance); if (victim < 0) return;
-                var hit = new Hit { Victim = victim, Dmg = Mathf.Min(drop, Mathf.Min(before, full)) * 100f / full, Lethal = value <= 0f, Frame = Time.frameCount };
+                var hit = new Hit { Victim = victim, Dmg = Mathf.Min(drop, Mathf.Min(before, full)) * 100f / full, Lethal = value <= 0f, Frame = Time.frameCount, Ph = __instance };
                 if (__instance.fellVoid || __instance.suicide) { Credit(hit, -1); return; }
                 // Who hit them is decided a frame later, not now: the game can send the new health just before the new
                 // attacker, and the attacker on record would still be whoever hit this player before.
                 Hit earlier;
-                if (Waiting.TryGetValue(key, out earlier)) Credit(earlier, Attacker(key));
+                if (Waiting.TryGetValue(key, out earlier)) Credit(earlier, Attacker(key, earlier));
                 Waiting[key] = hit;
                 Board.Me.Wait();
             }
@@ -120,13 +120,22 @@ namespace Monolith
 
         private static int Attacker(int key) { int a; return KillerOf.TryGetValue(key, out a) ? a : -1; }
 
+        // the attacker of a hit; for a kill with none on record, the killer the victim holds now. That happens when you
+        // join mid match: the game sends the killer while the map loads, and the map load clears the record.
+        private static int Attacker(int key, Hit h)
+        {
+            int a = Attacker(key);
+            if (a < 0 && h.Lethal && h.Ph != null && h.Ph.sync___get_value_killer() != null) a = IdOfTransform(h.Ph.sync___get_value_killer());
+            return a;
+        }
+
         // hits from an earlier frame: to the attacker on record now (set by then, if the game sent one)
         // all: also this frame's hits (a take or round that ends on the frame of its last kill counts that kill first)
         internal static void Flush(bool all = false)
         {
             if (Waiting.Count == 0) return;
             List<int> done = null;
-            foreach (var kv in Waiting) if (all || kv.Value.Frame < Time.frameCount) { Credit(kv.Value, Attacker(kv.Key)); (done ?? (done = new List<int>())).Add(kv.Key); }
+            foreach (var kv in Waiting) if (all || kv.Value.Frame < Time.frameCount) { Credit(kv.Value, Attacker(kv.Key, kv.Value)); (done ?? (done = new List<int>())).Add(kv.Key); }
             if (done != null) foreach (int k in done) Waiting.Remove(k);
         }
 

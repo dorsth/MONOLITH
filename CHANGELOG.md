@@ -1,5 +1,8 @@
 # MONOLITH changelog
 
+## 0.10.7
+- Match stats: a kill right after you join mid match goes to the player who made it (it went to nobody).
+
 ## 0.10.6
 - Fixed players showing up in the lobby without a name, picture or ready box after you left or got kicked from a lobby (DorsthTweaks 1.3.1).
 
