@@ -423,7 +423,7 @@ namespace Monolith
                 : _capture ? K("Key", "press one") + K("Esc", "cancel")
                 : _editRow != null ? K("Enter", "ok") + K("←", "delete") + K("Esc", "cancel")
                 : _searching ? K("type", "to search") + K("Enter", "open") + K("Esc", "leave search")
-                : K("↑↓", "move") + K("←→", "set") + K("Enter", "open") + (pageOn && ci >= 0 && ci < _vis.Count && Changed(_vis[ci]) ? K("R", "reset") : "") + K("Q", "back") + K("/", "search") + K("Esc", "close");
+                : K("↑↓", "move") + K("←→", "set") + K("Enter", "open") + ((over >= 0 && over < _vis.Count ? Changed(_vis[over]) : pageOn && ci >= 0 && ci < _vis.Count && Changed(_vis[ci])) ? K("R", "reset") : "") + K("Q", "back") + K("/", "search") + K("Esc", "close");
             Line(kb.x + _cw * 2f, kb.y, keys);   // on the same column as the text of the panels and of the box above it
             if (_pop != null) PopDraw(mouse, mouseMoved);
         }
@@ -838,6 +838,13 @@ namespace Monolith
             return row;
         }
 
+        // R resets the row under the mouse when there is one, else the row the cursor is on
+        private MenuRow ResetTarget(Vector2 mouse, MenuPage page, MenuRow cursor)
+        {
+            int at = RowAt(mouse, page);
+            return at >= 0 ? _vis[at] : cursor;
+        }
+
         /// <summary>A setting that is not at its default (for a group: one of its parts is not).</summary>
         private static bool Changed(MenuRow row)
         {
@@ -916,7 +923,7 @@ namespace Monolith
                 else if (k == KeyCode.DownArrow) Move(page, ci, 1);
                 else if (k == KeyCode.LeftArrow || k == KeyCode.RightArrow) { if (row != null) Change(row, k == KeyCode.RightArrow ? 1 : -1, ev.shift); }
                 else if (k == KeyCode.Return || k == KeyCode.KeypadEnter) { if (row != null) Activate(row); }
-                else if (k == KeyCode.Delete) { if (row != null) Default(row); }
+                else if (k == KeyCode.Delete) { MenuRow r = ResetTarget(ev.mousePosition, page, row); if (r != null) Default(r); }
                 else if (k == KeyCode.Backspace) { if (_query.Length > 0) { _query = _query.Substring(0, _query.Length - 1); _searchPage = null; } }
                 else if (_query.Length == 0 && (ch == '/' || ch == '.') && Time.frameCount - _modeFrame <= 1) { }   // the character of the key that opened the search
                 else if (ch >= ' ' && ch != 127 && _query.Length < 40) { _query += ch; _searchPage = null; }
@@ -944,7 +951,7 @@ namespace Monolith
             else if (k == KeyCode.PageUp) Move(page, ci, -Mathf.Max(1, _visRows - 1));
             else if (k == KeyCode.PageDown) Move(page, ci, Mathf.Max(1, _visRows - 1));
             else if (k == KeyCode.Backspace) GoBack();
-            else if (k == KeyCode.Delete) { if (row != null) Default(row); }
+            else if (k == KeyCode.Delete) { MenuRow r = ResetTarget(ev.mousePosition, page, row); if (r != null) Default(r); }
             else if (k == KeyCode.LeftArrow) { if (row == null || !Change(row, -1, ev.shift)) GoBack(); }
             else if (k == KeyCode.RightArrow) { if (row != null) { if (row.Kind == RowKind.Link) Activate(row); else Change(row, 1, ev.shift); } }
             else if (k == KeyCode.Return || k == KeyCode.KeypadEnter || k == KeyCode.Space) { if (row != null) Activate(row); }

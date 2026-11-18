@@ -1,5 +1,8 @@
 # MONOLITH changelog
 
+## 0.9.78
+- R resets the setting under the mouse, else the selected one.
+
 ## 0.9.77
 - The ↺ mark on changed rows is gone.
 
