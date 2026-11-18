@@ -2,7 +2,7 @@
     "name": "MONOLITH",
     "version_number": "1.0.0",
     "website_url": "",
-    "description": "Every Dorsth mod in one file, with one menu (F2)",
+    "description": "All my STRAFTAT mods in one plugin, with one menu (F2). Replaces Mod Menu and Minimal Viewmodels Reborn and keeps your settings.",
     "dependencies": [
         "BepInEx-BepInExPack-5.4.2305"
     ]

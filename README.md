@@ -6,6 +6,18 @@ Only your own screen and sound change. Nothing about hit registration, damage or
 
 Each mod in it is the same source as its own release, loads under its own name and keeps its own settings file.
 
+## Switching to MONOLITH
+
+MONOLITH replaces Mod Menu and Minimal Viewmodels Reborn, so you can remove both. Other mods that show up in Mod Menu show up in MONOLITH's menu instead.
+
+Your settings come along:
+
+- My mods you already had (DorsthTweaks, ezCrosshair, CombatSounds and the rest) keep using the same settings files.
+- Your Minimal Viewmodels Reborn and SwordStance settings are read once, the first time MONOLITH starts.
+- Settings of other mods stay in their own files.
+
+Remove the separate copies of my mods once MONOLITH is in. If one is still installed, BepInEx loads only one of the two and says so in its log.
+
 ## Menu
 
 **F2** opens it. Left: what a setting is about. Right: the settings. Drawn only while open; closed, it costs one key check per frame.
