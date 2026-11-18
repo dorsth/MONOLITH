@@ -1,5 +1,11 @@
 # MONOLITH changelog
 
+## 0.10.4
+- Stats boards: every column is left aligned under its header, and the padding is the same on both sides.
+- The match board sits bottom right, clear of chat.
+- Your own kills, deaths and damage show on the Tab screen too.
+- The per-hit log line is gone: the counting matches the kill feed.
+
 ## 0.10.3
 - Match stats: the kill that ends a take or round is counted before the round board is shown (its damage and kill were missing from the board).
 

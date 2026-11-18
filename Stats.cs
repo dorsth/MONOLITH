@@ -118,14 +118,6 @@ namespace Monolith
             catch (Exception e) { Quiet(e); }
         }
 
-        private static string Who(int id)
-        {
-            if (id < 0) return "nobody";
-            ClientInstance ci; P p;
-            if (ClientInstance.playerInstances.TryGetValue(id, out ci) && ci != null) return Untag(ci.PlayerName);
-            return All.TryGetValue(id, out p) && p.Name.Length > 0 ? p.Name : "player " + (id + 1);
-        }
-
         private static int Attacker(int key) { int a; return KillerOf.TryGetValue(key, out a) ? a : -1; }
 
         // hits from an earlier frame: to the attacker on record now (set by then, if the game sent one)
@@ -142,9 +134,6 @@ namespace Monolith
         {
             P v = Get(h.Victim);
             if (atk == h.Victim) atk = -1;
-            // one line per hit, to check the counting against the kill feed (until it is known to be right)
-            if (BundlePlugin.Log != null)
-                BundlePlugin.Log.LogInfo("Stats hit: " + Who(atk) + " -> " + Who(h.Victim) + " " + Num(h.Dmg) + (h.Lethal ? " (kill)" : "") + (atk >= 0 && Team(atk) == Team(h.Victim) ? " (teammate, not counted)" : ""));
             v.Taken += h.Dmg;
             P a = atk >= 0 ? Get(atk) : null;
             if (a != null && Team(atk) != Team(h.Victim)) { a.Dmg += h.Dmg; a.RDmg += h.Dmg; }
@@ -264,7 +253,7 @@ namespace Monolith
 
             private void LateUpdate()
             {
-                bool show = _id >= 0 && _name != null && On.Value && _name.text.Length > 0 && ClientInstance.playerInstances.ContainsKey(_id);
+                bool show = _id >= 0 && _name != null && On.Value && ClientInstance.playerInstances.ContainsKey(_id);
                 if (!show) { if (_t.text.Length > 0) _t.text = ""; _k = _d = _dmg = -1; return; }
                 P p; All.TryGetValue(_id, out p);
                 int k = p != null ? p.Kills : 0, d = p != null ? p.Deaths : 0, dmg = p != null ? Mathf.RoundToInt(p.Dmg) : 0;
@@ -275,10 +264,18 @@ namespace Monolith
                 }
                 _t.fontSize = Mathf.Max(16f, _name.fontSize * 0.5f);
                 _t.color = _mint;
-                // on the name's left edge as drawn, one fixed gap above its letters
+                // on the name's left edge as drawn, one fixed gap above its letters. Your own name can be empty on the Tab
+                // screen: then the label takes the name's place, lined up the way the name would be.
                 Bounds b = _name.textBounds;
-                if (b.size.x <= 0f) return;
-                Vector3 at = new Vector3(b.min.x, b.max.y + _t.fontSize * 0.2f, 0f);
+                Vector3 at;
+                if (_name.text.Length > 0 && b.size.x > 0f) at = new Vector3(b.min.x, b.max.y + _t.fontSize * 0.2f, 0f);
+                else
+                {
+                    Rect r = _name.rectTransform.rect; float tw = _t.preferredWidth;
+                    HorizontalAlignmentOptions h = _name.horizontalAlignment;
+                    float x = h == HorizontalAlignmentOptions.Right ? r.xMax - tw : h == HorizontalAlignmentOptions.Center ? r.center.x - tw * 0.5f : r.xMin;
+                    at = new Vector3(x, r.center.y - _t.fontSize * 0.35f, 0f);
+                }
                 Transform tr = _t.transform;
                 if ((tr.localPosition - at).sqrMagnitude > 0.01f) tr.localPosition = at;   // moved only when the name moved: a move makes the canvas build again
             }
@@ -431,25 +428,27 @@ namespace Monolith
                         : new[] { p.Name, p.RK.ToString(), p.RD.ToString(), Num(p.RDmg) });
                     names.Add(me >= 0 && Team(kv.Key) == Team(me) ? self : enemy);
                 }
-                // fixed widths worked out from the text, not measured: the longest entry of a column at this font's average
-                // letter width, plus the same gap for every column. Names get a fixed column; a long one shrinks, then "…".
+                // every column is as wide as its longest entry in the board's font, then the same gap. Names get a fixed
+                // column; a long one shrinks, then "…". The last column has no gap after it, so the panel's padding is the
+                // same on the right as on the left.
                 int cols = head.Length, cell = 0;
                 float[] w = new float[cols];
+                _canvas.SetActive(true);   // a text sets up its font when it first becomes active: measured after this
                 for (int i = 0; i < cols; i++)
                 {
-                    int chars = 0;
-                    foreach (string[] l in lines) if (i < l.Length && l[i] != null) chars = Math.Max(chars, l[i].Length);
-                    w[i] = (i == 0 ? (full ? 260f : 220f) : chars * size * 0.6f) + Gap;
+                    float widest = 0f; int chars = 0;
+                    foreach (string[] l in lines) if (i < l.Length && l[i] != null) { chars = Math.Max(chars, l[i].Length); widest = Math.Max(widest, Measure(l[i], size)); }
+                    if (widest < chars * size * 0.3f) widest = chars * size * 0.6f;   // no font to measure with: the average letter width
+                    w[i] = (i == 0 ? (full ? 260f : 220f) : widest) + (i < cols - 1 ? Gap : 0f);
                 }
                 _canvas.SetActive(true);
                 for (int r = 0; r < lines.Count; r++) Row(ref cell, r, lines[r], w, size, rowH, pad, names[r], r == 0 ? Mint : White);
                 for (int i = cell; i < _cells.Count; i++) _cells[i].gameObject.SetActive(false);
-                // the panel ends half a gap after the last column, so the padding matches the gap on the left of the names
-                float right = 0f; foreach (float f in w) right += f; right -= Gap * 0.5f;
+                float right = 0f; foreach (float f in w) right += f;
                 float height = (rows.Count + 1) * (rowH + 4f) - 4f;
                 _back.anchoredPosition = new Vector2(-Pad, Pad); _back.sizeDelta = new Vector2(right + 2f * Pad, height + 2f * Pad);
                 _root.sizeDelta = new Vector2(right, height);
-                if (full) { _root.anchorMin = _root.anchorMax = Vector2.zero; _root.pivot = new Vector2(0f, 1f); _root.anchoredPosition = new Vector2(Edge + Pad, 110f + Pad + height); }   // bottom left, over the floor: the podium and its sign are in the middle
+                if (full) { _root.anchorMin = _root.anchorMax = new Vector2(1f, 0f); _root.pivot = new Vector2(1f, 1f); _root.anchoredPosition = new Vector2(-(Edge + Pad), 110f + Pad + height); }   // bottom right: chat is bottom left, the podium in the middle
                 else { _root.anchorMin = _root.anchorMax = _root.pivot = new Vector2(0f, 1f); _root.anchoredPosition = new Vector2(Edge + Pad, -(Edge + Pad)); }   // the panel ends above the dark band of the round-end screen
                 _canvas.SetActive(true);
                 Counters(false);
@@ -468,12 +467,22 @@ namespace Monolith
                     // a long name gets smaller first (down to 75%), then ends in "…"
                     t.enableAutoSizing = i == 0; t.fontSizeMax = size; t.fontSizeMin = size * 0.75f; t.fontSize = size;
                     t.overflowMode = i == 0 ? TextOverflowModes.Ellipsis : TextOverflowModes.Overflow;
-                    // every cell of a row on one baseline (centered on its own letters, "player" and "open" sat higher than "k"),
+                    // every cell left aligned under its header and on one baseline (centered on its own letters, "player" sat higher than "k"),
                     // the row moved down by half a capital so its letters stay in the middle of the row
-                    t.alignment = i == 0 ? TextAlignmentOptions.BaselineLeft : TextAlignmentOptions.Baseline;
+                    t.alignment = TextAlignmentOptions.BaselineLeft;
                     Place(t.rectTransform, x, y - size * 0.35f, w[i], rowH); t.gameObject.SetActive(true);
                     x += w[i];
                 }
+            }
+
+            // the width the text takes in the board's font, from one hidden cell kept for measuring (0 without a font)
+            private TextMeshProUGUI _ruler;
+            private float Measure(string text, float size)
+            {
+                if (_font == null || string.IsNullOrEmpty(text)) return 0f;
+                if (_ruler == null) { _ruler = NewCell(); _cells.Remove(_ruler); _ruler.text = ""; }   // stays on, empty: draws nothing
+                _ruler.fontSize = size;
+                return _ruler.GetPreferredValues(text).x;
             }
 
             private static void Place(RectTransform rt, float x, float y, float w, float h)
