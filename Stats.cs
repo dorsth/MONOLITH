@@ -343,8 +343,8 @@ namespace Monolith
             if (BundlePlugin.Log != null) BundlePlugin.Log.LogInfo(sb.ToString().TrimEnd());
         }
 
-        // The boards in the game's own look: the font of its round-end screen, plain text with a soft shadow (no dark
-        // strips: they make the board look like a second kill feed), the names in the feed's colors (your team as
+        // The boards in the game's own look: the font of its round-end screen, text with a light shadow on one dark
+        // see-through panel (one panel, not a strip per row: strips look like a second kill feed), the names in the feed's colors (your team as
         // the game colors you, the others as it colors enemies), the headings in its mint, the numbers white. Every cell is
         // its own text in a fixed column, names left and numbers centered under their heading, so the columns line up.
         // The round board sits in the top left corner, above the dark band with the game's "First to" line; it stays 3 seconds after the
@@ -441,6 +441,10 @@ namespace Monolith
                 var sc = _canvas.AddComponent<CanvasScaler>(); sc.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize; sc.referenceResolution = new Vector2(1920f, 1080f); sc.matchWidthOrHeight = 0.5f;
                 var go = new GameObject("board"); go.transform.SetParent(_canvas.transform, false);
                 _root = go.AddComponent<RectTransform>();
+                // one dark see-through panel behind the whole board, like the game's own boxes (kill feed, Tab screen)
+                var back = new GameObject("backdrop"); back.transform.SetParent(_root, false);
+                var bi = back.AddComponent<Image>(); bi.color = new Color(0f, 0f, 0f, 0.45f); bi.raycastTarget = false;
+                var br = bi.rectTransform; br.anchorMin = Vector2.zero; br.anchorMax = Vector2.one; br.offsetMin = new Vector2(-18f, -10f); br.offsetMax = new Vector2(18f, 8f);
                 // the font and material of the round-end screen's names, so it reads like the game
                 try
                 {
@@ -453,9 +457,9 @@ namespace Monolith
                         // one copy of its material with a soft shadow under the letters (made once, kept): readable on a bright map
                         _mat = new Material(src.fontSharedMaterial) { name = "MONOLITH stats shadow" };
                         _mat.EnableKeyword(ShaderUtilities.Keyword_Underlay);
-                        _mat.SetColor(ShaderUtilities.ID_UnderlayColor, new Color(0f, 0f, 0f, 0.7f));
-                        _mat.SetFloat(ShaderUtilities.ID_UnderlayOffsetX, 0.5f); _mat.SetFloat(ShaderUtilities.ID_UnderlayOffsetY, -0.5f);
-                        _mat.SetFloat(ShaderUtilities.ID_UnderlaySoftness, 0.35f);
+                        _mat.SetColor(ShaderUtilities.ID_UnderlayColor, new Color(0f, 0f, 0f, 0.45f));
+                        _mat.SetFloat(ShaderUtilities.ID_UnderlayOffsetX, 0.25f); _mat.SetFloat(ShaderUtilities.ID_UnderlayOffsetY, -0.25f);
+                        _mat.SetFloat(ShaderUtilities.ID_UnderlaySoftness, 0.2f);
                     }
                 }
                 catch { }

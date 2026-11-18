@@ -1,5 +1,8 @@
 # MONOLITH changelog
 
+## 0.9.85
+- The stats boards have one dark see-through panel behind them, like the game's own boxes, and a lighter text shadow.
+
 ## 0.9.84
 - The round board is smaller and sits higher, clear of the round-end screen.
 - The Tab screen shows each player's kills this match next to their name, like the round-end screen.
