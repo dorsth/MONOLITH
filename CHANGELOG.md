@@ -1,5 +1,8 @@
 # MONOLITH changelog
 
+## 1.0.0
+- First public release.
+
 ## 0.10.11
 - The match board is in the middle of the screen.
 
