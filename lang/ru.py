@@ -29,7 +29,7 @@ T = [
 ('Settings of the other mods you have installed. Not part of MONOLITH.', 'Настройки других установленных модов. Не часть MONOLITH.', 'info'), ('no options', 'нет настроек', 'L20'),
 ('Move a taunt to another key, or switch it off.', 'Перенесите насмешку на другую клавишу или отключите её.', 'info'),
 ('Save, load and share configs. Sensitivity and keys are not included.', 'Сохранение, загрузка и обмен конфигами. Чувствительность и клавиши не входят.', 'info'),
-('Language, the key that opens this menu, menu animations.', 'Язык, клавиша, которая открывает это меню, анимации меню.', 'info'),
+('Language, the menu key, menu animations, playlists.', 'Язык, клавиша меню, анимации меню, плейлисты.', 'info'),
 ('A weapon listed here uses its own FOV and position.', 'У оружия из этого списка свои FOV и положение.', 'info'),
 # ---- crosshair (31 cells)
 ('Custom crosshair', 'Свой прицел', 'L27'), ('Off: the game crosshair.', 'Выкл: прицел игры.', 'tip'),

@@ -551,8 +551,7 @@ namespace Monolith
                  .Set("Outline color", Players.TeamOutline, null, "The same setting as in the game.")
                  .Head("Lobby")
                  .Set("Enemy outlines when I host", Players.HostOutlines, null, "The game's lobby option, kept between launches. In other lobbies the host decides.")
-                 .Set("Join message", E(Tweaks, "Menus", "Join Message"), null, "The line everyone sees when you join a lobby. {name} is your name. Leave it empty for the game's line.")
-                 .Set("Hide default playlists", E(Tweaks, "Menus", "Hide Default Playlists"), null, "Only your own playlists show when you host.");
+                 .Set("Join message", E(Tweaks, "Menus", "Join Message"), null, "The line everyone sees when you join a lobby. {name} is your name. Leave it empty for the game's line.");
                 if (p.Rows.Count > 2) { p.Draw = r => BundleMenu.I.PlayersPreview(r); p.SideCols = 24; p.SideRows = 14; p.SideTitle = "preview"; cats.Add(p); }
             }
 
@@ -612,10 +611,11 @@ namespace Monolith
 
             // ---------------------------------------------------------------- general
             {
-                var p = new MenuPage(null, "General", "Language, the key that opens this menu, menu animations.");
+                var p = new MenuPage(null, "General", "Language, the menu key, menu animations, playlists.");
                 p.Set("Language / Язык", Lang.Pick, null, "")
                  .Set("Open this menu", BundleMenu.Key, null, "Press Enter, then the key.")
-                 .Set("Fewer UI animations", E(Tweaks, "Menus", "Reduce UI Animations"), null, "No animations in menus and on the HUD. No logo screen at start.");
+                 .Set("Fewer UI animations", E(Tweaks, "Menus", "Reduce UI Animations"), null, "No animations in menus and on the HUD. No logo screen at start.")
+                 .Set("Hide default playlists", E(Tweaks, "Menus", "Hide Default Playlists"), null, "Only your own playlists show when you host.");
                 if (p.Rows.Count > 0) cats.Add(p);
             }
 

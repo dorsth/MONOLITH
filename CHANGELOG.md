@@ -1,5 +1,8 @@
 # MONOLITH changelog
 
+## 0.9.83
+- Hide default playlists moved from Players to General.
+
 ## 0.9.82
 - Reset works while a setting is being edited (a key being set, a list or the colors open): it stops the edit and resets.
 
