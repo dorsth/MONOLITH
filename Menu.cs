@@ -235,6 +235,8 @@ namespace Monolith
             _vis.Clear();
             if (p.Parent != null) _vis.Add(UpRow);
             foreach (MenuRow r in p.Rows) if (Shows(r)) _vis.Add(r);
+            MenuRow reset = _searching ? null : PageReset(p);   // not on search results: they are from many pages
+            if (reset != null) _vis.Add(reset);
             // a heading with nothing under it
             for (int i = _vis.Count - 1; i >= 0; i--)
                 if (_vis[i].Kind == RowKind.Header && (i == _vis.Count - 1 || _vis[i + 1].Kind == RowKind.Header)) _vis.RemoveAt(i);
@@ -424,7 +426,7 @@ namespace Monolith
                 : _capture ? K("Key", "press one") + K("Esc", "cancel")
                 : _editRow != null ? K("Enter", "ok") + K("←", "delete") + K("Esc", "cancel")
                 : _searching ? K("type", "to search") + K("Enter", "open") + K("Esc", "leave search")
-                : K("↑↓", "move") + K("←→", "set") + K("Enter", "open") + K("R", "default") + K("Q", "back") + K("/", "search") + K("Esc", "close");
+                : K("↑↓", "move") + K("←→", "set") + K("Enter", "open") + (pageOn && ci >= 0 && ci < _vis.Count && Changed(_vis[ci]) ? K("R", "reset") : "") + K("Q", "back") + K("/", "search") + K("Esc", "close");
             Line(kb.x + _cw * 2f, kb.y, keys);   // on the same column as the text of the panels and of the box above it
             if (_pop != null) PopDraw(mouse, mouseMoved);
         }
@@ -820,6 +822,25 @@ namespace Monolith
             if (_page != null && _page.Parent != null) _page = _page.Parent; else _inNav = true;
         }
 
+        // One "Reset this page" row per page, shown at its end while any setting on the page is changed (Enter twice).
+        private static readonly Dictionary<MenuPage, MenuRow> Resets = new Dictionary<MenuPage, MenuRow>();
+
+        private static MenuRow PageReset(MenuPage p)
+        {
+            bool any = false;
+            foreach (MenuRow r in p.Rows) if ((r.Kind == RowKind.Entry || r.Kind == RowKind.Group) && Changed(r)) { any = true; break; }
+            if (!any) return null;
+            MenuRow row;
+            if (!Resets.TryGetValue(p, out row))
+            {
+                MenuPage page = p;
+                row = new MenuRow { Kind = RowKind.Action, Label = "Reset this page", Info = "Puts every setting on this page back to its default.", Confirm = true,
+                    Take = s => { foreach (MenuRow r in page.Rows) Default(r); return Lang.T("Page reset."); } };
+                Resets[p] = row;
+            }
+            return row;
+        }
+
         /// <summary>A setting that is not at its default (for a group: one of its parts is not).</summary>
         private static bool Changed(MenuRow row)
         {
@@ -951,8 +972,7 @@ namespace Monolith
             _inNav = false;
             if (page.Cur != row) { _armed = null; _say = null; }
             page.Cur = row; page.Last = at;
-            // right button: back to its default. On a number's bar: the value goes to the mouse, and follows it while held.
-            if (button == 1) { Default(row); return; }
+            // On a number's bar: the value goes to the mouse, and follows it while held. The ↺ of a changed row resets it.
             if (button != 0) return;
             if (Changed(row) && m.x >= ResetX(ColsFor(page)) - _cw * 0.4f) { Default(row); return; }
             if (OnBar(row, m.x, page)) { _dragRow = row; Slide(row, m.x, page); return; }

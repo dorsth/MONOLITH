@@ -1,8 +1,12 @@
 # MONOLITH changelog
 
+## 0.9.76
+- One way to reset: R (or a click on the ↺ of a changed row). The key bar shows "R reset" while the selected setting is changed. Right-click no longer resets.
+- Reset this page: shown at the end of a page while something on it is changed. Enter twice.
+
 ## 0.9.75
 - Swap weapons is the game's own Swap binding: both menus show the same key, and resetting it in either one puts it back on the scroll wheel. A key set in an older version moves over by itself.
-- A changed setting has a ↺ at the end of its row. Click it to put that setting back to its default (R and right-click still work).
+- A changed setting has a ↺ at the end of its row. Click it to put that setting back to its default.
 
 ## 0.9.74
 - Replaces Mod Menu. `ModMenu.dll` in the MONOLITH folder gives other mods Mod Menu's API, so a mod made for Mod Menu works the same way: hidden settings stay hidden, its description shows, and the rows it adds itself (headers, text, buttons, values) are on its page under Other mods, in the same order.

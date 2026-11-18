@@ -182,7 +182,7 @@ T = [
 ('on', 'вкл', ''), ('empty', 'пусто', ''), ('(empty)', '(пусто)', 'W15'), ('Nothing found.', 'Ничего не найдено.', 'info'),
 ('search: ', 'поиск: ', ''), ('press a key…', 'нажмите клавишу…', 'W17'), ('Did not work: ', 'Не получилось: ', ''),
 ('   or type one: RRGGBB', '   или введите: RRGGBB', 'W30'),
-('move', 'выбор', ''), ('set', 'изменить', ''), ('open', 'открыть', ''), ('default', 'сброс', ''), ('back', 'назад', ''),
+('reset', 'сброс', ''), ('Reset this page', 'Сбросить страницу', 'W24'), ('Puts every setting on this page back to its default.', 'Возвращает все настройки этой страницы по умолчанию.', 'info'), ('Page reset.', 'Страница сброшена.', 'info'), ('move', 'выбор', ''), ('set', 'изменить', ''), ('open', 'открыть', ''), ('default', 'сброс', ''), ('back', 'назад', ''),
 ('close', 'закрыть', ''), ('take', 'выбрать', ''), ('cancel', 'отмена', ''), ('hex value', 'hex-код', ''),
 ('jump to a name', 'переход по имени', ''), ('A-Z', 'А-Я', ''), ('Key', 'Клавиша', ''), ('press one', 'нажмите', ''),
 ('ok', 'ок', ''), ('delete', 'стереть', ''), ('type', 'текст', ''), ('to search', 'для поиска', ''), ('leave search', 'выйти из поиска', ''),
@@ -195,7 +195,7 @@ for folder in ['HitSounds', 'HeadHitSounds', 'KillSounds', 'MeleeKillSounds']:
               'В списке каждый звук можно услышать. Свои звуки кладите в plugins/MONOLITH/' + folder + '.', 'tip'))
 # the key bars as the menu puts them together: (keys and words, in order)
 BARS = [
- [('↑↓','move'),('←→','set'),('Enter','open'),('R','default'),('Q','back'),('/','search'),('Esc','close')],
+ [('↑↓','move'),('←→','set'),('Enter','open'),('R','reset'),('Q','back'),('/','search'),('Esc','close')],
  [('↑↓','move'),('Enter','take'),('Esc','cancel'),('0-9 A-F','hex value')],
  [('↑↓','move'),('Enter','take'),('Esc','cancel'),('A-Z','jump to a name')],
  [('Key','press one'),('Enter','none'),('Esc','cancel')],

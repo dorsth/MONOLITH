@@ -16,7 +16,8 @@ Each mod in it is the same source as its own release, loads under its own name a
 | Left, Right or A, D | click or drag a bar | change a value (Shift: ten steps) |
 | Enter or Space | click | flip a switch, open a page, a list or the colors, type a number |
 | | move over a row | read what it does |
-| R | right click, or the ↺ on a changed row | default |
+| R | the ↺ on a changed row | back to default (shown in the key bar when the setting is changed) |
+| | Reset this page (end of a page with changes) | every setting on the page back to default, Enter twice |
 | Q or Backspace | click `..` | back |
 | Tab | | other panel |
 | `/` | | search every setting |
