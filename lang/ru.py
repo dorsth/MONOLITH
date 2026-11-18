@@ -143,7 +143,7 @@ T = [
 ('Second jump key', 'Вторая клавиша прыжка', 'L40'), ('Third jump key', 'Третья клавиша прыжка', 'L40'), ('Swap weapons', 'Смена оружия', 'L40'),
 ('Next to your own jump key.' + HOW_EN, 'В дополнение к вашей клавише прыжка.' + HOW_RU, 'tipb'),
 ('Scroll up on one and scroll down on the other: jump on the whole wheel.' + HOW_EN, 'На одну прокрутку вверх, на другую вниз: прыжок на всём колесе.' + HOW_RU, 'tipb'),
-('Replaces the scroll wheel. Enter, then a key or mouse button. Scroll: back to the wheel. R resets.', 'Заменяет колесо мыши. Enter, затем клавиша или кнопка мыши. Прокрутка: снова колесо. R: сброс.', 'tipb'),
+("The game's own Swap key, the same as in its settings. Enter, then a key or mouse button. Scroll: back to the wheel.", 'Клавиша смены оружия из настроек игры. Enter, затем клавиша или кнопка мыши. Прокрутка: снова колесо.', 'tipb'),
 ('not set', 'не задано', 'W15'), ('scroll wheel', 'колесо мыши', 'W15'), ('number keys', 'цифры', 'W24'), ('changed: ', 'изменено: ', 'W12'),
 ('Press Enter, then its new key. Enter twice: no key. R: its number key.', 'Нажмите Enter, затем новую клавишу. Enter дважды: без клавиши. R: вернуть цифру.', 'tipb'),
 ('off', 'выкл', 'W15'), ('scroll up', 'колесо вверх', 'W15'), ('scroll down', 'колесо вниз', 'W15'),

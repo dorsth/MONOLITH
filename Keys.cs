@@ -2,19 +2,19 @@
 //
 //  * A second and a third jump key, the scroll wheel included. Two, because scroll up and scroll down are two inputs:
 //    one on each is how a jump on the whole wheel is set.
-//  * Swap weapons: the game swaps on the scroll wheel and has no setting for it. The row shows the game's own binding;
-//    a key or mouse button set here takes its place (the wheel then no longer swaps). Scrolling while the row asks for
-//    a key gives the swap back to the whole wheel.
+//  * Swap weapons: the game's own swap binding (Settings, Controls, Swap), set from here. Both menus show the same key
+//    and either one's reset puts it back on the scroll wheel. Scrolling while the row asks for a key does that too.
 //  * Taunts: the game has them fixed on the number keys; each can be moved to another key or switched off.
 //
 // How, and what it leaves alone:
-//  * The game's key set is not touched: nothing is added to it or overridden in it, so nothing of this ends up in the
-//    game's saved bindings and it is all gone when MONOLITH is. Each key here is an input action of its own that
-//    calls the SAME routine of the game that its own key calls (FirstPersonController.Jump, PlayerPickup.SwitchWeapons).
+//  * The extra jumps and the taunts leave the game's key set alone: nothing of them ends up in the game's saved
+//    bindings and they are gone when MONOLITH is. Each is an input action of its own that calls the SAME routine of the
+//    game that its own key calls (FirstPersonController.Jump). Swap weapons is the one exception: it IS the game's
+//    binding, changed and saved the way the game's own settings change and save it.
 //    A press here is a press, one for one: nothing is repeated or timed for you.
 //  * No key is asked for every frame: the input system calls in when one is pressed. A key that is not set costs nothing.
-//  * The game's own swap is skipped (a prefix on the routine that hears it) while Swap weapons has a key of yours,
-//    and while a jump of yours is on the wheel, so one press or notch does one thing.
+//  * While a jump of yours is on the wheel, the game's swap does not hear the wheel (a prefix on the routine that hears
+//    it), so one notch does one thing.
 //  * Taunts: the game asks for the ten number keys every frame. Those questions are answered here: for a taunt you
 //    did not change, with the game's own answer.
 using System;
@@ -37,8 +37,10 @@ namespace Monolith
 
         private static readonly Dictionary<ConfigEntry<string>, InputAction> Actions = new Dictionary<ConfigEntry<string>, InputAction>();
         private static readonly int[] TauntFrame = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
-        private static Action<PlayerPickup> _switch;
-        private static bool _wheelMine, _swapMine;
+        private static bool _wheelMine;
+        private static ConfigFile _swapFile;
+        private static string _oldSwap;          // a Swap weapons key from before 0.9.74, moved into the game's binding once
+        private static bool _swapSync;
         private static int _tauntHits;
 
         internal static void Bind(ConfigFile c)
@@ -46,14 +48,20 @@ namespace Monolith
             const string S = "Keys";
             Jump1 = c.Bind(S, "Extra Jump", "", "A second jump key, next to your own. A key, a mouse button, scroll up or scroll down.");
             Jump2 = c.Bind(S, "Extra Jump 2", "", "A third jump key. Scroll up on one and scroll down on the other puts jump on the whole wheel.");
-            Swap = c.Bind(S, "Swap Weapons", "", "The key that swaps your two weapons, in place of the game's (the scroll wheel). Empty: the game's own.");
+            // Swap weapons was a key of MONOLITH's own until 0.9.74. Now it is the game's binding, shown through an entry that
+            // is never saved (the game saves the binding); an old value is moved over once.
+            ConfigEntry<string> old = c.Bind(S, "Swap Weapons", "", "");
+            _oldSwap = old.Value; c.Remove(old.Definition); c.Save();
+            _swapFile = new ConfigFile(System.IO.Path.Combine(BepInEx.Paths.CachePath, "MONOLITH.swap.cfg"), false) { SaveOnConfigSet = false };
+            Swap = _swapFile.Bind(S, "Swap Weapons", Wheel, "The game's own swap weapons key.");
             for (int i = 0; i < 10; i++)
                 Taunt[i] = c.Bind(S, "Taunt " + (i + 1), "", "The taunt the game has on number key " + ((i + 1) % 10) + ". Empty: that key.");
         }
 
         internal static void Install(Harmony h)
         {
-            _switch = AccessTools.MethodDelegate<Action<PlayerPickup>>(AccessTools.Method(typeof(PlayerPickup), "SwitchWeapons"));
+            Swap.SettingChanged += (s, a) => { if (!_swapSync) WriteSwap(Swap.Value); };
+            if (!string.IsNullOrEmpty(_oldSwap)) UnityEngine.SceneManagement.SceneManager.sceneLoaded += MoveOldSwap;
             MethodInfo heard = AccessTools.Method(typeof(PlayerPickup), "HandleDrop");
             if (heard != null) h.Patch(heard, prefix: new HarmonyMethod(typeof(Keys).GetMethod(nameof(WheelPrefix), BindingFlags.Static | BindingFlags.NonPublic)));
             MethodInfo taunts = AccessTools.Method(typeof(FirstPersonController), "HandleTaunt");
@@ -72,7 +80,7 @@ namespace Monolith
 
         private static IEnumerable<ConfigEntry<string>> All()
         {
-            yield return Jump1; yield return Jump2; yield return Swap;
+            yield return Jump1; yield return Jump2;
             foreach (ConfigEntry<string> t in Taunt) yield return t;
         }
 
@@ -88,21 +96,19 @@ namespace Monolith
                 {
                     var a = new InputAction("MONOLITH " + e.Definition.Key, InputActionType.Button, path);
                     int taunt = Array.IndexOf(Taunt, e);
-                    if (e == Swap) a.performed += ctx => Do(false);
-                    else if (taunt >= 0) a.performed += ctx => { TauntFrame[taunt] = Time.frameCount; };
-                    else a.performed += ctx => Do(true, ctx);
+                    if (taunt >= 0) a.performed += ctx => { TauntFrame[taunt] = Time.frameCount; };
+                    else a.performed += ctx => Jump(ctx);
                     a.Enable();
                     Actions[e] = a;
                 }
                 _wheelMine = false;
-                foreach (ConfigEntry<string> k in All()) if (k != Swap && k.Value != null && k.Value.IndexOf("/scroll", StringComparison.Ordinal) >= 0) _wheelMine = true;
-                _swapMine = !string.IsNullOrEmpty(Swap.Value);
+                foreach (ConfigEntry<string> k in All()) if (k.Value != null && k.Value.IndexOf("/scroll", StringComparison.Ordinal) >= 0) _wheelMine = true;
             }
             catch (Exception x) { BundlePlugin.Log.LogWarning("Keys: " + e.Definition.Key + " could not be set to " + e.Value + ": " + x.Message); }
         }
 
-        // a press of one of your keys: the game's own routine for it, under the game's own conditions
-        private static void Do(bool jump, InputAction.CallbackContext ctx = default(InputAction.CallbackContext))
+        // a press of an extra jump key: the game's own jump, under the game's own conditions
+        private static void Jump(InputAction.CallbackContext ctx)
         {
             try
             {
@@ -112,46 +118,79 @@ namespace Monolith
                 Settings st = Settings.Instance;
                 FirstPersonController me = st != null ? st.localPlayer : null;
                 if (me == null || !me.isActiveAndEnabled) return;
-                if (jump) me.Jump(ctx);
-                else if (me.playerPickupScript != null) _switch(me.playerPickupScript);
+                me.Jump(ctx);
             }
             catch (Exception) { }
         }
 
-        // The game hears "swap" from its own binding (the wheel) and from a gamepad button. Its own binding is skipped
-        // while Swap weapons has a key of yours (yours takes its place), and the wheel while a jump of yours is on it.
+        // While a jump of yours is on the wheel, the game's swap does not hear the wheel.
         private static bool WheelPrefix(InputAction.CallbackContext __0)
         {
-            if (!_wheelMine && !_swapMine) return true;
+            if (!_wheelMine) return true;
             InputControl c = __0.control;
-            if (c == null || c.device is Gamepad) return true;
-            return !(_swapMine || c.device is Mouse);
-        }
-
-        /// <summary>What the Swap weapons row reads while it is empty: the game's own binding (the scroll wheel).</summary>
-        internal static string GameSwap()
-        {
-            try
-            {
-                if (InputManager.inputActions != null)
-                    foreach (InputBinding b in InputManager.inputActions.Player.ChangeWeapon.bindings)
-                    {
-                        string p = b.effectivePath;
-                        if (!string.IsNullOrEmpty(p) && p.IndexOf("Gamepad", StringComparison.Ordinal) < 0) return p;
-                    }
-            }
-            catch (Exception) { }
-            return Wheel;
+            return c == null || !(c.device is Mouse) || c.path.IndexOf("/scroll", StringComparison.Ordinal) < 0;
         }
 
         internal const string Wheel = "<Mouse>/scroll";
 
-        /// <summary>The value a key just pressed gives a row. On Swap weapons either wheel direction means the whole
-        /// wheel: the game's own binding when that is the wheel (the row goes back to empty), else the wheel as a key.</summary>
+        // the game's swap action and the index of its keyboard and mouse binding (the other one is the gamepad's)
+        private static InputAction SwapAction(out int index)
+        {
+            index = -1;
+            if (InputManager.inputActions == null) return null;
+            InputAction a = InputManager.inputActions.Player.ChangeWeapon;
+            for (int i = 0; i < a.bindings.Count; i++)
+            {
+                InputBinding b = a.bindings[i];
+                if (!b.isComposite && !b.isPartOfComposite && (b.path ?? "").IndexOf("Gamepad", StringComparison.Ordinal) < 0) { index = i; return a; }
+            }
+            return null;
+        }
+
+        /// <summary>Reads the game's swap binding into the Swap weapons row (it may have been changed in the game's own
+        /// settings). Called while the menu shows the row; always true.</summary>
+        internal static bool SyncSwap()
+        {
+            try
+            {
+                int i; InputAction a = SwapAction(out i);
+                if (a == null) return true;
+                if (_oldSwap != null) { string o = _oldSwap; _oldSwap = null; if (o.Length > 0) WriteSwap(o); }
+                string p = a.bindings[i].effectivePath;
+                if (p != Swap.Value) { _swapSync = true; try { Swap.Value = p; } finally { _swapSync = false; } }
+            }
+            catch (Exception) { }
+            return true;
+        }
+
+        // the old Swap weapons key goes into the game's binding as soon as the game has its bindings (by the first scene)
+        private static void MoveOldSwap(UnityEngine.SceneManagement.Scene scene, UnityEngine.SceneManagement.LoadSceneMode mode)
+        {
+            SyncSwap();
+            if (_oldSwap == null) UnityEngine.SceneManagement.SceneManager.sceneLoaded -= MoveOldSwap;
+        }
+
+        // Sets the game's binding and saves it as the game does (InputManager.SaveBindingOverride: one PlayerPrefs value
+        // per binding, read back at start). The game's default (the wheel) is no override at all.
+        private static void WriteSwap(string path)
+        {
+            try
+            {
+                int i; InputAction a = SwapAction(out i);
+                if (a == null) return;
+                if (string.IsNullOrEmpty(path) || path == a.bindings[i].path) a.RemoveBindingOverride(i);
+                else a.ApplyBindingOverride(i, path);
+                PlayerPrefs.SetString((a.actionMap != null ? a.actionMap.ToString() : null) + a.name + i, a.bindings[i].overridePath ?? "");
+                PlayerPrefs.Save();
+            }
+            catch (Exception x) { BundlePlugin.Log.LogWarning("Keys: Swap weapons could not be set to " + path + ": " + x.Message); }
+        }
+
+        /// <summary>The value a key just pressed gives a row. On Swap weapons either wheel direction means the whole wheel.</summary>
         internal static string Taken(ConfigEntryBase row, string got)
         {
             if (row != Swap || got == null || !got.StartsWith(Wheel, StringComparison.Ordinal)) return got;
-            return GameSwap() == Wheel ? "" : Wheel;
+            return Wheel;
         }
 
         private static IEnumerable<CodeInstruction> TauntTr(IEnumerable<CodeInstruction> ins)

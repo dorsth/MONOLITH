@@ -16,7 +16,7 @@ Each mod in it is the same source as its own release, loads under its own name a
 | Left, Right or A, D | click or drag a bar | change a value (Shift: ten steps) |
 | Enter or Space | click | flip a switch, open a page, a list or the colors, type a number |
 | | move over a row | read what it does |
-| R | right click | default |
+| R | right click, or the ↺ on a changed row | default |
 | Q or Backspace | click `..` | back |
 | Tab | | other panel |
 | `/` | | search every setting |
@@ -66,7 +66,7 @@ Crosshair, Viewmodel, Camera, HUD, Effects, Players, Audio, Controls, Performanc
 **Keys** the game's own settings do not have. Enter on a row, then press the key, a mouse button or scroll the wheel. R puts a row back to its default; Enter a second time while it asks sets none.
 
 * **Second jump key**, **Third jump key**: next to your own. Scroll up and scroll down are two inputs, so one on each puts jump on the whole wheel.
-* **Swap weapons**: shows the game's own binding (the scroll wheel). A key or mouse button set here replaces it: the wheel then no longer swaps. Scroll while it asks for a key to give the swap back to the wheel.
+* **Swap weapons**: the game's own Swap binding, the same one as in its settings. Set it in either menu; either reset puts it back on the scroll wheel. Scroll while it asks for a key to do that from here.
 * **Taunts**: each on another key, or off.
 
 Each one calls the game's own routine, one press for one press. The game's saved bindings are not touched. With a jump of yours on the wheel, the wheel no longer swaps weapons: set a key for Swap weapons then. Keys are not part of a config.

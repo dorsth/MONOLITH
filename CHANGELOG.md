@@ -1,5 +1,9 @@
 # MONOLITH changelog
 
+## 0.9.75
+- Swap weapons is the game's own Swap binding: both menus show the same key, and resetting it in either one puts it back on the scroll wheel. A key set in an older version moves over by itself.
+- A changed setting has a ↺ at the end of its row. Click it to put that setting back to its default (R and right-click still work).
+
 ## 0.9.74
 - Replaces Mod Menu. `ModMenu.dll` in the MONOLITH folder gives other mods Mod Menu's API, so a mod made for Mod Menu works the same way: hidden settings stay hidden, its description shows, and the rows it adds itself (headers, text, buttons, values) are on its page under Other mods, in the same order.
 - Works on macOS ARM64: no asset bundles.

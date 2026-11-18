@@ -258,7 +258,9 @@ namespace Monolith
 
         private static readonly MenuRow UpRow = new MenuRow { Kind = RowKind.Up, Label = ".." };
         private MenuRow _dragRow; private Vector2 _lastMouse;
-        private int ColsFor(MenuPage page) { return (int)((_pageR.width - 2 * _cw) / _cw) - 1 - (page.Draw != null ? page.SideCols + 1 : 0); }
+        // the cells a row's text has; the last two of the row are kept for the reset mark (ResetX)
+        private int ColsFor(MenuPage page) { return (int)((_pageR.width - 2 * _cw) / _cw) - 3 - (page.Draw != null ? page.SideCols + 1 : 0); }
+        private float ResetX(int cols) { return _pageR.x + _cw * (2.5f + cols); }
 
         // ---- drawing
 
@@ -379,15 +381,16 @@ namespace Monolith
             string title = _searching ? Lang.T("search: ") + _query + "_" : PathText(page);
             Box(_pageR, Fit(title, (int)(_pageR.width / _cw) - 8), pageOn);
             int side = page.Draw != null ? page.SideCols + 1 : 0;
-            int cols = (int)((_pageR.width - 2 * _cw) / _cw) - 1 - side, vis = _visRows;
+            int cols = ColsFor(page), vis = _visRows;
             for (int i = 0; i < vis && page.Top + i < _vis.Count; i++)
             {
                 int idx = page.Top + i; MenuRow row = _vis[idx];
                 Rect r = new Rect(_pageR.x + _cw, _pageR.y + (i + 1) * _ch, _pageR.width - 2 * _cw - side * _cw, _ch);
                 bool cur = idx == ci && pageOn;
                 if (cur) Fill(r, Bar); else if (idx == over && row.Kind != RowKind.Header) Fill(r, Hover);
-                Line(r.x + _cw * 0.5f, r.y, RowText(row, cols, cur));
+                Line(r.x + _cw * 0.5f, r.y, RowText(row, row.Kind == RowKind.Header ? cols + 2 : cols, cur));
                 Knob(row, r.y, cols, cur);
+                if (Changed(row)) Line(ResetX(cols), r.y, "<color=" + Hot + ">↺</color>");   // changed: a click on it puts it back
             }
             if (_vis.Count > vis)
             {
@@ -523,7 +526,7 @@ namespace Monolith
             int room = Mathf.Clamp(cols - Lang.T(row.Label).Length - 3, 4, cols / 2);   // cells a list or text value may take
             if (row == _bindRow) { v = Lang.T("press a key…"); used = v.Length; return "<color=" + Hot + ">" + v + "</color>"; }
             if (row == _editRow) { v = Fit(_capture ? Lang.T("press a key…") : _edit + "_", room + 2); used = v.Length; return "<color=" + Hot + ">" + Esc(v) + "</color>"; }
-            if (row.Bind) { v = Lang.T(Monolith.Keys.Name(e == Monolith.Keys.Swap && e.GetSerializedValue().Length == 0 ? Monolith.Keys.GameSwap() : e.GetSerializedValue(), row.Empty)); used = v.Length; return "<color=" + Val + ">" + Esc(v) + "</color>"; }
+            if (row.Bind) { v = Lang.T(Monolith.Keys.Name(e.GetSerializedValue(), row.Empty)); used = v.Length; return "<color=" + Val + ">" + Esc(v) + "</color>"; }
             if (t == typeof(Color))
             {
                 Color c = (Color)e.BoxedValue;
@@ -817,6 +820,23 @@ namespace Monolith
             if (_page != null && _page.Parent != null) _page = _page.Parent; else _inNav = true;
         }
 
+        /// <summary>A setting that is not at its default (for a group: one of its parts is not).</summary>
+        private static bool Changed(MenuRow row)
+        {
+            try
+            {
+                if (row.Kind == RowKind.Entry && row.Entry != null) return !AtDefault(row.Entry);
+                if (row.Kind == RowKind.Group) foreach (ConfigEntryBase e in row.Parts) if (!AtDefault(e)) return true;
+            }
+            catch { }
+            return false;
+        }
+
+        private static bool AtDefault(ConfigEntryBase e)
+        {
+            return e.GetSerializedValue() == TomlTypeConverter.ConvertToString(e.DefaultValue, e.SettingType);
+        }
+
         private static void Default(MenuRow row)
         {
             try
@@ -934,6 +954,7 @@ namespace Monolith
             // right button: back to its default. On a number's bar: the value goes to the mouse, and follows it while held.
             if (button == 1) { Default(row); return; }
             if (button != 0) return;
+            if (Changed(row) && m.x >= ResetX(ColsFor(page)) - _cw * 0.4f) { Default(row); return; }
             if (OnBar(row, m.x, page)) { _dragRow = row; Slide(row, m.x, page); return; }
             Activate(row);
         }
