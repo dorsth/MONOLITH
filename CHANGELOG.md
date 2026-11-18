@@ -1,5 +1,11 @@
 # MONOLITH changelog
 
+## 0.9.84
+- The round board is smaller and sits higher, clear of the round-end screen.
+- The Tab screen shows each player's kills this match next to their name, like the round-end screen.
+- The Dorsth config is his current one.
+- New melee kill sound: sword cut.
+
 ## 0.9.83
 - Hide default playlists moved from Players to General.
 

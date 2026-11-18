@@ -136,7 +136,7 @@ T = [
 ('Kills, deaths, damage and more for every player.', 'Убийства, смерти, урон и другое для каждого игрока.', 'info'),
 ('Counted for every player. Shown only between rounds and after the match.', 'Для каждого игрока. Видна только между раундами и после матча.', 'tip'),
 ('Round board', 'Таблица раунда', 'L52'),
-('Kills, deaths and damage of that round on the round-end screen, and match kills next to each name.', 'Убийства, смерти и урон за этот раунд на экране конца раунда и убийства за матч рядом с именем.', 'tip'),
+('Kills, deaths and damage of that round on the round-end screen. Match kills next to each name there and on the Tab screen.', 'Убийства, смерти и урон за этот раунд на экране конца раунда. Убийства за матч рядом с каждым именем там и на экране Tab.', 'tip'),
 ('Match board', 'Таблица матча', 'L52'),
 ('ADR, opening kills, trades, 2k, clutches and rounds survived after the match. Also in the log.', 'ADR, первые убийства, размены, 2k, клатчи и выжитые раунды после матча. Также в логе.', 'tip'),
 # ---- keys

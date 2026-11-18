@@ -230,12 +230,31 @@ namespace Monolith
 
         // ---- the setups that come with it
 
-        // Dorsth's own (what differs from the defaults; his own sound files and anything experimental left out)
+        // Dorsth's own: what differs from the defaults. His outline settings and anything experimental are left out.
         private static readonly string[,] Dorsth =
         {
+            { "dorsth.straftat.ezcrosshair", "Crosshair", "Crosshair", "plus" },
+            { "dorsth.straftat.ezcrosshair", "Crosshair", "Color", "FF00FFFF" },
+            { "dorsth.straftat.ezcrosshair", "Crosshair", "Show While Scoped", "true" },
+            { "dorsth.straftat.viewmodeltweaks", "Viewmodel", "Viewmodel FOV", "80" },
+            { "dorsth.straftat.viewmodeltweaks", "Viewmodel", "Viewmodel Y Offset", "-1.250001" },
+            { "dorsth.straftat.viewmodeltweaks", "Viewmodel", "Viewmodel Z Offset", "1.6" },
+            { "dorsth.straftat.viewmodeltweaks", "Viewmodel", "Viewmodel Sway Scale", "0" },
+            { "dorsth.straftat.viewmodeltweaks", "Viewmodel", "Viewmodel Bob Scale", "0.35" },
+            { "dorsth.straftat.viewmodeltweaks", "Weapon 1", "Weapon", "Katana" },
+            { "dorsth.straftat.viewmodeltweaks", "Weapon 1", "Invisible Arms", "true" },
+            { "dorsth.straftat.viewmodeltweaks", "Weapon 1", "Viewmodel FOV", "90" },
+            { "dorsth.straftat.viewmodeltweaks", "Weapon 1", "Viewmodel Y Offset", "-1" },
+            { "dorsth.straftat.viewmodeltweaks", "Weapon 1", "Viewmodel Z Offset", "5" },
+            { "dorsth.straftat.viewmodeltweaks", "Weapon 2", "Weapon", "Flamberge" },
+            { "dorsth.straftat.viewmodeltweaks", "Weapon 2", "Invisible Arms", "true" },
+            { "dorsth.straftat.viewmodeltweaks", "Weapon 2", "Viewmodel FOV", "90" },
+            { "dorsth.straftat.viewmodeltweaks", "Weapon 2", "Viewmodel Y Offset", "-1" },
+            { "dorsth.straftat.viewmodeltweaks", "Weapon 2", "Viewmodel Z Offset", "5" },
+            { "dorsth.straftat.dorsthtweaks", "Bullet Trails", "Hide My Trails", "true" },
             { "dorsth.straftat.dorsthtweaks", "HUD", "Static Hitmarkers", "true" },
             { "dorsth.straftat.dorsthtweaks", "HUD", "Same Headshot Animation", "true" },
-            { "dorsth.straftat.dorsthtweaks", "HUD", "Hide Ping", "true" },
+            { "dorsth.straftat.dorsthtweaks", "HUD", "Hitmarker Shotgun Color", "FFFFFFFF" },
             { "dorsth.straftat.dorsthtweaks", "HUD", "Hide Near Miss Vignette", "true" },
             { "dorsth.straftat.dorsthtweaks", "Interaction", "Hide Key Prompt", "true" },
             { "dorsth.straftat.dorsthtweaks", "Interaction", "Prompt Scale", "0.8" },
@@ -245,34 +264,20 @@ namespace Monolith
             { "dorsth.straftat.dorsthtweaks", "Viewmodel", "No Bullet Casings", "true" },
             { "dorsth.straftat.dorsthtweaks", "World", "Reduce VFX+", "true" },
             { "dorsth.straftat.dorsthtweaks", "World", "No Post-Processing", "true" },
-            { "dorsth.straftat.dorsthtweaks", "World", "Lower Textures", "3" },
-            { "dorsth.straftat.viewmodeltweaks", "Viewmodel", "Viewmodel FOV", "80" },
-            { "dorsth.straftat.viewmodeltweaks", "Viewmodel", "Viewmodel Y Offset", "-1.250001" },
-            { "dorsth.straftat.viewmodeltweaks", "Viewmodel", "Viewmodel Z Offset", "1.6" },
-            { "dorsth.straftat.viewmodeltweaks", "Viewmodel", "Viewmodel Sway Scale", "0" },
-            { "dorsth.straftat.viewmodeltweaks", "Viewmodel", "Viewmodel Bob Scale", "0.35" },
-            { "dorsth.straftat.viewmodeltweaks", "Weapon 1", "Weapon", "Katana" },
-            { "dorsth.straftat.viewmodeltweaks", "Weapon 1", "Invisible Arms", "true" },
-            { "dorsth.straftat.viewmodeltweaks", "Weapon 1", "Viewmodel FOV", "90" },
-            { "dorsth.straftat.viewmodeltweaks", "Weapon 1", "Viewmodel Z Offset", "5" },
-            { "dorsth.straftat.viewmodeltweaks", "Weapon 2", "Weapon", "Flamberge" },
-            { "dorsth.straftat.viewmodeltweaks", "Weapon 2", "Invisible Arms", "true" },
-            { "dorsth.straftat.viewmodeltweaks", "Weapon 2", "Viewmodel FOV", "90" },
-            { "dorsth.straftat.viewmodeltweaks", "Weapon 2", "Viewmodel Y Offset", "-1" },
-            { "dorsth.straftat.viewmodeltweaks", "Weapon 2", "Viewmodel Z Offset", "5" },
-            { "dorsth.straftat.ezcrosshair", "Crosshair", "Crosshair", "plus" },
-            { "dorsth.straftat.ezcrosshair", "Crosshair", "Show While Scoped", "true" },
-            { "dorsth.straftat.combatsounds", "Guns", "Gun Sound Volume", "43" },
-            { "dorsth.straftat.combatsounds", "Sounds", "Hit Sound Volume", "99" },
-            { "dorsth.straftat.combatsounds", "Sounds", "Head Hit Sound Volume", "101" },
-            { "dorsth.straftat.combatsounds", "Sounds", "Kill Sound Volume", "0" },
-            { "dorsth.straftat.combatsounds", "Sounds", "Melee Kill Sound", "knife slash" },
-            { "dorsth.straftat.combatsounds", "Sounds", "Melee Kill Sound Volume", "104" },
-            { "dorsth.straftat.nogore", "Blood", "No Blood", "false" },
+            { "dorsth.straftat.nogore", "Bodies", "Hide Ragdolls", "true" },
+            { "dorsth.straftat.nogore", "Bodies", "Hide Hats", "true" },
             { "dorsth.straftat.nogore", "Blood", "No Hit Blood", "true" },
             { "dorsth.straftat.nogore", "Blood", "No Blood Stains", "true" },
-            { "dorsth.straftat.nogore", "Bodies", "Hide Ragdolls", "true" },
-            { "dorsth.straftat.nogore", "Bodies", "Hide Hats", "true" }
+            { "dorsth.straftat.combatsounds", "Sounds", "Hit Sound", "keyboard hit" },
+            { "dorsth.straftat.combatsounds", "Sounds", "Head Hit Sound", "keyboard hs" },
+            { "dorsth.straftat.combatsounds", "Sounds", "Melee Kill Sound", "sword cut" },
+            { "dorsth.straftat.combatsounds", "Sounds", "Melee Kill Sound Volume", "200" },
+            { "dorsth.straftat.monolith", "Players", "Enemy Outfit", "JumpSuit00" },
+            { "dorsth.straftat.monolith", "Players", "Enemy Hat", "No Hat" },
+            { "dorsth.straftat.monolith", "Players", "Team Outfit", "JumpSuit00" },
+            { "dorsth.straftat.monolith", "Players", "Team Hat", "No Hat" },
+            { "dorsth.straftat.monolith", "Frame Cap", "Enabled", "true" },
+            { "dorsth.straftat.monolith", "Frame Cap", "FPS", "390" }
         };
 
         private static Profile Made(string name, string[,] rows)
@@ -286,13 +291,12 @@ namespace Monolith
         {
             Profile p = Made(name, rows);
             KeepMyExperimental(p);
-            // the hit sounds in Dorsth's setup are files of his own, and his outline colors are not in it: yours are left as they are
+            // Dorsth's outline settings are not in his setup: yours are left as they are
             if (rows == Dorsth)
                 foreach (Item it in Items())
                 {
                     ConfigDefinition d = it.Entry.Definition;
-                    bool sound = d.Section == "Sounds" && (d.Key == "Hit Sound" || d.Key == "Head Hit Sound"), outline = d.Section == "Players" && d.Key.IndexOf("Outline", StringComparison.Ordinal) >= 0;
-                    if (!sound && !outline) continue;
+                    if (!(d.Section == "Players" && d.Key.IndexOf("Outline", StringComparison.Ordinal) >= 0)) continue;
                     string mine = it.Entry.GetSerializedValue();
                     if (it.Game || mine != DefaultText(it.Entry)) p.Values[it.Id] = mine; else p.Values.Remove(it.Id);
                 }

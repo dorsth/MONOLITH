@@ -498,7 +498,7 @@ namespace Monolith
                 var ms = new MenuPage(p, "Match stats", "Kills, deaths, damage and more for every player.");
                 if (Stats.On != null)
                     ms.Set("Match stats", Stats.On, null, "Counted for every player. Shown only between rounds and after the match.")
-                      .Set("Round board", Stats.RoundBoard, () => On(Stats.On), "Kills, deaths and damage of that round on the round-end screen, and match kills next to each name.")
+                      .Set("Round board", Stats.RoundBoard, () => On(Stats.On), "Kills, deaths and damage of that round on the round-end screen. Match kills next to each name there and on the Tab screen.")
                       .Set("Match board", Stats.MatchBoard, () => On(Stats.On), "ADR, opening kills, trades, 2k, clutches and rounds survived after the match. Also in the log.");
 
                 p.Go(hm, () => On(noHm) ? "hidden" : On(still) ? "static" : "")

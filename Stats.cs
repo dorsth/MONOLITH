@@ -58,12 +58,15 @@ namespace Monolith
         internal static void Bind(ConfigFile c, Harmony h)
         {
             On = c.Bind("Match Stats", "Enabled", true, "Count kills, deaths, damage and more for every player; show them between rounds and after the match.");
-            RoundBoard = c.Bind("Match Stats", "Round Board", true, "A small board with kills, deaths and damage of that round on the round-end screen, and each player's kills this match next to their name there.");
+            RoundBoard = c.Bind("Match Stats", "Round Board", true, "A small board with kills, deaths and damage of that round on the round-end screen, and each player's kills this match next to their name there and on the Tab screen.");
             MatchBoard = c.Bind("Match Stats", "Match Board", true, "The full board on the victory screen after the match.");
             Type ph = AccessTools.TypeByName("PlayerHealth");
             h.Patch(AccessTools.Method(ph, "sync___set_value_health"), postfix: new HarmonyMethod(typeof(Stats), nameof(HealthPost)));
             h.Patch(AccessTools.Method(ph, "sync___set_value_killer"), postfix: new HarmonyMethod(typeof(Stats), nameof(KillerPost)));
             h.Patch(AccessTools.Method(typeof(RoundManager), "NextRoundCall"), prefix: new HarmonyMethod(typeof(Stats), nameof(RoundEnd)), postfix: new HarmonyMethod(typeof(Stats), nameof(RoundNames)));
+            // the Tab screen: the same match kills next to each name
+            MethodInfo list = AccessTools.Method(typeof(LobbyController), "UpdatePlayerList");
+            if (list != null) h.Patch(list, transpiler: new HarmonyMethod(typeof(Stats), nameof(TabNamesTr)));
             // a new take: the game tells every player to spawn again (an observers RPC: it runs on every client)
             MethodInfo spawn = AccessTools.GetDeclaredMethods(typeof(GameManager)).Find(m => m.Name.StartsWith("RpcLogic___ObserversRoundSpawn", StringComparison.Ordinal));
             if (spawn != null) h.Patch(spawn, prefix: new HarmonyMethod(typeof(Stats), nameof(TakeStart)));
@@ -222,9 +225,43 @@ namespace Monolith
             catch (Exception e) { Quiet(e); }
         }
 
+        // LobbyController.UpdatePlayerList writes every player's name into their row on the Tab screen (PlayerListItemTab),
+        // every time it runs. The name it writes there is read through TabName instead, so the row says the kills too.
+        // The same text comes back while the kills stay the same, so the row's text is not changed again (no new mesh).
+        private static IEnumerable<CodeInstruction> TabNamesTr(IEnumerable<CodeInstruction> ins)
+        {
+            FieldInfo tab = AccessTools.Field(typeof(PlayerListItems), "PlayerListItemTab"), name = AccessTools.Field(typeof(ClientInstance), "PlayerName");
+            MethodInfo mine = AccessTools.Method(typeof(Stats), nameof(TabName));
+            int sinceTab = -1;
+            foreach (CodeInstruction c in ins)
+            {
+                if (tab != null && c.LoadsField(tab)) sinceTab = 0;
+                else if (sinceTab >= 0) sinceTab++;
+                if (sinceTab > 0 && sinceTab <= 3 && name != null && c.LoadsField(name)) { c.opcode = System.Reflection.Emit.OpCodes.Call; c.operand = mine; sinceTab = -1; }
+                yield return c;
+            }
+        }
+
+        private static readonly Dictionary<int, KeyValuePair<int, string>> TabText = new Dictionary<int, KeyValuePair<int, string>>();
+
+        internal static string TabName(ClientInstance ci)
+        {
+            string n = ci != null ? ci.PlayerName : null;
+            try
+            {
+                P p;
+                if (n == null || !On.Value || !RoundBoard.Value || !All.TryGetValue(ci.PlayerId, out p)) return n;
+                KeyValuePair<int, string> last;
+                if (!TabText.TryGetValue(ci.PlayerId, out last) || last.Key != p.Kills || !last.Value.StartsWith(n, StringComparison.Ordinal))
+                    TabText[ci.PlayerId] = last = new KeyValuePair<int, string>(p.Kills, n + "  <size=60%>[" + p.Kills.ToString(CultureInfo.InvariantCulture) + "]</size>");
+                return last.Value;
+            }
+            catch { return n; }
+        }
+
         private static void MatchReset()
         {
-            All.Clear(); Known.Clear(); KillerOf.Clear(); IdOfKiller.Clear(); Waiting.Clear(); IdOf.Clear(); RoundDeaths.Clear();
+            All.Clear(); TabText.Clear(); Known.Clear(); KillerOf.Clear(); IdOfKiller.Clear(); Waiting.Clear(); IdOf.Clear(); RoundDeaths.Clear();
             _firstDone = false; _takeOn = false;
         }
 
@@ -310,7 +347,7 @@ namespace Monolith
         // strips: they make the board look like a second kill feed), the names in the feed's colors (your team as
         // the game colors you, the others as it colors enemies), the headings in its mint, the numbers white. Every cell is
         // its own text in a fixed column, names left and numbers centered under their heading, so the columns line up.
-        // The round board sits in the top left corner above the game's "First to" line; it stays 3 seconds after the
+        // The round board sits in the top left corner, above the dark band with the game's "First to" line; it stays 3 seconds after the
         // round-end screen closes. Made when a board is shown (cells are reused); the canvas is only active while it is.
         internal sealed class Board : MonoBehaviour
         {
@@ -342,7 +379,7 @@ namespace Monolith
                 }
                 catch { }
                 string[] head = full ? FullHead : RoundHead; float[] w = full ? FullW : RoundW;
-                float size = full ? 26f : 22f, rowH = full ? 40f : 30f, pad = 0f, width = 0f;
+                float size = full ? 26f : 20f, rowH = full ? 40f : 22f, pad = 0f, width = 0f;
                 foreach (float f in w) width += f;
                 var rows = Sorted();
                 if (!full) rows.Sort((a, b) => Team(a.Key) != Team(b.Key) ? Team(a.Key).CompareTo(Team(b.Key)) : b.Value.RK != a.Value.RK ? b.Value.RK.CompareTo(a.Value.RK) : b.Value.RDmg.CompareTo(a.Value.RDmg));
@@ -359,7 +396,7 @@ namespace Monolith
                 }
                 for (int i = cell; i < _cells.Count; i++) _cells[i].gameObject.SetActive(false);
                 if (full) { _root.anchorMin = _root.anchorMax = _root.pivot = new Vector2(0.5f, 1f); _root.anchoredPosition = new Vector2(0f, -150f); }
-                else { _root.anchorMin = _root.anchorMax = _root.pivot = new Vector2(0f, 1f); _root.anchoredPosition = new Vector2(64f, -36f); }
+                else { _root.anchorMin = _root.anchorMax = _root.pivot = new Vector2(0f, 1f); _root.anchoredPosition = new Vector2(64f, -20f); }   // ends above the dark band of the round-end screen
                 _root.sizeDelta = new Vector2(width, (rows.Count + 1) * (rowH + 4f));
                 _canvas.SetActive(true);
                 enabled = true;
