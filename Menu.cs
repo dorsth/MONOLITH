@@ -438,7 +438,7 @@ namespace Monolith
             MenuRow row = _bindRow;
             _bindRow = null; _bindEnd = Time.frameCount;
             if (got == "<Keyboard>/escape") return;
-            try { row.Entry.BoxedValue = none ? Monolith.Keys.Off : got; } catch { }
+            try { row.Entry.BoxedValue = none ? Monolith.Keys.Off : Monolith.Keys.Taken(row.Entry, got); } catch { }
         }
 
         private Rect SideRect(MenuPage page)
@@ -517,7 +517,7 @@ namespace Monolith
             int room = Mathf.Clamp(cols - Lang.T(row.Label).Length - 3, 4, cols / 2);   // cells a list or text value may take
             if (row == _bindRow) { v = Lang.T("press a key…"); used = v.Length; return "<color=" + Hot + ">" + v + "</color>"; }
             if (row == _editRow) { v = Fit(_capture ? Lang.T("press a key…") : _edit + "_", room + 2); used = v.Length; return "<color=" + Hot + ">" + Esc(v) + "</color>"; }
-            if (row.Bind) { v = Lang.T(Monolith.Keys.Name(e.GetSerializedValue(), row.Empty)); used = v.Length; return "<color=" + Val + ">" + Esc(v) + "</color>"; }
+            if (row.Bind) { v = Lang.T(Monolith.Keys.Name(e == Monolith.Keys.Swap && e.GetSerializedValue().Length == 0 ? Monolith.Keys.GameSwap() : e.GetSerializedValue(), row.Empty)); used = v.Length; return "<color=" + Val + ">" + Esc(v) + "</color>"; }
             if (t == typeof(Color))
             {
                 Color c = (Color)e.BoxedValue;

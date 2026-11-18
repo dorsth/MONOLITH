@@ -1,5 +1,9 @@
 # MONOLITH changelog
 
+## 0.9.73
+- Swap weapons shows the game's own binding (the scroll wheel) and a key set there replaces it. Scroll while it asks for a key: back to the wheel.
+- Extra jump and Extra jump 2 are named Second jump key and Third jump key.
+
 ## 0.9.72
 - Pages reordered and renamed: Sound is Audio, Mouse and Keys are one page (Controls), Profiles is Configs, Frame cap is FPS cap. Other mods is last and dimmer: it is not part of MONOLITH.
 - Hide default playlists moved to Players, Lobby.

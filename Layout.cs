@@ -455,9 +455,9 @@ namespace Monolith
                  .Set("Scoped multiplier", E(Sens, "Sensitivity", "Scoped Multiplier"), own, "1 matches your normal aim.");
                 const string how = " Enter, then a key, mouse button or wheel. R resets.";
                 p.Head("Keys")
-                 .Key("Extra jump", Keys.Jump1, "not set", "A second jump key." + how)
-                 .Key("Extra jump 2", Keys.Jump2, "not set", "A third. Scroll up on one and scroll down on the other, for example." + how)
-                 .Key("Swap weapons", Keys.Swap, "wheel only", "Swaps your two weapons." + how);
+                 .Key("Second jump key", Keys.Jump1, "not set", "Next to your own jump key." + how)
+                 .Key("Third jump key", Keys.Jump2, "not set", "Scroll up on one and scroll down on the other: jump on the whole wheel." + how)
+                 .Key("Swap weapons", Keys.Swap, "scroll wheel", "Replaces the scroll wheel. Enter, then a key or mouse button. Scroll: back to the wheel. R resets.");
                 var t = new MenuPage(p, "Taunts", "Move a taunt to another key, or switch it off.");
                 for (int i = 0; i < Keys.Taunt.Length; i++) t.Key("Taunt " + (i + 1), Keys.Taunt[i], "key " + ((i + 1) % 10), "Press Enter, then its new key. Enter twice: no key. R: its number key.");
                 p.Go(t, () => { int n = 0; foreach (var e in Keys.Taunt) if (e != null && e.Value.Length > 0) n++; return n == 0 ? "number keys" : Lang.Count(n, " changed", " changed", "changed: "); });

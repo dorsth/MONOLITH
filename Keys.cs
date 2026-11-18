@@ -1,7 +1,10 @@
 // MONOLITH - keys the game's own settings do not let you set. Dorsth was here.
 //
-//  * Extra jump (two of them): a second and third way to jump, the scroll wheel included.
-//  * Swap weapons: the game only swaps on the scroll wheel; this gives it a key or a mouse button as well.
+//  * A second and a third jump key, the scroll wheel included. Two, because scroll up and scroll down are two inputs:
+//    one on each is how a jump on the whole wheel is set.
+//  * Swap weapons: the game swaps on the scroll wheel and has no setting for it. The row shows the game's own binding;
+//    a key or mouse button set here takes its place (the wheel then no longer swaps). Scrolling while the row asks for
+//    a key gives the swap back to the whole wheel.
 //  * Taunts: the game has them fixed on the number keys; each can be moved to another key or switched off.
 //
 // How, and what it leaves alone:
@@ -10,8 +13,8 @@
 //    calls the SAME routine of the game that its own key calls (FirstPersonController.Jump, PlayerPickup.SwitchWeapons).
 //    A press here is a press, one for one: nothing is repeated or timed for you.
 //  * No key is asked for every frame: the input system calls in when one is pressed. A key that is not set costs nothing.
-//  * The scroll wheel swaps weapons in the game. Once you put anything of yours on the wheel, the game's own swap on
-//    the wheel is skipped (a prefix on the routine that hears it), so one notch does one thing.
+//  * The game's own swap is skipped (a prefix on the routine that hears it) while Swap weapons has a key of yours,
+//    and while a jump of yours is on the wheel, so one press or notch does one thing.
 //  * Taunts: the game asks for the ten number keys every frame. Those questions are answered here: for a taunt you
 //    did not change, with the game's own answer.
 using System;
@@ -35,15 +38,15 @@ namespace Monolith
         private static readonly Dictionary<ConfigEntry<string>, InputAction> Actions = new Dictionary<ConfigEntry<string>, InputAction>();
         private static readonly int[] TauntFrame = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
         private static Action<PlayerPickup> _switch;
-        private static bool _wheelMine;
+        private static bool _wheelMine, _swapMine;
         private static int _tauntHits;
 
         internal static void Bind(ConfigFile c)
         {
             const string S = "Keys";
-            Jump1 = c.Bind(S, "Extra Jump", "", "Another way to jump, next to your jump key. A key, a mouse button or the scroll wheel.");
-            Jump2 = c.Bind(S, "Extra Jump 2", "", "One more, for example scroll up on the first and scroll down on this one.");
-            Swap = c.Bind(S, "Swap Weapons", "", "Swaps your two weapons, next to the scroll wheel.");
+            Jump1 = c.Bind(S, "Extra Jump", "", "A second jump key, next to your own. A key, a mouse button, scroll up or scroll down.");
+            Jump2 = c.Bind(S, "Extra Jump 2", "", "A third jump key. Scroll up on one and scroll down on the other puts jump on the whole wheel.");
+            Swap = c.Bind(S, "Swap Weapons", "", "The key that swaps your two weapons, in place of the game's (the scroll wheel). Empty: the game's own.");
             for (int i = 0; i < 10; i++)
                 Taunt[i] = c.Bind(S, "Taunt " + (i + 1), "", "The taunt the game has on number key " + ((i + 1) % 10) + ". Empty: that key.");
         }
@@ -92,7 +95,8 @@ namespace Monolith
                     Actions[e] = a;
                 }
                 _wheelMine = false;
-                foreach (ConfigEntry<string> k in All()) if (k.Value != null && k.Value.IndexOf("/scroll", StringComparison.Ordinal) >= 0) _wheelMine = true;
+                foreach (ConfigEntry<string> k in All()) if (k != Swap && k.Value != null && k.Value.IndexOf("/scroll", StringComparison.Ordinal) >= 0) _wheelMine = true;
+                _swapMine = !string.IsNullOrEmpty(Swap.Value);
             }
             catch (Exception x) { BundlePlugin.Log.LogWarning("Keys: " + e.Definition.Key + " could not be set to " + e.Value + ": " + x.Message); }
         }
@@ -114,12 +118,40 @@ namespace Monolith
             catch (Exception) { }
         }
 
-        // the game hears "swap" from the wheel (and from a gamepad button): the wheel is skipped once it is yours
+        // The game hears "swap" from its own binding (the wheel) and from a gamepad button. Its own binding is skipped
+        // while Swap weapons has a key of yours (yours takes its place), and the wheel while a jump of yours is on it.
         private static bool WheelPrefix(InputAction.CallbackContext __0)
         {
-            if (!_wheelMine) return true;
+            if (!_wheelMine && !_swapMine) return true;
             InputControl c = __0.control;
-            return !(c != null && c.device is Mouse);
+            if (c == null || c.device is Gamepad) return true;
+            return !(_swapMine || c.device is Mouse);
+        }
+
+        /// <summary>What the Swap weapons row reads while it is empty: the game's own binding (the scroll wheel).</summary>
+        internal static string GameSwap()
+        {
+            try
+            {
+                if (InputManager.inputActions != null)
+                    foreach (InputBinding b in InputManager.inputActions.Player.ChangeWeapon.bindings)
+                    {
+                        string p = b.effectivePath;
+                        if (!string.IsNullOrEmpty(p) && p.IndexOf("Gamepad", StringComparison.Ordinal) < 0) return p;
+                    }
+            }
+            catch (Exception) { }
+            return Wheel;
+        }
+
+        internal const string Wheel = "<Mouse>/scroll";
+
+        /// <summary>The value a key just pressed gives a row. On Swap weapons either wheel direction means the whole
+        /// wheel: the game's own binding when that is the wheel (the row goes back to empty), else the wheel as a key.</summary>
+        internal static string Taken(ConfigEntryBase row, string got)
+        {
+            if (row != Swap || got == null || !got.StartsWith(Wheel, StringComparison.Ordinal)) return got;
+            return GameSwap() == Wheel ? "" : Wheel;
         }
 
         private static IEnumerable<CodeInstruction> TauntTr(IEnumerable<CodeInstruction> ins)
@@ -148,6 +180,7 @@ namespace Monolith
         {
             if (string.IsNullOrEmpty(path)) return empty;
             if (path == Off) return "off";
+            if (path == Wheel) return "scroll wheel";
             if (path == "<Mouse>/scroll/up") return "scroll up";
             if (path == "<Mouse>/scroll/down") return "scroll down";
             int slash = path.LastIndexOf('/');
