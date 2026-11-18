@@ -33,7 +33,7 @@ namespace Monolith
 {
     internal static class Stats
     {
-        internal static ConfigEntry<bool> On, RoundBoard, MatchBoard;
+        internal static ConfigEntry<bool> On;
 
         internal sealed class P
         {
@@ -58,8 +58,6 @@ namespace Monolith
         internal static void Bind(ConfigFile c, Harmony h)
         {
             On = c.Bind("Match Stats", "Enabled", true, "Count kills, deaths, damage and more for every player; show them between rounds and after the match.");
-            RoundBoard = c.Bind("Match Stats", "Round Board", true, "A small board with kills, deaths and damage of that round on the round-end screen, and each player's kills this match next to their name there and on the Tab screen.");
-            MatchBoard = c.Bind("Match Stats", "Match Board", true, "The full board on the victory screen after the match.");
             Type ph = AccessTools.TypeByName("PlayerHealth");
             h.Patch(AccessTools.Method(ph, "sync___set_value_health"), postfix: new HarmonyMethod(typeof(Stats), nameof(HealthPost)));
             h.Patch(AccessTools.Method(ph, "sync___set_value_killer"), postfix: new HarmonyMethod(typeof(Stats), nameof(KillerPost)));
@@ -201,7 +199,7 @@ namespace Monolith
                 FinishTake();
                 foreach (var kv in All) if (ClientInstance.playerInstances.ContainsKey(kv.Key)) kv.Value.Rounds++;
                 Names();
-                if (RoundBoard.Value && All.Count > 0) Board.Me.Show(false);
+                if (All.Count > 0) Board.Me.Show(false);
             }
             catch (Exception e) { Quiet(e); }
         }
@@ -213,7 +211,7 @@ namespace Monolith
         {
             try
             {
-                if (!On.Value || !RoundBoard.Value || __instance == null || __instance.names == null) return;
+                if (!On.Value || __instance == null || __instance.names == null) return;
                 string[] n = __instance.names;
                 for (int i = 0; i < n.Length; i++)
                 {
@@ -250,7 +248,7 @@ namespace Monolith
             try
             {
                 P p;
-                if (n == null || !On.Value || !RoundBoard.Value || !All.TryGetValue(ci.PlayerId, out p)) return n;
+                if (n == null || !On.Value || !All.TryGetValue(ci.PlayerId, out p)) return n;
                 KeyValuePair<int, string> last;
                 if (!TabText.TryGetValue(ci.PlayerId, out last) || last.Key != p.Kills || !last.Value.StartsWith(n, StringComparison.Ordinal))
                     TabText[ci.PlayerId] = last = new KeyValuePair<int, string>(p.Kills, n + "  <size=60%>[" + p.Kills.ToString(CultureInfo.InvariantCulture) + "]</size>");
@@ -268,7 +266,7 @@ namespace Monolith
         private static void Scene(string name)
         {
             Known.Clear(); KillerOf.Clear(); IdOfKiller.Clear(); Waiting.Clear(); IdOf.Clear();
-            if (name == "VictoryScene") { FinishTake(); Names(); if (On.Value && MatchBoard.Value && All.Count > 0) { Board.Me.Show(true); Log(); } return; }
+            if (name == "VictoryScene") { FinishTake(); Names(); if (On.Value && All.Count > 0) { Board.Me.Show(true); Log(); } return; }
             Board.Me.Hide();
             if (name == "MainMenu") MatchReset();
             else if (On.Value) { FinishTake(); _takeOn = true; foreach (var kv in All) { kv.Value.RK = 0; kv.Value.RD = 0; kv.Value.RDmg = 0f; } }   // a map: its first take, and a new round

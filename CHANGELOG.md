@@ -1,5 +1,8 @@
 # MONOLITH changelog
 
+## 0.9.87
+- Match stats is one switch on the HUD page (the round board and match board no longer have their own).
+
 ## 0.9.86
 - The Dorsth config no longer forces suits or hats.
 

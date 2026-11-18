@@ -495,15 +495,9 @@ namespace Monolith
                   .Set("Down / up", E(Tweaks, "Interaction", "Prompt Y Offset"), some, "")
                   .Set("Weapon highlight color", E(Tweaks, "Interaction", "Weapon Highlight Color"), null, "The outline of the weapon you look at.");
 
-                var ms = new MenuPage(p, "Match stats", "Kills, deaths, damage and more for every player.");
-                if (Stats.On != null)
-                    ms.Set("Match stats", Stats.On, null, "Counted for every player. Shown only between rounds and after the match.")
-                      .Set("Round board", Stats.RoundBoard, () => On(Stats.On), "Kills, deaths and damage of that round on the round-end screen. Match kills next to each name there and on the Tab screen.")
-                      .Set("Match board", Stats.MatchBoard, () => On(Stats.On), "ADR, opening kills, trades, 2k, clutches and rounds survived after the match. Also in the log.");
-
                 p.Go(hm, () => On(noHm) ? "hidden" : On(still) ? "static" : "")
                  .Go(pr, () => On(noPick) && On(noUse) ? "hidden" : "")
-                 .Go(ms, () => Stats.On != null && !Stats.On.Value ? "off" : "")
+                 .Set("Match stats", Stats.On, null, "Kills, deaths and damage of each round on the round-end screen, match kills next to each name there and on the Tab screen, and a full board after the match.")
                  .Set("Hide FPS", E(Tweaks, "HUD", "Hide FPS"), null, "")
                  .Set("Hide ping", E(Tweaks, "HUD", "Hide Ping"), null, "")
                  .Set("Slide cooldown timer", E(Tweaks, "HUD", "Slide Cooldown Timer"), null, "Shows the time until you can slide again under the crosshair, as text or a bar.")
