@@ -1,5 +1,8 @@
 # MONOLITH changelog
 
+## 1.0.1
+- Description and readme: MONOLITH replaces Mod Menu and Minimal Viewmodels Reborn, other mods' settings are in its menu, and your settings come along when you switch.
+
 ## 1.0.0
 - First public release.
 - The match board sits centered in the free floor between the rematch signs and the health line, so it covers neither the 1st/2nd panel nor the signs.
