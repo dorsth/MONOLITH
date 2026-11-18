@@ -445,7 +445,7 @@ namespace Monolith
                 {
                     TextMeshProUGUI t = _cells[i]; RectTransform rt = t.rectTransform;
                     float tw = Mathf.Min(t.preferredWidth, rt.sizeDelta.x);
-                    float end = t.alignment == TextAlignmentOptions.MidlineLeft ? rt.anchoredPosition.x + tw : rt.anchoredPosition.x + (rt.sizeDelta.x + tw) * 0.5f;
+                    float end = t.alignment == TextAlignmentOptions.BaselineLeft ? rt.anchoredPosition.x + tw : rt.anchoredPosition.x + (rt.sizeDelta.x + tw) * 0.5f;
                     if (end > right) right = end;
                 }
                 float height = (rows.Count + 1) * (rowH + 4f) - 4f;
@@ -469,8 +469,10 @@ namespace Monolith
                     // a long name gets smaller first (down to 75%), then ends in "…"
                     t.enableAutoSizing = i == 0; t.fontSizeMax = size; t.fontSizeMin = size * 0.75f; t.fontSize = size;
                     t.overflowMode = i == 0 ? TextOverflowModes.Ellipsis : TextOverflowModes.Overflow;
-                    t.alignment = i == 0 ? TextAlignmentOptions.MidlineLeft : TextAlignmentOptions.Midline;
-                    Place(t.rectTransform, x, y, w[i], rowH); t.gameObject.SetActive(true);
+                    // every cell of a row on one baseline (centered on its own letters, "player" and "open" sat higher than "k"),
+                    // the row moved down by half a capital so its letters stay in the middle of the row
+                    t.alignment = i == 0 ? TextAlignmentOptions.BaselineLeft : TextAlignmentOptions.Baseline;
+                    Place(t.rectTransform, x, y - size * 0.35f, w[i], rowH); t.gameObject.SetActive(true);
                     x += w[i];
                 }
             }

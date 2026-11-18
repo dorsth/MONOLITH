@@ -1,5 +1,8 @@
 # MONOLITH changelog
 
+## 0.9.97
+- Board text sits on one baseline per row, so headers like "player" and "first kills" line up with "k" and "d".
+
 ## 0.9.96
 - Board headers all lowercase, like the game's own round-end and Tab screens.
 
