@@ -354,7 +354,8 @@ namespace Monolith
         {
             internal static Board Me;
             private bool _full, _waitOnly; private float _hideAt = -1f;
-            private GameObject _canvas; private RectTransform _root;
+            private GameObject _canvas; private RectTransform _root, _back;
+            private const float Pad = 14f, Edge = 24f;   // panel padding around the text; the round board's distance from the screen's left and top
             private TMP_FontAsset _font; private Material _mat;
             private readonly List<TextMeshProUGUI> _cells = new List<TextMeshProUGUI>();
 
@@ -396,9 +397,21 @@ namespace Monolith
                     Row(ref cell, r + 1, v, w, size, rowH, pad, name, White);
                 }
                 for (int i = cell; i < _cells.Count; i++) _cells[i].gameObject.SetActive(false);
+                // the panel fits the text as drawn: from the names' left edge to the right edge of the widest last number,
+                // the same padding on every side
+                float right = 0f;
+                for (int i = 0; i < cell; i++)
+                {
+                    TextMeshProUGUI t = _cells[i]; RectTransform rt = t.rectTransform;
+                    float tw = Mathf.Min(t.preferredWidth, rt.sizeDelta.x);
+                    float end = t.alignment == TextAlignmentOptions.MidlineLeft ? rt.anchoredPosition.x + tw : rt.anchoredPosition.x + (rt.sizeDelta.x + tw) * 0.5f;
+                    if (end > right) right = end;
+                }
+                float height = (rows.Count + 1) * (rowH + 4f) - 4f;
+                _back.anchoredPosition = new Vector2(-Pad, Pad); _back.sizeDelta = new Vector2(right + 2f * Pad, height + 2f * Pad);
+                _root.sizeDelta = new Vector2(right, height);
                 if (full) { _root.anchorMin = _root.anchorMax = _root.pivot = new Vector2(0.5f, 1f); _root.anchoredPosition = new Vector2(0f, -150f); }
-                else { _root.anchorMin = _root.anchorMax = _root.pivot = new Vector2(0f, 1f); _root.anchoredPosition = new Vector2(64f, -20f); }   // ends above the dark band of the round-end screen
-                _root.sizeDelta = new Vector2(width, (rows.Count + 1) * (rowH + 4f));
+                else { _root.anchorMin = _root.anchorMax = _root.pivot = new Vector2(0f, 1f); _root.anchoredPosition = new Vector2(Edge + Pad, -(Edge + Pad)); }   // the panel ends above the dark band of the round-end screen
                 _canvas.SetActive(true);
                 enabled = true;
             }
@@ -445,7 +458,7 @@ namespace Monolith
                 // one dark see-through panel behind the whole board, like the game's own boxes (kill feed, Tab screen)
                 var back = new GameObject("backdrop"); back.transform.SetParent(_root, false);
                 var bi = back.AddComponent<Image>(); bi.color = new Color(0f, 0f, 0f, 0.45f); bi.raycastTarget = false;
-                var br = bi.rectTransform; br.anchorMin = Vector2.zero; br.anchorMax = Vector2.one; br.offsetMin = new Vector2(-18f, -10f); br.offsetMax = new Vector2(18f, 8f);
+                _back = bi.rectTransform; _back.anchorMin = _back.anchorMax = _back.pivot = new Vector2(0f, 1f);
                 // the font and material of the round-end screen's names, so it reads like the game
                 try
                 {

@@ -1,5 +1,8 @@
 # MONOLITH changelog
 
+## 0.9.89
+- The stats panel fits its text, with the same padding on every side. The round board sits the same distance from the left and top of the screen.
+
 ## 0.9.88
 - Tab screen: the kills are added to the name shown, not to the player's name itself. Rows keep their avatars, buttons and places again.
 
