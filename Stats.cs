@@ -129,11 +129,12 @@ namespace Monolith
         private static int Attacker(int key) { int a; return KillerOf.TryGetValue(key, out a) ? a : -1; }
 
         // hits from an earlier frame: to the attacker on record now (set by then, if the game sent one)
-        internal static void Flush()
+        // all: also this frame's hits (a take or round that ends on the frame of its last kill counts that kill first)
+        internal static void Flush(bool all = false)
         {
             if (Waiting.Count == 0) return;
             List<int> done = null;
-            foreach (var kv in Waiting) if (kv.Value.Frame < Time.frameCount) { Credit(kv.Value, Attacker(kv.Key)); (done ?? (done = new List<int>())).Add(kv.Key); }
+            foreach (var kv in Waiting) if (all || kv.Value.Frame < Time.frameCount) { Credit(kv.Value, Attacker(kv.Key)); (done ?? (done = new List<int>())).Add(kv.Key); }
             if (done != null) foreach (int k in done) Waiting.Remove(k);
         }
 
@@ -183,7 +184,7 @@ namespace Monolith
 
         private static void FinishTake()
         {
-            Flush();
+            Flush(true);
             if (_takeOn && RoundDeaths.Count > 0)   // a take ends with at least one death; a spawn right after a map load is not a take of its own
             {
                 foreach (var kv in ClientInstance.playerInstances) if (kv.Value != null) Get(kv.Key);

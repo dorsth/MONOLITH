@@ -1,5 +1,8 @@
 # MONOLITH changelog
 
+## 0.10.3
+- Match stats: the kill that ends a take or round is counted before the round board is shown (its damage and kill were missing from the board).
+
 ## 0.10.2
 - Stats boards: fixed column widths worked out from the text, the same gap between every column (no measuring, which squeezed the columns).
 - Each counted hit is written to the BepInEx log ("Stats hit: ..."), to check the counting.
