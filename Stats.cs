@@ -400,7 +400,7 @@ namespace Monolith
 
             // the match board keeps the headers every FPS scoreboard uses (k, d, adr) and writes out its own: it has to stay
             // clear of the podium on the victory screen. The round board has room for whole words.
-            private static readonly string[] FullHead = { "player", "k", "d", "ADR", "taken", "first kills", "trade", "multi", "clutch", "survived" };
+            private static readonly string[] FullHead = { "player", "k", "d", "adr", "taken", "first kills", "trade", "multi", "clutch", "survived" };
             private static readonly float[] FullW = { 300f, 70f, 70f, 80f, 100f, 140f, 90f, 90f, 100f, 120f };
             private static readonly string[] RoundHead = { "player", "kills", "deaths", "damage" };
             private static readonly float[] RoundW = { 250f, 80f, 90f, 100f };
