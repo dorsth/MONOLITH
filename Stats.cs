@@ -223,9 +223,22 @@ namespace Monolith
             foreach (var kv in All)
             {
                 ClientInstance ci;
-                if (ClientInstance.playerInstances.TryGetValue(kv.Key, out ci) && ci != null && !string.IsNullOrEmpty(ci.PlayerName)) kv.Value.Name = ci.PlayerName;
+                string n = ClientInstance.playerInstances.TryGetValue(kv.Key, out ci) && ci != null ? Untag(ci.PlayerName) : "";
+                if (n.Length > 0) kv.Value.Name = n;
                 else if (kv.Value.Name.Length == 0) kv.Value.Name = "player " + (kv.Key + 1);
             }
+        }
+
+        // A name without the game's text tags (<#FFF>, <b>, <color=red>, <gradient=...>), the same rule as strafth.com's
+        // leaderboards; also a tag cut off at the end of a name by Steam's length limit ("<#52A").
+        private static readonly System.Text.RegularExpressions.Regex Tag = new System.Text.RegularExpressions.Regex(
+            @"</?(?:#[0-9a-f]{3,8}|color(?:=[^<>]{1,20})?|b|i|u|s|size[^<>]{0,12}|alpha[^<>]{0,12}|mark[^<>]{0,20}|font[^<>]{0,30}|sup|sub|noparse|br|cspace[^<>]{0,12}|mspace[^<>]{0,12}|voffset[^<>]{0,12}|rotate[^<>]{0,12}|uppercase|lowercase|smallcaps|gradient[^<>]{0,40}|sprite[^<>]{0,40}|style[^<>]{0,20}|nobr|indent[^<>]{0,12}|pos[^<>]{0,12}|line-height[^<>]{0,12}|width[^<>]{0,12}|margin[^<>]{0,12})>",
+            System.Text.RegularExpressions.RegexOptions.IgnoreCase), CutTag = new System.Text.RegularExpressions.Regex(@"</?(?:#[0-9a-f]{0,8}|color[^<>]{0,20})$", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+
+        internal static string Untag(string name)
+        {
+            if (string.IsNullOrEmpty(name)) return "";
+            return CutTag.Replace(Tag.Replace(name, ""), "").Trim();
         }
 
         internal static int Team(int id)
@@ -351,7 +364,7 @@ namespace Monolith
                 float height = (rows.Count + 1) * (rowH + 4f) - 4f;
                 _back.anchoredPosition = new Vector2(-Pad, Pad); _back.sizeDelta = new Vector2(right + 2f * Pad, height + 2f * Pad);
                 _root.sizeDelta = new Vector2(right, height);
-                if (full) { _root.anchorMin = _root.anchorMax = _root.pivot = new Vector2(0.5f, 1f); _root.anchoredPosition = new Vector2(0f, -150f); }
+                if (full) { _root.anchorMin = _root.anchorMax = _root.pivot = new Vector2(0f, 1f); _root.anchoredPosition = new Vector2(Edge + Pad, -150f); }   // left: the podium is on the right
                 else { _root.anchorMin = _root.anchorMax = _root.pivot = new Vector2(0f, 1f); _root.anchoredPosition = new Vector2(Edge + Pad, -(Edge + Pad)); }   // the panel ends above the dark band of the round-end screen
                 _canvas.SetActive(true);
                 enabled = true;
@@ -365,8 +378,10 @@ namespace Monolith
                 {
                     TextMeshProUGUI t = cell < _cells.Count ? _cells[cell] : NewCell(); cell++;
                     string text = v[i] ?? "";
-                    if (i == 0 && text.Length > 18) text = text.Substring(0, 17) + "…";
-                    t.text = text; t.fontSize = size; t.color = i == 0 ? name : num;
+                    t.text = text; t.color = i == 0 ? name : num;
+                    // a long name gets smaller first (down to 75%), then ends in "…"
+                    t.enableAutoSizing = i == 0; t.fontSizeMax = size; t.fontSizeMin = size * 0.75f; t.fontSize = size;
+                    t.overflowMode = i == 0 ? TextOverflowModes.Ellipsis : TextOverflowModes.Overflow;
                     t.alignment = i == 0 ? TextAlignmentOptions.MidlineLeft : TextAlignmentOptions.Midline;
                     Place(t.rectTransform, x, y, w[i], rowH); t.gameObject.SetActive(true);
                     x += w[i];

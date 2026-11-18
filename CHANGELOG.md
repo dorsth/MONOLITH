@@ -1,5 +1,9 @@
 # MONOLITH changelog
 
+## 0.9.91
+- Stats boards: names show without the game's text tags (<gradient=...>, <#FFF> and the like), the same rule as strafth.com. A long name gets smaller to fit before it is cut with "…".
+- The match board sits on the left, clear of the podium on the victory screen.
+
 ## 0.9.90
 - No more kill counts added to names on the round-end screen and the Tab screen: they broke the game's own layout. The round board shows the kills.
 
