@@ -398,10 +398,12 @@ namespace Monolith
             private TMP_FontAsset _font; private Material _mat;
             private readonly List<TextMeshProUGUI> _cells = new List<TextMeshProUGUI>();
 
-            private static readonly string[] FullHead = { "player", "k", "d", "adr", "taken", "open", "trade", "2k", "clutch", "alive" };
-            private static readonly float[] FullW = { 320f, 70f, 70f, 80f, 100f, 90f, 90f, 70f, 100f, 100f };
-            private static readonly string[] RoundHead = { "player", "k", "d", "dmg" };
-            private static readonly float[] RoundW = { 250f, 60f, 60f, 80f };
+            // the match board keeps the headers every FPS scoreboard uses (k, d, adr) and writes out its own: it has to stay
+            // clear of the podium on the victory screen. The round board has room for whole words.
+            private static readonly string[] FullHead = { "player", "k", "d", "ADR", "taken", "first kills", "trade", "multi", "clutch", "survived" };
+            private static readonly float[] FullW = { 300f, 70f, 70f, 80f, 100f, 140f, 90f, 90f, 100f, 120f };
+            private static readonly string[] RoundHead = { "player", "kills", "deaths", "damage" };
+            private static readonly float[] RoundW = { 250f, 80f, 90f, 100f };
             private static readonly Color Mint = new Color32(0xB4, 0xF2, 0xB4, 0xFF), White = new Color32(0xF8, 0xF8, 0xF8, 0xFF);
 
             internal void Show(bool full)

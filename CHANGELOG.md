@@ -1,5 +1,8 @@
 # MONOLITH changelog
 
+## 0.9.95
+- Round board headers in whole words: kills, deaths, damage. Match board: k, d and ADR stay (what every FPS scoreboard uses); open, 2k and alive are now first kills, multi and survived.
+
 ## 0.9.94
 - The label over each name says kills and deaths ("kills 7   deaths 3"), in the color of the Tab screen's map line, a little bigger, and shows for every player (also one with nothing counted yet).
 
