@@ -1,6 +1,6 @@
 {
     "name": "MONOLITH",
-    "version_number": "0.9.79",
+    "version_number": "0.9.80",
     "website_url": "",
     "description": "Every Dorsth mod in one file, with one menu (F2)",
     "dependencies": [

@@ -42,7 +42,7 @@ Have Mod Menu installed as well? Only one of the two loads, so remove one: MONOL
 
 ## Language
 
-Menu, Language: English or Russian. The first start takes Russian when Windows is in Russian. Everything the menu draws is translated: names, lines under the page, lists, messages, the key bar. A setting no page has (found through the search) keeps its English name and description. Settings files and configs are the same in both languages.
+General, Language: English or Russian. The first start takes Russian when Windows is in Russian. Everything the menu draws is translated: names, lines under the page, lists, messages, the key bar. A setting no page has (found through the search) keeps its English name and description. Settings files and configs are the same in both languages.
 
 The Russian texts are in `lang/ru.py`. `lang/make.py` (run by `build.sh`) checks each one against the cells it has in the menu and stops the build when one would be cut, then writes `Russian.cs`.
 
@@ -57,7 +57,7 @@ The Russian texts are in `lang/ru.py`. `lang/make.py` (run by `build.sh`) checks
 
 ## Pages
 
-Crosshair, Viewmodel, Camera, HUD, Effects, Players, Audio, Controls, Performance, Configs, Menu. **Other mods**, last and dimmer, is not part of MONOLITH: it lists the settings of the other mods you have, the way Mod Menu does (see above).
+Crosshair, Viewmodel, Camera, HUD, Effects, Players, Audio, Controls, Performance, Configs, General. **Other mods**, last and dimmer, is not part of MONOLITH: it lists the settings of the other mods you have, the way Mod Menu does (see above).
 
 ## Controls
 

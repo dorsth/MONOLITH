@@ -1,5 +1,10 @@
 # MONOLITH changelog
 
+## 0.9.80
+- The Menu page is General. Fewer UI animations moved there from HUD.
+- No near miss vignette moved from Camera to Effects, Screen.
+- Descriptions no longer repeat the default (the box shows it already). "From the next round" is said once, on the Players page.
+
 ## 0.9.79
 - A changed setting shows Reset in the box under the page, next to its default. Click it, or press R.
 - Reset this page is gone.
