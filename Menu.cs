@@ -260,9 +260,7 @@ namespace Monolith
 
         private static readonly MenuRow UpRow = new MenuRow { Kind = RowKind.Up, Label = ".." };
         private MenuRow _dragRow; private Vector2 _lastMouse;
-        // the cells a row's text has; the last two of the row are kept for the reset mark (ResetX)
-        private int ColsFor(MenuPage page) { return (int)((_pageR.width - 2 * _cw) / _cw) - 3 - (page.Draw != null ? page.SideCols + 1 : 0); }
-        private float ResetX(int cols) { return _pageR.x + _cw * (2.5f + cols); }
+        private int ColsFor(MenuPage page) { return (int)((_pageR.width - 2 * _cw) / _cw) - 1 - (page.Draw != null ? page.SideCols + 1 : 0); }
 
         // ---- drawing
 
@@ -390,9 +388,8 @@ namespace Monolith
                 Rect r = new Rect(_pageR.x + _cw, _pageR.y + (i + 1) * _ch, _pageR.width - 2 * _cw - side * _cw, _ch);
                 bool cur = idx == ci && pageOn;
                 if (cur) Fill(r, Bar); else if (idx == over && row.Kind != RowKind.Header) Fill(r, Hover);
-                Line(r.x + _cw * 0.5f, r.y, RowText(row, row.Kind == RowKind.Header ? cols + 2 : cols, cur));
+                Line(r.x + _cw * 0.5f, r.y, RowText(row, cols, cur));
                 Knob(row, r.y, cols, cur);
-                if (Changed(row)) Line(ResetX(cols), r.y, "<color=" + Hot + ">↺</color>");   // changed: a click on it puts it back
             }
             if (_vis.Count > vis)
             {
@@ -972,9 +969,8 @@ namespace Monolith
             _inNav = false;
             if (page.Cur != row) { _armed = null; _say = null; }
             page.Cur = row; page.Last = at;
-            // On a number's bar: the value goes to the mouse, and follows it while held. The ↺ of a changed row resets it.
+            // On a number's bar: the value goes to the mouse, and follows it while held.
             if (button != 0) return;
-            if (Changed(row) && m.x >= ResetX(ColsFor(page)) - _cw * 0.4f) { Default(row); return; }
             if (OnBar(row, m.x, page)) { _dragRow = row; Slide(row, m.x, page); return; }
             Activate(row);
         }

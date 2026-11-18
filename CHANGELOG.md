@@ -1,7 +1,10 @@
 # MONOLITH changelog
 
+## 0.9.77
+- The ↺ mark on changed rows is gone.
+
 ## 0.9.76
-- One way to reset: R (or a click on the ↺ of a changed row). The key bar shows "R reset" while the selected setting is changed. Right-click no longer resets.
+- One way to reset: R. The key bar shows "R reset" while the selected setting is changed. Right-click no longer resets.
 - Reset this page: shown at the end of a page while something on it is changed. Enter twice.
 
 ## 0.9.75
