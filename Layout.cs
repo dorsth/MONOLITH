@@ -497,7 +497,7 @@ namespace Monolith
 
                 p.Go(hm, () => On(noHm) ? "hidden" : On(still) ? "static" : "")
                  .Go(pr, () => On(noPick) && On(noUse) ? "hidden" : "")
-                 .Set("Match stats", Stats.On, null, "Kills, deaths and damage of each round on the round-end screen, and a full board after the match.")
+                 .Set("Match stats", Stats.On, null, "Kills, deaths and damage of each round on the round-end screen, match kills over each name there and on the Tab screen, and a full board after the match.")
                  .Set("Hide FPS", E(Tweaks, "HUD", "Hide FPS"), null, "")
                  .Set("Hide ping", E(Tweaks, "HUD", "Hide Ping"), null, "")
                  .Set("Slide cooldown timer", E(Tweaks, "HUD", "Slide Cooldown Timer"), null, "Shows the time until you can slide again under the crosshair, as text or a bar.")

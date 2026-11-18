@@ -61,7 +61,10 @@ namespace Monolith
             Type ph = AccessTools.TypeByName("PlayerHealth");
             h.Patch(AccessTools.Method(ph, "sync___set_value_health"), postfix: new HarmonyMethod(typeof(Stats), nameof(HealthPost)));
             h.Patch(AccessTools.Method(ph, "sync___set_value_killer"), postfix: new HarmonyMethod(typeof(Stats), nameof(KillerPost)));
-            h.Patch(AccessTools.Method(typeof(RoundManager), "NextRoundCall"), prefix: new HarmonyMethod(typeof(Stats), nameof(RoundEnd)));
+            h.Patch(AccessTools.Method(typeof(RoundManager), "NextRoundCall"), prefix: new HarmonyMethod(typeof(Stats), nameof(RoundEnd)), postfix: new HarmonyMethod(typeof(Stats), nameof(RoundTags)));
+            // the Tab screen: the same label over each player's name
+            MethodInfo shown = AccessTools.Method(typeof(PlayerListItem), "SetPlayerValues");
+            if (shown != null) h.Patch(shown, postfix: new HarmonyMethod(typeof(Stats), nameof(TabTag)));
             // a new take: the game tells every player to spawn again (an observers RPC: it runs on every client)
             MethodInfo spawn = AccessTools.GetDeclaredMethods(typeof(GameManager)).Find(m => m.Name.StartsWith("RpcLogic___ObserversRoundSpawn", StringComparison.Ordinal));
             if (spawn != null) h.Patch(spawn, prefix: new HarmonyMethod(typeof(Stats), nameof(TakeStart)));
@@ -201,9 +204,87 @@ namespace Monolith
             catch (Exception e) { Quiet(e); }
         }
 
+        // ---- "kills: 7" over a name on the round-end screen and the Tab screen
+        // The game's name texts are not changed (they wrap, and other mods find rows by them): each gets a small label of
+        // its own, a child of the name, that sits just over where the name's letters are and moves with it.
+
+        private static readonly AccessTools.FieldRef<RoundManager, TextMeshProUGUI> SelfName = AccessTools.FieldRefAccess<RoundManager, TextMeshProUGUI>("playerName");
+        private static readonly AccessTools.FieldRef<RoundManager, TextMeshProUGUI[]> OtherNames = AccessTools.FieldRefAccess<RoundManager, TextMeshProUGUI[]>("enemyName");
+        private static readonly HashSet<PlayerListItem> Tagged = new HashSet<PlayerListItem>();
+
+        // NextRoundCall(playerId, ...): the screen shows you in the big slot and every other player i in slot i or i-1
+        private static void RoundTags(RoundManager __instance, int playerId)
+        {
+            try
+            {
+                if (__instance == null) return;
+                KillTag.Put(SelfName(__instance), playerId);
+                TextMeshProUGUI[] others = OtherNames(__instance);
+                if (others == null) return;
+                var used = new bool[others.Length];
+                for (int i = 0; i < 4; i++)
+                {
+                    int slot = playerId < i ? i - 1 : i;
+                    if (i == playerId || slot < 0 || slot >= others.Length || !ClientInstance.playerInstances.ContainsKey(i)) continue;
+                    KillTag.Put(others[slot], i); used[slot] = true;
+                }
+                for (int k = 0; k < others.Length; k++) if (!used[k]) KillTag.Put(others[k], -1);
+            }
+            catch (Exception e) { Quiet(e); }
+        }
+
+        private static void TabTag(PlayerListItem __instance)
+        {
+            try
+            {
+                if (__instance == null || Tagged.Contains(__instance)) return;
+                Tagged.Add(__instance);
+                if (__instance.GetComponentInParent<TabScreen>(true) != null) KillTag.Put(__instance.PlayerNameText, __instance.PlayerIdNumber);
+            }
+            catch (Exception e) { Quiet(e); }
+        }
+
+        internal sealed class KillTag : MonoBehaviour
+        {
+            private TMP_Text _name; private TextMeshProUGUI _t; private int _id = -1, _shown = -1;
+
+            internal static void Put(TMP_Text name, int id)
+            {
+                if (name == null) return;
+                KillTag tag = name.GetComponentInChildren<KillTag>(true);
+                if (tag == null)
+                {
+                    var go = new GameObject("MONOLITH kills"); go.transform.SetParent(name.transform, false);
+                    tag = go.AddComponent<KillTag>(); tag._name = name;
+                    var t = tag._t = go.AddComponent<TextMeshProUGUI>();
+                    t.raycastTarget = false; t.enableWordWrapping = false; t.overflowMode = TextOverflowModes.Overflow; t.richText = false;
+                    t.font = name.font; t.fontSharedMaterial = name.fontSharedMaterial; t.alignment = TextAlignmentOptions.BottomLeft;
+                    RectTransform rt = t.rectTransform; rt.anchorMin = rt.anchorMax = rt.pivot = new Vector2(0.5f, 0.5f); rt.sizeDelta = new Vector2(300f, 40f);
+                }
+                tag._id = id; tag._shown = -2;
+            }
+
+            private void LateUpdate()
+            {
+                P p;
+                bool show = _id >= 0 && _name != null && On.Value && All.TryGetValue(_id, out p) && _name.text.Length > 0;
+                if (!show) { if (_t.text.Length > 0) _t.text = ""; _shown = -1; return; }
+                p = All[_id];
+                if (_shown != p.Kills) { _shown = p.Kills; _t.text = "kills: " + p.Kills.ToString(CultureInfo.InvariantCulture); }
+                _t.fontSize = Mathf.Max(14f, _name.fontSize * 0.4f);
+                _t.color = _name.color;
+                // just over the first letter of the name as drawn (its bounds, in the name's own space)
+                Bounds b = _name.textBounds;
+                if (b.size.x <= 0f) return;
+                RectTransform rt = _t.rectTransform;
+                rt.pivot = new Vector2(0f, 0f);
+                rt.localPosition = new Vector3(b.min.x, b.max.y + _t.fontSize * 0.15f, 0f);
+            }
+        }
+
         private static void MatchReset()
         {
-            All.Clear(); Known.Clear(); KillerOf.Clear(); IdOfKiller.Clear(); Waiting.Clear(); IdOf.Clear(); RoundDeaths.Clear();
+            All.Clear(); Tagged.Clear(); Known.Clear(); KillerOf.Clear(); IdOfKiller.Clear(); Waiting.Clear(); IdOf.Clear(); RoundDeaths.Clear();
             _firstDone = false; _takeOn = false;
         }
 
