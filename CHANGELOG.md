@@ -2,7 +2,7 @@
 
 ## 1.0.0
 - First public release.
-- The match board sits below the 1st/2nd panel, so it covers neither the panel nor the rematch signs.
+- The match board sits centered in the free floor between the rematch signs and the health line, so it covers neither the 1st/2nd panel nor the signs.
 - Stats boards: "-" and "/" keep their normal width ("4-0" read as "4 - 0").
 
 ## 0.10.11
