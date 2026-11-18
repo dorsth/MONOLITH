@@ -1,5 +1,8 @@
 # MONOLITH changelog
 
+## 0.9.93
+- The kill labels only move when their name moves (no canvas rebuild every frame), and the list of Tab rows they keep is emptied on every map.
+
 ## 0.9.92
 - "kills: 7" over each name on the round-end screen and the Tab screen: a small label of its own, the game's names and layout stay as they are.
 

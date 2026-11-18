@@ -259,7 +259,7 @@ namespace Monolith
                     var t = tag._t = go.AddComponent<TextMeshProUGUI>();
                     t.raycastTarget = false; t.enableWordWrapping = false; t.overflowMode = TextOverflowModes.Overflow; t.richText = false;
                     t.font = name.font; t.fontSharedMaterial = name.fontSharedMaterial; t.alignment = TextAlignmentOptions.BottomLeft;
-                    RectTransform rt = t.rectTransform; rt.anchorMin = rt.anchorMax = rt.pivot = new Vector2(0.5f, 0.5f); rt.sizeDelta = new Vector2(300f, 40f);
+                    RectTransform rt = t.rectTransform; rt.anchorMin = rt.anchorMax = new Vector2(0.5f, 0.5f); rt.pivot = Vector2.zero; rt.sizeDelta = new Vector2(300f, 40f);
                 }
                 tag._id = id; tag._shown = -2;
             }
@@ -276,9 +276,10 @@ namespace Monolith
                 // just over the first letter of the name as drawn (its bounds, in the name's own space)
                 Bounds b = _name.textBounds;
                 if (b.size.x <= 0f) return;
-                RectTransform rt = _t.rectTransform;
-                rt.pivot = new Vector2(0f, 0f);
-                rt.localPosition = new Vector3(b.min.x, b.max.y + _t.fontSize * 0.15f, 0f);
+                // moved only when the name moved: moving a UI element makes its canvas build again
+                Vector3 at = new Vector3(b.min.x, b.max.y + _t.fontSize * 0.15f, 0f);
+                Transform tr = _t.transform;
+                if ((tr.localPosition - at).sqrMagnitude > 0.01f) tr.localPosition = at;
             }
         }
 
@@ -290,7 +291,7 @@ namespace Monolith
 
         private static void Scene(string name)
         {
-            Known.Clear(); KillerOf.Clear(); IdOfKiller.Clear(); Waiting.Clear(); IdOf.Clear();
+            Known.Clear(); KillerOf.Clear(); IdOfKiller.Clear(); Waiting.Clear(); IdOf.Clear(); Tagged.Clear();
             if (name == "VictoryScene") { FinishTake(); Names(); if (On.Value && All.Count > 0) { Board.Me.Show(true); Log(); } return; }
             Board.Me.Hide();
             if (name == "MainMenu") MatchReset();
