@@ -512,6 +512,11 @@ namespace UltimateTweaks
             });
             Try("LobbyLeaveFix", () => h.Patch(AccessTools.Method(typeof(ClientInstance), "OnDisable"), finalizer: M("LeaveFin")));
             Try("LobbyStaleIds", () => h.Patch(AccessTools.Method(typeof(ClientInstance), "RpcLogic___AddNewPlayer_2166193949"), prefix: M("AddNewPre")));
+            Try("LobbyStaleRows", () =>
+            {
+                rowsById = AccessTools.FieldRefAccess<LobbyController, Dictionary<int, PlayerListItems>>("PlayerIdToListItem");
+                h.Patch(AccessTools.Method(typeof(LobbyController), "UpdatePlayerList"), prefix: M("StaleRowsPre"));
+            });
             Try("FovTweensNoPileUp", () =>
             {
                 var m = AccessTools.Method(typeof(DG.Tweening.ShortcutExtensions), "DOFieldOfView", new[] { typeof(Camera), typeof(float), typeof(float) });
@@ -922,6 +927,39 @@ namespace UltimateTweaks
         {
             ClientInstance old;
             if (ClientInstance.playerInstances.TryGetValue(id, out old) && old == null) ClientInstance.playerInstances.Remove(id);
+        }
+
+        // ---- LobbyStaleRows. The lobby keeps its name rows by player number. Rows left from the last lobby (its cleanup
+        // was cut short, see LobbyLeaveFix) still hold a number, so the game never makes a row for the new player with that
+        // number: no name, picture or ready box. A row that is gone or belongs to another Steam account is dropped, and
+        // the game makes a new one in the same pass.
+        static AccessTools.FieldRef<LobbyController, Dictionary<int, PlayerListItems>> rowsById;
+        static readonly List<int> staleRows = new List<int>();
+        static void StaleRowsPre(LobbyController __instance)
+        {
+            try
+            {
+                var rows = rowsById(__instance);
+                if (rows == null || rows.Count == 0) return;
+                foreach (var kv in rows)
+                {
+                    ClientInstance ci;
+                    PlayerListItems r = kv.Value;
+                    bool gone = r == null || r.PlayerListItem == null || r.PlayerListItemTab == null;
+                    if (gone || (ClientInstance.playerInstances.TryGetValue(kv.Key, out ci) && ci != null && ci.PlayerSteamID != r.PlayerListItem.PlayerSteamID)) staleRows.Add(kv.Key);
+                }
+                if (staleRows.Count == 0) return;
+                foreach (int id in staleRows)
+                {
+                    PlayerListItems r = rows[id];
+                    rows.Remove(id);
+                    if (r == null) continue;
+                    if (r.PlayerListItem != null) UnityEngine.Object.Destroy(r.PlayerListItem.gameObject);
+                    if (r.PlayerListItemTab != null) UnityEngine.Object.Destroy(r.PlayerListItemTab.gameObject);
+                }
+                staleRows.Clear();
+            }
+            catch { staleRows.Clear(); }
         }
 
         // ---- MyceliumPollRate. MyceliumNetworking.PersistentGameObject.Update calls MyceliumNetwork.ReceiveMessages() every frame:

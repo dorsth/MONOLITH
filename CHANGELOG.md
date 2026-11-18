@@ -1,5 +1,8 @@
 # MONOLITH changelog
 
+## 0.10.8
+- Fixed a player in the lobby and Tab screen having no name row when an old row from your last lobby still held their player number (DorsthTweaks 1.3.2).
+
 ## 0.10.7
 - Match stats: a kill right after you join mid match goes to the player who made it (it went to nobody).
 
