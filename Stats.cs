@@ -429,7 +429,7 @@ namespace Monolith
                 for (int i = 0; i < cols; i++)
                 {
                     float widest = 0f; int chars = 0;
-                    for (int r = 0; r < lines.Count; r++) { string[] l = lines[r]; if (i < l.Length && l[i] != null) { chars = Math.Max(chars, l[i].Length); widest = Math.Max(widest, Measure(Shown(r, i, l[i]), size)); } }
+                    for (int r = 0; r < lines.Count; r++) { string[] l = lines[r]; if (i < l.Length && l[i] != null) { chars = Math.Max(chars, l[i].Length); widest = Math.Max(widest, Ink(Shown(r, i, l[i]), size)); } }
                     if (widest < chars * size * 0.3f) widest = chars * size * 0.6f;   // no font to measure with: the average letter width
                     // names: as wide as the longest one, up to a cap; a longer one shrinks, then ends in "…"
                     if (i == 0) widest = Mathf.Min(widest, full ? 260f : 220f);
@@ -468,7 +468,7 @@ namespace Monolith
                     // same edge as its column; every cell on one baseline (centered on its own letters, "player" sat higher than "k"),
                     // the row moved down by half a capital so its letters stay in the middle of the row
                     t.alignment = i == 0 ? TextAlignmentOptions.BaselineLeft : TextAlignmentOptions.BaselineRight;
-                    Place(t.rectTransform, x, y - size * 0.35f, w[i], rowH); t.gameObject.SetActive(true);
+                    Place(t.rectTransform, x, y - size * 0.35f, i == 0 ? w[i] + Gap : w[i], rowH); t.gameObject.SetActive(true);
                     x += w[i];
                 }
             }
@@ -491,6 +491,17 @@ namespace Monolith
                 if (_ruler == null) { _ruler = NewCell(); _cells.Remove(_ruler); _ruler.text = ""; _ruler.richText = true; }   // stays on, empty: draws nothing
                 _ruler.fontSize = size;
                 return _ruler.GetPreferredValues(text).x;
+            }
+
+            // the width of the letters as drawn. The width above has room for the slant after the last letter: on a
+            // left-aligned name that room showed as a wider gap before "kills" than between the other columns.
+            private float Ink(string text, float size)
+            {
+                if (Measure(text, size) <= 0f) return 0f;
+                _ruler.text = text; _ruler.ForceMeshUpdate();
+                float w = _ruler.textBounds.size.x;
+                _ruler.text = ""; _ruler.ForceMeshUpdate();
+                return w;
             }
 
             private static void Place(RectTransform rt, float x, float y, float w, float h)

@@ -1,5 +1,8 @@
 # MONOLITH changelog
 
+## 0.10.10
+- Stats boards: columns are measured on the letters as drawn, so the gap after the names is the same as between the other columns.
+
 ## 0.10.9
 - Stats boards: every digit is as wide as a 0, so numbers line up exactly on their right edge.
 
