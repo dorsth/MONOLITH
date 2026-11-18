@@ -61,10 +61,7 @@ namespace Monolith
             Type ph = AccessTools.TypeByName("PlayerHealth");
             h.Patch(AccessTools.Method(ph, "sync___set_value_health"), postfix: new HarmonyMethod(typeof(Stats), nameof(HealthPost)));
             h.Patch(AccessTools.Method(ph, "sync___set_value_killer"), postfix: new HarmonyMethod(typeof(Stats), nameof(KillerPost)));
-            h.Patch(AccessTools.Method(typeof(RoundManager), "NextRoundCall"), prefix: new HarmonyMethod(typeof(Stats), nameof(RoundEnd)), postfix: new HarmonyMethod(typeof(Stats), nameof(RoundNames)));
-            // the Tab screen: the same match kills next to each name (only the text shown, not the player's name)
-            MethodInfo shown = AccessTools.Method(typeof(PlayerListItem), "SetPlayerValues");
-            if (shown != null) h.Patch(shown, transpiler: new HarmonyMethod(typeof(Stats), nameof(TabNamesTr)));
+            h.Patch(AccessTools.Method(typeof(RoundManager), "NextRoundCall"), prefix: new HarmonyMethod(typeof(Stats), nameof(RoundEnd)));
             // a new take: the game tells every player to spawn again (an observers RPC: it runs on every client)
             MethodInfo spawn = AccessTools.GetDeclaredMethods(typeof(GameManager)).Find(m => m.Name.StartsWith("RpcLogic___ObserversRoundSpawn", StringComparison.Ordinal));
             if (spawn != null) h.Patch(spawn, prefix: new HarmonyMethod(typeof(Stats), nameof(TakeStart)));
@@ -204,65 +201,9 @@ namespace Monolith
             catch (Exception e) { Quiet(e); }
         }
 
-        // The game's round-end screen: the names it is about to show get the kills of this match next to them, small, as
-        // Kill Tracker did ("nutellamonsta  [7]"). NextRoundCall fills RoundManager.names and starts the screen's routine,
-        // which reads them after its first wait: changed here, after the method, they are what it shows.
-        private static void RoundNames(RoundManager __instance)
-        {
-            try
-            {
-                if (!On.Value || __instance == null || __instance.names == null) return;
-                string[] n = __instance.names;
-                for (int i = 0; i < n.Length; i++)
-                {
-                    P p;
-                    if (string.IsNullOrEmpty(n[i]) || !All.TryGetValue(i, out p)) continue;
-                    n[i] = n[i] + "  <size=60%>[" + p.Kills.ToString(CultureInfo.InvariantCulture) + "]</size>";
-                }
-            }
-            catch (Exception e) { Quiet(e); }
-        }
-
-        // PlayerListItem.SetPlayerValues puts the item's PlayerName into its text. For a row of the Tab screen the text it
-        // puts there is read through ShownName, with the kills added. The item's PlayerName itself stays the player's name
-        // (the game and other mods find rows by it). The same text comes back while the kills stay the same, so the text
-        // is not changed again on every call (no new mesh).
-        private static IEnumerable<CodeInstruction> TabNamesTr(IEnumerable<CodeInstruction> ins)
-        {
-            FieldInfo name = AccessTools.Field(typeof(PlayerListItem), "PlayerName");
-            MethodInfo mine = AccessTools.Method(typeof(Stats), nameof(ShownName));
-            bool done = false;
-            foreach (CodeInstruction c in ins)
-            {
-                if (!done && name != null && c.LoadsField(name)) { c.opcode = System.Reflection.Emit.OpCodes.Call; c.operand = mine; done = true; }
-                yield return c;
-            }
-        }
-
-        private static readonly Dictionary<PlayerListItem, bool> OnTab = new Dictionary<PlayerListItem, bool>();
-        private static readonly Dictionary<int, KeyValuePair<int, string>> TabText = new Dictionary<int, KeyValuePair<int, string>>();
-
-        internal static string ShownName(PlayerListItem item)
-        {
-            string n = item != null ? item.PlayerName : null;
-            try
-            {
-                P p;
-                if (n == null || !On.Value || !All.TryGetValue(item.PlayerIdNumber, out p)) return n;
-                bool tab;
-                if (!OnTab.TryGetValue(item, out tab)) OnTab[item] = tab = item.GetComponentInParent<TabScreen>(true) != null;
-                if (!tab) return n;
-                KeyValuePair<int, string> last;
-                if (!TabText.TryGetValue(item.PlayerIdNumber, out last) || last.Key != p.Kills || !last.Value.StartsWith(n, StringComparison.Ordinal))
-                    TabText[item.PlayerIdNumber] = last = new KeyValuePair<int, string>(p.Kills, n + "  [" + p.Kills.ToString(CultureInfo.InvariantCulture) + "]");
-                return last.Value;
-            }
-            catch { return n; }
-        }
-
         private static void MatchReset()
         {
-            All.Clear(); TabText.Clear(); OnTab.Clear(); Known.Clear(); KillerOf.Clear(); IdOfKiller.Clear(); Waiting.Clear(); IdOf.Clear(); RoundDeaths.Clear();
+            All.Clear(); Known.Clear(); KillerOf.Clear(); IdOfKiller.Clear(); Waiting.Clear(); IdOf.Clear(); RoundDeaths.Clear();
             _firstDone = false; _takeOn = false;
         }
 

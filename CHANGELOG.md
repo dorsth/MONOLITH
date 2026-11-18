@@ -1,5 +1,8 @@
 # MONOLITH changelog
 
+## 0.9.90
+- No more kill counts added to names on the round-end screen and the Tab screen: they broke the game's own layout. The round board shows the kills.
+
 ## 0.9.89
 - The stats panel fits its text, with the same padding on every side. The round board sits the same distance from the left and top of the screen.
 
