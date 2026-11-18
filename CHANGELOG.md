@@ -1,5 +1,8 @@
 # MONOLITH changelog
 
+## 0.10.1
+- Fixed the stats boards squeezing all columns together: columns are measured on the board's own text, and never narrower than their longest entry.
+
 ## 0.10.0
 - Match board: no damage taken column; multi is called 2k again.
 

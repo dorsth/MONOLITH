@@ -389,7 +389,6 @@ namespace Monolith
             private static readonly string[] FullHead = { "player", "k", "d", "adr", "first kills", "trade", "2k", "clutch", "survived" };
             private static readonly string[] RoundHead = { "player", "kills", "deaths", "damage" };
             private const float Gap = 28f, NameMax = 300f;   // the same gap between all columns; a longer name shrinks, then ends in "…"
-            private TextMeshProUGUI _measure;
             private static readonly Color Mint = new Color32(0xB4, 0xF2, 0xB4, 0xFF), White = new Color32(0xF8, 0xF8, 0xF8, 0xFF);
 
             internal void Show(bool full)
@@ -420,16 +419,30 @@ namespace Monolith
                         : new[] { p.Name, p.RK.ToString(), p.RD.ToString(), Num(p.RDmg) });
                     names.Add(me >= 0 && Team(kv.Key) == Team(me) ? self : enemy);
                 }
-                // each column as wide as its widest entry, plus the same gap: even spacing whatever the numbers are
-                float[] w = new float[head.Length];
-                if (_font != null) _measure.font = _font;
-                _measure.fontSize = size;
-                foreach (string[] l in lines)
-                    for (int i = 0; i < l.Length && i < w.Length; i++)
-                        w[i] = Mathf.Max(w[i], _measure.GetPreferredValues(l[i] ?? "").x);
+                // each column as wide as its widest entry, plus the same gap: even spacing whatever the numbers are.
+                // Measured on the cells themselves (drawn once wide, then laid out again at the measured widths).
+                _canvas.SetActive(true);   // text is only measured right on an active canvas
+                int cols = head.Length, cell = 0;
+                float[] w = new float[cols];
+                for (int i = 0; i < cols; i++) w[i] = i == 0 ? NameMax : 400f;
+                for (int r = 0; r < lines.Count; r++) Row(ref cell, r, lines[r], w, size, rowH, pad, names[r], r == 0 ? Mint : White);
+                for (int i = 0; i < cols; i++) w[i] = 0f;
+                for (int k = 0; k < cell; k++)
+                {
+                    TextMeshProUGUI t = _cells[k]; t.ForceMeshUpdate();
+                    int col = k % cols;
+                    w[col] = Mathf.Max(w[col], t.GetPreferredValues(t.text, 9999f, 100f).x);
+                }
+                // never narrower than the longest entry at an average letter width (if measuring failed, this still fits)
+                for (int i = 0; i < cols; i++)
+                {
+                    int chars = 0;
+                    foreach (string[] l in lines) if (i < l.Length && l[i] != null) chars = Math.Max(chars, l[i].Length);
+                    w[i] = Mathf.Max(w[i], chars * size * 0.5f);
+                }
                 w[0] = Mathf.Min(w[0], NameMax);
-                for (int i = 0; i < w.Length; i++) w[i] += Gap;
-                int cell = 0;
+                for (int i = 0; i < cols; i++) w[i] += Gap;
+                cell = 0;
                 for (int r = 0; r < lines.Count; r++) Row(ref cell, r, lines[r], w, size, rowH, pad, names[r], r == 0 ? Mint : White);
                 for (int i = cell; i < _cells.Count; i++) _cells[i].gameObject.SetActive(false);
                 // the panel fits the text as drawn: from the names' left edge to the right edge of the widest last number,
@@ -496,8 +509,6 @@ namespace Monolith
                 var go = new GameObject("board"); go.transform.SetParent(_canvas.transform, false);
                 _root = go.AddComponent<RectTransform>();
                 // one dark see-through panel behind the whole board, like the game's own boxes (kill feed, Tab screen)
-                var mg = new GameObject("measure"); mg.transform.SetParent(_canvas.transform, false); mg.SetActive(false);
-                _measure = mg.AddComponent<TextMeshProUGUI>(); _measure.enableWordWrapping = false; _measure.richText = false;
                 var back = new GameObject("backdrop"); back.transform.SetParent(_root, false);
                 var bi = back.AddComponent<Image>(); bi.color = new Color(0f, 0f, 0f, 0.45f); bi.raycastTarget = false;
                 _back = bi.rectTransform; _back.anchorMin = _back.anchorMax = _back.pivot = new Vector2(0f, 1f);
