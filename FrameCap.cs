@@ -85,7 +85,6 @@ namespace Monolith
                 catch { _timer = IntPtr.Zero; }
                 if (!_hiRes) Period1();
             }
-            if (BundlePlugin.Log != null) BundlePlugin.Log.LogInfo("Frame cap: " + (_hiRes ? "high resolution timer." : "1 ms sleeps."));
         }
 
         private static void Period1()

@@ -246,7 +246,6 @@ namespace Monolith
                     hp[i] = ui != null ? ui.sprite : null;
                 }
                 _outfits = o; _hats = hs; _outfitPics = op; _hatPics = hp; _from = cm;
-                BundlePlugin.Log.LogInfo("Players: " + o.Length + " outfits (" + string.Join(", ", o) + "), " + hs.Length + " hats (" + string.Join(", ", hs) + ").");
             }
             catch (Exception e) { BundlePlugin.Log.LogInfo("Players: the game's outfits could not be read: " + e.Message); }
         }

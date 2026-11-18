@@ -78,7 +78,6 @@ namespace Monolith
         // a row that wants Enter twice, and the line a row's action gave back
         private MenuRow _armed; private string _say; private float _sayUntil;
         private void Say(string s) { _say = s; _sayUntil = Time.unscaledTime + 8f; }
-        // a line from outside the menu (the frame cap test): shown now if the menu is open, else when it next opens
         // the search
         private bool _searching; private string _query = ""; private MenuPage _searchPage;
 
@@ -291,8 +290,7 @@ namespace Monolith
             if (!_fontSaid)
             {
                 _fontSaid = true;
-                BundlePlugin.Log.LogInfo("Menu font: " + string.Join(", ", _font.fontNames) + ", " + size + " px, cell " + _cw.ToString("0.0", CultureInfo.InvariantCulture) + " x " + _ch + " px"
-                    + (Mathf.Abs(thin - _cw) > 0.5f ? ". NOT fixed-width (no such font was found on this PC): the columns will not line up." : "."));
+                if (Mathf.Abs(thin - _cw) > 0.5f) BundlePlugin.Log.LogWarning("Menu font " + string.Join(", ", _font.fontNames) + " is not fixed-width (no such font was found on this PC): the columns will not line up.");
             }
         }
 

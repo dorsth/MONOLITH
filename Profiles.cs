@@ -230,7 +230,7 @@ namespace Monolith
 
         // ---- the setups that come with it
 
-        // Dorsth's own: what differs from the defaults. His outline settings and anything experimental are left out.
+        // Dorsth's own: what differs from the defaults. Anything experimental is left out.
         private static readonly string[,] Dorsth =
         {
             { "dorsth.straftat.ezcrosshair", "Crosshair", "Crosshair", "plus" },
@@ -271,8 +271,11 @@ namespace Monolith
             { "dorsth.straftat.combatsounds", "Sounds", "Hit Sound", "keyboard hit" },
             { "dorsth.straftat.combatsounds", "Sounds", "Head Hit Sound", "keyboard hs" },
             { "dorsth.straftat.combatsounds", "Sounds", "Melee Kill Sound", "sword cut" },
-            { "dorsth.straftat.combatsounds", "Sounds", "Melee Kill Sound Volume", "200" },
-            { "dorsth.straftat.monolith", "Frame Cap", "Enabled", "true" },
+            { "dorsth.straftat.combatsounds", "Sounds", "Melee Kill Sound Volume", "150" },
+            { "dorsth.straftat.combatsounds", "Guns", "Gun Sound Volume", "25" },
+            { "dorsth.straftat.monolith", "Players", "Enemy Outline Color", "FFFF00FF" },
+            { "dorsth.straftat.monolith", "Players", "Team Outline Color", "000000FF" },
+            { "dorsth.straftat.monolith", "Players", "Enemy Outlines In My Lobbies", "true" },
             { "dorsth.straftat.monolith", "Frame Cap", "FPS", "390" }
         };
 
@@ -287,15 +290,6 @@ namespace Monolith
         {
             Profile p = Made(name, rows);
             KeepMyExperimental(p);
-            // Dorsth's outline settings are not in his setup: yours are left as they are
-            if (rows == Dorsth)
-                foreach (Item it in Items())
-                {
-                    ConfigDefinition d = it.Entry.Definition;
-                    if (!(d.Section == "Players" && d.Key.IndexOf("Outline", StringComparison.Ordinal) >= 0)) continue;
-                    string mine = it.Entry.GetSerializedValue();
-                    if (it.Game || mine != DefaultText(it.Entry)) p.Values[it.Id] = mine; else p.Values.Remove(it.Id);
-                }
             Put(Capture(Before)); Write();
             int n = Apply(p);
             return Loaded(name, n) + Lang.T(WhatYouHad);
@@ -393,7 +387,7 @@ namespace Monolith
                 pg.Go(sub);
             }
             pg.Head("Presets");
-            pg.Rows.Add(new MenuRow { Kind = RowKind.Action, Label = "Dorsth", Confirm = true, Info = "The config Dorsth plays with, except sensitivity, keys, outline settings and Performance viewmodel.", Take = s => { string r = LoadMade("Dorsth", Dorsth); Fill(); return r; } });
+            pg.Rows.Add(new MenuRow { Kind = RowKind.Action, Label = "Dorsth", Confirm = true, Info = "The config Dorsth plays with, except sensitivity, keys and Performance viewmodel.", Take = s => { string r = LoadMade("Dorsth", Dorsth); Fill(); return r; } });
             pg.Rows.Add(new MenuRow { Kind = RowKind.Action, Label = "Defaults", Confirm = true, Info = "Every setting back to its default, except sensitivity, keys, outline colors and Performance viewmodel.", Take = s => { string r = LoadMade("Defaults", new string[0, 4]); Fill(); return r; } });
         }
     }

@@ -1,5 +1,12 @@
 # MONOLITH changelog
 
+## 0.10.5
+- Stats boards: names left aligned, numbers right aligned so their digits line up. The name column is as wide as the longest name.
+- The match board is centered under the podium and writes out kills, deaths and first blood.
+- Letters the game's font can't draw are left out of names instead of showing as boxes.
+- Dorsth profile updated: outline colors, gun sound volume, melee kill volume 150, frame cap off.
+- Removed log lines that only helped during development.
+
 ## 0.10.4
 - Stats boards: every column is left aligned under its header, and the padding is the same on both sides.
 - The match board sits bottom right, clear of chat.

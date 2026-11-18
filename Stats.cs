@@ -38,8 +38,8 @@ namespace Monolith
         internal sealed class P
         {
             public string Name = "";
-            public int Kills, Deaths, Takes, Rounds, Survived, OpenK, OpenD, Trades, Multi, Clutch, Self;
-            public float Dmg, Taken;
+            public int Kills, Deaths, Takes, Survived, OpenK, OpenD, Trades, Multi, Clutch;
+            public float Dmg;
             public int RoundKills; public bool Alive = true, LastAlive;
             public int RK, RD; public float RDmg;   // this round (this map) only: the round-end board
         }
@@ -134,12 +134,10 @@ namespace Monolith
         {
             P v = Get(h.Victim);
             if (atk == h.Victim) atk = -1;
-            v.Taken += h.Dmg;
             P a = atk >= 0 ? Get(atk) : null;
             if (a != null && Team(atk) != Team(h.Victim)) { a.Dmg += h.Dmg; a.RDmg += h.Dmg; }
             if (!h.Lethal) return;
             v.Deaths++; v.RD++; v.Alive = false;
-            if (a == null) v.Self++;
             float now = Time.time;
             if (a != null && Team(atk) != Team(h.Victim))
             {
@@ -203,7 +201,6 @@ namespace Monolith
             {
                 if (!On.Value) return;
                 FinishTake();
-                foreach (var kv in All) if (ClientInstance.playerInstances.ContainsKey(kv.Key)) kv.Value.Rounds++;
                 Names();
                 if (All.Count > 0) Board.Me.Show(false);
             }
@@ -290,7 +287,7 @@ namespace Monolith
         private static void Scene(string name)
         {
             Known.Clear(); KillerOf.Clear(); IdOfKiller.Clear(); Waiting.Clear(); IdOf.Clear(); Tagged.Clear();
-            if (name == "VictoryScene") { FinishTake(); Names(); if (On.Value && All.Count > 0) { Board.Me.Show(true); Log(); } return; }
+            if (name == "VictoryScene") { FinishTake(); Names(); if (On.Value && All.Count > 0) { Board.Me.Show(true); } return; }
             Board.Me.Hide();
             if (name == "MainMenu") MatchReset();
             else if (On.Value) { FinishTake(); _takeOn = true; foreach (var kv in All) { kv.Value.RK = 0; kv.Value.RD = 0; kv.Value.RDmg = 0f; } }   // a map: its first take, and a new round
@@ -363,21 +360,6 @@ namespace Monolith
             return l;
         }
 
-        private static void Log()
-        {
-            var sb = new StringBuilder("Match stats:\n");
-            foreach (var kv in Sorted())
-            {
-                P p = kv.Value; int r = Math.Max(1, p.Takes);
-                sb.Append("  ").Append(p.Name).Append(" (team ").Append(Team(kv.Key) + 1).Append("): ")
-                  .Append(p.Kills).Append(" kills, ").Append(p.Deaths).Append(" deaths, ").Append(Num(p.Dmg)).Append(" damage (")
-                  .Append(Num(p.Dmg / r)).Append(" a take), ").Append(Num(p.Taken)).Append(" taken, opening kills ").Append(p.OpenK)
-                  .Append(", opening deaths ").Append(p.OpenD).Append(", trades ").Append(p.Trades).Append(", 2 or more kills in a take ").Append(p.Multi)
-                  .Append(", clutches ").Append(p.Clutch).Append(", survived ").Append(p.Survived).Append(" of ").Append(p.Takes).Append(" takes (").Append(p.Rounds).Append(" rounds), own deaths ").Append(p.Self).Append('\n');
-            }
-            if (BundlePlugin.Log != null) BundlePlugin.Log.LogInfo(sb.ToString().TrimEnd());
-        }
-
         // The boards in the game's own look: the font of its round-end screen, text with a light shadow on one dark
         // see-through panel (one panel, not a strip per row: strips look like a second kill feed), the names in the feed's colors (your team as
         // the game colors you, the others as it colors enemies), the headings in its mint, the numbers white. Every cell is
@@ -393,9 +375,8 @@ namespace Monolith
             private TMP_FontAsset _font; private Material _mat;
             private readonly List<TextMeshProUGUI> _cells = new List<TextMeshProUGUI>();
 
-            // the match board keeps the short headers players know (k, d, adr, 2k) and writes out the rest: it has to stay
-            // clear of the podium on the victory screen. The round board has room for whole words.
-            private static readonly string[] FullHead = { "player", "k", "d", "adr", "first kills", "trade", "2k", "clutch", "survived" };
+            // adr and 2k are the short names players already know; the rest is written out
+            private static readonly string[] FullHead = { "player", "kills", "deaths", "adr", "first blood", "trade", "2k", "clutch", "survived" };
             private static readonly string[] RoundHead = { "player", "kills", "deaths", "damage" };
             private const float Gap = 28f;   // the same gap between all columns
             private static readonly Color Mint = new Color32(0xB4, 0xF2, 0xB4, 0xFF), White = new Color32(0xF8, 0xF8, 0xF8, 0xFF);
@@ -424,13 +405,12 @@ namespace Monolith
                 {
                     P p = kv.Value; int t = Math.Max(1, p.Takes);
                     lines.Add(full
-                        ? new[] { p.Name, p.Kills.ToString(), p.Deaths.ToString(), Num(p.Dmg / t), p.OpenK + "-" + p.OpenD, p.Trades.ToString(), p.Multi.ToString(), p.Clutch.ToString(), p.Survived + "/" + p.Takes }
-                        : new[] { p.Name, p.RK.ToString(), p.RD.ToString(), Num(p.RDmg) });
+                        ? new[] { Drawable(p.Name), p.Kills.ToString(), p.Deaths.ToString(), Num(p.Dmg / t), p.OpenK + "-" + p.OpenD, p.Trades.ToString(), p.Multi.ToString(), p.Clutch.ToString(), p.Survived + "/" + p.Takes }
+                        : new[] { Drawable(p.Name), p.RK.ToString(), p.RD.ToString(), Num(p.RDmg) });
                     names.Add(me >= 0 && Team(kv.Key) == Team(me) ? self : enemy);
                 }
-                // every column is as wide as its longest entry in the board's font, then the same gap. Names get a fixed
-                // column; a long one shrinks, then "…". The last column has no gap after it, so the panel's padding is the
-                // same on the right as on the left.
+                // every column is as wide as its longest entry in the board's font, with the same gap before each number
+                // column. Nothing comes after the last one, so the panel's padding is the same on both sides.
                 int cols = head.Length, cell = 0;
                 float[] w = new float[cols];
                 _canvas.SetActive(true);   // a text sets up its font when it first becomes active: measured after this
@@ -439,7 +419,9 @@ namespace Monolith
                     float widest = 0f; int chars = 0;
                     foreach (string[] l in lines) if (i < l.Length && l[i] != null) { chars = Math.Max(chars, l[i].Length); widest = Math.Max(widest, Measure(l[i], size)); }
                     if (widest < chars * size * 0.3f) widest = chars * size * 0.6f;   // no font to measure with: the average letter width
-                    w[i] = (i == 0 ? (full ? 260f : 220f) : widest) + (i < cols - 1 ? Gap : 0f);
+                    // names: as wide as the longest one, up to a cap; a longer one shrinks, then ends in "…"
+                    if (i == 0) widest = Mathf.Min(widest, full ? 260f : 220f);
+                    w[i] = widest + (i > 0 ? Gap : 0f);
                 }
                 _canvas.SetActive(true);
                 for (int r = 0; r < lines.Count; r++) Row(ref cell, r, lines[r], w, size, rowH, pad, names[r], r == 0 ? Mint : White);
@@ -448,7 +430,7 @@ namespace Monolith
                 float height = (rows.Count + 1) * (rowH + 4f) - 4f;
                 _back.anchoredPosition = new Vector2(-Pad, Pad); _back.sizeDelta = new Vector2(right + 2f * Pad, height + 2f * Pad);
                 _root.sizeDelta = new Vector2(right, height);
-                if (full) { _root.anchorMin = _root.anchorMax = new Vector2(1f, 0f); _root.pivot = new Vector2(1f, 1f); _root.anchoredPosition = new Vector2(-(Edge + Pad), 110f + Pad + height); }   // bottom right: chat is bottom left, the podium in the middle
+                if (full) { _root.anchorMin = _root.anchorMax = new Vector2(0.5f, 0f); _root.pivot = new Vector2(0.5f, 1f); _root.anchoredPosition = new Vector2(0f, 130f + Pad + height); }   // centered under the podium, above the health line; chat is bottom left
                 else { _root.anchorMin = _root.anchorMax = _root.pivot = new Vector2(0f, 1f); _root.anchoredPosition = new Vector2(Edge + Pad, -(Edge + Pad)); }   // the panel ends above the dark band of the round-end screen
                 _canvas.SetActive(true);
                 Counters(false);
@@ -467,12 +449,23 @@ namespace Monolith
                     // a long name gets smaller first (down to 75%), then ends in "…"
                     t.enableAutoSizing = i == 0; t.fontSizeMax = size; t.fontSizeMin = size * 0.75f; t.fontSize = size;
                     t.overflowMode = i == 0 ? TextOverflowModes.Ellipsis : TextOverflowModes.Overflow;
-                    // every cell left aligned under its header and on one baseline (centered on its own letters, "player" sat higher than "k"),
+                    // names left aligned, numbers right aligned so their last digits line up (4 under 18), each header on the
+                    // same edge as its column; every cell on one baseline (centered on its own letters, "player" sat higher than "k"),
                     // the row moved down by half a capital so its letters stay in the middle of the row
-                    t.alignment = TextAlignmentOptions.BaselineLeft;
+                    t.alignment = i == 0 ? TextAlignmentOptions.BaselineLeft : TextAlignmentOptions.BaselineRight;
                     Place(t.rectTransform, x, y - size * 0.35f, w[i], rowH); t.gameObject.SetActive(true);
                     x += w[i];
                 }
+            }
+
+            // a name without the letters the board's font (and its fallbacks) can't draw: they would show as boxes
+            private readonly StringBuilder _sb = new StringBuilder();
+            private string Drawable(string name)
+            {
+                if (_font == null || string.IsNullOrEmpty(name)) return name;
+                _sb.Length = 0;
+                foreach (char c in name) if (char.IsWhiteSpace(c) || _font.HasCharacter(c, true)) _sb.Append(c);
+                return _sb.ToString().Trim();
             }
 
             // the width the text takes in the board's font, from one hidden cell kept for measuring (0 without a font)

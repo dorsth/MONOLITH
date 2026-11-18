@@ -165,7 +165,7 @@ T = [
 ('Overwrite with current config', 'Перезаписать текущим конфигом', 'L41'),
 ('Saves your current config under this name.', 'Сохраняет текущий конфиг под этим именем.', 'info'),
 ('Delete', 'Удалить', 'L41'),
-('The config Dorsth plays with, except sensitivity, keys, outline settings and Performance viewmodel.', 'Конфиг, с которым играет Dorsth, кроме чувствительности, клавиш, настроек обводки и быстрой вьюмодели.', 'info'),
+('The config Dorsth plays with, except sensitivity, keys and Performance viewmodel.', 'Конфиг, с которым играет Dorsth, кроме чувствительности, клавиш и быстрой вьюмодели.', 'info'),
 ('Defaults', 'По умолчанию', 'L41'),
 ('Every setting back to its default, except sensitivity, keys, outline colors and Performance viewmodel.', 'Все настройки к значениям по умолчанию, кроме чувствительности, клавиш, цветов обводки и быстрой вьюмодели.', 'info'),
 (': Enter again', ': ещё раз Enter', 'W15'),
