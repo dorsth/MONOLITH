@@ -8,7 +8,7 @@ Each mod in it is the same source as its own release, loads under its own name a
 
 ## Switching to MONOLITH
 
-MONOLITH replaces Mod Menu and Minimal Viewmodels Reborn, so you can remove both. Other mods that show up in Mod Menu show up in MONOLITH's menu instead.
+MONOLITH replaces Mod Menu and Minimal Viewmodels Reborn, so you can remove both. The settings of every other mod you install can be changed in MONOLITH's menu, the same way as in Mod Menu.
 
 Your settings come along:
 
