@@ -510,6 +510,8 @@ namespace UltimateTweaks
                 lobbyTab = AccessTools.FieldRefAccess<LobbyController, Transform>("tabScreen");
                 h.Patch(AccessTools.Method(typeof(LobbyController), "CreateNewObjects"), prefix: M("LobbyRowPre"));
             });
+            Try("LobbyLeaveFix", () => h.Patch(AccessTools.Method(typeof(ClientInstance), "OnDisable"), finalizer: M("LeaveFin")));
+            Try("LobbyStaleIds", () => h.Patch(AccessTools.Method(typeof(ClientInstance), "RpcLogic___AddNewPlayer_2166193949"), prefix: M("AddNewPre")));
             Try("FovTweensNoPileUp", () =>
             {
                 var m = AccessTools.Method(typeof(DG.Tweening.ShortcutExtensions), "DOFieldOfView", new[] { typeof(Camera), typeof(float), typeof(float) });
@@ -893,6 +895,33 @@ namespace UltimateTweaks
                 return false;
             }
             catch { return true; }
+        }
+
+        // ---- LobbyLeaveFix. When you leave or get kicked, the game's ClientInstance.OnDisable redraws the lobby list
+        // before it takes the player out of ClientInstance.playerInstances. That redraw can throw (the lobby is half gone),
+        // which ends OnDisable early: the player stays in the list, and on leaving yourself the list is never cleared.
+        // In the next lobby the same player number is then "already added", and that player gets no name, picture or
+        // ready box. The rest of OnDisable is done here when it threw.
+        static Exception LeaveFin(ClientInstance __instance, Exception __exception)
+        {
+            if (__exception == null) return null;
+            try
+            {
+                ClientInstance mine;
+                if (ClientInstance.playerInstances.TryGetValue(__instance.PlayerId, out mine) && mine == __instance) ClientInstance.playerInstances.Remove(__instance.PlayerId);
+                var lc = LobbyController.Instance;
+                if (lc == null || lc.LocalPlayerController == null || lc.LocalPlayerController == __instance) ClientInstance.playerInstances.Clear();
+            }
+            catch { }
+            return null;
+        }
+
+        // ---- LobbyStaleIds. A player number still held by a player that is gone (left over from before the fix above,
+        // or from another mod) is freed for the new player, so joining never fails on "already added".
+        static void AddNewPre(int id)
+        {
+            ClientInstance old;
+            if (ClientInstance.playerInstances.TryGetValue(id, out old) && old == null) ClientInstance.playerInstances.Remove(id);
         }
 
         // ---- MyceliumPollRate. MyceliumNetworking.PersistentGameObject.Update calls MyceliumNetwork.ReceiveMessages() every frame:

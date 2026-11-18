@@ -1,5 +1,8 @@
 # MONOLITH changelog
 
+## 0.10.6
+- Fixed players showing up in the lobby without a name, picture or ready box after you left or got kicked from a lobby (DorsthTweaks 1.3.1).
+
 ## 0.10.5
 - Stats boards: names left aligned, numbers right aligned so their digits line up. The name column is as wide as the longest name.
 - The match board is centered under the podium and writes out kills, deaths and first blood.
