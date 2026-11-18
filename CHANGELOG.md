@@ -1,5 +1,9 @@
 # MONOLITH changelog
 
+## 0.9.98
+- Tab screen: kills, deaths and damage of the match so far over each name.
+- Round-end screen: only the round board, no labels over the names (one set of numbers per screen).
+
 ## 0.9.97
 - Board text sits on one baseline per row, so headers like "player" and "first kills" line up with "k" and "d".
 

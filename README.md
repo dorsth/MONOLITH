@@ -91,7 +91,8 @@ The hat you picked is drawn on the hat a player wears, which is only not drawn a
 
 Kills, deaths and damage for every player, counted from what the game already sends everyone. Shown only between rounds and after the match, never while anyone can play.
 
-* Round-end screen: a small board with kills, deaths and damage of that round, and each player's kills and deaths this match over their name (also on the Tab screen).
+* Round-end screen: a small board with kills, deaths and damage of that round.
+* Tab screen: kills, deaths and damage of the match so far over each name.
 * Victory screen: kills, deaths, damage per take, damage taken, opening kills and deaths, trades, takes with two or more kills, clutches and takes survived. Also written to the BepInEx log.
 
 Damage is on the HUD's 0 to 100 scale and stops at the health a player had left.

@@ -61,7 +61,7 @@ namespace Monolith
             Type ph = AccessTools.TypeByName("PlayerHealth");
             h.Patch(AccessTools.Method(ph, "sync___set_value_health"), postfix: new HarmonyMethod(typeof(Stats), nameof(HealthPost)));
             h.Patch(AccessTools.Method(ph, "sync___set_value_killer"), postfix: new HarmonyMethod(typeof(Stats), nameof(KillerPost)));
-            h.Patch(AccessTools.Method(typeof(RoundManager), "NextRoundCall"), prefix: new HarmonyMethod(typeof(Stats), nameof(RoundEnd)), postfix: new HarmonyMethod(typeof(Stats), nameof(RoundTags)));
+            h.Patch(AccessTools.Method(typeof(RoundManager), "NextRoundCall"), prefix: new HarmonyMethod(typeof(Stats), nameof(RoundEnd)));
             // the Tab screen: the same label over each player's name
             MethodInfo shown = AccessTools.Method(typeof(PlayerListItem), "SetPlayerValues");
             if (shown != null) h.Patch(shown, postfix: new HarmonyMethod(typeof(Stats), nameof(TabTag)));
@@ -204,34 +204,11 @@ namespace Monolith
             catch (Exception e) { Quiet(e); }
         }
 
-        // ---- "kills 7   deaths 3" over a name on the round-end screen and the Tab screen
+        // ---- "kills 7   deaths 3   damage 412" over each name on the Tab screen (the match so far)
         // The game's name texts are not changed (they wrap, and other mods find rows by them): each gets a small label of
         // its own, a child of the name, that sits just over where the name's letters are and moves with it.
 
-        private static readonly AccessTools.FieldRef<RoundManager, TextMeshProUGUI> SelfName = AccessTools.FieldRefAccess<RoundManager, TextMeshProUGUI>("playerName");
-        private static readonly AccessTools.FieldRef<RoundManager, TextMeshProUGUI[]> OtherNames = AccessTools.FieldRefAccess<RoundManager, TextMeshProUGUI[]>("enemyName");
         private static readonly HashSet<PlayerListItem> Tagged = new HashSet<PlayerListItem>();
-
-        // NextRoundCall(playerId, ...): the screen shows you in the big slot and every other player i in slot i or i-1
-        private static void RoundTags(RoundManager __instance, int playerId)
-        {
-            try
-            {
-                if (__instance == null) return;
-                KillTag.Put(SelfName(__instance), playerId);
-                TextMeshProUGUI[] others = OtherNames(__instance);
-                if (others == null) return;
-                var used = new bool[others.Length];
-                for (int i = 0; i < 4; i++)
-                {
-                    int slot = playerId < i ? i - 1 : i;
-                    if (i == playerId || slot < 0 || slot >= others.Length || !ClientInstance.playerInstances.ContainsKey(i)) continue;
-                    KillTag.Put(others[slot], i); used[slot] = true;
-                }
-                for (int k = 0; k < others.Length; k++) if (!used[k]) KillTag.Put(others[k], -1);
-            }
-            catch (Exception e) { Quiet(e); }
-        }
 
         private static void TabTag(PlayerListItem __instance)
         {
@@ -248,7 +225,7 @@ namespace Monolith
         {
             private static readonly AccessTools.FieldRef<TabScreen, TextMeshProUGUI> MapText = AccessTools.FieldRefAccess<TabScreen, TextMeshProUGUI>("mapText");
             private static Color _mint = new Color32(0xA8, 0xE6, 0xB4, 0xFF);   // until the Tab screen's map line is found
-            private TMP_Text _name; private TextMeshProUGUI _t; private int _id = -1, _k = -1, _d = -1;
+            private TMP_Text _name; private TextMeshProUGUI _t; private int _id = -1, _k = -1, _d = -1, _dmg = -1;
 
             internal static void Put(TMP_Text name, int id)
             {
@@ -265,16 +242,20 @@ namespace Monolith
                     t.font = name.font; t.fontSharedMaterial = name.fontSharedMaterial; t.alignment = TextAlignmentOptions.BottomLeft;
                     RectTransform rt = t.rectTransform; rt.anchorMin = rt.anchorMax = new Vector2(0.5f, 0.5f); rt.pivot = Vector2.zero; rt.sizeDelta = new Vector2(400f, 40f);
                 }
-                tag._id = id; tag._k = tag._d = -1;
+                tag._id = id; tag._k = tag._d = tag._dmg = -1;
             }
 
             private void LateUpdate()
             {
                 bool show = _id >= 0 && _name != null && On.Value && _name.text.Length > 0 && ClientInstance.playerInstances.ContainsKey(_id);
-                if (!show) { if (_t.text.Length > 0) _t.text = ""; _k = _d = -1; return; }
+                if (!show) { if (_t.text.Length > 0) _t.text = ""; _k = _d = _dmg = -1; return; }
                 P p; All.TryGetValue(_id, out p);
-                int k = p != null ? p.Kills : 0, d = p != null ? p.Deaths : 0;
-                if (k != _k || d != _d) { _k = k; _d = d; _t.text = "kills " + k.ToString(CultureInfo.InvariantCulture) + "   deaths " + d.ToString(CultureInfo.InvariantCulture); }
+                int k = p != null ? p.Kills : 0, d = p != null ? p.Deaths : 0, dmg = p != null ? Mathf.RoundToInt(p.Dmg) : 0;
+                if (k != _k || d != _d || dmg != _dmg)
+                {
+                    _k = k; _d = d; _dmg = dmg;
+                    _t.text = "kills " + k.ToString(CultureInfo.InvariantCulture) + "   deaths " + d.ToString(CultureInfo.InvariantCulture) + "   damage " + dmg.ToString(CultureInfo.InvariantCulture);
+                }
                 _t.fontSize = Mathf.Max(16f, _name.fontSize * 0.5f);
                 _t.color = _mint;
                 // on the name's left edge as drawn, one fixed gap above its letters
