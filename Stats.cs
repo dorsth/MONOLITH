@@ -442,7 +442,7 @@ namespace Monolith
                 float height = (rows.Count + 1) * (rowH + 4f) - 4f;
                 _back.anchoredPosition = new Vector2(-Pad, Pad); _back.sizeDelta = new Vector2(right + 2f * Pad, height + 2f * Pad);
                 _root.sizeDelta = new Vector2(right, height);
-                if (full) { _root.anchorMin = _root.anchorMax = new Vector2(0.5f, 0f); _root.pivot = new Vector2(0.5f, 1f); _root.anchoredPosition = new Vector2(0f, 130f + Pad + height); }   // centered under the podium, above the health line; chat is bottom left
+                if (full) { _root.anchorMin = _root.anchorMax = _root.pivot = new Vector2(0.5f, 0.5f); _root.anchoredPosition = Vector2.zero; }   // the middle of the screen, like STRAFTH's boards
                 else { _root.anchorMin = _root.anchorMax = _root.pivot = new Vector2(0f, 1f); _root.anchoredPosition = new Vector2(Edge + Pad, -(Edge + Pad)); }   // the panel ends above the dark band of the round-end screen
                 _canvas.SetActive(true);
                 Counters(false);

@@ -1,5 +1,8 @@
 # MONOLITH changelog
 
+## 0.10.11
+- The match board is in the middle of the screen.
+
 ## 0.10.10
 - Stats boards: columns are measured on the letters as drawn, so the gap after the names is the same as between the other columns.
 
