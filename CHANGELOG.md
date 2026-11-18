@@ -1,5 +1,8 @@
 # MONOLITH changelog
 
+## 0.10.9
+- Stats boards: every digit is as wide as a 0, so numbers line up exactly on their right edge.
+
 ## 0.10.8
 - Fixed a player in the lobby and Tab screen having no name row when an old row from your last lobby still held their player number (DorsthTweaks 1.3.2).
 

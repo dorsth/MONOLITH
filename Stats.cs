@@ -423,10 +423,13 @@ namespace Monolith
                 int cols = head.Length, cell = 0;
                 float[] w = new float[cols];
                 _canvas.SetActive(true);   // a text sets up its font when it first becomes active: measured after this
+                // every digit as wide as this font's 0, so a 1 takes the room of a 4 and right edges line up exactly
+                float zero = Measure("0", size);
+                _digit = zero > 0f ? "<mspace=" + (zero / size).ToString("0.###", CultureInfo.InvariantCulture) + "em>" : null;
                 for (int i = 0; i < cols; i++)
                 {
                     float widest = 0f; int chars = 0;
-                    foreach (string[] l in lines) if (i < l.Length && l[i] != null) { chars = Math.Max(chars, l[i].Length); widest = Math.Max(widest, Measure(l[i], size)); }
+                    for (int r = 0; r < lines.Count; r++) { string[] l = lines[r]; if (i < l.Length && l[i] != null) { chars = Math.Max(chars, l[i].Length); widest = Math.Max(widest, Measure(Shown(r, i, l[i]), size)); } }
                     if (widest < chars * size * 0.3f) widest = chars * size * 0.6f;   // no font to measure with: the average letter width
                     // names: as wide as the longest one, up to a cap; a longer one shrinks, then ends in "…"
                     if (i == 0) widest = Mathf.Min(widest, full ? 260f : 220f);
@@ -446,6 +449,9 @@ namespace Monolith
                 enabled = true;
             }
 
+            private string _digit;
+            private string Shown(int r, int i, string v) { return r > 0 && i > 0 && _digit != null ? _digit + v + "</mspace>" : v; }
+
             private void Row(ref int cell, int r, string[] v, float[] w, float size, float rowH, float pad, Color name, Color num)
             {
                 float y = -r * (rowH + 4f);
@@ -454,7 +460,7 @@ namespace Monolith
                 {
                     TextMeshProUGUI t = cell < _cells.Count ? _cells[cell] : NewCell(); cell++;
                     string text = v[i] ?? "";
-                    t.text = text; t.color = i == 0 ? name : num;
+                    t.richText = r > 0 && i > 0; t.text = Shown(r, i, text); t.color = i == 0 ? name : num;
                     // a long name gets smaller first (down to 75%), then ends in "…"
                     t.enableAutoSizing = i == 0; t.fontSizeMax = size; t.fontSizeMin = size * 0.75f; t.fontSize = size;
                     t.overflowMode = i == 0 ? TextOverflowModes.Ellipsis : TextOverflowModes.Overflow;
@@ -482,7 +488,7 @@ namespace Monolith
             private float Measure(string text, float size)
             {
                 if (_font == null || string.IsNullOrEmpty(text)) return 0f;
-                if (_ruler == null) { _ruler = NewCell(); _cells.Remove(_ruler); _ruler.text = ""; }   // stays on, empty: draws nothing
+                if (_ruler == null) { _ruler = NewCell(); _cells.Remove(_ruler); _ruler.text = ""; _ruler.richText = true; }   // stays on, empty: draws nothing
                 _ruler.fontSize = size;
                 return _ruler.GetPreferredValues(text).x;
             }
