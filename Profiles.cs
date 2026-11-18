@@ -272,10 +272,6 @@ namespace Monolith
             { "dorsth.straftat.combatsounds", "Sounds", "Head Hit Sound", "keyboard hs" },
             { "dorsth.straftat.combatsounds", "Sounds", "Melee Kill Sound", "sword cut" },
             { "dorsth.straftat.combatsounds", "Sounds", "Melee Kill Sound Volume", "200" },
-            { "dorsth.straftat.monolith", "Players", "Enemy Outfit", "JumpSuit00" },
-            { "dorsth.straftat.monolith", "Players", "Enemy Hat", "No Hat" },
-            { "dorsth.straftat.monolith", "Players", "Team Outfit", "JumpSuit00" },
-            { "dorsth.straftat.monolith", "Players", "Team Hat", "No Hat" },
             { "dorsth.straftat.monolith", "Frame Cap", "Enabled", "true" },
             { "dorsth.straftat.monolith", "Frame Cap", "FPS", "390" }
         };

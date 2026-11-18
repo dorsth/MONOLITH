@@ -1,5 +1,8 @@
 # MONOLITH changelog
 
+## 0.9.86
+- The Dorsth config no longer forces suits or hats.
+
 ## 0.9.85
 - The stats boards have one dark see-through panel behind them, like the game's own boxes, and a lighter text shadow.
 
