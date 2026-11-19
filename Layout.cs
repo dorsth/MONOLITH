@@ -522,7 +522,7 @@ namespace Monolith
                  .Head("Bodies and blood")
                  .Set("Hide bodies", bodies, null, "Hides ragdolls, gibs and shot-off hats. Turn it off to pick which.")
                  .Set("  Hide ragdolls", E(Gore, "Bodies", "Hide Ragdolls"), () => Off(bodies), "")
-                 .Set("  Hide hats", E(Gore, "Bodies", "Hide Hats"), () => Off(bodies), "Hats that were shot off.")
+                 .Set("  Hide dropped hats", E(Gore, "Bodies", "Hide Dropped Hats"), () => Off(bodies), "Hats that were shot off.")
                  .Set("No blood", blood, null, "Turn it off to pick which.")
                  .Set("  No hit blood", E(Gore, "Blood", "No Hit Blood"), () => Off(blood), "")
                  .Set("  No death blood", E(Gore, "Blood", "No Death Blood"), () => Off(blood), "")

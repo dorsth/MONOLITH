@@ -137,7 +137,7 @@ namespace Monolith
             { "Hide bodies", "Скрыть тела" },
             { "Hides ragdolls, gibs and shot-off hats. Turn it off to pick which.", "Скрывает тела, ошмётки и сбитые шапки. Выключите, чтобы выбрать отдельно." },
             { "Hide ragdolls", "Скрыть рэгдоллы" },
-            { "Hide hats", "Скрыть шапки" },
+            { "Hide dropped hats", "Скрыть сбитые шапки" },
             { "Hats that were shot off.", "Шапки, сбитые выстрелом." },
             { "No blood", "Без крови" },
             { "Turn it off to pick which.", "Выключите, чтобы выбрать отдельно." },

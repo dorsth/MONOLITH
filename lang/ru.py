@@ -95,7 +95,7 @@ T = [
 ('No bullet casings', 'Без гильз', 'L52'), ('No casings from any gun, yours or other players. No casing sound.', 'Без гильз у любого оружия, вашего и чужого. Без их звука.', 'tip'),
 ('Bodies and blood', 'Тела и кровь', 'L50'), ('Hide bodies', 'Скрыть тела', 'L52'),
 ('Hides ragdolls, gibs and shot-off hats. Turn it off to pick which.', 'Скрывает тела, ошмётки и сбитые шапки. Выключите, чтобы выбрать отдельно.', 'tip'),
-('Hide ragdolls', 'Скрыть рэгдоллы', 'L50'), ('Hide hats', 'Скрыть шапки', 'L50'), ('Hats that were shot off.', 'Шапки, сбитые выстрелом.', 'tip'),
+('Hide ragdolls', 'Скрыть рэгдоллы', 'L50'), ('Hide dropped hats', 'Скрыть сбитые шапки', 'L50'), ('Hats that were shot off.', 'Шапки, сбитые выстрелом.', 'tip'),
 ('No blood', 'Без крови', 'L52'), ('Turn it off to pick which.', 'Выключите, чтобы выбрать отдельно.', 'tip'),
 ('No hit blood', 'Без крови при попадании', 'L50'), ('No death blood', 'Без крови при смерти', 'L50'), ('No blood decals', 'Без декалей крови', 'L50'),
 # ---- players (31 cells)

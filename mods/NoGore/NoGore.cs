@@ -3,7 +3,7 @@
 // Client-side and visual only:
 //   Hide Bodies  everything a death leaves lying around. Off, you pick:
 //     Hide Ragdolls    dead bodies (yours too) and the pieces from an explosive death
-//     Hide Hats        hats that come off players
+//     Hide Dropped Hats   hats that come off players
 //   No Blood     all blood. Off, you pick:
 //     No Hit Blood     blood from hits
 //     No Death Blood   the blood that comes out of a body when it dies
@@ -25,7 +25,7 @@ using UnityEngine;
 
 [assembly: AssemblyTitle("NoGore")]
 [assembly: AssemblyDescription("STRAFTAT: no blood and no ragdolls, only on your screen.")]
-[assembly: AssemblyVersion("1.3.1.0")]
+[assembly: AssemblyVersion("1.3.2.0")]
 [assembly: AssemblyFileVersion("1.3.0.0")]
 
 // Only changes what you see on your own screen, so matchmaking with unmodded players still works.
@@ -39,13 +39,27 @@ namespace NoGore
     {
         public const string Guid = "dorsth.straftat.nogore";
         public const string Name = "NoGore";
-        public const string Version = "1.3.1";
+        public const string Version = "1.3.2";
 
         internal static ManualLogSource Log;
         internal static ConfigEntry<bool> HideBodies, HideRagdolls, HideHats, NoBlood, NoHitBlood, NoDeathBlood, NoBloodStains;
 
         // a group switch that's on covers everything under it; off, each of its own switches decides
         internal static bool Ragdolls { get { return HideBodies.Value || HideRagdolls.Value; } }
+        // a setting that was renamed keeps its value: BepInEx keeps the line under the old name until something takes it
+        private static void FromOldName(ConfigFile c, ConfigDefinition old, ConfigEntry<bool> now)
+        {
+            try
+            {
+                var orphans = HarmonyLib.AccessTools.Property(typeof(ConfigFile), "OrphanedEntries")?.GetValue(c, null) as System.Collections.Generic.Dictionary<ConfigDefinition, string>;
+                string v; bool b;
+                if (orphans == null || !orphans.TryGetValue(old, out v)) return;
+                if (bool.TryParse(v, out b)) now.Value = b;
+                orphans.Remove(old); c.Save();
+            }
+            catch { }
+        }
+
         internal static bool Hats { get { return HideBodies.Value || HideHats.Value; } }
         internal static bool HitBlood { get { return NoBlood.Value || NoHitBlood.Value; } }
         internal static bool DeathBlood { get { return NoBlood.Value || NoDeathBlood.Value; } }
@@ -70,7 +84,8 @@ namespace NoGore
             const string Bodies = "Bodies", Blood = "Blood";
             HideBodies = Config.Bind(Bodies, "Hide Bodies", true, "No ragdolls, body pieces or dropped hats. Turn off to pick which.");
             HideRagdolls = Config.Bind(Bodies, "Hide Ragdolls", false, "Dead bodies (yours too) and the pieces from an explosive death.");
-            HideHats = Config.Bind(Bodies, "Hide Hats", false, "Hats that come off players.");
+            HideHats = Config.Bind(Bodies, "Hide Dropped Hats", false, "Hats that come off players.");
+            FromOldName(Config, new ConfigDefinition(Bodies, "Hide Hats"), HideHats);   // its name until 1.3.2
             NoBlood = Config.Bind(Blood, "No Blood", true, "No blood at all. Turn off to pick which.");
             NoHitBlood = Config.Bind(Blood, "No Hit Blood", false, "Blood from hits.");
             NoDeathBlood = Config.Bind(Blood, "No Death Blood", false, "The blood that comes out of a body when it dies. It shows without the body too.");

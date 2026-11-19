@@ -297,7 +297,7 @@ namespace Monolith
             { "dorsth.straftat.dorsthtweaks", "World", "Reduce VFX+", "true" },
             { "dorsth.straftat.dorsthtweaks", "World", "No Post-Processing", "true" },
             { "dorsth.straftat.nogore", "Bodies", "Hide Ragdolls", "true" },
-            { "dorsth.straftat.nogore", "Bodies", "Hide Hats", "true" },
+            { "dorsth.straftat.nogore", "Bodies", "Hide Dropped Hats", "true" },
             { "dorsth.straftat.nogore", "Blood", "No Hit Blood", "true" },
             { "dorsth.straftat.nogore", "Blood", "No Blood Stains", "true" },
             { "dorsth.straftat.combatsounds", "Sounds", "Hit Sound", "keyboard hit" },
