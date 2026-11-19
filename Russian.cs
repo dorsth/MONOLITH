@@ -5,7 +5,7 @@ namespace Monolith
 {
     internal static partial class Lang
     {
-        private static readonly Dictionary<string, string> Table = new Dictionary<string, string>(289)
+        private static readonly Dictionary<string, string> Table = new Dictionary<string, string>(307)
         {
             { "Crosshair", "Прицел" },
             { "Viewmodel", "Вьюмодель" },
@@ -240,9 +240,9 @@ namespace Monolith
             { "This config as one line of text. Paste it to a friend.", "Этот конфиг одной строкой текста. Вставьте его другу." },
             { "Saves your current config under this name.", "Сохраняет текущий конфиг под этим именем." },
             { "Delete", "Удалить" },
-            { "The config Dorsth plays with, except sensitivity, keys and Performance viewmodel.", "Конфиг, с которым играет Dorsth, кроме чувствительности, клавиш и быстрой вьюмодели." },
+            { "The config Dorsth plays with, except sensitivity and keys.", "Конфиг, с которым играет Dorsth, кроме чувствительности и клавиш." },
             { "Defaults", "По умолчанию" },
-            { "Every mod setting back to its default, except keys, outline colors and Performance viewmodel. The game's own settings stay as they are.", "Все настройки модов к значениям по умолчанию, кроме клавиш, цветов обводки и быстрой вьюмодели. Настройки самой игры не меняются." },
+            { "Every mod setting back to its default, except keys and outline colors. The game's own settings stay as they are.", "Все настройки модов к значениям по умолчанию, кроме клавиш и цветов обводки. Настройки самой игры не меняются." },
             { ": Enter again", ": ещё раз Enter" },
             { "No name given, nothing saved.", "Имя не задано, ничего не сохранено." },
             { "Overwrote ", "Перезаписан профиль " },
@@ -292,6 +292,24 @@ namespace Monolith
             { "Off", "Выкл" },
             { "Text", "Текст" },
             { "Bar", "Полоса" },
+            { "Updates", "Обновления" },
+            { "Check at start", "Проверять при запуске" },
+            { "Update", "Обновить" },
+            { "Restart now", "Перезапустить" },
+            { "Asks Thunderstore once, at start, whether a newer MONOLITH is out.", "Один раз при запуске спрашивает Thunderstore, вышел ли новый MONOLITH." },
+            { "Checks Thunderstore, and puts a newer MONOLITH in place. Installed with a mod manager: update it there.", "Проверяет Thunderstore и ставит новый MONOLITH. Установлен через менеджер модов: обновляйте там." },
+            { "Closes the game and starts it again through Steam, with the new version.", "Закрывает игру и запускает ее снова через Steam, уже с новой версией." },
+            { "restart to finish", "перезапустите" },
+            { " is out", " вышла" },
+            { ", newest", ", последняя" },
+            { "Busy, one moment.", "Занято, секунду." },
+            { "Restart the game to finish the update.", "Перезапустите игру, чтобы закончить обновление." },
+            { "Checking Thunderstore.", "Проверка Thunderstore." },
+            { "MONOLITH was installed with ", "MONOLITH установлен через " },
+            { ". Update it there.", ". Обновляйте там." },
+            { "Downloading ", "Загрузка " },
+            { "Could not restart: ", "Не удалось перезапустить: " },
+            { "your mod manager", "ваш менеджер модов" },
             { "You hear each one in the list. Add yours: a sound file in plugins/MONOLITH/HitSounds.", "В списке каждый звук можно услышать. Свои звуки кладите в plugins/MONOLITH/HitSounds." },
             { "You hear each one in the list. Add yours: a sound file in plugins/MONOLITH/HeadHitSounds.", "В списке каждый звук можно услышать. Свои звуки кладите в plugins/MONOLITH/HeadHitSounds." },
             { "You hear each one in the list. Add yours: a sound file in plugins/MONOLITH/KillSounds.", "В списке каждый звук можно услышать. Свои звуки кладите в plugins/MONOLITH/KillSounds." },

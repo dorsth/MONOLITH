@@ -159,9 +159,9 @@ T = [
 ('Load', 'Загрузить', 'L41'), ('This config as one line of text. Paste it to a friend.', 'Этот конфиг одной строкой текста. Вставьте его другу.', 'info'),
 ('Saves your current config under this name.', 'Сохраняет текущий конфиг под этим именем.', 'info'),
 ('Delete', 'Удалить', 'L41'),
-('The config Dorsth plays with, except sensitivity, keys and Performance viewmodel.', 'Конфиг, с которым играет Dorsth, кроме чувствительности, клавиш и быстрой вьюмодели.', 'info'),
+('The config Dorsth plays with, except sensitivity and keys.', 'Конфиг, с которым играет Dorsth, кроме чувствительности и клавиш.', 'info'),
 ('Defaults', 'По умолчанию', 'L41'),
-('Every mod setting back to its default, except keys, outline colors and Performance viewmodel. The game\'s own settings stay as they are.', 'Все настройки модов к значениям по умолчанию, кроме клавиш, цветов обводки и быстрой вьюмодели. Настройки самой игры не меняются.', 'info'),
+('Every mod setting back to its default, except keys and outline colors. The game\'s own settings stay as they are.', 'Все настройки модов к значениям по умолчанию, кроме клавиш и цветов обводки. Настройки самой игры не меняются.', 'info'),
 (': Enter again', ': ещё раз Enter', 'W15'),
 ('No name given, nothing saved.', 'Имя не задано, ничего не сохранено.', 'info'),
 ('Overwrote ', 'Перезаписан профиль ', ''), ('Saved ', 'Сохранён профиль ', ''), ('Deleted ', 'Удалён профиль ', ''), ('Loaded ', 'Загружен профиль ', ''),
@@ -182,6 +182,14 @@ T = [
 # ---- values
 ('Squared', 'Прямые', 'W15'), ('Rounded', 'Скруглённые', 'W15'), ('Spiked', 'Острые', 'W15'),
 ('Off', 'Выкл', 'W15'), ('Text', 'Текст', 'W15'), ('Bar', 'Полоса', 'W15'),
+    ('Updates', 'Обновления', 'L25'), ('Check at start', 'Проверять при запуске', 'L27'), ('Update', 'Обновить', 'L27'), ('Restart now', 'Перезапустить', 'L27'),
+    ('Asks Thunderstore once, at start, whether a newer MONOLITH is out.', 'Один раз при запуске спрашивает Thunderstore, вышел ли новый MONOLITH.', 'tip'),
+    ('Checks Thunderstore, and puts a newer MONOLITH in place. Installed with a mod manager: update it there.', 'Проверяет Thunderstore и ставит новый MONOLITH. Установлен через менеджер модов: обновляйте там.', 'info'),
+    ('Closes the game and starts it again through Steam, with the new version.', 'Закрывает игру и запускает ее снова через Steam, уже с новой версией.', 'info'),
+    ('restart to finish', 'перезапустите', 'W15'), (' is out', ' вышла', ''), (', newest', ', последняя', ''),
+    ('Busy, one moment.', 'Занято, секунду.', ''), ('Restart the game to finish the update.', 'Перезапустите игру, чтобы закончить обновление.', ''),
+    ('Checking Thunderstore.', 'Проверка Thunderstore.', ''), ('MONOLITH was installed with ', 'MONOLITH установлен через ', ''), ('. Update it there.', '. Обновляйте там.', ''),
+    ('Downloading ', 'Загрузка ', ''), ('Could not restart: ', 'Не удалось перезапустить: ', ''), ('your mod manager', 'ваш менеджер модов', ''),
 ]
 for folder in ['HitSounds', 'HeadHitSounds', 'KillSounds', 'MeleeKillSounds']:
     T.append(('You hear each one in the list. Add yours: a sound file in plugins/MONOLITH/' + folder + '.',
