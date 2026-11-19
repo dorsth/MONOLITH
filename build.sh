@@ -32,7 +32,7 @@ for d in mods/*/; do
 done
 contents=$(echo "$contents" | sed 's/, $//')
 sed "s/@CONTENTS@/$contents/" Bundle.cs > obj/Bundle.cs
-cp Menu.cs MenuPop.cs Layout.cs Profiles.cs Players.cs Previews.cs Keys.cs Lang.cs Russian.cs FrameCap.cs Stats.cs GameConfig.cs obj/
+cp Menu.cs MenuPop.cs Layout.cs Profiles.cs Players.cs Previews.cs Keys.cs Lang.cs Russian.cs FrameCap.cs Stats.cs GameConfig.cs Updates.cs obj/
 rm -f MONOLITH.dll
 dotnet $CSC -nologo -target:library -out:MONOLITH.dll -define:DORSTH_BUNDLE -nostdlib -langversion:10 -unsafe -optimize+ -debug- -nowarn:CS0436,CS1701,CS1702 $refs $(find obj -name '*.cs') 2>&1 | grep -E "error|warning CS0(1|2)" | cut -c1-260 | head -40
 ls -la MONOLITH.dll 2>/dev/null && echo "holds: $contents"

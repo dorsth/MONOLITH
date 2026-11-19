@@ -52,6 +52,10 @@ It loads no asset bundles, so it also runs on macOS ARM64, where Mod Menu does n
 
 Remove Mod Menu if you have it. MONOLITH comes with its own copy.
 
+## Updates
+
+General, Update: checks Thunderstore for a newer MONOLITH and puts it in place. Restart now starts the game again through Steam with the new version. Installed with a mod manager (r2modman, Thunderstore Mod Manager, Gale): it says to update there, since the manager keeps its own list of versions. Check at start asks Thunderstore once when the game starts.
+
 ## Language
 
 General, Language: English or Russian. The first start takes Russian when Windows is in Russian. Everything the menu draws is translated: names, lines under the page, lists, messages, the key bar. A setting no page has (found through the search) keeps its English name and description. Settings files and configs are the same in both languages.
@@ -166,6 +170,7 @@ The viewmodel's weapon camera (its offset, FOV and mirroring) is adapted from [M
 | `Keys.cs` | extra jump, swap and taunt keys |
 | `Stats.cs` | match stats |
 | `FrameCap.cs` | the FPS cap |
+| `Updates.cs` | the update check and update |
 | `Lang.cs`, `Russian.cs`, `lang/` | the menu's language |
 
 Code in a mod that is only for MONOLITH, or left out of it, sits behind `#if DORSTH_BUNDLE` in the mod's own source: where CombatSounds looks for sounds, the crosshair folder, the switches above, and the Mod Menu page and window of each mod (ezCrosshair's window is not compiled in at all).

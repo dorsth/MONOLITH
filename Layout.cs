@@ -610,7 +610,11 @@ namespace Monolith
                 p.Set("Language / Язык", Lang.Pick, null, "")
                  .Set("Open this menu", BundleMenu.Key, null, "Press Enter, then the key.")
                  .Set("Fewer UI animations", E(Tweaks, "Menus", "Reduce UI Animations"), null, "No animations in menus and on the HUD.")
-                 .Set("Hide default playlists", E(Tweaks, "Menus", "Hide Default Playlists"), null, "Only your own playlists show when you host.");
+                 .Set("Hide default playlists", E(Tweaks, "Menus", "Hide Default Playlists"), null, "Only your own playlists show when you host.")
+                 .Head("Updates")
+                 .Set("Check at start", Updates.AtStart, null, "Asks Thunderstore once, at start, whether a newer MONOLITH is out.");
+                p.Rows.Add(new MenuRow { Kind = RowKind.Action, Label = "Update", Dyn = Updates.Status, Info = "Checks Thunderstore, and puts a newer MONOLITH in place. Installed with a mod manager: update it there.", Take = s => Updates.Use(BundlePlugin.I) });
+                p.Rows.Add(new MenuRow { Kind = RowKind.Action, Label = "Restart now", Confirm = true, If = Updates.Ready, Info = "Closes the game and starts it again through Steam, with the new version.", Take = s => Updates.Restart() });
                 if (p.Rows.Count > 0) cats.Add(p);
             }
 
