@@ -5,6 +5,7 @@
 - Readme: plainer wording about Mod Menu.
 - Hide hats is now Hide dropped hats (NoGore 1.3.2). Your setting is kept.
 - Match stats make no garbage per hit any more.
+- The round board no longer causes a 7 ms hitch when a round ends: it is made while the map loads, and only the names are measured letter by letter.
 - Forced hats show again: the copy kept the wardrobe's own scripts, which switched it off.
 - Forced hats come off like real ones: on a player who wears a hat when that hat is shot, on a player without one when that player is killed.
 - The Thunderstore zips of 1.0.0 to 1.0.3 held Mod Menu itself instead of MONOLITH's own copy of its API: Mod Menu's window showed and other mods were missing from MONOLITH's menu. Fixed.

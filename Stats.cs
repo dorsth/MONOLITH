@@ -300,7 +300,7 @@ namespace Monolith
             if (name == "VictoryScene") { FinishTake(); Names(); if (On.Value && All.Count > 0) { Board.Me.Show(true); } return; }
             Board.Me.Hide();
             if (name == "MainMenu") MatchReset();
-            else if (On.Value) { FinishTake(); _takeOn = true; foreach (var kv in All) { kv.Value.RK = 0; kv.Value.RD = 0; kv.Value.RDmg = 0f; } }   // a map: its first take, and a new round
+            else if (On.Value) { FinishTake(); _takeOn = true; foreach (var kv in All) { kv.Value.RK = 0; kv.Value.RD = 0; kv.Value.RDmg = 0f; } if (RoundManager.Instance != null && Board.Me != null) Board.Me.Prepare(); }   // a map: its first take, and a new round
         }
 
         private static P Get(int id) { P p; if (!All.TryGetValue(id, out p)) { p = new P(); All[id] = p; } return p; }
@@ -430,7 +430,7 @@ namespace Monolith
                 for (int i = 0; i < cols; i++)
                 {
                     float widest = 0f; int chars = 0;
-                    for (int r = 0; r < lines.Count; r++) { string[] l = lines[r]; if (i < l.Length && l[i] != null) { chars = Math.Max(chars, l[i].Length); widest = Math.Max(widest, Ink(Shown(r, i, l[i]), size)); } }
+                    for (int r = 0; r < lines.Count; r++) { string[] l = lines[r]; if (i < l.Length && l[i] != null) { chars = Math.Max(chars, l[i].Length); widest = Math.Max(widest, i == 0 ? Ink(l[i], size) : Measure(Shown(r, i, l[i]), size)); } }
                     if (widest < chars * size * 0.3f) widest = chars * size * 0.6f;   // no font to measure with: the average letter width
                     // names: as wide as the longest one, up to a cap; a longer one shrinks, then ends in "…"
                     if (i == 0) widest = Mathf.Min(widest, full ? 260f : 220f);
@@ -502,16 +502,20 @@ namespace Monolith
                 return _ruler.GetPreferredValues(text).x;
             }
 
-            // the width of the letters as drawn. The width above has room for the slant after the last letter: on a
-            // left-aligned name that room showed as a wider gap before "kills" than between the other columns.
+            // the width of the letters as drawn, for the names only: the width above has room for the slant after the last
+            // letter, which on a left-aligned name showed as a wider gap before "kills". Building the letters costs time, so
+            // the right-aligned numbers (where that room falls in the gap anyway) are not measured this way.
             private float Ink(string text, float size)
             {
                 if (Measure(text, size) <= 0f) return 0f;
                 _ruler.text = text; _ruler.ForceMeshUpdate();
                 float w = _ruler.textBounds.size.x;
-                _ruler.text = ""; _ruler.ForceMeshUpdate();
+                _ruler.text = "";
                 return w;
             }
+
+            /// <summary>The board made while a map loads, so the first round end does not pay for it.</summary>
+            internal void Prepare() { if (_canvas == null) Make(); }
 
             private static void Place(RectTransform rt, float x, float y, float w, float h)
             {
