@@ -10,7 +10,7 @@ using ComputerysModdingUtilities;
 
 [assembly: AssemblyTitle("MONOLITH")]
 [assembly: AssemblyDescription("Every Dorsth mod for STRAFTAT in one file. Dorsth was here.")]
-[assembly: AssemblyVersion("1.0.7.0")]
+[assembly: AssemblyVersion("1.0.8.0")]
 // only changes things on your own screen: fine to play with people who don't have it
 [assembly: StraftatMod(isVanillaCompatible: true)]
 
@@ -20,16 +20,17 @@ namespace Monolith
     [BepInDependency(ModMenuGuid, BepInDependency.DependencyFlags.SoftDependency)]
     public sealed class BundlePlugin : BaseUnityPlugin
     {
-        public const string Guid = "dorsth.straftat.monolith", Name = "MONOLITH", Version = "1.0.7";
+        public const string Guid = "dorsth.straftat.monolith", Name = "MONOLITH", Version = "1.0.8";
         // filled in by build.sh: the mods and versions this file was built from
         internal const string Contents = "@CONTENTS@";
 
         internal const string ModMenuGuid = "kestrel.straftat.modmenu";
         internal static BepInEx.Logging.ManualLogSource Log;
+        internal static BundlePlugin I;   // runs the update check, which waits on the web
 
         private void Awake()
         {
-            Log = Logger;
+            Log = Logger; I = this;
             Logger.LogMessage("Dorsth was here");
             Logger.LogInfo(Name + " " + Version + " holds: " + Contents);
             // as the mods in here do: the object BepInEx keeps its plugins on is hidden, so the game does not destroy it
@@ -37,6 +38,7 @@ namespace Monolith
             BundleMenu.Key = Config.Bind("Keys", "Menu", UnityEngine.KeyCode.F2, "Opens the menu with the settings of every mod in the bundle.");
             Lang.Bind(Config);
             GameConfig.Bind(Config);
+            Updates.Bind(Config);
             try
             {
                 // the menu: a script that is off until the key is pressed, and one that only watches the key
@@ -129,6 +131,7 @@ namespace Monolith
         {
             // settings that one switch of the menu stands for: not in the search, not in a profile
             foreach (var e in MenuLayout.Inert()) if (e != null) BundleMenu.Hidden.Add(e);
+            try { Updates.Start(this); } catch (System.Exception e) { Logger.LogInfo("Updates: " + e.Message); }
         }
     }
 }

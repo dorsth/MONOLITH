@@ -1,5 +1,9 @@
 # MONOLITH changelog
 
+## 1.0.8
+- General, updates: Update checks Thunderstore for a newer MONOLITH and puts it in place, then Restart now starts the game again. Installed with a mod manager (r2modman, Thunderstore Mod Manager, Gale): it says to update there. Check at start asks once when the game starts.
+- The Dorsth and Defaults presets say what they really leave out: sensitivity and keys, keys and outline colors.
+
 ## 1.0.7
 - Friendly fire when I host: the game's lobby option for friendly fire, kept between launches like enemy outlines.
 - Join message: up to 120 letters with color, bold, italic, underline and strikethrough tags, which do not count toward the limit (DorsthTweaks 1.3.7).
