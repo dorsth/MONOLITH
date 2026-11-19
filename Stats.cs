@@ -386,7 +386,7 @@ namespace Monolith
             private readonly List<TextMeshProUGUI> _cells = new List<TextMeshProUGUI>();
 
             // adr and 2k are the short names players already know; the rest is written out
-            private static readonly string[] FullHead = { "player", "kills", "deaths", "adr", "first blood", "trade", "2k", "clutch", "survived" };
+            private static readonly string[] FullHead = { "player", "kills", "deaths", "adr", "first k-d", "trade", "2k", "clutch", "survived" };
             private static readonly string[] RoundHead = { "player", "kills", "deaths", "damage" };
             private const float Gap = 28f;   // the same gap between all columns
             private static readonly Color Mint = new Color32(0xB4, 0xF2, 0xB4, 0xFF), White = new Color32(0xF8, 0xF8, 0xF8, 0xFF);
