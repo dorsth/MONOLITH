@@ -111,10 +111,29 @@ namespace Monolith
                             n++;
                         }
                 PlayerPrefs.Save();
+                if (n > 0) Menus();
                 if (keys) Keys.SyncSwap();
             }
             catch (Exception e) { BundlePlugin.Log.LogWarning("Configs: the game's settings could not all be set: " + e.Message); }
             return n;
+        }
+
+        // The game fills its settings menu once per scene (DisplayLoadValues.LoadValues), and most settings only take
+        // effect through that menu: Reduce VFX, graphics quality and the HUD stayed as they were until a restart. Running
+        // it again puts the new values in the menu, and each changed toggle or dropdown runs the game's own handler.
+        private static void Menus()
+        {
+            foreach (DisplayLoadValues d in Resources.FindObjectsOfTypeAll<DisplayLoadValues>())
+            {
+                if (d == null || !d.gameObject.scene.IsValid()) continue;
+                try
+                {
+                    System.Collections.IEnumerator e = Traverse.Create(d).Method("LoadValues").GetValue<System.Collections.IEnumerator>();
+                    // stepped through at once: its only wait is the one at the start, for the game to finish loading
+                    for (int i = 0; e != null && i < 16 && e.MoveNext(); i++) { }
+                }
+                catch (Exception x) { BundlePlugin.Log.LogWarning("Configs: the game's settings menu could not be updated: " + x.Message); }
+            }
         }
 
         // the game sets its volumes once at start (Settings.Start): set now as it does there
