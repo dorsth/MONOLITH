@@ -154,7 +154,7 @@ namespace Monolith
         internal static void Install(Harmony h)
         {
             MethodInfo died = AccessTools.Method(typeof(PlayerHealth), "sync___set_value_health");
-            if (died != null) h.Patch(died, postfix: new HarmonyMethod(typeof(Players).GetMethod(nameof(Died), BindingFlags.Static | BindingFlags.NonPublic)));
+            if (died != null) h.Patch(died, prefix: new HarmonyMethod(typeof(Players).GetMethod(nameof(Died), BindingFlags.Static | BindingFlags.NonPublic)));
             MethodInfo tr = typeof(Players).GetMethod(nameof(MatTr), BindingFlags.Static | BindingFlags.NonPublic);
             MethodInfo post = typeof(Players).GetMethod(nameof(Dressed), BindingFlags.Static | BindingFlags.NonPublic);
             MethodInfo saved = typeof(Players).GetMethod(nameof(SavedInGame), BindingFlags.Static | BindingFlags.NonPublic);
@@ -354,9 +354,11 @@ namespace Monolith
             }
         }
 
+        // before the new health is set: only a living player going to 0 is a kill. The game also sends 0 to players that
+        // are already down (a new round, someone joining), and the hat must stay on then.
         private static void Died(PlayerHealth __instance, float value)
         {
-            if (Knock.On.Count == 0 || value > 0f || __instance == null) return;
+            if (Knock.On.Count == 0 || value > 0f || __instance == null || __instance.sync___get_value_health() <= 0f) return;
             Knock k;
             if (Knock.On.TryGetValue(__instance.GetInstanceID(), out k) && k != null)
                 try { k.Off(__instance.sync___get_value_lastKillDirection()); } catch (Exception e) { BundlePlugin.Log.LogInfo("Players: a drawn hat stayed on: " + e.Message); }
