@@ -1,5 +1,10 @@
 # MONOLITH changelog
 
+## 1.0.2
+- Configs hold the game's own settings too (graphics, HUD, crosshair, audio, toggles) and every keybind. Sensitivity and what belongs to one PC stay out.
+- Load keybinds: off by default; on, loading a config also sets its keybinds.
+- Undo last load: back to what you had before the last load or import, keybinds included.
+
 ## 1.0.1
 - Description and readme: MONOLITH replaces Mod Menu and Minimal Viewmodels Reborn, other mods' settings are in its menu, and your settings come along when you switch.
 

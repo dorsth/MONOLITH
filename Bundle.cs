@@ -10,7 +10,7 @@ using ComputerysModdingUtilities;
 
 [assembly: AssemblyTitle("MONOLITH")]
 [assembly: AssemblyDescription("Every Dorsth mod for STRAFTAT in one file. Dorsth was here.")]
-[assembly: AssemblyVersion("1.0.1.0")]
+[assembly: AssemblyVersion("1.0.2.0")]
 // only changes things on your own screen: fine to play with people who don't have it
 [assembly: StraftatMod(isVanillaCompatible: true)]
 
@@ -20,7 +20,7 @@ namespace Monolith
     [BepInDependency(ModMenuGuid, BepInDependency.DependencyFlags.SoftDependency)]
     public sealed class BundlePlugin : BaseUnityPlugin
     {
-        public const string Guid = "dorsth.straftat.monolith", Name = "MONOLITH", Version = "1.0.1";
+        public const string Guid = "dorsth.straftat.monolith", Name = "MONOLITH", Version = "1.0.2";
         // filled in by build.sh: the mods and versions this file was built from
         internal const string Contents = "@CONTENTS@";
 
@@ -36,6 +36,7 @@ namespace Monolith
             gameObject.hideFlags = UnityEngine.HideFlags.HideAndDontSave;
             BundleMenu.Key = Config.Bind("Keys", "Menu", UnityEngine.KeyCode.F2, "Opens the menu with the settings of every mod in the bundle.");
             Lang.Bind(Config);
+            GameConfig.Bind(Config);
             try
             {
                 // the menu: a script that is off until the key is pressed, and one that only watches the key

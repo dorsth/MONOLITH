@@ -1,9 +1,11 @@
 // MONOLITH - profiles: a setup saved under a name, loaded again, or passed to someone else. Dorsth was here.
 //
-// A profile is every setting of every mod in the bundle that is not at its default, EXCEPT:
+// A profile is every setting of every mod in the bundle that is not at its default, the game's own settings and every
+// keybind (GameConfig), EXCEPT:
 //  * sensitivity (never copied: it belongs to a hand and a mouse, not to a setup),
-//  * the menu's own key, where a window was, a mod's internal notes, the join message.
-// Loading one puts every setting it does not name back to its default, so a loaded profile is the whole setup.
+//  * what belongs to one PC (resolution, window mode, V-Sync), the menu's own key, a mod's internal notes, the join message.
+// Loading one puts every mod setting it does not name back to its default, so a loaded profile is the whole setup.
+// Keybinds are only loaded when "Load keybinds" is on; undoing a load always brings yours back.
 //
 // To pass one on it becomes one line of text on the clipboard: MONOLITH:<name>:<code>. The code is letters and digits
 // only, so a chat program cannot mangle it. Importing reads the clipboard, keeps what you had as "previous setup",
@@ -31,9 +33,11 @@ namespace Monolith
 
         // Game: a setting that belongs to the game and is only shown here too (the two outline colors). A profile sets it
         // only when it holds a value for it: Defaults, and a profile from before these rows existed, leave yours as it is.
-        private struct Item { public uint Id; public ConfigEntryBase Entry; public bool Experimental, Game; }
+        private struct Item { public uint Id; public ConfigEntryBase Entry; public bool Experimental, Game, Key; }
 
         // FNV-1a over mod, section and name: a setting keeps its number as long as it keeps its name
+        internal static uint IdOf(string mod, string section, string key) { return Id(mod, new ConfigDefinition(section, key)); }
+
         private static uint Id(string mod, ConfigDefinition d)
         {
             uint h = 2166136261;
@@ -57,17 +61,26 @@ namespace Monolith
                 foreach (ConfigDefinition d in f.Keys)
                 {
                     ConfigEntryBase e = f[d];
-                    if (e == null || d.Section == "Internal" || d.Section == "Keys" || (kv.Key == BundlePlugin.Guid && d.Section == "Menu") || BundleMenu.Hidden.Contains(e) || e.SettingType == typeof(KeyCode) || e.SettingType == typeof(KeyboardShortcut)) continue;
+                    if (e == null || d.Section == "Internal" || d.Section == "Configs" || (kv.Key == BundlePlugin.Guid && d.Section == "Menu") || BundleMenu.Hidden.Contains(e) || e == BundleMenu.Key || e == Keys.Swap) continue;
                     if (d.Key == "Join Message") continue;
                     string desc = e.Description != null ? e.Description.Description : null;
                     if (desc != null && desc.IndexOf("Not used since", StringComparison.Ordinal) >= 0) continue;
                     uint id = Id(kv.Key, d);
                     if (!seen.Add(id)) continue;
                     bool exp = d.Section == "Experimental" || d.Section == "Test" || (d.Section == "Tiers" && d.Key == "Experimental");
-                    list.Add(new Item { Id = id, Entry = e, Experimental = exp, Game = ReferenceEquals(e, Players.EnemyOutline) || ReferenceEquals(e, Players.TeamOutline) });
+                    bool key = d.Section == "Keys" || e.SettingType == typeof(KeyCode) || e.SettingType == typeof(KeyboardShortcut);
+                    list.Add(new Item { Id = id, Entry = e, Experimental = exp, Key = key, Game = ReferenceEquals(e, Players.EnemyOutline) || ReferenceEquals(e, Players.TeamOutline) });
                 }
             }
             return list;
+        }
+
+        // mod settings this config sets away from their default (keybinds and the game's settings are not counted)
+        private static int Differs(Profile p)
+        {
+            int n = 0;
+            foreach (Item it in Items()) if (!it.Key && !it.Game && p.Values.ContainsKey(it.Id)) n++;
+            return n;
         }
 
         private static string DefaultText(ConfigEntryBase e) { return TomlTypeConverter.ConvertToString(e.DefaultValue, e.SettingType); }
@@ -92,13 +105,16 @@ namespace Monolith
             foreach (Item it in Items())
             {
                 string v = it.Entry.GetSerializedValue();
-                if (it.Game || v != DefaultText(it.Entry)) p.Values[it.Id] = v;
+                if (it.Game || it.Key || v != DefaultText(it.Entry)) p.Values[it.Id] = v;
             }
+            GameConfig.Capture(p.Values);
             return p;
         }
 
         /// <summary>Makes the setup what the profile says. Returns how many settings changed.</summary>
-        internal static int Apply(Profile p)
+        internal static int Apply(Profile p) { return Apply(p, GameConfig.TakeKeys.Value); }
+
+        internal static int Apply(Profile p, bool keys)
         {
             int changed = 0;
             var files = new List<ConfigFile>(); var saved = new List<bool>();
@@ -113,7 +129,9 @@ namespace Monolith
                 foreach (Item it in items)
                 {
                     string want;
-                    if (!p.Values.TryGetValue(it.Id, out want)) { if (it.Game) continue; want = DefaultText(it.Entry); }
+                    if (it.Key && !keys) continue;
+                    // keys and the game's settings are only set from a config that holds them
+                    if (!p.Values.TryGetValue(it.Id, out want)) { if (it.Game || it.Key) continue; want = DefaultText(it.Entry); }
                     if (it.Entry.GetSerializedValue() == want) continue;
                     try { it.Entry.SetSerializedValue(want); changed++; } catch { }
                 }
@@ -123,7 +141,7 @@ namespace Monolith
                 CombatSounds.CombatSoundsPlugin.Quiet = false;
                 for (int i = 0; i < files.Count; i++) { files[i].SaveOnConfigSet = saved[i]; try { files[i].Save(); } catch { } }
             }
-            return changed;
+            return changed + GameConfig.Apply(p.Values, keys);
         }
 
         // ---- as text
@@ -223,9 +241,21 @@ namespace Monolith
         internal static string Load(Profile p)
         {
             // what you had is kept under one name, so the last load can always be taken back
-            if (!string.Equals(p.Name, Before, StringComparison.OrdinalIgnoreCase)) { Put(Capture(Before)); Write(); }
+            Put(Capture(Before)); Write();
             int n = Apply(p);
-            return Loaded(p.Name, n) + (string.Equals(p.Name, Before, StringComparison.OrdinalIgnoreCase) ? "" : Lang.T(WhatYouHad));
+            return Loaded(p.Name, n) + Lang.T(WhatYouHad);
+        }
+
+        // back to what you had before the last load, keybinds included; doing it again takes it back once more
+        internal static string Undo()
+        {
+            Profile was = Find(Before);
+            if (was == null) return Lang.T("Nothing to undo.");
+            Put(Capture(Before)); Write();
+            Profile now = Find(Before);
+            All[All.IndexOf(now)] = was; Apply(was, true);
+            All[All.IndexOf(was)] = now; Write();
+            return Lang.T("Back to what you had before the last load. Undo again to return.");
         }
 
         // ---- the setups that come with it
@@ -364,7 +394,7 @@ namespace Monolith
         internal static MenuPage Page()
         {
             Read();
-            if (_page == null) _page = new MenuPage(null, "Configs", "Save, load and share configs. Sensitivity and keys are not included.");
+            if (_page == null) _page = new MenuPage(null, "Configs", "Save, load and share configs: every setting, the game's included. Sensitivity is never included.");
             Fill();
             return _page;
         }
@@ -373,14 +403,17 @@ namespace Monolith
         {
             MenuPage pg = _page;
             pg.Rows.Clear(); pg.Cur = null;
+            if (Find(Before) != null) pg.Rows.Add(new MenuRow { Kind = RowKind.Action, Label = "Undo last load", Info = "Back to what you had before the last load or import, keybinds included.", Take = s => { string r = Undo(); Fill(); return r; } });
+            pg.Rows.Add(new MenuRow { Kind = RowKind.Entry, Label = "Load keybinds", Entry = GameConfig.TakeKeys });
             pg.Rows.Add(new MenuRow { Kind = RowKind.Action, Label = "Copy my config to clipboard", Info = "Your config as one line of text. Paste it to a friend.", Take = s => ExportNow() });
             pg.Rows.Add(new MenuRow { Kind = RowKind.Action, Label = "Import from clipboard", Info = "Copy a line from a friend (it starts with MONOLITH:), then press Enter here. Yours is kept as \"" + Before + "\".", Take = s => { string r = Import(); Fill(); return r; } });
             pg.Rows.Add(new MenuRow { Kind = RowKind.Action, Label = "Save my config as", Ask = "name", Info = "Type a name and press Enter. A config with the same name is replaced.", Take = s => { string r = SaveAs(s); Fill(); return r; } });
             foreach (Profile each in All)
             {
                 Profile p = each;
-                var sub = new MenuPage(pg, p.Name, Lang.Count(p.Values.Count, " setting differs from the defaults.", " settings differ from the defaults.", "Differences from the defaults: ") + (Lang.Ru ? "." : ""));
-                sub.Rows.Add(new MenuRow { Kind = RowKind.Action, Label = "Load", Info = "Loads everything except sensitivity and keys.", Take = s => { string r = Load(p); Fill(); return r; } });
+                if (string.Equals(p.Name, Before, StringComparison.OrdinalIgnoreCase)) continue;   // the Undo row stands for it
+                var sub = new MenuPage(pg, p.Name, Lang.Count(Differs(p), " setting differs from the defaults.", " settings differ from the defaults.", "Differences from the defaults: ") + (Lang.Ru ? "." : ""));
+                sub.Rows.Add(new MenuRow { Kind = RowKind.Action, Label = "Load", Info = "Loads everything except sensitivity. Keybinds only when Load keybinds is on.", Take = s => { string r = Load(p); Fill(); return r; } });
                 sub.Rows.Add(new MenuRow { Kind = RowKind.Action, Label = "Copy to clipboard", Info = "This config as one line of text. Paste it to a friend.", Take = s => Export(p) });
                 sub.Rows.Add(new MenuRow { Kind = RowKind.Action, Label = "Overwrite with current config", Confirm = true, Info = "Saves your current config under this name.", Take = s => { string r = SaveAs(p.Name); Fill(); return r; } });
                 sub.Rows.Add(new MenuRow { Kind = RowKind.Action, Label = "Delete", Confirm = true, Info = "", Take = s => { string r = Delete(p); Fill(); return r; } });
@@ -388,7 +421,7 @@ namespace Monolith
             }
             pg.Head("Presets");
             pg.Rows.Add(new MenuRow { Kind = RowKind.Action, Label = "Dorsth", Confirm = true, Info = "The config Dorsth plays with, except sensitivity, keys and Performance viewmodel.", Take = s => { string r = LoadMade("Dorsth", Dorsth); Fill(); return r; } });
-            pg.Rows.Add(new MenuRow { Kind = RowKind.Action, Label = "Defaults", Confirm = true, Info = "Every setting back to its default, except sensitivity, keys, outline colors and Performance viewmodel.", Take = s => { string r = LoadMade("Defaults", new string[0, 4]); Fill(); return r; } });
+            pg.Rows.Add(new MenuRow { Kind = RowKind.Action, Label = "Defaults", Confirm = true, Info = "Every mod setting back to its default, except keys, outline colors and Performance viewmodel. The game's own settings stay as they are.", Take = s => { string r = LoadMade("Defaults", new string[0, 4]); Fill(); return r; } });
         }
     }
 }

@@ -1,17 +1,22 @@
 #!/bin/sh
-# Builds MONOLITH.dll: every mod under mods/ compiled together into one plugin file.
+# builds MONOLITH.dll: every mod under mods/ compiled together into one plugin file.
 # The mods' own sources are used as they are; only their [assembly: ...] lines are left out (the bundle has its own).
-# Also builds modmenu/ModMenu.dll, the stand-in for Mod Menu's API that ships next to it.
-# Needs the .NET SDK and two paths:
-#   LIB = <game>/STRAFTAT_Data/Managed   BEP = <game>/BepInEx/core
+# LIB = <game>/STRAFTAT_Data/Managed, BEP = <game>/BepInEx/core, MODMENU = Mod Menu's dll
 cd "$(dirname "$0")"
-: "${LIB:?set LIB to <game>/STRAFTAT_Data/Managed}" "${BEP:?set BEP to <game>/BepInEx/core}"
-CSC=$(ls /usr/lib/dotnet/sdk/*/Roslyn/bincore/csc.dll /usr/share/dotnet/sdk/*/Roslyn/bincore/csc.dll 2>/dev/null | head -1)
-base=$(ls "$LIB"/*.dll "$BEP"/*.dll | grep -v Mono.Cecil | awk -F/ '!seen[$NF]++' | sed 's/^/-r:/')
-rm -f modmenu/ModMenu.dll
-dotnet "$CSC" -nologo -target:library -out:modmenu/ModMenu.dll -nostdlib -langversion:10 -optimize+ -debug- -deterministic -nowarn:CS0436,CS1701,CS1702 $base modmenu/src/*.cs 2>&1 | grep -E "error" | head -20
-[ -f modmenu/ModMenu.dll ] || { echo "modmenu/ModMenu.dll not built"; exit 1; }
-refs="$base -r:modmenu/ModMenu.dll"
+LIB=${LIB:-/home/claude/straftat/lib}; BEP=${BEP:-/home/claude/straftat/bep}; MODMENU=${MODMENU:-/home/claude/mods/plugins/ModMenu.dll}
+CSC=$(ls /usr/lib/dotnet/sdk/*/Roslyn/bincore/csc.dll | head -1)
+# MORE = further folders with game dlls (every dll is taken once, the first found)
+MORE=${MORE:-/home/claude/mods/refs/STRAFTAT/STRAFTAT_Data/Managed /mnt/user-data/uploads/STRAFTAT/STRAFTAT_Data/Managed}
+refs=$(ls $LIB/*.dll $BEP/*.dll $MODMENU $(for m in $MORE; do ls $m/*.dll 2>/dev/null; done) | grep -v Mono.Cecil | awk -F/ '!seen[$NF]++' | sed 's/^/-r:/')
+# the mods' own sources, taken fresh on every build (SYNC=0 builds from mods/ as it is)
+if [ "${SYNC:-1}" = 1 ]; then
+  for pair in "CameraTweaks /home/claude/mods/cam" "CombatSounds /home/claude/mods/combat" "ezCrosshair /home/claude/mods/ez/src" "ViewmodelTweaks /home/claude/mods/vm/src" "DorsthTweaks /home/claude/mods/dt/src" "TrueSens /home/claude/mods/truesens"; do
+    set -- $pair
+    [ -d "$2" ] && for f in mods/$1/*.cs; do [ -f "$2/$(basename $f)" ] && { chmod u+w "$f"; cp "$2/$(basename $f)" "$f"; }; done
+  done
+  # DorsthTweaks has Ultimate Tweaks in a folder of its own (since 1.3.0): taken whole
+  rm -rf mods/DorsthTweaks/UltimateTweaks && cp -r /home/claude/mods/dt/src/UltimateTweaks mods/DorsthTweaks/
+fi
 # the menu's Russian: checked against the room each text has, then written out as Russian.cs
 python3 lang/make.py || { echo "lang/make.py: a Russian text does not fit or is missing, not built"; exit 1; }
 rm -rf obj && mkdir -p obj
@@ -27,7 +32,7 @@ for d in mods/*/; do
 done
 contents=$(echo "$contents" | sed 's/, $//')
 sed "s/@CONTENTS@/$contents/" Bundle.cs > obj/Bundle.cs
-cp Menu.cs MenuPop.cs Layout.cs Profiles.cs Players.cs Previews.cs Keys.cs Lang.cs Russian.cs FrameCap.cs Stats.cs obj/
+cp Menu.cs MenuPop.cs Layout.cs Profiles.cs Players.cs Previews.cs Keys.cs Lang.cs Russian.cs FrameCap.cs Stats.cs GameConfig.cs obj/
 rm -f MONOLITH.dll
-dotnet "$CSC" -nologo -target:library -out:MONOLITH.dll -define:DORSTH_BUNDLE -nostdlib -langversion:10 -unsafe -optimize+ -debug- -nowarn:CS0436,CS1701,CS1702 $refs $(find obj -name '*.cs') 2>&1 | grep -E "error|warning CS0(1|2)" | head -40
+dotnet $CSC -nologo -target:library -out:MONOLITH.dll -define:DORSTH_BUNDLE -nostdlib -langversion:10 -unsafe -optimize+ -debug- -nowarn:CS0436,CS1701,CS1702 $refs $(find obj -name '*.cs') 2>&1 | grep -E "error|warning CS0(1|2)" | cut -c1-260 | head -40
 ls -la MONOLITH.dll 2>/dev/null && echo "holds: $contents"
