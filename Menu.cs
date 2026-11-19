@@ -453,7 +453,7 @@ namespace Monolith
                 : _capture ? K("Key", "press one") + K("Esc", "cancel")
                 : _editRow != null ? K("Enter", "ok") + K("←", "delete") + K("Esc", "cancel")
                 : _searching ? K("type", "to search") + K("Enter", "open") + K("Esc", "leave search")
-                : K("↑↓", "move") + K("←→", "set") + K("Enter", "open") + ((over >= 0 && over < _vis.Count ? Changed(_vis[over]) : pageOn && ci >= 0 && ci < _vis.Count && Changed(_vis[ci])) ? K("R", "reset") : "") + K("Q", "back") + K("/", "search") + K("Esc", "close");
+                : K("WS", "move") + K("AD", "set") + K("E", "open") + ((over >= 0 && over < _vis.Count ? Changed(_vis[over]) : pageOn && ci >= 0 && ci < _vis.Count && Changed(_vis[ci])) ? K("R", "reset") : "") + K("Q", "back") + K("/", "search") + K("Esc", "close");
             Line(kb.x + _cw * 2f, kb.y, keys);   // on the same column as the text of the panels and of the box above it
             if (_pop != null) PopDraw(mouse, mouseMoved);
         }
@@ -946,6 +946,7 @@ namespace Monolith
             if (k == KeyCode.W) k = KeyCode.UpArrow; else if (k == KeyCode.S) k = KeyCode.DownArrow; else if (k == KeyCode.A) k = KeyCode.LeftArrow; else if (k == KeyCode.D) k = KeyCode.RightArrow;
             else if (k == KeyCode.R) k = KeyCode.Delete;
             else if (k == KeyCode.Q) k = KeyCode.Backspace;   // back, for keyboards without that key
+            else if (k == KeyCode.E) k = KeyCode.Return;      // open or take: Q and E sit either side of W, so one hand does it all
             // the search starts on the character, so it is the same key on every keyboard layout
             if (ch == '/' || k == KeyCode.Slash) { _searching = true; _query = ""; _searchPage = null; _modeFrame = Time.frameCount; ev.Use(); return; }
             if (_inNav)

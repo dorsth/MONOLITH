@@ -189,7 +189,7 @@ for folder in ['HitSounds', 'HeadHitSounds', 'KillSounds', 'MeleeKillSounds']:
               'В списке каждый звук можно услышать. Свои звуки кладите в plugins/MONOLITH/' + folder + '.', 'tip'))
 # the key bars as the menu puts them together: (keys and words, in order)
 BARS = [
- [('↑↓','move'),('←→','set'),('Enter','open'),('R','reset'),('Q','back'),('/','search'),('Esc','close')],
+ [('WS','move'),('AD','set'),('E','open'),('R','reset'),('Q','back'),('/','search'),('Esc','close')],
  [('↑↓','move'),('Enter','take'),('Esc','cancel'),('0-9 A-F','hex value')],
  [('↑↓','move'),('Enter','take'),('Esc','cancel'),('A-Z','jump to a name')],
  [('Key','press one'),('Enter','none'),('Esc','cancel')],

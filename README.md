@@ -26,7 +26,7 @@ Remove the separate copies of my mods once MONOLITH is in. If one is still insta
 |---|---|---|
 | Up, Down or W, S | | move |
 | Left, Right or A, D | click or drag a bar | change a value (Shift: ten steps) |
-| Enter or Space | click | flip a switch, open a page, a list or the colors, type a number |
+| E, Enter or Space | click | flip a switch, open a page, a list or the colors, type a number |
 | | move over a row | read what it does |
 | R | Reset in the box under the page | back to default (shown when the setting is changed) |
 | Q or Backspace | click `..` | back |
