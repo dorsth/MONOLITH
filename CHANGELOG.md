@@ -1,5 +1,10 @@
 # MONOLITH changelog
 
+## 1.0.7
+- Friendly fire when I host: the game's lobby option for friendly fire, kept between launches like enemy outlines.
+- Join message: up to 120 letters with color, bold, italic, underline and strikethrough tags, which do not count toward the limit (DorsthTweaks 1.3.7).
+- The match board column first blood is now first k-d.
+
 ## 1.0.6
 - Performance viewmodel is no longer experimental: an imported config now sets it like any other setting (ViewmodelTweaks 2.0.4).
 - The Dorsth preset has Performance viewmodel on.
