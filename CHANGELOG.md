@@ -1,7 +1,7 @@
 # MONOLITH changelog
 
 ## 1.0.4
-- The icon is the original drawing again, only compressed: 3 pixels of its own edge were added on each side to make the 256 x 256 Thunderstore asks for, nothing was scaled.
+- The icon is the original drawing again, only compressed.
 - Readme: plainer wording about Mod Menu.
 - The Thunderstore zips of 1.0.0 to 1.0.3 held Mod Menu itself instead of MONOLITH's own copy of its API: Mod Menu's window showed and other mods were missing from MONOLITH's menu. Fixed.
 
