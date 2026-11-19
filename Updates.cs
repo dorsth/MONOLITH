@@ -26,7 +26,7 @@ namespace Monolith
         private const string Api = "https://thunderstore.io/api/experimental/package/" + Package + "/";
         private const string Download = "https://thunderstore.io/package/download/" + Package + "/";
         private const string InZip = "BepInEx/plugins/MONOLITH/";
-        private const string Me = "MONOLITH";
+        private const string Me = "MONOLITH", DllName = "MONOLITH.dll", Folder = "MONOLITH";
 
         private static string _latest, _manager;
         private static bool _busy, _ready, _failed;
@@ -69,7 +69,8 @@ namespace Monolith
             }
         }
 
-        private const float Spot = 1.6f;   // line height steps up from the bottom of the screen
+        // line heights up from the bottom of the screen: MONOLITH lowest, then STRAFTH, then Straftat Tournaments, so they never overlap
+        private const float Spot = 1.6f;
 
         private static string Line()
         {
@@ -117,7 +118,7 @@ namespace Monolith
                         if (req.result != UnityWebRequest.Result.Success) { BundlePlugin.Log.LogInfo("Updates: Thunderstore did not answer: " + req.error); yield break; }
                         Match m = Regex.Match(req.downloadHandler.text, "\"latest\"\\s*:\\s*\\{[^{}]*?\"version_number\"\\s*:\\s*\"(\\d+\\.\\d+\\.\\d+)\"");
                         if (m.Success) _latest = m.Groups[1].Value;
-                        if (Newer) { BundlePlugin.Log.LogMessage("MONOLITH " + _latest + " is out (you have " + BundlePlugin.Version + ")."); BundlePlugin.I.gameObject.AddComponent<Notice>(); }
+                        if (Newer) { BundlePlugin.Log.LogMessage(Me + " " + _latest + " is out (you have " + BundlePlugin.Version + ")."); BundlePlugin.I.gameObject.AddComponent<Notice>(); }
                     }
                     yield break;
                 }
@@ -127,7 +128,7 @@ namespace Monolith
                     req.timeout = 60;
                     yield return req.SendWebRequest();
                     if (req.result != UnityWebRequest.Result.Success) { _failed = true; BundlePlugin.Log.LogWarning("Updates: the download failed: " + req.error); yield break; }
-                    try { Put(req.downloadHandler.data); _ready = true; BundlePlugin.Log.LogMessage("MONOLITH " + install + " is in place. It loads at the next start."); }
+                    try { Put(req.downloadHandler.data); _ready = true; BundlePlugin.Log.LogMessage(Me + " " + install + " is in place. It loads at the next start."); }
                     catch (Exception e) { _failed = true; BundlePlugin.Log.LogWarning("Updates: the new version could not be put in place: " + e.Message); }
                 }
             }
@@ -138,17 +139,17 @@ namespace Monolith
         private static void Put(byte[] zip)
         {
             string dir = Path.GetDirectoryName(Dll);
-            bool own = Path.GetFileName(dir).IndexOf("MONOLITH", StringComparison.OrdinalIgnoreCase) >= 0;   // a folder of its own, not plugins itself
+            bool own = Path.GetFileName(dir).IndexOf(Folder, StringComparison.OrdinalIgnoreCase) >= 0;   // a folder of its own, not plugins itself
             var files = new List<KeyValuePair<string, byte[]>>();
             foreach (KeyValuePair<string, byte[]> f in Unzip(zip))
             {
                 if (!f.Key.StartsWith(InZip, StringComparison.Ordinal) || f.Key.EndsWith("/", StringComparison.Ordinal)) continue;
                 string rel = f.Key.Substring(InZip.Length);
                 if (rel.Contains("..")) continue;
-                if (!own && rel != "MONOLITH.dll") continue;
+                if (!own && rel != DllName) continue;
                 files.Add(new KeyValuePair<string, byte[]>(rel, f.Value));
             }
-            if (!files.Exists(f => f.Key == "MONOLITH.dll")) throw new InvalidDataException("no MONOLITH.dll in the download");
+            if (!files.Exists(f => f.Key == DllName)) throw new InvalidDataException("no " + DllName + " in the download");
             foreach (KeyValuePair<string, byte[]> f in files)
             {
                 string to = Path.Combine(dir, f.Key.Replace('/', Path.DirectorySeparatorChar));
