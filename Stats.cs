@@ -50,6 +50,7 @@ namespace Monolith
         private static readonly Dictionary<int, int> IdOfKiller = new Dictionary<int, int>();           // killer transform -> player id
         private struct Hit { public int Victim, Frame; public float Dmg; public bool Lethal; public PlayerHealth Ph; }
         private static readonly Dictionary<int, Hit> Waiting = new Dictionary<int, Hit>();
+        private static readonly List<int> Done = new List<int>();   // reused: nothing new per hit
         private static readonly Dictionary<int, int> IdOf = new Dictionary<int, int>();                 // instance -> player id
         private struct Death { public int Victim, Killer; public float At; }
         private static readonly List<Death> RoundDeaths = new List<Death>();
@@ -134,9 +135,9 @@ namespace Monolith
         internal static void Flush(bool all = false)
         {
             if (Waiting.Count == 0) return;
-            List<int> done = null;
-            foreach (var kv in Waiting) if (all || kv.Value.Frame < Time.frameCount) { Credit(kv.Value, Attacker(kv.Key, kv.Value)); (done ?? (done = new List<int>())).Add(kv.Key); }
-            if (done != null) foreach (int k in done) Waiting.Remove(k);
+            foreach (var kv in Waiting) if (all || kv.Value.Frame < Time.frameCount) { Credit(kv.Value, Attacker(kv.Key, kv.Value)); Done.Add(kv.Key); }
+            foreach (int k in Done) Waiting.Remove(k);
+            Done.Clear();
         }
 
         private static void Credit(Hit h, int atk)
