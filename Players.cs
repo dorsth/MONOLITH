@@ -322,6 +322,8 @@ namespace Monolith
                 shown.name = "MonolithHat";
                 shown.tag = "Untagged";
                 shown.layer = 18;
+                // only the model: the hat list holds the wardrobe's models, whose own scripts switch them off outside the wardrobe
+                foreach (MonoBehaviour m in shown.GetComponentsInChildren<MonoBehaviour>(true)) if (!(m is HatPosition) && !(m is Knock)) { m.enabled = false; UnityEngine.Object.Destroy(m); }
                 // nothing a shot or a body can touch
                 foreach (Collider c in shown.GetComponentsInChildren<Collider>(true)) { c.enabled = false; UnityEngine.Object.Destroy(c); }
                 foreach (Rigidbody rb in shown.GetComponentsInChildren<Rigidbody>(true)) UnityEngine.Object.Destroy(rb);
