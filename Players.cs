@@ -17,9 +17,9 @@
 //    is the one that counts when it starts; a change here is written where the game keeps it and shown on the game's
 //    own settings page, and a change there comes back here. Whether enemies have an outline at all stays the
 //    lobby's rule: this only sets the color the game uses when it draws one.
-//  * Enemy outlines in lobbies you host: the game's own lobby switch (the tick box in its lobby settings), which
-//    the game forgets at every start. This remembers it and sets it for you, by setting that tick box: the game then
-//    does what it does when you click it, and every player in your lobby gets the outlines, as with the game's own
+//  * Enemy outlines and friendly fire in lobbies you host: the game's own lobby switches (the tick boxes in its lobby settings), which
+//    the game forgets at every start. This remembers them and sets them for you, by setting those tick boxes: the game then
+//    does what it does when you click one, and every player in your lobby gets the same rule, as with the game's own
 //    option. In somebody else's lobby the host's choice counts and nothing here changes it: an outline only you would
 //    see is information the others do not have.
 // Applies when a player is dressed: from the next round. Costs nothing between rounds: no script of its own runs.
@@ -39,7 +39,7 @@ namespace Monolith
     {
         internal static ConfigEntry<string> EnemyOutfit, TeamOutfit, EnemyHat, TeamHat;
         internal static ConfigEntry<Color> EnemyOutline, TeamOutline;
-        internal static ConfigEntry<bool> HostOutlines;
+        internal static ConfigEntry<bool> HostOutlines, HostFriendlyFire;
         private const string TeamKey = "TeamOutlineColor", EnemyKey = "EnemyOutlineColor";   // where the game saves them
         private static bool _fromGame;
         private static int _hits;
@@ -62,43 +62,58 @@ namespace Monolith
             catch (Exception e) { BundlePlugin.Log.LogInfo("Players: the game's outline colors could not be read: " + e.Message); }
             TeamOutline.SettingChanged += (s, e) => ToGame(true);
             EnemyOutline.SettingChanged += (s, e) => ToGame(false);
-            HostOutlines = c.Bind(S, "Enemy Outlines In My Lobbies", false, "The game's lobby option for enemy outlines, remembered between launches. It counts in lobbies you host; in somebody else's lobby the host decides.");
-            HostOutlines.SettingChanged += (s, e) => { if (!_tickFromGame) Tick(SteamLobby.Instance); };
+            HostOutlines = Box.Remember(c.Bind(S, "Enemy Outlines In My Lobbies", false, "The game's lobby option for enemy outlines, remembered between launches. It counts in lobbies you host; in somebody else's lobby the host decides."), l => l.enemyOutlineToggle);
+            HostFriendlyFire = Box.Remember(c.Bind(S, "Friendly Fire In My Lobbies", true, "The game's lobby option for friendly fire, remembered between launches. It counts in lobbies you host; in somebody else's lobby the host decides."), l => l.friendlyFireToggle);
         }
 
-        // ---- enemy outlines in lobbies you host: the game's own tick box, remembered
+        // ---- lobby options you host with: the game's own tick boxes, remembered
 
-        private static int _tickId; private static bool _tickFromGame, _tickFromHere;
-        // one delegate for the life of the game: the tick box of each new lobby window gets the same one
-        private static readonly UnityAction<bool> Ticked = on =>
+        private sealed class Box
         {
-            if (_tickFromHere || HostOutlines == null || HostOutlines.Value == on) return;
-            _tickFromGame = true;
-            try { HostOutlines.Value = on; } finally { _tickFromGame = false; }
-        };
+            private static readonly List<Box> All = new List<Box>();
+            private readonly ConfigEntry<bool> _entry; private readonly Func<SteamLobby, Toggle> _of;
+            private int _id; private bool _fromGame, _fromHere;
+            private readonly UnityAction<bool> _ticked;   // one delegate for the life of the game: each new lobby window's box gets the same one
 
-        // the lobby window exists: its tick box is set to what you last had, and a click on it is remembered from here on
-        private static void Tick(SteamLobby lobby)
-        {
-            try
+            private Box(ConfigEntry<bool> entry, Func<SteamLobby, Toggle> of)
             {
-                Toggle box = lobby != null ? lobby.enemyOutlineToggle : null;
-                if (box == null) return;
-                if (box.GetInstanceID() != _tickId) { _tickId = box.GetInstanceID(); box.onValueChanged.AddListener(Ticked); }
-                bool want = HostOutlines.Value;
-                if (box.isOn == want) return;
-                _tickFromHere = true;
+                _entry = entry; _of = of;
+                _ticked = on =>
+                {
+                    if (_fromHere || _entry.Value == on) return;
+                    _fromGame = true;
+                    try { _entry.Value = on; } finally { _fromGame = false; }
+                };
+                _entry.SettingChanged += (s, e) => { if (!_fromGame) Set(SteamLobby.Instance); };
+            }
+
+            internal static ConfigEntry<bool> Remember(ConfigEntry<bool> entry, Func<SteamLobby, Toggle> of) { All.Add(new Box(entry, of)); return entry; }
+
+            internal static void SetAll(SteamLobby lobby) { for (int i = 0; i < All.Count; i++) All[i].Set(lobby); }
+
+            // the lobby window exists: its box is set to what you last had, and a click on it is remembered from here on
+            private void Set(SteamLobby lobby)
+            {
                 try
                 {
-                    // with a lobby running the game's own routine passes it on; before that it reads the box when the lobby starts
-                    if (GameManager.Instance != null) box.isOn = want; else box.SetIsOnWithoutNotify(want);
+                    Toggle box = lobby != null ? _of(lobby) : null;
+                    if (box == null) return;
+                    if (box.GetInstanceID() != _id) { _id = box.GetInstanceID(); box.onValueChanged.AddListener(_ticked); }
+                    bool want = _entry.Value;
+                    if (box.isOn == want) return;
+                    _fromHere = true;
+                    try
+                    {
+                        // with a lobby running the game's own routine passes it on; before that it reads the box when the lobby starts
+                        if (GameManager.Instance != null) box.isOn = want; else box.SetIsOnWithoutNotify(want);
+                    }
+                    finally { _fromHere = false; }
                 }
-                finally { _tickFromHere = false; }
+                catch (Exception e) { BundlePlugin.Log.LogInfo("Players: the lobby option " + _entry.Definition.Key + " was not set: " + e.Message); }
             }
-            catch (Exception e) { BundlePlugin.Log.LogInfo("Players: the lobby's outline switch was not set: " + e.Message); }
         }
 
-        private static void LobbyMade(SteamLobby __instance) { Tick(__instance); }
+        private static void LobbyMade(SteamLobby __instance) { Box.SetAll(__instance); }
 
         // ---- outline colors: one setting in two menus
 

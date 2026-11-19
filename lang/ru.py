@@ -84,7 +84,7 @@ T = [
 ('Fewer UI animations', 'Меньше анимаций интерфейса', 'L52'),
 ('No animations in menus and on the HUD.', 'Без анимаций в меню и на HUD.', 'tip'),
 ('Hide default playlists', 'Скрыть стандартные плейлисты', 'L52'), ('Join message', 'Сообщение при входе', 'L46'),
-("The line everyone sees when you join a lobby. {name} is your name. Leave it empty for the game's line.", 'Строка, которую все видят, когда вы входите в лобби. {name}: ваше имя. Пусто: строка игры.', 'tip'),
+("The line everyone sees when you join a lobby. {name} is your name. Color, bold, italic, underline and strikethrough tags work. Up to 120 letters, tags not counted. Leave it empty for the game's line.", 'Строка, которую все видят, когда вы входите в лобби. {name}: ваше имя. Теги цвета, жирного, курсива, подчеркивания и зачеркивания работают. До 120 букв, теги не считаются. Пусто: строка игры.', 'tip'),
 # ---- effects
 ('Tracers', 'Трассеры', 'L50'), ('Hide my tracers', 'Скрыть мои трассеры', 'L52'),
 ('Hide other players tracers', 'Скрыть трассеры других игроков', 'L52'),
@@ -98,7 +98,7 @@ T = [
 ('No hit blood', 'Без крови при попадании', 'L50'), ('No death blood', 'Без крови при смерти', 'L50'), ('No blood decals', 'Без декалей крови', 'L50'),
 # ---- players (31 cells)
 ('Enemies', 'Враги', 'L25'), ('Teammates', 'Союзники', 'L25'), ('Suit', 'Костюм', 'L15'), ('Hat', 'Шапка', 'L15'),
-('their own', 'как у них', 'W9'), ('From the next round.', 'Со следующего раунда.', 'tip'), ('Outline color', 'Цвет обводки', 'L17'), ('Lobby', 'Лобби', 'L25'), ('Enemy outlines when I host', 'Обводка врагов в моих лобби', 'L27'),
+('their own', 'как у них', 'W9'), ('From the next round.', 'Со следующего раунда.', 'tip'), ('Outline color', 'Цвет обводки', 'L17'), ('Lobby', 'Лобби', 'L25'), ('Enemy outlines when I host', 'Обводка врагов в моих лобби', 'L27'), ('Friendly fire when I host', 'Огонь по своим в моих лобби', 'L27'),
 ("The game's lobby option, kept between launches. In other lobbies the host decides.", 'Настройка лобби из игры, сохраняется между запусками. В чужих лобби решает хост.', 'tip'),
 ('The same setting as in the game. Only in lobbies with enemy outlines on.', 'Та же настройка, что в игре. Только в лобби с обводкой врагов.', 'tip'),
 ('The same setting as in the game.', 'Та же настройка, что в игре.', 'tip'),

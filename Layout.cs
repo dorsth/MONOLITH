@@ -545,7 +545,8 @@ namespace Monolith
                  .Set("Outline color", Players.TeamOutline, null, "The same setting as in the game.")
                  .Head("Lobby")
                  .Set("Enemy outlines when I host", Players.HostOutlines, null, "The game's lobby option, kept between launches. In other lobbies the host decides.")
-                 .Set("Join message", E(Tweaks, "Menus", "Join Message"), null, "The line everyone sees when you join a lobby. {name} is your name. Leave it empty for the game's line.");
+                 .Set("Friendly fire when I host", Players.HostFriendlyFire, null, "The game's lobby option, kept between launches. In other lobbies the host decides.")
+                 .Set("Join message", E(Tweaks, "Menus", "Join Message"), null, "The line everyone sees when you join a lobby. {name} is your name. Color, bold, italic, underline and strikethrough tags work. Up to 120 letters, tags not counted. Leave it empty for the game's line.");
                 if (p.Rows.Count > 2) { p.Draw = r => BundleMenu.I.PlayersPreview(r); p.SideCols = 24; p.SideRows = 14; p.SideTitle = "preview"; cats.Add(p); }
             }
 

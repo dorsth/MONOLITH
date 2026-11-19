@@ -5,7 +5,7 @@ namespace Monolith
 {
     internal static partial class Lang
     {
-        private static readonly Dictionary<string, string> Table = new Dictionary<string, string>(288)
+        private static readonly Dictionary<string, string> Table = new Dictionary<string, string>(289)
         {
             { "Crosshair", "Прицел" },
             { "Viewmodel", "Вьюмодель" },
@@ -122,7 +122,7 @@ namespace Monolith
             { "No animations in menus and on the HUD.", "Без анимаций в меню и на HUD." },
             { "Hide default playlists", "Скрыть стандартные плейлисты" },
             { "Join message", "Сообщение при входе" },
-            { "The line everyone sees when you join a lobby. {name} is your name. Leave it empty for the game's line.", "Строка, которую все видят, когда вы входите в лобби. {name}: ваше имя. Пусто: строка игры." },
+            { "The line everyone sees when you join a lobby. {name} is your name. Color, bold, italic, underline and strikethrough tags work. Up to 120 letters, tags not counted. Leave it empty for the game's line.", "Строка, которую все видят, когда вы входите в лобби. {name}: ваше имя. Теги цвета, жирного, курсива, подчеркивания и зачеркивания работают. До 120 букв, теги не считаются. Пусто: строка игры." },
             { "Tracers", "Трассеры" },
             { "Hide my tracers", "Скрыть мои трассеры" },
             { "Hide other players tracers", "Скрыть трассеры других игроков" },
@@ -151,6 +151,7 @@ namespace Monolith
             { "Outline color", "Цвет обводки" },
             { "Lobby", "Лобби" },
             { "Enemy outlines when I host", "Обводка врагов в моих лобби" },
+            { "Friendly fire when I host", "Огонь по своим в моих лобби" },
             { "The game's lobby option, kept between launches. In other lobbies the host decides.", "Настройка лобби из игры, сохраняется между запусками. В чужих лобби решает хост." },
             { "The same setting as in the game. Only in lobbies with enemy outlines on.", "Та же настройка, что в игре. Только в лобби с обводкой врагов." },
             { "The same setting as in the game.", "Та же настройка, что в игре." },
