@@ -282,9 +282,11 @@ namespace Monolith
             return i >= 0 && i < pics.Length ? pics[i] : null;
         }
 
-        // ---- the hat: drawn on the real one, which stays as it is and is only not drawn, so it comes off when the real one is shot
+        // ---- the hat: drawn on the real one, which stays as it is and is only not drawn, so it comes off when the real one is shot.
+        // A player without a hat gets a drawn one where the game puts hats; there is no real hat to shoot, so it comes off when
+        // the player is killed (Knock).
 
-        private static void Dressed(PlayerSetup __instance)
+        private static void Dressed(PlayerSetup __instance, Transform ___hatToWearPosition, Vector3 __2)
         {
             try
             {
@@ -297,8 +299,16 @@ namespace Monolith
                 GameObject prefab = CosmeticsManager.Instance.hats[i];
                 if (prefab == null) return;
                 GameObject real = __instance.hat, shown;
-                // a player without a hat stays without one: a drawn hat there could never be shot off, as a real one is
-                if (real == null) return;
+                if (real == null)
+                {
+                    if (___hatToWearPosition == null) return;
+                    shown = UnityEngine.Object.Instantiate(prefab, ___hatToWearPosition.position, Quaternion.identity, ___hatToWearPosition);
+                    shown.AddComponent<HatPosition>().reference = ___hatToWearPosition;
+                    shown.transform.forward = __2;   // the way the game turns a hat: the third value it was called with
+                    PlayerHealth ph = __instance.GetComponent<PlayerHealth>() ?? __instance.GetComponentInParent<PlayerHealth>() ?? __instance.GetComponentInChildren<PlayerHealth>();
+                    if (ph != null) shown.AddComponent<Knock>().Health = ph;
+                }
+                else
                 {
                     if (real.name.StartsWith(prefab.name, StringComparison.Ordinal)) return;   // wears it already
                     foreach (Renderer r in real.GetComponentsInChildren<Renderer>(true)) r.enabled = false;
@@ -316,6 +326,31 @@ namespace Monolith
                 shown.SetActive(true);
             }
             catch (Exception e) { BundlePlugin.Log.LogInfo("Players: a hat was left as it was: " + e.Message); }
+        }
+
+        // A drawn hat on a player who wears none: flies off when the player is killed, the way a shot hat does, and is gone
+        // two seconds later. No collider, so nothing can hit it or stand on it.
+        internal sealed class Knock : MonoBehaviour
+        {
+            internal PlayerHealth Health;
+            private float _goneAt = -1f; private bool _seenAlive;
+
+            private void LateUpdate()
+            {
+                if (_goneAt >= 0f) { if (Time.time >= _goneAt) Destroy(gameObject); return; }
+                if (Health == null) { Destroy(gameObject); return; }
+                bool alive = !Health.sync___get_value_isKilled() && Health.sync___get_value_health() > 0f;
+                if (alive) { _seenAlive = true; return; }
+                if (!_seenAlive) return;   // dressed before the new life began: not a kill
+                Vector3 dir = Health.sync___get_value_lastKillDirection(); if (dir.sqrMagnitude < 0.01f) dir = -transform.forward;
+                HatPosition pos = GetComponent<HatPosition>(); if (pos != null) Destroy(pos);
+                transform.SetParent(null, true);
+                var rb = gameObject.AddComponent<Rigidbody>();
+                rb.interpolation = RigidbodyInterpolation.Interpolate;
+                rb.AddForce(dir.normalized * 10f, ForceMode.Impulse);
+                rb.AddTorque(Vector3.Cross(Vector3.up, dir) * 40f, ForceMode.Impulse);
+                _goneAt = Time.time + 2f;
+            }
         }
     }
 }
