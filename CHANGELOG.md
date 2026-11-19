@@ -1,7 +1,8 @@
 # MONOLITH changelog
 
 ## 1.0.8
-- General, updates: Update checks Thunderstore for a newer MONOLITH and puts it in place, then Restart now starts the game again. Installed with a mod manager (r2modman, Thunderstore Mod Manager, Gale): it says to update there. Check at start asks once when the game starts.
+- When a newer MONOLITH is on Thunderstore, a line in the game's main menu says so. A click updates it, a second click restarts the game. Installed with a mod manager (r2modman, Thunderstore Mod Manager, Gale): the line says to update there.
+- The menu's title shows the version you have.
 - The Dorsth and Defaults presets say what they really leave out: sensitivity and keys, keys and outline colors.
 
 ## 1.0.7

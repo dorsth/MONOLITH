@@ -38,7 +38,6 @@ namespace Monolith
             BundleMenu.Key = Config.Bind("Keys", "Menu", UnityEngine.KeyCode.F2, "Opens the menu with the settings of every mod in the bundle.");
             Lang.Bind(Config);
             GameConfig.Bind(Config);
-            Updates.Bind(Config);
             try
             {
                 // the menu: a script that is off until the key is pressed, and one that only watches the key

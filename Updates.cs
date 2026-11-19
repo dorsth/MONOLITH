@@ -1,6 +1,8 @@
 // MONOLITH - finds out whether a newer MONOLITH is on Thunderstore and, when it was not installed by a mod manager,
 // puts it in place itself. Dorsth was here.
 //
+// It asks once at start. Only when a newer one is out does a line show, in the game's main menu and nowhere else:
+// a click on it updates, a second click restarts the game. Nothing of it runs during a match.
 // A mod manager (r2modman, Thunderstore Mod Manager, Gale) keeps its own list of what version each mod is. Swapping
 // the files behind its back would leave that list wrong, so inside a manager's profile this only says where to update.
 // What is downloaded: only Dorsth's own package, from thunderstore.io, at a version number checked to be just that.
@@ -12,9 +14,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Text.RegularExpressions;
-using BepInEx.Configuration;
 using UnityEngine;
 using UnityEngine.Networking;
+using UnityEngine.SceneManagement;
 
 namespace Monolith
 {
@@ -24,58 +26,69 @@ namespace Monolith
         private const string Api = "https://thunderstore.io/api/experimental/package/" + Package + "/";
         private const string Download = "https://thunderstore.io/package/download/" + Package + "/";
         private const string InZip = "BepInEx/plugins/MONOLITH/";
+        private const string Me = "MONOLITH";
 
-        internal static ConfigEntry<bool> AtStart;
         private static string _latest, _manager;
-        private static bool _busy, _ready;
-
-        internal static void Bind(ConfigFile c)
-        {
-            AtStart = c.Bind("General", "Check For Updates", true, "At start, asks Thunderstore once whether a newer MONOLITH is out.");
-        }
+        private static bool _busy, _ready, _failed;
 
         internal static void Start(MonoBehaviour host)
         {
             _manager = Manager(Dll);
             ClearOld();
-            if (AtStart.Value) host.StartCoroutine(Ask(null));
+            host.StartCoroutine(Ask(null));
         }
 
         private static string Dll { get { return typeof(BundlePlugin).Assembly.Location; } }
         private static bool Newer { get { return _latest != null && new Version(_latest) > new Version(BundlePlugin.Version); } }
 
-        /// <summary>What the menu row shows on its right.</summary>
-        internal static string Status()
+        // ---- the one line in the game's main menu, only while there is something to do
+
+        private sealed class Notice : MonoBehaviour
         {
-            if (_ready) return Lang.T("restart to finish");
-            if (_busy) return "...";
-            if (_latest == null) return BundlePlugin.Version;
-            return Newer ? _latest + Lang.T(" is out") : BundlePlugin.Version + Lang.T(", newest");
+            private GUIStyle _st;
+            private string _line; private int _state = -1;   // the line is only made again when what it says changes
+            private void Awake() { SceneManager.activeSceneChanged += (a, b) => Check(); Check(); }
+            private void Check() { enabled = Newer && SceneManager.GetActiveScene().name == "MainMenu"; }
+
+            private void OnGUI()
+            {
+                int state = (_busy ? 1 : 0) | (_ready ? 2 : 0) | (_failed ? 4 : 0);
+                if (state != _state) { _state = state; _line = Line(); }
+                string line = _line;
+                if (_st == null) _st = new GUIStyle(GUI.skin.label) { fontSize = Mathf.RoundToInt(Screen.height / 50f), alignment = TextAnchor.MiddleCenter, fontStyle = FontStyle.Italic, richText = false };
+                bool click = !_busy && (_ready || (_manager == null && !_failed));
+                _st.normal.textColor = click ? new Color(0.62f, 0.95f, 0.75f) : new Color(0.85f, 0.85f, 0.85f);
+                float h = _st.fontSize * 2f;
+                Rect r = new Rect(0f, Screen.height - h * Spot, Screen.width, h);
+                GUI.Label(r, line, _st);
+                if (click && Event.current.type == EventType.MouseUp && r.Contains(Event.current.mousePosition))
+                {
+                    Event.current.Use();
+                    if (_ready) Restart(); else StartCoroutine(Ask(_latest));
+                }
+            }
         }
 
-        internal static bool Ready() { return _ready; }
+        private const float Spot = 1.6f;   // line height steps up from the bottom of the screen
 
-        /// <summary>Enter on the row: check, or update when a newer one is known.</summary>
-        internal static string Use(MonoBehaviour host)
+        private static string Line()
         {
-            if (_busy) return Lang.T("Busy, one moment.");
-            if (_ready) return Lang.T("Restart the game to finish the update.");
-            if (!Newer) { host.StartCoroutine(Ask(null)); return Lang.T("Checking Thunderstore."); }
-            if (_manager != null) return Lang.T("MONOLITH was installed with ") + _manager + Lang.T(". Update it there.");
-            host.StartCoroutine(Ask(_latest));
-            return Lang.T("Downloading ") + _latest + "...";
+            if (_ready) return Me + " " + _latest + Lang.T(" is in place. Click to restart.");
+            if (_busy) return Lang.T("Downloading ") + Me + " " + _latest + "...";
+            if (_failed) return Me + Lang.T(" could not update itself. Get ") + _latest + Lang.T(" from Thunderstore.");
+            if (_manager != null) return Me + " " + _latest + Lang.T(" is out. Update it in ") + _manager + ".";
+            return Me + " " + _latest + Lang.T(" is out. Click to update.");
         }
 
-        internal static string Restart()
+        private static void Restart()
         {
             try
             {
                 uint app = Steamworks.SteamUtils.GetAppID().m_AppId;
                 System.Diagnostics.Process.Start("steam://rungameid/" + app);
                 Application.Quit();
-                return null;
             }
-            catch (Exception e) { return Lang.T("Could not restart: ") + e.Message; }
+            catch (Exception e) { BundlePlugin.Log.LogWarning("Updates: could not restart: " + e.Message); }
         }
 
         // the files of a mod manager's profile sit under its own folder, in a "profiles" folder
@@ -104,7 +117,7 @@ namespace Monolith
                         if (req.result != UnityWebRequest.Result.Success) { BundlePlugin.Log.LogInfo("Updates: Thunderstore did not answer: " + req.error); yield break; }
                         Match m = Regex.Match(req.downloadHandler.text, "\"latest\"\\s*:\\s*\\{[^{}]*?\"version_number\"\\s*:\\s*\"(\\d+\\.\\d+\\.\\d+)\"");
                         if (m.Success) _latest = m.Groups[1].Value;
-                        if (Newer) BundlePlugin.Log.LogMessage("MONOLITH " + _latest + " is out (you have " + BundlePlugin.Version + ").");
+                        if (Newer) { BundlePlugin.Log.LogMessage("MONOLITH " + _latest + " is out (you have " + BundlePlugin.Version + ")."); BundlePlugin.I.gameObject.AddComponent<Notice>(); }
                     }
                     yield break;
                 }
@@ -113,9 +126,9 @@ namespace Monolith
                 {
                     req.timeout = 60;
                     yield return req.SendWebRequest();
-                    if (req.result != UnityWebRequest.Result.Success) { BundlePlugin.Log.LogWarning("Updates: the download failed: " + req.error); yield break; }
+                    if (req.result != UnityWebRequest.Result.Success) { _failed = true; BundlePlugin.Log.LogWarning("Updates: the download failed: " + req.error); yield break; }
                     try { Put(req.downloadHandler.data); _ready = true; BundlePlugin.Log.LogMessage("MONOLITH " + install + " is in place. It loads at the next start."); }
-                    catch (Exception e) { BundlePlugin.Log.LogWarning("Updates: the new version could not be put in place, nothing was changed: " + e.Message); }
+                    catch (Exception e) { _failed = true; BundlePlugin.Log.LogWarning("Updates: the new version could not be put in place: " + e.Message); }
                 }
             }
             finally { _busy = false; }

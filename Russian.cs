@@ -5,7 +5,7 @@ namespace Monolith
 {
     internal static partial class Lang
     {
-        private static readonly Dictionary<string, string> Table = new Dictionary<string, string>(307)
+        private static readonly Dictionary<string, string> Table = new Dictionary<string, string>(296)
         {
             { "Crosshair", "Прицел" },
             { "Viewmodel", "Вьюмодель" },
@@ -292,23 +292,12 @@ namespace Monolith
             { "Off", "Выкл" },
             { "Text", "Текст" },
             { "Bar", "Полоса" },
-            { "Updates", "Обновления" },
-            { "Check at start", "Проверять при запуске" },
-            { "Update", "Обновить" },
-            { "Restart now", "Перезапустить" },
-            { "Asks Thunderstore once, at start, whether a newer MONOLITH is out.", "Один раз при запуске спрашивает Thunderstore, вышел ли новый MONOLITH." },
-            { "Checks Thunderstore, and puts a newer MONOLITH in place. Installed with a mod manager: update it there.", "Проверяет Thunderstore и ставит новый MONOLITH. Установлен через менеджер модов: обновляйте там." },
-            { "Closes the game and starts it again through Steam, with the new version.", "Закрывает игру и запускает ее снова через Steam, уже с новой версией." },
-            { "restart to finish", "перезапустите" },
-            { " is out", " вышла" },
-            { ", newest", ", последняя" },
-            { "Busy, one moment.", "Занято, секунду." },
-            { "Restart the game to finish the update.", "Перезапустите игру, чтобы закончить обновление." },
-            { "Checking Thunderstore.", "Проверка Thunderstore." },
-            { "MONOLITH was installed with ", "MONOLITH установлен через " },
-            { ". Update it there.", ". Обновляйте там." },
+            { " is in place. Click to restart.", " на месте. Нажмите, чтобы перезапустить." },
             { "Downloading ", "Загрузка " },
-            { "Could not restart: ", "Не удалось перезапустить: " },
+            { " could not update itself. Get ", " не смог обновиться. Скачайте " },
+            { " from Thunderstore.", " с Thunderstore." },
+            { " is out. Update it in ", " вышел. Обновите в " },
+            { " is out. Click to update.", " вышел. Нажмите, чтобы обновить." },
             { "your mod manager", "ваш менеджер модов" },
             { "You hear each one in the list. Add yours: a sound file in plugins/MONOLITH/HitSounds.", "В списке каждый звук можно услышать. Свои звуки кладите в plugins/MONOLITH/HitSounds." },
             { "You hear each one in the list. Add yours: a sound file in plugins/MONOLITH/HeadHitSounds.", "В списке каждый звук можно услышать. Свои звуки кладите в plugins/MONOLITH/HeadHitSounds." },

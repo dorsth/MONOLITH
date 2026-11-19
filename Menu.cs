@@ -379,7 +379,7 @@ namespace Monolith
 
             Fill(_win, Back);
             // the categories
-            Box(_navR, "MONOLITH", !pageOn);
+            Box(_navR, "MONOLITH " + BundlePlugin.Version, !pageOn);
             for (int i = 0; i < _cats.Count; i++)
             {
                 Rect r = new Rect(_navR.x + _cw, _navR.y + (i + 1) * _ch, _navR.width - 2 * _cw, _ch);
