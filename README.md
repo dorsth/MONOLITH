@@ -54,7 +54,7 @@ Remove Mod Menu if you have it. MONOLITH comes with its own copy.
 
 ## Updates
 
-MONOLITH asks Thunderstore once at start whether a newer version is out. Only then does a line show, in the game's main menu: a click updates it, a second click restarts the game through Steam. Installed with a mod manager (r2modman, Thunderstore Mod Manager, Gale), the line says to update there instead, since the manager keeps its own list of versions. The menu's title shows the version you have.
+MONOLITH asks Thunderstore once at start whether a newer version is out. Only then does a line show, in the game's main menu: a click opens the Thunderstore page. Installed with a mod manager (r2modman, Thunderstore Mod Manager, Gale), the line says to update there. MONOLITH never downloads or installs anything itself. The menu's title shows the version you have.
 
 ## Language
 

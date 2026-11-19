@@ -5,7 +5,7 @@ namespace Monolith
 {
     internal static partial class Lang
     {
-        private static readonly Dictionary<string, string> Table = new Dictionary<string, string>(296)
+        private static readonly Dictionary<string, string> Table = new Dictionary<string, string>(292)
         {
             { "Crosshair", "Прицел" },
             { "Viewmodel", "Вьюмодель" },
@@ -292,12 +292,8 @@ namespace Monolith
             { "Off", "Выкл" },
             { "Text", "Текст" },
             { "Bar", "Полоса" },
-            { " is in place. Click to restart.", " на месте. Нажмите, чтобы перезапустить." },
-            { "Downloading ", "Загрузка " },
-            { " could not update itself. Get ", " не смог обновиться. Скачайте " },
-            { " from Thunderstore.", " с Thunderstore." },
             { " is out. Update it in ", " вышел. Обновите в " },
-            { " is out. Click to update.", " вышел. Нажмите, чтобы обновить." },
+            { " is out. Click to get it on Thunderstore.", " вышел. Нажмите, чтобы открыть его на Thunderstore." },
             { "your mod manager", "ваш менеджер модов" },
             { "You hear each one in the list. Add yours: a sound file in plugins/MONOLITH/HitSounds.", "В списке каждый звук можно услышать. Свои звуки кладите в plugins/MONOLITH/HitSounds." },
             { "You hear each one in the list. Add yours: a sound file in plugins/MONOLITH/HeadHitSounds.", "В списке каждый звук можно услышать. Свои звуки кладите в plugins/MONOLITH/HeadHitSounds." },
