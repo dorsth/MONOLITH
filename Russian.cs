@@ -121,7 +121,7 @@ namespace Monolith
             { "Minimal HUD color", "Цвет минимального HUD" },
             { "Color of the minimal HUD, speedometer and slide cooldown timer.", "Цвет минимального HUD, спидометра и таймера подката." },
             { "Fewer UI animations", "Меньше анимаций интерфейса" },
-            { "No animations in menus and on the HUD. No logo screen at start.", "Без анимаций в меню и на HUD. Без заставки при запуске." },
+            { "No animations in menus and on the HUD.", "Без анимаций в меню и на HUD." },
             { "Hide default playlists", "Скрыть стандартные плейлисты" },
             { "Join message", "Сообщение при входе" },
             { "The line everyone sees when you join a lobby. {name} is your name. Leave it empty for the game's line.", "Строка, которую все видят, когда вы входите в лобби. {name}: ваше имя. Пусто: строка игры." },

@@ -35,7 +35,7 @@ using PlanarReflection = UnityStandardAssets.Water.PlanarReflection;
 
 [assembly: AssemblyTitle("DorsthTweaks")]
 [assembly: AssemblyDescription("Hitmarker, HUD, viewmodel and FPS tweaks for STRAFTAT.")]
-[assembly: AssemblyVersion("1.3.2.0")]
+[assembly: AssemblyVersion("1.3.3.0")]
 [assembly: AssemblyFileVersion("1.2.7.0")]
 
 // Only changes what you see on your own screen, so matchmaking with unmodded players still works.
@@ -49,7 +49,7 @@ namespace DorsthTweaks
     {
         public const string Guid = "dorsth.straftat.dorsthtweaks";
         public const string Name = "DorsthTweaks";
-        public const string Version = "1.3.2";
+        public const string Version = "1.3.3";
 
         internal static ManualLogSource Log;
         internal static Harmony Harmony;
@@ -244,9 +244,7 @@ namespace DorsthTweaks
             Carry(JoinMessage, "Lobby", "Join Message");
             HideDefaultPlaylists = Config.Bind(Menus, "Hide Default Playlists", false, "Hides the game's playlists.");
 #if DORSTH_BUNDLE
-            // in MONOLITH this also ends the engine's logo screen at start (this runs while it shows; nothing happens if it is over)
-            ReduceUIAnimations = Config.Bind(Menus, "Reduce UI Animations", false, "No animations in the menus and on the HUD, no logo screen when the game starts.");
-            if (ReduceUIAnimations.Value) { try { UnityEngine.Rendering.SplashScreen.Stop(UnityEngine.Rendering.SplashScreen.StopBehavior.StopImmediate); } catch { } }
+            ReduceUIAnimations = Config.Bind(Menus, "Reduce UI Animations", false, "No animations in the menus and on the HUD.");
 #else
             ReduceUIAnimations = Config.Bind(Menus, "Reduce UI Animations", false, "No animations in the menus and on the HUD.");
 #endif

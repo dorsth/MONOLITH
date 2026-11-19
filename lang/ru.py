@@ -84,7 +84,7 @@ T = [
 ('Minimal HUD color', 'Цвет минимального HUD', 'L42'),
 ('Color of the minimal HUD, speedometer and slide cooldown timer.', 'Цвет минимального HUD, спидометра и таймера подката.', 'tip'),
 ('Fewer UI animations', 'Меньше анимаций интерфейса', 'L52'),
-('No animations in menus and on the HUD. No logo screen at start.', 'Без анимаций в меню и на HUD. Без заставки при запуске.', 'tip'),
+('No animations in menus and on the HUD.', 'Без анимаций в меню и на HUD.', 'tip'),
 ('Hide default playlists', 'Скрыть стандартные плейлисты', 'L52'), ('Join message', 'Сообщение при входе', 'L46'),
 ("The line everyone sees when you join a lobby. {name} is your name. Leave it empty for the game's line.", 'Строка, которую все видят, когда вы входите в лобби. {name}: ваше имя. Пусто: строка игры.', 'tip'),
 # ---- effects

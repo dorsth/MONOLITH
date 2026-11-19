@@ -5,6 +5,7 @@
 - Readme: plainer wording about Mod Menu.
 - Hide hats is now Hide dropped hats (NoGore 1.3.2). Your setting is kept.
 - Match stats make no garbage per hit any more.
+- Fewer UI animations no longer claims to skip the logo screen at start: the game shows it before any mod loads (DorsthTweaks 1.3.3).
 - The round board no longer causes a 7 ms hitch when a round ends: it is made while the map loads, and only the names are measured letter by letter.
 - Forced hats show again: the copy kept the wardrobe's own scripts, which switched it off.
 - Forced hats come off like real ones: on a player who wears a hat when that hat is shot, on a player without one when that player is killed.

@@ -608,7 +608,7 @@ namespace Monolith
                 var p = new MenuPage(null, "General", "Language, the menu key, menu animations, playlists.");
                 p.Set("Language / Язык", Lang.Pick, null, "")
                  .Set("Open this menu", BundleMenu.Key, null, "Press Enter, then the key.")
-                 .Set("Fewer UI animations", E(Tweaks, "Menus", "Reduce UI Animations"), null, "No animations in menus and on the HUD. No logo screen at start.")
+                 .Set("Fewer UI animations", E(Tweaks, "Menus", "Reduce UI Animations"), null, "No animations in menus and on the HUD.")
                  .Set("Hide default playlists", E(Tweaks, "Menus", "Hide Default Playlists"), null, "Only your own playlists show when you host.");
                 if (p.Rows.Count > 0) cats.Add(p);
             }
