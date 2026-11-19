@@ -120,7 +120,7 @@ A config under a name: every setting of the mods and of the game itself (graphic
 * **Undo load**: back to what you had before the last load or import, keybinds included. Then **Redo load** takes it back.
 * **Save as new**: type a name.
 * **Export to clipboard**: one line of text, `MONOLITH:name:code`. Paste it to a friend.
-* **Import from clipboard**: copy such a line, then Enter. It is saved under its name. Experimental settings are not taken from an imported line.
+* **Import from clipboard**: copy such a line, then Enter. It is saved under its name.
 * **Include keybinds**: off by default. On: loading or importing a config also sets its keybinds.
 * **Saved**: your configs. Each has Load, Export to clipboard, Overwrite, Delete.
 * Presets: **Dorsth**, **Defaults**.
@@ -142,6 +142,8 @@ A mod that is installed twice is loaded once, and which copy is not up to you: d
 The menu look is inspired by the STRAFTAT color theme for Far Manager by klammvs.
 
 The slide cooldown timer and bar (DorsthTweaks) are based on MovementPro by Glizzmn.
+
+The camera tilt and shake switches (CameraTweaks) build on the idea of [NoCameraRoll](https://thunderstore.io/c/straftat/p/Kevnator/NoCameraRoll/) by Kevnator.
 
 The viewmodel's weapon camera (its offset, FOV and mirroring) is adapted from [Minimal Viewmodels Reborn](https://github.com/kestrel-straftat/minimal-viewmodels-reborn) by kestrel, under the MIT License. The license text is `mods/ViewmodelTweaks/LICENSE-MinimalViewmodelsReborn.txt`.
 

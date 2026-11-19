@@ -166,7 +166,6 @@ T = [
 ('No name given, nothing saved.', 'Имя не задано, ничего не сохранено.', 'info'),
 ('Overwrote ', 'Перезаписан профиль ', ''), ('Saved ', 'Сохранён профиль ', ''), ('Deleted ', 'Удалён профиль ', ''), ('Loaded ', 'Загружен профиль ', ''),
 ('Settings changed: ', 'Изменено настроек: ', ''), (' Undo load brings back what you had.', ' Отмена загрузки вернёт прежнее.', ''),
-('Experimental settings left out: ', 'Экспериментальных настроек не взято: ', ''),
 ('Differences from the defaults: ', 'Отличий от настроек по умолчанию: ', ''),
 ('Copied. Paste it to a friend. They copy the line and use Import from clipboard.', 'Скопировано. Отправьте строку другу. Он копирует её и нажимает «Импорт из буфера».', 'info'),
 ('Could not reach the clipboard: ', 'Буфер обмена недоступен: ', ''),

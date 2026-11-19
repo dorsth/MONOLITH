@@ -1,5 +1,10 @@
 # MONOLITH changelog
 
+## 1.0.6
+- Performance viewmodel is no longer experimental: an imported config now sets it like any other setting (ViewmodelTweaks 2.0.4).
+- The Dorsth preset has Performance viewmodel on.
+- Credits: NoCameraRoll by Kevnator, the idea CameraTweaks builds on (CameraTweaks 1.1.8).
+
 ## 1.0.5
 - README: the Fewer UI animations row no longer mentions the logo screen, and SwordStance is named as the old name of ViewmodelTweaks. 15 old Russian texts that nothing used are gone.
 - Readme fixes in DorsthTweaks 1.3.6 and CombatSounds 1.1.6.

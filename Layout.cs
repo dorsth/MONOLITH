@@ -139,7 +139,7 @@ namespace Monolith
         /// <summary>Settings one switch of the menu stands for (No post-processing, Ultimate tweaks, Performance viewmodel): kept out of the search and of profiles.</summary>
         internal static IEnumerable<ConfigEntryBase> Inert()
         {
-            yield return Find(View, "Experimental", "One Camera Hides Weapon Effects");
+            yield return Find(View, "Viewmodel", "One Camera Hides Weapon Effects");
         }
 
         private static bool On(ConfigEntryBase e) { return e != null && e.BoxedValue is bool && (bool)e.BoxedValue; }
@@ -595,7 +595,7 @@ namespace Monolith
                  .Set("No post-processing", E(Tweaks, "World", "No Post-Processing"), null, "Turns off color grading and screen effects. Menus lose their blur and the brightness slider stops working.")
                  .Set("Lower textures", E(Tweaks, "World", "Lower Textures"), null, "Like picmip. 0 is full quality, 3 is the lowest.")
                  .Set("Ultimate tweaks", E(Tweaks, "World", "Ultimate Tweaks"), null, "Fixes slow game code, uses fewer worker threads, removes the voice key freeze and compiles code at start.")
-                 .Set("Performance viewmodel", E(View, "Experimental", "One Camera"), null, "One camera draws everything, your weapon included. Slightly more FPS. Not used while you hold a melee weapon.")
+                 .Set("Performance viewmodel", E(View, "Viewmodel", "One Camera"), null, "One camera draws everything, your weapon included. Slightly more FPS. Not used while you hold a melee weapon.")
                  .Set("FPS cap", FrameCap.On, null, "Replaces the game's FPS cap, which can be up to 1 ms off per frame. This one keeps every frame the same length. Not in the main menu.")
                  .Set("  Max FPS", FrameCap.Fps, () => On(FrameCap.On), "Set it a bit below what your PC holds on busy maps.");
                 if (p.Rows.Count > 3) cats.Add(p);

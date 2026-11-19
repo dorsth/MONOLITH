@@ -9,7 +9,7 @@
 //
 // To pass one on it becomes one line of text on the clipboard: MONOLITH:<name>:<code>. The code is letters and digits
 // only, so a chat program cannot mangle it. Importing reads the clipboard, keeps what you had as "previous setup",
-// and loads the new one. Experimental settings are NOT taken from somebody else's line: yours stay as they are.
+// and loads the new one.
 //
 // Saved profiles are lines of the same kind in BepInEx/config/dorsth.straftat.monolith.profiles.txt.
 using System;
@@ -33,7 +33,7 @@ namespace Monolith
 
         // Game: a setting that belongs to the game and is only shown here too (the two outline colors). A profile sets it
         // only when it holds a value for it: Defaults, and a profile from before these rows existed, leave yours as it is.
-        private struct Item { public uint Id; public ConfigEntryBase Entry; public bool Experimental, Game, Key; }
+        private struct Item { public uint Id; public ConfigEntryBase Entry; public bool Game, Key; }
 
         // FNV-1a over mod, section and name: a setting keeps its number as long as it keeps its name
         internal static uint IdOf(string mod, string section, string key) { return Id(mod, new ConfigDefinition(section, key)); }
@@ -67,9 +67,8 @@ namespace Monolith
                     if (desc != null && desc.IndexOf("Not used since", StringComparison.Ordinal) >= 0) continue;
                     uint id = Id(kv.Key, d);
                     if (!seen.Add(id)) continue;
-                    bool exp = d.Section == "Experimental" || d.Section == "Test" || (d.Section == "Tiers" && d.Key == "Experimental");
                     bool key = d.Section == "Keys" || e.SettingType == typeof(KeyCode) || e.SettingType == typeof(KeyboardShortcut);
-                    list.Add(new Item { Id = id, Entry = e, Experimental = exp, Key = key, Game = ReferenceEquals(e, Players.EnemyOutline) || ReferenceEquals(e, Players.TeamOutline) });
+                    list.Add(new Item { Id = id, Entry = e, Key = key, Game = ReferenceEquals(e, Players.EnemyOutline) || ReferenceEquals(e, Players.TeamOutline) });
                 }
             }
             return list;
@@ -262,7 +261,7 @@ namespace Monolith
 
         // ---- the setups that come with it
 
-        // Dorsth's own: what differs from the defaults. Anything experimental is left out.
+        // Dorsth's own: what differs from the defaults.
         private static readonly string[,] Dorsth =
         {
             { "dorsth.straftat.ezcrosshair", "Crosshair", "Crosshair", "plus" },
@@ -273,6 +272,7 @@ namespace Monolith
             { "dorsth.straftat.viewmodeltweaks", "Viewmodel", "Viewmodel Z Offset", "1.6" },
             { "dorsth.straftat.viewmodeltweaks", "Viewmodel", "Viewmodel Sway Scale", "0" },
             { "dorsth.straftat.viewmodeltweaks", "Viewmodel", "Viewmodel Bob Scale", "0.35" },
+            { "dorsth.straftat.viewmodeltweaks", "Viewmodel", "One Camera", "true" },
             { "dorsth.straftat.viewmodeltweaks", "Weapon 1", "Weapon", "Katana" },
             { "dorsth.straftat.viewmodeltweaks", "Weapon 1", "Invisible Arms", "true" },
             { "dorsth.straftat.viewmodeltweaks", "Weapon 1", "Viewmodel FOV", "90" },
@@ -321,24 +321,9 @@ namespace Monolith
         private static string LoadMade(string name, string[,] rows)
         {
             Profile p = Made(name, rows);
-            KeepMyExperimental(p);
             Put(Capture(Before)); Write(); _undone = false;
             int n = Apply(p);
             return Loaded(name, n) + Lang.T(WhatYouHad);
-        }
-
-        // experimental settings are never switched by a profile that is not your own: yours stay as they are
-        private static int KeepMyExperimental(Profile p)
-        {
-            int had = 0;
-            foreach (Item it in Items())
-            {
-                if (!it.Experimental) continue;
-                string mine = it.Entry.GetSerializedValue();
-                if (p.Values.ContainsKey(it.Id)) had++;
-                if (mine != DefaultText(it.Entry)) p.Values[it.Id] = mine; else p.Values.Remove(it.Id);
-            }
-            return had;
         }
 
         /// <summary>Your setup as it is now, under your Steam name, as text on the clipboard.</summary>
@@ -367,7 +352,6 @@ namespace Monolith
             try { text = GUIUtility.systemCopyBuffer; } catch (Exception e) { return Lang.T("Could not reach the clipboard: ") + e.Message; }
             Profile p = Decode(text);
             if (p == null) return Lang.T("No config on the clipboard. Copy the whole line, from MONOLITH: to the end.");
-            int kept = KeepMyExperimental(p);
             if (string.Equals(p.Name, Before, StringComparison.OrdinalIgnoreCase)) p.Name = "imported";
             // what you had is kept, so one Load brings it back
             Put(Capture(Before)); _undone = false;
@@ -376,7 +360,7 @@ namespace Monolith
             Put(p);
             int n = Apply(p);
             Write();
-            return Loaded(p.Name, n) + Lang.T(WhatYouHad) + (kept > 0 ? " " + Lang.Count(kept, " experimental setting was left out.", " experimental settings were left out.", "Experimental settings left out: ") + (Lang.Ru ? "." : "") : "");
+            return Loaded(p.Name, n) + Lang.T(WhatYouHad);
         }
 
         // ---- the page

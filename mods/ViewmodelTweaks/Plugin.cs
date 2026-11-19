@@ -15,7 +15,7 @@ using UnityEngine.LowLevel;
 
 [assembly: AssemblyTitle("ViewmodelTweaks")]
 [assembly: AssemblyDescription("Viewmodel FOV, position, sway, bob and arms, with its own values for any weapon you pick. Dorsth was here.")]
-[assembly: AssemblyVersion("2.0.3.0")]
+[assembly: AssemblyVersion("2.0.4.0")]
 [assembly: StraftatMod(isVanillaCompatible: true)]
 
 namespace ViewmodelTweaks
@@ -55,7 +55,7 @@ namespace ViewmodelTweaks
     {
         public const string Guid = "dorsth.straftat.viewmodeltweaks";
         public const string Name = "ViewmodelTweaks";
-        public const string Version = "2.0.3";
+        public const string Version = "2.0.4";
         internal const int MaxSlots = 10;
 
         internal static ManualLogSource Log;
@@ -67,7 +67,7 @@ namespace ViewmodelTweaks
         private static Slot _shown;
         private static PlayerPickup _me;
 
-        // ---- One Camera (experimental, 1.2.0)
+        // ---- One Camera (since 1.2.0)
         // Your weapon is drawn with the game's second camera (View.cs). Having that camera on costs about 4% of the
         // frame rate whatever it draws (measured: 35 us a frame, with two different settings of that camera making no
         // difference). With One Camera on, that camera is off and your main camera draws the weapon, and the weapon is
@@ -687,8 +687,11 @@ namespace ViewmodelTweaks
             FromOneVersion();
             View.Bind(Config);
             Hide(View.TakeOver(Config, Paths.ConfigPath));
-            OneCamera = Config.Bind("Experimental", "One Camera", false, "EXPERIMENTAL, off by default. Your weapon and arms are drawn by the main camera and the game's second camera is switched off; they are made to look the same (viewmodel FOV, offset, never inside a wall). Having the second camera on costs about 4% of the frame rate. The loose effects of your own weapon (muzzle effect, ejected case or pin, a launcher's smoke) can only be drawn right by the second camera: see the next setting. Can look slightly different: the light on the weapon, a blade's trail. Your shots, hits and what other players see are not changed. Switch it off if anything looks wrong.");
-            HideEffects = Config.Bind("Experimental", "One Camera Hides Weapon Effects", true, "Only matters with One Camera on. On (default): the loose effects of your own weapon (muzzle effect, ejected case or pin, a launcher's smoke at the gun) are not drawn, so the second camera never has to come on. Their sounds and the muzzle light stay. Off: they are drawn as always, by switching the second camera back on for the frames in which one is showing; in those frames One Camera gains nothing. Other players' effects, explosions, smoke grenades and everything else in the world are never hidden by this.");
+            OneCamera = Config.Bind("Viewmodel", "One Camera", false, "Your weapon and arms are drawn by the main camera and the game's second camera is switched off; they look the same (viewmodel FOV, offset, never inside a wall). Having the second camera on costs about 4% of the frame rate. The loose effects of your own weapon (muzzle effect, ejected case or pin, a launcher's smoke) can only be drawn by the second camera: see the next setting. Your shots, hits and what other players see are not changed.");
+            HideEffects = Config.Bind("Viewmodel", "One Camera Hides Weapon Effects", true, "Only matters with One Camera on. On (default): the loose effects of your own weapon (muzzle effect, ejected case or pin, a launcher's smoke at the gun) are not drawn, so the second camera never has to come on. Their sounds and the muzzle light stay. Off: they are drawn as always, by switching the second camera back on for the frames in which one is showing; in those frames One Camera gains nothing. Effects of other players, explosions, smoke grenades and everything else in the world are never hidden by this.");
+            // under Experimental until 2.0.3
+            FromOldName(new ConfigDefinition("Experimental", "One Camera"), OneCamera);
+            FromOldName(new ConfigDefinition("Experimental", "One Camera Hides Weapon Effects"), HideEffects);
             // switched at once, not on the next frame: whoever flips the setting (the benchmark does) can rely on the cameras being as it says
             OneCamera.SettingChanged += (s, e) => { try { SyncOneCamera(); } catch (Exception x) { Log.LogWarning("One Camera: " + x.Message); } };
             // a changed setting is on the camera and the arms at once; a weapon's own values go back on top the next frame
@@ -803,6 +806,20 @@ namespace ViewmodelTweaks
             }
             names.Value = "";
             Hide(names, fov, x, y, z, arms);
+        }
+
+        // a moved setting keeps its value: BepInEx keeps the line under the old name until something takes it
+        private void FromOldName(ConfigDefinition old, ConfigEntry<bool> now)
+        {
+            try
+            {
+                var orphans = AccessTools.Property(typeof(ConfigFile), "OrphanedEntries")?.GetValue(Config, null) as Dictionary<ConfigDefinition, string>;
+                string v; bool b;
+                if (orphans == null || !orphans.TryGetValue(old, out v)) return;
+                if (bool.TryParse(v, out b)) now.Value = b;
+                orphans.Remove(old); Config.Save();
+            }
+            catch { }
         }
 
         private static void Hide(params ConfigEntryBase[] entries)
