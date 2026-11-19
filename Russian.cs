@@ -5,7 +5,7 @@ namespace Monolith
 {
     internal static partial class Lang
     {
-        private static readonly Dictionary<string, string> Table = new Dictionary<string, string>(304)
+        private static readonly Dictionary<string, string> Table = new Dictionary<string, string>(289)
         {
             { "Crosshair", "Прицел" },
             { "Viewmodel", "Вьюмодель" },
@@ -60,7 +60,6 @@ namespace Monolith
             { "color", "цвет" },
             { "preview", "превью" },
             { "FOV", "FOV" },
-            { "75 is the game default.", "75: как в игре." },
             { "Left / right", "Влево / вправо" },
             { "Down / up", "Вниз / вверх" },
             { "Back / forward", "Назад / вперёд" },
@@ -95,7 +94,6 @@ namespace Monolith
             { "Width", "Толщина" },
             { "Thickness", "Толщина" },
             { "Gap", "Зазор" },
-            { "1 is the game default.", "1: как в игре." },
             { "Static hitmarkers", "Статичные хитмаркеры" },
             { "They fade out without popping.", "Они исчезают без увеличения." },
             { "Animation size", "Сила анимации" },
@@ -198,11 +196,6 @@ namespace Monolith
             { "Set it a bit below what your PC holds on busy maps.", "Ставьте немного ниже того, что ваш ПК держит на тяжёлых картах." },
             { "Match stats", "Статистика матча" },
             { "Kills, deaths and damage of each round on the round-end screen, the match so far over each name on the Tab screen, and a full board after the match.", "Убийства, смерти и урон за раунд на экране конца раунда, итог матча над именами на экране Tab и полная таблица после матча." },
-            { "Counted for every player. Shown only between rounds and after the match.", "Для каждого игрока. Видна только между раундами и после матча." },
-            { "Round board", "Таблица раунда" },
-            { "Kills, deaths and damage of that round on the round-end screen. Match kills next to each name there and on the Tab screen.", "Убийства, смерти и урон за этот раунд на экране конца раунда. Убийства за матч рядом с каждым именем там и на экране Tab." },
-            { "Match board", "Таблица матча" },
-            { "ADR, opening kills, trades, 2k, clutches and rounds survived after the match. Also in the log.", "ADR, первые убийства, размены, 2k, клатчи и выжитые раунды после матча. Также в логе." },
             { "Second jump key", "Вторая клавиша прыжка" },
             { "Third jump key", "Третья клавиша прыжка" },
             { "Swap weapons", "Смена оружия" },
@@ -235,9 +228,6 @@ namespace Monolith
             { "Copy a line from a friend (it starts with MONOLITH:), then press Enter here. It is saved under its name.", "Скопируйте строку от друга (она начинается с MONOLITH:) и нажмите здесь Enter. Она сохранится под своим именем." },
             { "Loads everything except sensitivity. Keybinds only when Include keybinds is on.", "Загружает всё, кроме чувствительности. Клавиши только при включённом пункте Вместе с клавишами." },
             { "Saves your current config under a name. A config with the same name is replaced.", "Сохраняет текущий конфиг под именем. Конфиг с тем же именем заменяется." },
-            { "Copy my config to clipboard", "Скопировать мой конфиг в буфер" },
-            { "Undo last load", "Отменить последнюю загрузку" },
-            { "Load keybinds", "Загружать клавиши" },
             { "Back to what you had before the last load or import, keybinds included.", "Возврат к тому, что было до последней загрузки или импорта, включая клавиши." },
             { "Nothing to undo.", "Нечего отменять." },
             { "Back to what you had before the last load.", "Возвращено то, что было до последней загрузки." },
@@ -245,13 +235,8 @@ namespace Monolith
             { "Your config as one line of text. Paste it to a friend.", "Ваш конфиг одной строкой текста. Отправьте её другу." },
             { "Import from clipboard", "Импорт из буфера" },
             { "Copy a line from a friend (it starts with MONOLITH:), then press Enter here. Yours is kept as \"previous config\".", "Скопируйте строку от друга (она начинается с MONOLITH:) и нажмите здесь Enter. Ваш конфиг сохранится как «previous config»." },
-            { "Save my config as", "Сохранить мой конфиг как" },
-            { "Type a name and press Enter. A config with the same name is replaced.", "Введите имя и нажмите Enter. Конфиг с таким же именем заменяется." },
             { "Load", "Загрузить" },
-            { "Loads everything except sensitivity. Keybinds only when Load keybinds is on.", "Загружает всё, кроме чувствительности. Клавиши только при включённом пункте Загружать клавиши." },
-            { "Copy to clipboard", "Скопировать в буфер" },
             { "This config as one line of text. Paste it to a friend.", "Этот конфиг одной строкой текста. Вставьте его другу." },
-            { "Overwrite with current config", "Перезаписать текущим конфигом" },
             { "Saves your current config under this name.", "Сохраняет текущий конфиг под этим именем." },
             { "Delete", "Удалить" },
             { "The config Dorsth plays with, except sensitivity, keys and Performance viewmodel.", "Конфиг, с которым играет Dorsth, кроме чувствительности, клавиш и быстрой вьюмодели." },

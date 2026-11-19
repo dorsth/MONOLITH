@@ -207,7 +207,7 @@ namespace Monolith
                     if (p != null && Find(p.Name) == null) All.Add(p);
                 }
             }
-            catch (Exception e) { BundlePlugin.Log.LogWarning("Profiles could not be read: " + e.Message); }
+            catch (Exception e) { BundlePlugin.Log.LogWarning("Configs could not be read: " + e.Message); }
         }
 
         private static void Write()
@@ -218,7 +218,7 @@ namespace Monolith
                 foreach (Profile p in All) lines.Add(Encode(p));
                 File.WriteAllLines(FilePath, lines.ToArray());
             }
-            catch (Exception e) { BundlePlugin.Log.LogWarning("Profiles could not be saved: " + e.Message); }
+            catch (Exception e) { BundlePlugin.Log.LogWarning("Configs could not be saved: " + e.Message); }
         }
 
         private static void Put(Profile p)

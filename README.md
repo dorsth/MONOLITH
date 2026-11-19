@@ -63,7 +63,7 @@ The Russian texts are in `lang/ru.py`. `lang/make.py` (run by `build.sh`) checks
 | Switch | Stands for |
 |---|---|
 | No post-processing | no screen effects at all, in maps and in the menus (no menu blur; the game's brightness slider does nothing then), forward rendering, and a soft matte fill light (0.1) for the brightness the effects gave |
-| Fewer UI animations | no menu and HUD animations, no logo screen at start |
+| Fewer UI animations | no menu and HUD animations |
 | Ultimate tweaks | about 30 fixes to the game's own code (garbage and needless work every frame), 2 worker threads, the voice key off the main thread, code compiled at start. Listed in `mods/DorsthTweaks/UltimateTweaks/ULTIMATE-TWEAKS.md` |
 | Performance viewmodel (off by default) | your weapon drawn by the main camera, second camera off; its muzzle effect, ejected case and launcher smoke not drawn |
 

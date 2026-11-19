@@ -6,6 +6,7 @@
 - Hide hats is now Hide dropped hats (NoGore 1.3.2). Your setting is kept.
 - Match stats make no garbage per hit any more.
 - Loading a config now sets Reduce VFX, graphics quality, the HUD and the other game settings right away, and the game's settings menu shows them. Before, they only took effect after a restart.
+- README: the Fewer UI animations row no longer mentions the logo screen, and SwordStance is named as the old name of ViewmodelTweaks. 15 old Russian texts that nothing used are gone.
 - No more warnings in the log about Mod Menu, GunSounds or weapon sounds that are not there (CombatSounds 1.1.5, DorsthTweaks 1.3.5, NoGore 1.3.3).
 - The log only gets problems now: the notes from the FPS work (DorsthTweaks 1.3.4, ViewmodelTweaks 2.0.3) are written only with Detailed Log on in their settings files.
 - Fewer UI animations no longer claims to skip the logo screen at start: the game shows it before any mod loads (DorsthTweaks 1.3.3).
