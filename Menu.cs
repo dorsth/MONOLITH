@@ -318,6 +318,9 @@ namespace Monolith
         private void Line(float x, float y, string rich) { GUI.Label(new Rect(x, y, _win.xMax - x, _ch), rich, _st); }
 
 
+        // long enough for a join message with color tags in it
+        private const int EditMax = 200;
+
         private static string Esc(string s) { return s == null ? "" : s.Replace('<', '‹').Replace('>', '›'); }
         private static string Fit(string s, int n) { if (n <= 0) return ""; return s.Length <= n ? s : (n == 1 ? "…" : s.Substring(0, n - 1) + "…"); }
         private static string Pad(string s, int n) { s = Fit(s, n); return s.Length >= n ? s : s + new string(' ', n - s.Length); }
@@ -920,7 +923,7 @@ namespace Monolith
                     else try { done.Entry.SetSerializedValue(done.Entry.SettingType == typeof(Color) ? _edit.TrimStart('#') : _edit); } catch { }
                 }
                 else if (k == KeyCode.Backspace || k == KeyCode.LeftArrow) { if (_edit.Length > 0) _edit = _edit.Substring(0, _edit.Length - 1); }
-                else if (ch >= ' ' && ch != 127 && _edit.Length < 64) _edit += ch;
+                else if (ch >= ' ' && ch != 127 && _edit.Length < EditMax) _edit += ch;
                 ev.Use(); return;
             }
             if (_searching)

@@ -35,8 +35,8 @@ using PlanarReflection = UnityStandardAssets.Water.PlanarReflection;
 
 [assembly: AssemblyTitle("DorsthTweaks")]
 [assembly: AssemblyDescription("Hitmarker, HUD, viewmodel and FPS tweaks for STRAFTAT.")]
-[assembly: AssemblyVersion("1.3.6.0")]
-[assembly: AssemblyFileVersion("1.3.6.0")]
+[assembly: AssemblyVersion("1.3.7.0")]
+[assembly: AssemblyFileVersion("1.3.7.0")]
 
 // Only changes what you see on your own screen, so matchmaking with unmodded players still works.
 [assembly: StraftatMod(isVanillaCompatible: true)]
@@ -49,7 +49,7 @@ namespace DorsthTweaks
     {
         public const string Guid = "dorsth.straftat.dorsthtweaks";
         public const string Name = "DorsthTweaks";
-        public const string Version = "1.3.6";
+        public const string Version = "1.3.7";
 
         internal static ManualLogSource Log;
         internal static ConfigEntry<bool> Detail;
@@ -244,7 +244,7 @@ namespace DorsthTweaks
             WeaponHighlightColor = new ColorSetting(Config, Use, "Weapon Highlight Color", new Color32(255, 209, 109, 255), "Outline of the weapon you look at. The default is the game's.");
 
             JoinMessage = Config.Bind(Menus, "Join Message", "",
-                "Replaces your 'joined the lobby' line, for everyone in the lobby. {name} is your name. Empty uses the game's.");
+                "Replaces your 'joined the lobby' line, for everyone in the lobby. {name} is your name. Color, bold, italic, underline and strikethrough tags work. Up to 120 letters, tags not counted. Empty uses the game's.");
             Carry(JoinMessage, "Lobby", "Join Message");
             HideDefaultPlaylists = Config.Bind(Menus, "Hide Default Playlists", false, "Hides the game's playlists.");
             ReduceUIAnimations = Config.Bind(Menus, "Reduce UI Animations", false, "No animations in the menus and on the HUD.");
@@ -2459,7 +2459,7 @@ namespace DorsthTweaks
     internal static class JoinLine
     {
         private const string GameEnding = " joined the lobby";
-        private const int MaxLength = 120;
+        private const int MaxLength = 120, MaxWithTags = 400;
 
         internal static void Install()
         {
@@ -2497,7 +2497,8 @@ namespace DorsthTweaks
                 if (t == before) break;
             }
             t = t.Trim();
-            if (t.Length > MaxLength) t = t.Substring(0, MaxLength);
+            // the limit is on what people read: tags do not count, so a colored message is not cut short
+            if (Regex.Replace(t, "<[^<>]*>", "").Length > MaxLength || t.Length > MaxWithTags) return null;
             return t.Replace("{name}", me).Replace("{NAME}", me).Replace("{USER}", me).Replace("{user}", me);
         }
     }
