@@ -12,8 +12,8 @@ MONOLITH replaces Mod Menu and Minimal Viewmodels Reborn, so you can remove both
 
 Your settings come along:
 
-- My mods you already had (DorsthTweaks, ezCrosshair, CombatSounds and the rest) keep using the same settings files.
-- Your Minimal Viewmodels Reborn and SwordStance settings are read once, the first time MONOLITH starts.
+- My mods you already had (DorsthTweaks, ViewmodelTweaks, ezCrosshair, CombatSounds and the rest) keep using the same settings files. ViewmodelTweaks used to be called SwordStance: those settings come along too.
+- Your Minimal Viewmodels Reborn settings are read once, the first time MONOLITH starts.
 - Settings of other mods stay in their own files.
 
 Remove the separate copies of my mods once MONOLITH is in. If one is still installed, BepInEx loads only one of the two and says so in its log.
