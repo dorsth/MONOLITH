@@ -1,5 +1,8 @@
 # MONOLITH changelog
 
+## 1.0.10
+- E opens and takes in the menu, next to Q for back and WASD to move. The key bar shows these keys. Arrows, Enter and Backspace still work.
+
 ## 1.0.9
 - The update line no longer updates by itself: a click opens the Thunderstore page, and installed with a mod manager it says to update there. Thunderstore leaves updating to the mod manager.
 
