@@ -90,7 +90,7 @@ namespace UltimateTweaks
             SceneManager.activeSceneChanged += (a, b) => { InMenu = b.name == "MainMenu"; Keeper.Dirty = true; };
             InMenu = SceneManager.GetActiveScene().name == "MainMenu";
             Refresh();
-            L.LogInfo("Ultimate Tweaks " + (Master.Value ? "on: " + string.Join(", ", tierOf.Keys.Where(Active).ToArray()) : "off"));
+            DorsthTweaks.DorsthTweaksPlugin.Note("Ultimate Tweaks " + (Master.Value ? "on: " + string.Join(", ", tierOf.Keys.Where(Active).ToArray()) : "off"));
         }
 
         bool Active(string name)
@@ -208,7 +208,7 @@ namespace UltimateTweaks
         {
             if (TweaksPlugin.GcSteps && UnityEngine.Scripting.GarbageCollector.isIncremental)
             {
-                if (!gcSet) { gcOrig = UnityEngine.Scripting.GarbageCollector.incrementalTimeSliceNanoseconds; gcSet = true; TweaksPlugin.L.LogInfo("GcSmallSteps: the game allows the garbage collector " + (gcOrig / 1e6).ToString("0.##") + " ms per frame; now " + (TweaksPlugin.GcStepNs / 1e6).ToString("0.##") + " ms"); }
+                if (!gcSet) { gcOrig = UnityEngine.Scripting.GarbageCollector.incrementalTimeSliceNanoseconds; gcSet = true; DorsthTweaks.DorsthTweaksPlugin.Note("GcSmallSteps: the game allows the garbage collector " + (gcOrig / 1e6).ToString("0.##") + " ms per frame; now " + (TweaksPlugin.GcStepNs / 1e6).ToString("0.##") + " ms"); }
                 if (UnityEngine.Scripting.GarbageCollector.incrementalTimeSliceNanoseconds != TweaksPlugin.GcStepNs) UnityEngine.Scripting.GarbageCollector.incrementalTimeSliceNanoseconds = TweaksPlugin.GcStepNs;
             }
             else if (gcSet) { UnityEngine.Scripting.GarbageCollector.incrementalTimeSliceNanoseconds = gcOrig; gcSet = false; }
@@ -221,10 +221,10 @@ namespace UltimateTweaks
             if (TweaksPlugin.JobLimit)
             {
                 int max = Unity.Jobs.LowLevel.Unsafe.JobsUtility.JobWorkerMaximumCount, n = Mathf.Clamp(TweaksPlugin.JobCount, 0, max), cur = Unity.Jobs.LowLevel.Unsafe.JobsUtility.JobWorkerCount;
-                if (jobOrig < 0) { jobOrig = cur; TweaksPlugin.L.LogInfo("JobWorkerLimit: the game runs " + cur + " job worker threads (maximum " + max + ")"); }
-                if (cur != n) { Unity.Jobs.LowLevel.Unsafe.JobsUtility.JobWorkerCount = n; TweaksPlugin.L.LogInfo("JobWorkerLimit: now " + n); }
+                if (jobOrig < 0) { jobOrig = cur; DorsthTweaks.DorsthTweaksPlugin.Note("JobWorkerLimit: the game runs " + cur + " job worker threads (maximum " + max + ")"); }
+                if (cur != n) { Unity.Jobs.LowLevel.Unsafe.JobsUtility.JobWorkerCount = n; DorsthTweaks.DorsthTweaksPlugin.Note("JobWorkerLimit: now " + n); }
             }
-            else if (jobOrig >= 0) { Unity.Jobs.LowLevel.Unsafe.JobsUtility.JobWorkerCount = jobOrig; TweaksPlugin.L.LogInfo("JobWorkerLimit: back to " + jobOrig); jobOrig = -1; }
+            else if (jobOrig >= 0) { Unity.Jobs.LowLevel.Unsafe.JobsUtility.JobWorkerCount = jobOrig; DorsthTweaks.DorsthTweaksPlugin.Note("JobWorkerLimit: back to " + jobOrig); jobOrig = -1; }
         }
 
         // ---- Safe: own name-tag canvas
@@ -423,7 +423,7 @@ namespace UltimateTweaks
                 PruneEvents(nm.SceneManager); PruneEvents(nm.TimeManager); PruneEvents(nm.ClientManager); PruneEvents(nm.ServerManager);
                 var gm = GameManager.Instance;
                 if (gm != null) { foreach (var c in gm.ConnectionsToStartGame) PruneOwned(c); foreach (var c in gm.NetworkConnectionsReady) PruneOwned(c); }
-                if (deadNetRemoved > 0 && deadNetLogged < 3) { deadNetLogged++; TweaksPlugin.L.LogInfo("DeadNetworkObjects: " + deadNetRemoved + " destroyed objects and dead subscribers taken off the network library's lists (owned, spawned, pending destroy, events)" + (deadNetLogged == 3 ? " (not logged again)" : "")); }
+                if (deadNetRemoved > 0 && deadNetLogged < 3) { deadNetLogged++; DorsthTweaks.DorsthTweaksPlugin.Note("DeadNetworkObjects: " + deadNetRemoved + " destroyed objects and dead subscribers taken off the network library's lists (owned, spawned, pending destroy, events)" + (deadNetLogged == 3 ? " (not logged again)" : "")); }
             }
             catch (Exception e) { if (deadNetLogged < 3) { deadNetLogged = 3; TweaksPlugin.L.LogWarning("DeadNetworkObjects: could not read the lists (" + e.Message + "); nothing changed"); } }
         }
@@ -434,7 +434,7 @@ namespace UltimateTweaks
             try
             {
                 int total, gone; InputCallbacks.Scan(true, out total, out gone);
-                if (gone > 0 && deadInputLogged < 3) { deadInputLogged++; TweaksPlugin.L.LogInfo("DeadInputCallbacks: " + gone + " of " + total + " input callbacks belonged to destroyed objects and were taken off" + (deadInputLogged == 3 ? " (not logged again)" : "")); }
+                if (gone > 0 && deadInputLogged < 3) { deadInputLogged++; DorsthTweaks.DorsthTweaksPlugin.Note("DeadInputCallbacks: " + gone + " of " + total + " input callbacks belonged to destroyed objects and were taken off" + (deadInputLogged == 3 ? " (not logged again)" : "")); }
             }
             catch (Exception e) { if (deadInputLogged < 3) { deadInputLogged = 3; TweaksPlugin.L.LogWarning("DeadInputCallbacks: could not read the input callbacks (" + e.Message + "); nothing changed"); } }
         }
@@ -483,7 +483,7 @@ namespace UltimateTweaks
                 gsScan = (Action)Delegate.CreateDelegate(typeof(Action), scan);
                 h.Patch(scan, prefix: M("GunScanPre"));
                 PauseManager.OnRoundStarted += GunScanAtCountdown;
-                TweaksPlugin.L.LogInfo("GunSoundsNoScanInPlay: GunSounds found, its weapon search is kept out of play time");
+                DorsthTweaks.DorsthTweaksPlugin.Note("GunSoundsNoScanInPlay: GunSounds found, its weapon search is kept out of play time");
             });
             Try("DecalSmallBuffers", () =>
             {
@@ -491,20 +491,20 @@ namespace UltimateTweaks
                 decalHits = 0;
                 foreach (var c in AccessTools.GetDeclaredConstructors(dm)) if (!c.IsStatic) h.Patch(c, transpiler: M("DecalCapTr"));
                 if (decalHits == 0) throw new Exception("no list of 4048 found in the decal library (changed?)");
-                TweaksPlugin.L.LogInfo("DecalSmallBuffers: " + decalHits + " lists in the decal library start small");
+                DorsthTweaks.DorsthTweaksPlugin.Note("DecalSmallBuffers: " + decalHits + " lists in the decal library start small");
             });
             Try("ItemNameNoGarbage", () => { nameHits = 0; h.Patch(AccessTools.Method(typeof(ItemBehaviour), "Update"), transpiler: M("ItemNameTr")); if (nameHits != 1) throw new Exception(nameHits + " name reads found in ItemBehaviour.Update, expected 1"); });
             sceneHits = 0;
             foreach (var tm in new[] { new KeyValuePair<Type, string>(typeof(PauseManager), "Update"), new KeyValuePair<Type, string>(typeof(SetMenuMusicVolume), "UpdateMusic"), new KeyValuePair<Type, string>(typeof(Settings), "Update"),
                                        new KeyValuePair<Type, string>(typeof(Crosshair), "Update"), new KeyValuePair<Type, string>(typeof(SceneLoader), "Update"), new KeyValuePair<Type, string>(typeof(TabScreen), "Update") })
             { var x = tm; Try("SceneNameNoGarbage (" + x.Key.Name + ")", () => h.Patch(AccessTools.Method(x.Key, x.Value), transpiler: M("SceneNameTr"))); }
-            TweaksPlugin.L.LogInfo("SceneNameNoGarbage: " + sceneHits + " reads of the map name are remembered (14 expected)");
+            DorsthTweaks.DorsthTweaksPlugin.Note("SceneNameNoGarbage: " + sceneHits + " reads of the map name are remembered (14 expected)");
             SceneManager.sceneLoaded += (sc, m) => { snHandle = int.MinValue; }; SceneManager.sceneUnloaded += sc => { snHandle = int.MinValue; itemNames.Clear(); }; SceneManager.activeSceneChanged += (x, y) => { snHandle = int.MinValue; };
             textHits = 0;
             foreach (var tm in new[] { new KeyValuePair<Type, string>(typeof(PlayerHealth), "Update"), new KeyValuePair<Type, string>(typeof(ProgressManager), "HandleUIUpdate"), new KeyValuePair<Type, string>(typeof(Weapon), "WeaponUpdate"),
                                        new KeyValuePair<Type, string>(typeof(PauseManager), "ChangeAmmoText") })
             { var x = tm; Try("HudNumbersNoGarbage (" + x.Key.Name + ")", () => h.Patch(AccessTools.Method(x.Key, x.Value), transpiler: M("HudTextTr"))); }
-            TweaksPlugin.L.LogInfo("HudNumbersNoGarbage: " + textHits + " places where a number is turned into text use a remembered text (14 expected)");
+            DorsthTweaks.DorsthTweaksPlugin.Note("HudNumbersNoGarbage: " + textHits + " places where a number is turned into text use a remembered text (14 expected)");
             Try("LobbyRowsNotInPlay", () =>
             {
                 lobbyTab = AccessTools.FieldRefAccess<LobbyController, Transform>("tabScreen");
@@ -527,7 +527,7 @@ namespace UltimateTweaks
                 int hz = 0; try { hz = Screen.currentResolution.refreshRate; } catch { }
                 if (hz < 120) hz = 120;
                 arcStep = 1f / hz;
-                TweaksPlugin.L.LogInfo("OtherArcsAtScreenRate: other players' launcher arcs are worked out " + hz + " times a second");
+                DorsthTweaks.DorsthTweaksPlugin.Note("OtherArcsAtScreenRate: other players' launcher arcs are worked out " + hz + " times a second");
             }
             SceneManager.sceneUnloaded += sc => { arcWeapon.Clear(); arcNext.Clear(); fovTweens.Clear(); };
             Try("KillCamLean", () => h.Patch(AccessTools.Method(typeof(KillCam), "Update"), transpiler: M("KillCamTr")));
@@ -536,7 +536,7 @@ namespace UltimateTweaks
                 kcHits = 0;
                 h.Patch(AccessTools.Method(typeof(KillCam), "Update"), transpiler: M("KillCamTextTr"));
                 if (kcHits != 10) TweaksPlugin.L.LogWarning("KillCamNoGarbage: " + kcHits + " of 10 places found in KillCam.Update (game update?); the ones found are handled");
-                else TweaksPlugin.L.LogInfo("KillCamNoGarbage: 10 places in the kill camera no longer make garbage every frame");
+                else DorsthTweaks.DorsthTweaksPlugin.Note("KillCamNoGarbage: 10 places in the kill camera no longer make garbage every frame");
             });
             Try("FadedLinesEndEarly", () =>
             {
@@ -548,7 +548,7 @@ namespace UltimateTweaks
                     h.Patch(m, transpiler: M("LineLifeTr"));
                 }
                 if (fadeHits != 2) TweaksPlugin.L.LogWarning("FadedLinesEndEarly: " + fadeHits + " of 2 places found (game update?); the others keep the game's 2.5 seconds");
-                else TweaksPlugin.L.LogInfo("FadedLinesEndEarly: the fragment lines of 2 explosion scripts are removed when they have faded out");
+                else DorsthTweaks.DorsthTweaksPlugin.Note("FadedLinesEndEarly: the fragment lines of 2 explosion scripts are removed when they have faded out");
             });
             Try("ExplosionLinesOneMaterial", () =>
             {
@@ -561,7 +561,7 @@ namespace UltimateTweaks
                 }
                 if (lineHits != 3) throw new Exception(lineHits + " of 3 material creations found");
                 LineMat();   // made now, not in the first explosion
-                TweaksPlugin.L.LogInfo("ExplosionLinesOneMaterial: the fragment lines of 3 explosion scripts share one material");
+                DorsthTweaks.DorsthTweaksPlugin.Note("ExplosionLinesOneMaterial: the fragment lines of 3 explosion scripts share one material");
             });
             Try("ArcPathNoGarbage", () =>
             {
@@ -575,7 +575,7 @@ namespace UltimateTweaks
                     h.Patch(m, transpiler: M("ArcPathTr")); methods++;
                 }
                 if (arcHits != methods || methods == 0) throw new Exception(arcHits + " list creations found in " + methods + " path methods (library changed?)");
-                TweaksPlugin.L.LogInfo("ArcPathNoGarbage: " + arcHits + " path builders of the arc library use one reused point list");
+                DorsthTweaks.DorsthTweaksPlugin.Note("ArcPathNoGarbage: " + arcHits + " path builders of the arc library use one reused point list");
             });
             Try("GunSoundsNoScanInPlay (countdown)", () => h.Patch(AccessTools.Method(typeof(PlayerManager), "WaitForRoundStartCoroutineStart"), postfix: M("CountdownPost")));
             Try("WeaponLayerNoGarbage", () =>
@@ -588,7 +588,7 @@ namespace UltimateTweaks
             {
                 h.Patch(AccessTools.Method(typeof(FirstPersonController), "Awake"), postfix: M("FpcGuiPost"));
                 SceneManager.sceneLoaded += (sc, mode) => GuiLayoutRefresh();
-                TweaksPlugin.L.LogInfo("OnGuiNoLayout: no GUI layout pass for the player script, the ping script and the FPS counter");
+                DorsthTweaks.DorsthTweaksPlugin.Note("OnGuiNoLayout: no GUI layout pass for the player script, the ping script and the FPS counter");
             });
             Try("WeaponNoInputCopy", () => h.Patch(AccessTools.Method(typeof(Weapon), "Awake___UserLogic"), transpiler: M("WeaponControlsTr")));
             Try("VoiceKeyOffThread", () =>
@@ -973,7 +973,7 @@ namespace UltimateTweaks
                 var t = AccessTools.TypeByName("MyceliumNetworking.MyceliumNetwork"); if (t == null) return;   // not installed
                 var m = AccessTools.Method(t, "ReceiveMessages", Type.EmptyTypes); if (m == null) throw new Exception("Mycelium is not the version this was written for (1.1.17)");
                 h.Patch(m, prefix: new HarmonyMethod(self.GetMethod("MycPre", bf)));
-                TweaksPlugin.L.LogInfo("MyceliumPollRate: Mycelium found, it asks Steam for mod messages 60 times a second");
+                DorsthTweaks.DorsthTweaksPlugin.Note("MyceliumPollRate: Mycelium found, it asks Steam for mod messages 60 times a second");
             });
             Try("SpawnViewerNoSearch", () =>
             {
@@ -984,7 +984,7 @@ namespace UltimateTweaks
                 if (m == null || f == null || f.FieldType != typeof(bool)) throw new Exception("SpawnViewer is not the version this was written for (1.6.0)");
                 svPlugin = pi.Instance; svFlag = f;
                 h.Patch(m, prefix: new HarmonyMethod(self.GetMethod("SvRefreshPre", bf)));
-                TweaksPlugin.L.LogInfo("SpawnViewerNoSearch: SpawnViewer found, its refresh no longer searches every loaded object");
+                DorsthTweaks.DorsthTweaksPlugin.Note("SpawnViewerNoSearch: SpawnViewer found, its refresh no longer searches every loaded object");
             });
             Try("OnGuiNoLayout (SpawnViewer)", () =>
             {
@@ -995,7 +995,7 @@ namespace UltimateTweaks
                 if (m == null || f == null || f.FieldType != typeof(bool) || f.IsStatic) throw new Exception("SpawnViewer is not the version this was written for (1.6.0)");
                 svGui = pi.Instance; svVisible = AccessTools.FieldRefAccess<object, bool>(f);
                 h.Patch(m, postfix: new HarmonyMethod(self.GetMethod("SvGuiPost", bf)));
-                TweaksPlugin.L.LogInfo("OnGuiNoLayout: SpawnViewer found, no GUI layout pass for it while its panel is hidden");
+                DorsthTweaks.DorsthTweaksPlugin.Note("OnGuiNoLayout: SpawnViewer found, no GUI layout pass for it while its panel is hidden");
             });
         }
         // ---- SpawnViewerNoSearch. SpawnViewer.RefreshPostfix (run after the game's spawn methods):
@@ -1512,7 +1512,7 @@ namespace UltimateTweaks
                         }
                     }
                     skipped += withInit;
-                    TweaksPlugin.L.LogInfo("PreCompile: " + done + " methods compiled ahead of time in " + (sw.ElapsedMilliseconds / 1000.0).ToString("0.0") + " s on a helper thread (" + skipped + " methods or classes skipped: generic, without a body, or with start-up code that touches the engine or the game, " + failed + " could not be compiled; " + withHarmless + " classes with harmless start-up code included)");
+                    DorsthTweaks.DorsthTweaksPlugin.Note("PreCompile: " + done + " methods compiled ahead of time in " + (sw.ElapsedMilliseconds / 1000.0).ToString("0.0") + " s on a helper thread (" + skipped + " methods or classes skipped: generic, without a body, or with start-up code that touches the engine or the game, " + failed + " could not be compiled; " + withHarmless + " classes with harmless start-up code included)");
                 }
                 catch (Exception e) { TweaksPlugin.L.LogWarning("PreCompile stopped: " + e.Message); }
             }) { IsBackground = true, Priority = System.Threading.ThreadPriority.BelowNormal, Name = "UT precompile" };

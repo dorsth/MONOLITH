@@ -143,7 +143,7 @@ namespace UltimateTweaks
                 if (dulled.Count > 4000) dulled.RemoveAll(d => !d.M);   // materials of maps that are gone
                 var sb = new System.Text.StringBuilder("Fullbright fill light, shine Matte: " + n + " meshes looked at, gloss taken out on");
                 foreach (var kv in touched) sb.Append(" [" + kv.Key + ": " + kv.Value + "]");
-                TweaksPlugin.L.LogInfo(sb.ToString()); touched.Clear();
+                DorsthTweaks.DorsthTweaksPlugin.Note(sb.ToString()); touched.Clear();
             }
         }
 
@@ -197,7 +197,7 @@ namespace UltimateTweaks
             if (map != null && map != sunSaid)
             {
                 sunSaid = map;
-                TweaksPlugin.L.LogInfo("Fullbright fill light: " + (off ? "off" : "on") + " on " + map + " (sun of its own: " + sunKind + ", lightmaps: " + maps + ", chunks that can be shot off: " + chunks
+                DorsthTweaks.DorsthTweaksPlugin.Note("Fullbright fill light: " + (off ? "off" : "on") + " on " + map + " (sun of its own: " + sunKind + ", lightmaps: " + maps + ", chunks that can be shot off: " + chunks
                     + (off ? "; a second sun-type light would draw every object twice" : sun ? "; kept for the dark parts, every object is drawn twice" : "") + ")");
             }
         }

@@ -15,7 +15,7 @@ using UnityEngine.LowLevel;
 
 [assembly: AssemblyTitle("ViewmodelTweaks")]
 [assembly: AssemblyDescription("Viewmodel FOV, position, sway, bob and arms, with its own values for any weapon you pick. Dorsth was here.")]
-[assembly: AssemblyVersion("2.0.2.0")]
+[assembly: AssemblyVersion("2.0.3.0")]
 [assembly: StraftatMod(isVanillaCompatible: true)]
 
 namespace ViewmodelTweaks
@@ -55,10 +55,13 @@ namespace ViewmodelTweaks
     {
         public const string Guid = "dorsth.straftat.viewmodeltweaks";
         public const string Name = "ViewmodelTweaks";
-        public const string Version = "2.0.2";
+        public const string Version = "2.0.3";
         internal const int MaxSlots = 10;
 
         internal static ManualLogSource Log;
+        internal static ConfigEntry<bool> Detail;
+        // what One Camera does, for measuring: only with Detailed Log on
+        internal static void Note(string s) { if (Detail != null && Detail.Value) Log.LogInfo(s); }
         internal static readonly List<Slot> Slots = new List<Slot>();
         private static bool _dirty = true;
         private static Slot _shown;
@@ -218,7 +221,7 @@ namespace ViewmodelTweaks
                     _loopBroken = true;
                     Log.LogWarning("One Camera: Unity's frame loop is not built as expected. Your weapon is still drawn right, your arms can be the wrong size.");
                 }
-                if (!_oneOn) { _oneOn = true; Log.LogInfo("One Camera on: the main camera draws your weapon and arms; the second camera only comes on while a loose effect of a weapon is showing."); }
+                if (!_oneOn) { _oneOn = true; Note("One Camera on: the main camera draws your weapon and arms; the second camera only comes on while a loose effect of a weapon is showing."); }
             }
             else if (_oneOn || _hooked)
             {
@@ -233,7 +236,7 @@ namespace ViewmodelTweaks
                     if (_main != null) _main.cullingMask &= ~_heldLayerBit;
                     // the second camera, its place and its FOV back as the general settings say (and a weapon's own on top, next frame)
                     try { View.Apply(); } catch { }
-                    Log.LogInfo("One Camera off: the second camera draws your weapon again.");
+                    Note("One Camera off: the second camera draws your weapon again.");
                 }
             }
         }
@@ -356,7 +359,7 @@ namespace ViewmodelTweaks
             int n = _rends.Count;
             for (int r = 0; r < n; r++) _rends[r].enabled = false;
             _rends.Clear();
-            if (_hidSaid.Count < 40 && _hidSaid.Add(go.name)) Log.LogInfo("One Camera: your weapon's effect " + go.name.Replace("(Clone)", "").Trim() + " is not drawn (" + n + " parts).");
+            if (_hidSaid.Count < 40 && _hidSaid.Add(go.name)) Note("One Camera: your weapon's effect " + go.name.Replace("(Clone)", "").Trim() + " is not drawn (" + n + " parts).");
         }
 
         // ---- Particle effects that are part of the weapon you hold (the Prophet has one at its muzzle, always on)
@@ -408,7 +411,7 @@ namespace ViewmodelTweaks
             if (!hide) _heldFx = true;
             string name = weapon.name.Replace("(Clone)", "").Trim();
             if (_hidSaid.Count < 40 && _hidSaid.Add("held " + name))
-                Log.LogInfo("One Camera: " + name + " has " + n + " particle effect" + (n == 1 ? "" : "s") + " of its own; " + (hide ? "not drawn while you hold it." : "the second camera stays on while you hold it."));
+                Note("One Camera: " + name + " has " + n + " particle effect" + (n == 1 ? "" : "s") + " of its own; " + (hide ? "not drawn while you hold it." : "the second camera stays on while you hold it."));
         }
 
         private static void LooseClear()
@@ -420,7 +423,7 @@ namespace ViewmodelTweaks
         private static void ModeReport()
         {
             int n = _framesOne + _framesTwo;
-            if (n > 600) Log.LogInfo("One Camera: of the last " + n + " frames, " + (100f * _framesTwo / n).ToString("0.0") + "% needed the second camera (a weapon effect was showing, or a melee weapon was in your hands).");
+            if (n > 600) Note("One Camera: of the last " + n + " frames, " + (100f * _framesTwo / n).ToString("0.0") + "% needed the second camera (a weapon effect was showing, or a melee weapon was in your hands).");
             _framesOne = 0; _framesTwo = 0;
         }
 
@@ -665,6 +668,7 @@ namespace ViewmodelTweaks
         private void Awake()
         {
             Log = Logger;
+            Detail = Config.Bind("Internal", "Detailed Log", false, "Writes what One Camera does to the log (for measuring). Off: only problems are written.");
             FromSwordStance();
             NoSword();
             for (int i = 1; i <= MaxSlots; i++)

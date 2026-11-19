@@ -35,7 +35,7 @@ using PlanarReflection = UnityStandardAssets.Water.PlanarReflection;
 
 [assembly: AssemblyTitle("DorsthTweaks")]
 [assembly: AssemblyDescription("Hitmarker, HUD, viewmodel and FPS tweaks for STRAFTAT.")]
-[assembly: AssemblyVersion("1.3.3.0")]
+[assembly: AssemblyVersion("1.3.4.0")]
 [assembly: AssemblyFileVersion("1.2.7.0")]
 
 // Only changes what you see on your own screen, so matchmaking with unmodded players still works.
@@ -49,9 +49,12 @@ namespace DorsthTweaks
     {
         public const string Guid = "dorsth.straftat.dorsthtweaks";
         public const string Name = "DorsthTweaks";
-        public const string Version = "1.3.3";
+        public const string Version = "1.3.4";
 
         internal static ManualLogSource Log;
+        internal static ConfigEntry<bool> Detail;
+        // the notes of the FPS work: only with Detailed Log on, so a normal game writes nothing it does not need
+        internal static void Note(string s) { if (Detail != null && Detail.Value) Log.LogInfo(s); }
         internal static Harmony Harmony;
 
         internal static ConfigEntry<bool> StaticHitmarkers, HideHitmarkers, HeadPopLikeBody;
@@ -111,6 +114,7 @@ namespace DorsthTweaks
         private void Awake()
         {
             Log = Logger;
+            Detail = Config.Bind("Internal", "Detailed Log", false, "Writes what each tweak did to the log (for measuring). Off: only problems are written.");
             Log.LogMessage("Dorsth was here");
             // BepInEx's manager object (every plugin's home) is a plain object the game destroys on the way into a lobby,
             // unless something hides it (Mod Menu does, so does BepInEx's HideManagerGameObject). Hidden here too.
@@ -243,11 +247,7 @@ namespace DorsthTweaks
                 "Replaces your 'joined the lobby' line, for everyone in the lobby. {name} is your name. Empty uses the game's.");
             Carry(JoinMessage, "Lobby", "Join Message");
             HideDefaultPlaylists = Config.Bind(Menus, "Hide Default Playlists", false, "Hides the game's playlists.");
-#if DORSTH_BUNDLE
             ReduceUIAnimations = Config.Bind(Menus, "Reduce UI Animations", false, "No animations in the menus and on the HUD.");
-#else
-            ReduceUIAnimations = Config.Bind(Menus, "Reduce UI Animations", false, "No animations in the menus and on the HUD.");
-#endif
 
             NoViewmodelClimb = Config.Bind(View, "No Viewmodel Climb", false, "Your gun stays in place while spraying.");
             NoBulletCasings = Config.Bind(View, "No Bullet Casings", false, "No casings or their sound.");
@@ -1634,7 +1634,7 @@ namespace DorsthTweaks
                             int half = Mathf.Max(Mathf.Max(raw[0].r, raw[0].g), Mathf.Max(raw[1].r, raw[1].g));   // went in as 128
                             if (half > 30 && half < 92) curve = 1;            // 55: came back linear
                             else if (half > 160 && half < 215) curve = 2;     // 188: the curve was applied twice
-                            if (rows != 0 || curve != 0) DorsthTweaksPlugin.Log.LogInfo("Hitmarker pictures come back from the graphics card " + (rows != 0 ? "top row first" : "bottom row first") + (curve == 1 ? ", darker (put right)" : curve == 2 ? ", lighter (put right)" : "") + ".");
+                            if (rows != 0 || curve != 0) DorsthTweaksPlugin.Note("Hitmarker pictures come back from the graphics card " + (rows != 0 ? "top row first" : "bottom row first") + (curve == 1 ? ", darker (put right)" : curve == 2 ? ", lighter (put right)" : "") + ".");
                         }
                     }
                     RenderTexture.ReleaseTemporary(rt);
@@ -1799,7 +1799,7 @@ namespace DorsthTweaks
                     patched++;
                 }
             }
-            DorsthTweaksPlugin.Log.LogInfo("Neck hitmarkers: " + patched + " shot methods");
+            DorsthTweaksPlugin.Note("Neck hitmarkers: " + patched + " shot methods");
         }
 
         private static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
@@ -2010,7 +2010,7 @@ namespace DorsthTweaks
                     LineFade fade = line.GetComponent<LineFade>();
                     Material mat = line.sharedMaterial;
                     Trails[id] = own = new Own { Line = line, Fade = fade, Start = line.startColor, End = line.endColor, FadeColor = fade != null ? fade.color : Color.white, Mat = mat, Glow = Adds(mat) };
-                    DorsthTweaksPlugin.Log.LogInfo("Bullet trail of " + __instance.gameObject.name.Replace("(Clone)", "").Trim() + ": " +
+                    DorsthTweaksPlugin.Note("Bullet trail of " + __instance.gameObject.name.Replace("(Clone)", "").Trim() + ": " +
                         (mat != null && mat.shader != null ? mat.shader.name : "no material") + (own.Glow ? " (glow)" : ""));
                 }
                 Paint(own);
@@ -3202,7 +3202,7 @@ namespace DorsthTweaks
                 AsyncOperation unload = null;
                 try { unload = Resources.UnloadUnusedAssets(); } catch (Exception e) { DorsthTweaksPlugin.LogErrorOnce(e); }
                 if (unload != null) yield return unload;
-                DorsthTweaksPlugin.Log.LogInfo("Last map's leftovers freed in " + ((Time.realtimeSinceStartup - t0) * 1000f).ToString("F0", CultureInfo.InvariantCulture) + " ms");
+                DorsthTweaksPlugin.Note("Last map's leftovers freed in " + ((Time.realtimeSinceStartup - t0) * 1000f).ToString("F0", CultureInfo.InvariantCulture) + " ms");
             }
             Settled = true;
             try { Stills.ForgetGone(); }
@@ -3456,7 +3456,7 @@ namespace DorsthTweaks
                     foreach (AudioSource a in sources) n += Load(a.clip);
                 }
             }
-            if (n > 0) DorsthTweaksPlugin.Log.LogInfo("Warm up: " + n + " sounds read in");
+            if (n > 0) DorsthTweaksPlugin.Note("Warm up: " + n + " sounds read in");
             return n;
         }
 
@@ -3677,7 +3677,7 @@ namespace DorsthTweaks
                 if (r.Field == "explosiondecal" && OnlyAMark(r.Prefab)) Marks.Add(r.Prefab);
                 else if (r.Field.Contains("hitimpact") || r.Field == "genericimpact" || r.Field.Contains("decal")) Decals.Add(r.Prefab);
             }
-            if (Marks.Count > 0) DorsthTweaksPlugin.Log.LogInfo("Reduce VFX: the burn marks of explosions aren't made (" + Marks.Count + " kinds).");
+            if (Marks.Count > 0) DorsthTweaksPlugin.Note("Reduce VFX: the burn marks of explosions aren't made (" + Marks.Count + " kinds).");
         }
 
         // a decal script and what it draws with, nothing else
@@ -4249,7 +4249,7 @@ namespace DorsthTweaks
             if (Parked.Count != _parkedSaid)
             {
                 _parkedSaid = Parked.Count;
-                DorsthTweaksPlugin.Log.LogInfo("Reduce VFX+: sparks, debris, smoke and gas cloud switched off in the effects: " + Parked.Count + " parts.");
+                DorsthTweaksPlugin.Note("Reduce VFX+: sparks, debris, smoke and gas cloud switched off in the effects: " + Parked.Count + " parts.");
             }
         }
 
@@ -4951,7 +4951,7 @@ namespace DorsthTweaks
             }
             Drop.Clear();
             foreach (Texture2D c in Copies.Values) if (c) kept++;
-            DorsthTweaksPlugin.Log.LogInfo("Lower Textures: " + kept + " small copies kept, " + Fresh.Count + " to make, " + dropped + " dropped (in " + swapped + " places now, game texture limit " + limit + ")");
+            DorsthTweaksPlugin.Note("Lower Textures: " + kept + " small copies kept, " + Fresh.Count + " to make, " + dropped + " dropped (in " + swapped + " places now, game texture limit " + limit + ")");
             Fresh.Clear();
             if (Queue.Count > 0) Host.Run(MakeQueued(_run));
         }
