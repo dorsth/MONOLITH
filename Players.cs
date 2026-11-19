@@ -153,6 +153,8 @@ namespace Monolith
 
         internal static void Install(Harmony h)
         {
+            MethodInfo died = AccessTools.Method(typeof(PlayerHealth), "sync___set_value_health");
+            if (died != null) h.Patch(died, postfix: new HarmonyMethod(typeof(Players).GetMethod(nameof(Died), BindingFlags.Static | BindingFlags.NonPublic)));
             MethodInfo tr = typeof(Players).GetMethod(nameof(MatTr), BindingFlags.Static | BindingFlags.NonPublic);
             MethodInfo post = typeof(Players).GetMethod(nameof(Dressed), BindingFlags.Static | BindingFlags.NonPublic);
             MethodInfo saved = typeof(Players).GetMethod(nameof(SavedInGame), BindingFlags.Static | BindingFlags.NonPublic);
@@ -284,7 +286,7 @@ namespace Monolith
 
         // ---- the hat: drawn on the real one, which stays as it is and is only not drawn, so it comes off when the real one is shot.
         // A player without a hat gets a drawn one where the game puts hats; there is no real hat to shoot, so it comes off when
-        // the player is killed (Knock).
+        // the player is killed (Knock, Died).
 
         private static void Dressed(PlayerSetup __instance, Transform ___hatToWearPosition, Vector3 __2)
         {
@@ -306,7 +308,7 @@ namespace Monolith
                     shown.AddComponent<HatPosition>().reference = ___hatToWearPosition;
                     shown.transform.forward = __2;   // the way the game turns a hat: the third value it was called with
                     PlayerHealth ph = __instance.GetComponent<PlayerHealth>() ?? __instance.GetComponentInParent<PlayerHealth>() ?? __instance.GetComponentInChildren<PlayerHealth>();
-                    if (ph != null) shown.AddComponent<Knock>().Health = ph;
+                    if (ph != null) { Knock k = shown.AddComponent<Knock>(); k.Key = ph.GetInstanceID(); Knock.On[k.Key] = k; }
                 }
                 else
                 {
@@ -329,24 +331,18 @@ namespace Monolith
         }
 
         // A drawn hat on a player who wears none: flies off when the player is killed, the way a shot hat does, and is gone
-        // two seconds later. No collider, so nothing can hit it or stand on it.
+        // two seconds later. No collider, so nothing can hit it or stand on it. Told by the health the game sends (Died), so
+        // nothing runs between hits.
         internal sealed class Knock : MonoBehaviour
         {
-            internal PlayerHealth Health;
-            private float _goneAt = -1f; private bool _seenAlive;
+            internal static readonly Dictionary<int, Knock> On = new Dictionary<int, Knock>();   // by the PlayerHealth it sits on
+            internal int Key;
 
-            private void LateUpdate()
-            {
-                if (_goneAt >= 0f) { if (Time.time >= _goneAt) Destroy(gameObject); return; }
-                if (Health == null) { Destroy(gameObject); return; }
-                bool alive = !Health.sync___get_value_isKilled() && Health.sync___get_value_health() > 0f;
-                if (alive) { _seenAlive = true; return; }
-                if (!_seenAlive) return;   // dressed before the new life began: not a kill
-                Off(Health.sync___get_value_lastKillDirection());
-            }
+            private void OnDestroy() { Knock k; if (On.TryGetValue(Key, out k) && k == this) On.Remove(Key); }
 
-            private void Off(Vector3 dir)
+            internal void Off(Vector3 dir)
             {
+                On.Remove(Key);
                 if (dir.sqrMagnitude < 0.01f) dir = -transform.forward;
                 HatPosition pos = GetComponent<HatPosition>(); if (pos != null) Destroy(pos);
                 transform.SetParent(null, true);
@@ -354,8 +350,16 @@ namespace Monolith
                 rb.interpolation = RigidbodyInterpolation.Interpolate;
                 rb.AddForce(dir.normalized * 10f, ForceMode.Impulse);
                 rb.AddTorque(Vector3.Cross(Vector3.up, dir) * 40f, ForceMode.Impulse);
-                _goneAt = Time.time + 2f;
+                Destroy(gameObject, 2f);
             }
+        }
+
+        private static void Died(PlayerHealth __instance, float value)
+        {
+            if (Knock.On.Count == 0 || value > 0f || __instance == null) return;
+            Knock k;
+            if (Knock.On.TryGetValue(__instance.GetInstanceID(), out k) && k != null)
+                try { k.Off(__instance.sync___get_value_lastKillDirection()); } catch (Exception e) { BundlePlugin.Log.LogInfo("Players: a drawn hat stayed on: " + e.Message); }
         }
     }
 }
