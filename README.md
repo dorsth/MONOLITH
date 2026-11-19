@@ -50,7 +50,7 @@ MONOLITH does what [Mod Menu](https://github.com/kestrel-straftat/mod-menu) does
 
 It loads no asset bundles, so it also runs on macOS ARM64, where Mod Menu does not.
 
-Have Mod Menu installed as well? Only one of the two loads, so remove one: MONOLITH needs neither.
+Remove Mod Menu if you have it. MONOLITH comes with its own copy.
 
 ## Language
 
@@ -149,7 +149,7 @@ The viewmodel's weapon camera (its offset, FOV and mirroring) is adapted from [M
 
 ## Building
 
-`build.sh` compiles everything under `mods/` into `MONOLITH.dll`. It needs the .NET SDK and two paths: `LIB` (the game's `STRAFTAT_Data/Managed`) and `BEP` (`BepInEx/core`). It builds `modmenu/ModMenu.dll` first. The mods' sources are used as they are; only their `[assembly: ...]` lines are left out.
+`build.sh` compiles everything under `mods/` into `MONOLITH.dll`. It needs the .NET SDK and two paths: `LIB` (the game's `STRAFTAT_Data/Managed`) and `BEP` (`BepInEx/core`). It builds `modmenu/ModMenu.dll` first. The source of each mod is used as it is; only their `[assembly: ...]` lines are left out.
 
 | File | Holds |
 |---|---|
@@ -166,6 +166,6 @@ The viewmodel's weapon camera (its offset, FOV and mirroring) is adapted from [M
 | `FrameCap.cs` | the FPS cap |
 | `Lang.cs`, `Russian.cs`, `lang/` | the menu's language |
 
-Code in a mod that is only for MONOLITH, or left out of it, sits behind `#if DORSTH_BUNDLE` in the mod's own source: where CombatSounds looks for sounds, the crosshair folder, the switches above, and the mods' own Mod Menu pages and windows (ezCrosshair's window is not compiled in at all).
+Code in a mod that is only for MONOLITH, or left out of it, sits behind `#if DORSTH_BUNDLE` in the mod's own source: where CombatSounds looks for sounds, the crosshair folder, the switches above, and the Mod Menu page and window of each mod (ezCrosshair's window is not compiled in at all).
 
 At start the log says which mods and versions the file holds.

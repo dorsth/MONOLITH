@@ -1,5 +1,9 @@
 # MONOLITH changelog
 
+## 1.0.4
+- The icon is the original drawing again, only compressed: 3 pixels of its own edge were added on each side to make the 256 x 256 Thunderstore asks for, nothing was scaled.
+- Readme: plainer wording about Mod Menu.
+
 ## 1.0.3
 - Configs page reordered and renamed: Undo load (Redo load after it), Save as new, Export to clipboard, Import from clipboard, Include keybinds, then your saved configs under Saved, then Presets.
 
@@ -9,7 +13,7 @@
 - Undo last load: back to what you had before the last load or import, keybinds included.
 
 ## 1.0.1
-- Description and readme: MONOLITH replaces Mod Menu and Minimal Viewmodels Reborn, other mods' settings are in its menu, and your settings come along when you switch.
+- Description and readme: MONOLITH replaces Mod Menu and Minimal Viewmodels Reborn, the settings of other mods are in its menu, and your settings come along when you switch.
 
 ## 1.0.0
 - First public release.

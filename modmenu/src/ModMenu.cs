@@ -20,7 +20,7 @@ using UnityEngine;
 using UnityEngine.UI;
 
 [assembly: AssemblyTitle("ModMenu")]
-[assembly: AssemblyDescription("Mod Menu's API for MONOLITH: other mods' settings pages show in MONOLITH's menu.")]
+[assembly: AssemblyDescription("Mod Menu's API for MONOLITH: the settings pages of other mods show in MONOLITH's menu.")]
 [assembly: AssemblyVersion("0.0.0.0")]
 
 namespace ModMenu
@@ -34,7 +34,7 @@ namespace ModMenu
         private void Awake()
         {
             gameObject.hideFlags = HideFlags.HideAndDontSave;
-            Logger.LogInfo("Mod Menu's API is provided by MONOLITH: mods' Mod Menu pages show in MONOLITH's menu (F2).");
+            Logger.LogInfo("Mod Menu's API is provided by MONOLITH: the Mod Menu pages of other mods show in MONOLITH's menu (F2).");
         }
     }
 
