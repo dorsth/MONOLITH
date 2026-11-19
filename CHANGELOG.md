@@ -3,6 +3,7 @@
 ## 1.0.4
 - The icon is the original drawing again, only compressed.
 - Readme: plainer wording about Mod Menu.
+- Forced hats: a player with no hat keeps having none. Every forced hat now sits on a real one and comes off when it is shot.
 - The Thunderstore zips of 1.0.0 to 1.0.3 held Mod Menu itself instead of MONOLITH's own copy of its API: Mod Menu's window showed and other mods were missing from MONOLITH's menu. Fixed.
 
 ## 1.0.3

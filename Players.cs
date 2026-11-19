@@ -282,22 +282,23 @@ namespace Monolith
             return i >= 0 && i < pics.Length ? pics[i] : null;
         }
 
-        // ---- the hat: drawn on the real one, which stays as it is and is only not drawn
+        // ---- the hat: drawn on the real one, which stays as it is and is only not drawn, so it comes off when the real one is shot
 
-        private static void Dressed(PlayerSetup __instance, Transform ___hatToWearPosition, Vector3 __2)
+        private static void Dressed(PlayerSetup __instance)
         {
             try
             {
                 int side = Side(__instance);
                 if (side == 0) return;
                 string want = side == 2 ? EnemyHat.Value : TeamHat.Value;
-                if (string.IsNullOrEmpty(want) || ___hatToWearPosition == null) return;
+                if (string.IsNullOrEmpty(want)) return;
                 int i = Array.IndexOf(Hats(), want);
                 if (i < 0) return;
                 GameObject prefab = CosmeticsManager.Instance.hats[i];
                 if (prefab == null) return;
                 GameObject real = __instance.hat, shown;
-                if (real != null)
+                // a player without a hat stays without one: a drawn hat there could never be shot off, as a real one is
+                if (real == null) return;
                 {
                     if (real.name.StartsWith(prefab.name, StringComparison.Ordinal)) return;   // wears it already
                     foreach (Renderer r in real.GetComponentsInChildren<Renderer>(true)) r.enabled = false;
@@ -305,12 +306,6 @@ namespace Monolith
                     // the real hat's own size must not stretch it
                     Vector3 a = prefab.transform.localScale, b = real.transform.localScale;
                     shown.transform.localScale = new Vector3(b.x != 0f ? a.x / b.x : a.x, b.y != 0f ? a.y / b.y : a.y, b.z != 0f ? a.z / b.z : a.z);
-                }
-                else
-                {
-                    shown = UnityEngine.Object.Instantiate(prefab, ___hatToWearPosition.position, Quaternion.identity, ___hatToWearPosition);
-                    shown.AddComponent<HatPosition>().reference = ___hatToWearPosition;
-                    shown.transform.forward = __2;   // the way the game turns a hat: the third value it was called with
                 }
                 shown.name = "MonolithHat";
                 shown.tag = "Untagged";

@@ -97,7 +97,7 @@ One outfit and one hat for enemies, one for teammates, with the game's own wardr
 
 **Outline color** for enemies and for teammates is the game's own setting, not a second one: change it here or in the game's settings and both show it. Whether enemies have an outline at all stays the lobby's rule. Part of a config.
 
-The hat you picked is drawn on the hat a player wears, which is only not drawn any more; it flies off with it when shot. A player with no hat gets a drawn one that stays on. The real hat is not replaced: a shot that passes a hat sends a bullet trail point to every player and counts for the Hats Off achievement, so a hat only you have would change both.
+The hat you picked is drawn on the hat a player wears, which is only not drawn any more, so it flies off when that hat is shot. A player with no hat keeps having none: a drawn hat there could not be shot off. The real hat is not replaced, because a hat changes what a shot hits for every player.
 
 ## Match stats
 
