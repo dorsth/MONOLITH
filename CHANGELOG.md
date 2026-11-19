@@ -1,5 +1,8 @@
 # MONOLITH changelog
 
+## 1.0.3
+- Configs page reordered and renamed: Undo load (Redo load after it), Save as new, Export to clipboard, Import from clipboard, Include keybinds, then your saved configs under Saved, then Presets.
+
 ## 1.0.2
 - Configs hold the game's own settings too (graphics, HUD, crosshair, audio, toggles) and every keybind. Sensitivity and what belongs to one PC stay out.
 - Load keybinds: off by default; on, loading a config also sets its keybinds.

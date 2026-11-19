@@ -35,7 +35,7 @@ namespace Monolith
 
         internal static void Bind(ConfigFile c)
         {
-            TakeKeys = c.Bind("Configs", "Load Keybinds", false, "Loading a config also sets its keybinds. Off: your keybinds stay as they are.");
+            TakeKeys = c.Bind("Configs", "Include Keybinds", false, "Loading a config also sets its keybinds. Off: your keybinds stay as they are.");
         }
 
         private static readonly CultureInfo Inv = CultureInfo.InvariantCulture;

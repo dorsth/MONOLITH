@@ -5,7 +5,7 @@ namespace Monolith
 {
     internal static partial class Lang
     {
-        private static readonly Dictionary<string, string> Table = new Dictionary<string, string>(292)
+        private static readonly Dictionary<string, string> Table = new Dictionary<string, string>(304)
         {
             { "Crosshair", "Прицел" },
             { "Viewmodel", "Вьюмодель" },
@@ -224,12 +224,24 @@ namespace Monolith
             { "Open this menu", "Открыть это меню" },
             { "Press Enter, then the key.", "Нажмите Enter, затем клавишу." },
             { "Presets", "Пресеты" },
+            { "Saved", "Сохранённые" },
+            { "Undo load", "Отменить загрузку" },
+            { "Redo load", "Вернуть загрузку" },
+            { "Save as new", "Сохранить как новый" },
+            { "Export to clipboard", "Экспорт в буфер" },
+            { "Include keybinds", "Вместе с клавишами" },
+            { "Overwrite", "Перезаписать" },
+            { "Back to the config you loaded last.", "Возврат к последнему загруженному конфигу." },
+            { "Copy a line from a friend (it starts with MONOLITH:), then press Enter here. It is saved under its name.", "Скопируйте строку от друга (она начинается с MONOLITH:) и нажмите здесь Enter. Она сохранится под своим именем." },
+            { "Loads everything except sensitivity. Keybinds only when Include keybinds is on.", "Загружает всё, кроме чувствительности. Клавиши только при включённом пункте Вместе с клавишами." },
+            { "Saves your current config under a name. A config with the same name is replaced.", "Сохраняет текущий конфиг под именем. Конфиг с тем же именем заменяется." },
             { "Copy my config to clipboard", "Скопировать мой конфиг в буфер" },
             { "Undo last load", "Отменить последнюю загрузку" },
             { "Load keybinds", "Загружать клавиши" },
             { "Back to what you had before the last load or import, keybinds included.", "Возврат к тому, что было до последней загрузки или импорта, включая клавиши." },
             { "Nothing to undo.", "Нечего отменять." },
-            { "Back to what you had before the last load. Undo again to return.", "Возвращено то, что было до последней загрузки. Отмените ещё раз, чтобы вернуться." },
+            { "Back to what you had before the last load.", "Возвращено то, что было до последней загрузки." },
+            { "The load is back.", "Загрузка возвращена." },
             { "Your config as one line of text. Paste it to a friend.", "Ваш конфиг одной строкой текста. Отправьте её другу." },
             { "Import from clipboard", "Импорт из буфера" },
             { "Copy a line from a friend (it starts with MONOLITH:), then press Enter here. Yours is kept as \"previous config\".", "Скопируйте строку от друга (она начинается с MONOLITH:) и нажмите здесь Enter. Ваш конфиг сохранится как «previous config»." },
@@ -252,7 +264,7 @@ namespace Monolith
             { "Deleted ", "Удалён профиль " },
             { "Loaded ", "Загружен профиль " },
             { "Settings changed: ", "Изменено настроек: " },
-            { " What you had is \"previous config\".", " Прежний конфиг сохранён как «previous config»." },
+            { " Undo load brings back what you had.", " Отмена загрузки вернёт прежнее." },
             { "Experimental settings left out: ", "Экспериментальных настроек не взято: " },
             { "Differences from the defaults: ", "Отличий от настроек по умолчанию: " },
             { "Copied. Paste it to a friend. They copy the line and use Import from clipboard.", "Скопировано. Отправьте строку другу. Он копирует её и нажимает «Импорт из буфера»." },

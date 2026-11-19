@@ -81,7 +81,7 @@ Crosshair, Viewmodel, Camera, HUD, Effects, Players, Audio, Controls, Performanc
 * **Swap weapons**: the game's own Swap binding, the same one as in its settings. Set it in either menu; either reset puts it back on the scroll wheel. Scroll while it asks for a key to do that from here.
 * **Taunts**: each on another key, or off.
 
-Each one calls the game's own routine, one press for one press. The game's saved bindings are not touched. With a jump of yours on the wheel, the wheel no longer swaps weapons: set a key for Swap weapons then. Keys are part of a config, loaded only when Load keybinds is on.
+Each one calls the game's own routine, one press for one press. The game's saved bindings are not touched. With a jump of yours on the wheel, the wheel no longer swaps weapons: set a key for Swap weapons then. Keys are part of a config, loaded only when Include keybinds is on.
 
 ## Crosshairs
 
@@ -117,12 +117,12 @@ Replaces the game's FPS cap while it is on. The game's cap asks Windows to sleep
 
 A config under a name: every setting of the mods and of the game itself (graphics, HUD, crosshair, audio, toggles), and every keybind. Never in it: sensitivity and the rest of the mouse feel, what belongs to one PC (resolution, window mode, V-Sync, the game's frame cap), voice chat and the join message.
 
-* **Undo last load**: back to what you had before the last load or import, keybinds included. Undo again to return.
-* **Load keybinds**: off by default. On: loading a config also sets its keybinds.
-* **Copy my config to clipboard**: one line of text, `MONOLITH:name:code`. Paste it to a friend.
-* **Import from clipboard**: copy such a line, then Enter. Your config is kept as "previous config" first. Experimental settings are not taken from an imported line.
-* **Save my config as**: type a name.
-* A saved config: Load, Copy to clipboard, Overwrite, Delete.
+* **Undo load**: back to what you had before the last load or import, keybinds included. Then **Redo load** takes it back.
+* **Save as new**: type a name.
+* **Export to clipboard**: one line of text, `MONOLITH:name:code`. Paste it to a friend.
+* **Import from clipboard**: copy such a line, then Enter. It is saved under its name. Experimental settings are not taken from an imported line.
+* **Include keybinds**: off by default. On: loading or importing a config also sets its keybinds.
+* **Saved**: your configs. Each has Load, Export to clipboard, Overwrite, Delete.
 * Presets: **Dorsth**, **Defaults**.
 * The game's own settings and the keybinds are set only from a config that holds them: Defaults and Dorsth leave yours as they are. Nothing in the game's settings is written when MONOLITH is first installed.
 

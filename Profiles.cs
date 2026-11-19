@@ -5,7 +5,7 @@
 //  * sensitivity (never copied: it belongs to a hand and a mouse, not to a setup),
 //  * what belongs to one PC (resolution, window mode, V-Sync), the menu's own key, a mod's internal notes, the join message.
 // Loading one puts every mod setting it does not name back to its default, so a loaded profile is the whole setup.
-// Keybinds are only loaded when "Load keybinds" is on; undoing a load always brings yours back.
+// Keybinds are only loaded when "Include keybinds" is on; undoing a load always brings yours back.
 //
 // To pass one on it becomes one line of text on the clipboard: MONOLITH:<name>:<code>. The code is letters and digits
 // only, so a chat program cannot mangle it. Importing reads the clipboard, keeps what you had as "previous setup",
@@ -241,12 +241,13 @@ namespace Monolith
         internal static string Load(Profile p)
         {
             // what you had is kept under one name, so the last load can always be taken back
-            Put(Capture(Before)); Write();
+            Put(Capture(Before)); Write(); _undone = false;
             int n = Apply(p);
             return Loaded(p.Name, n) + Lang.T(WhatYouHad);
         }
 
         // back to what you had before the last load, keybinds included; doing it again takes it back once more
+        private static bool _undone;   // the last Undo load is not yet taken back: the row offers Redo load
         internal static string Undo()
         {
             Profile was = Find(Before);
@@ -255,7 +256,8 @@ namespace Monolith
             Profile now = Find(Before);
             All[All.IndexOf(now)] = was; Apply(was, true);
             All[All.IndexOf(was)] = now; Write();
-            return Lang.T("Back to what you had before the last load. Undo again to return.");
+            _undone = !_undone;
+            return Lang.T(_undone ? "Back to what you had before the last load." : "The load is back.");
         }
 
         // ---- the setups that come with it
@@ -320,7 +322,7 @@ namespace Monolith
         {
             Profile p = Made(name, rows);
             KeepMyExperimental(p);
-            Put(Capture(Before)); Write();
+            Put(Capture(Before)); Write(); _undone = false;
             int n = Apply(p);
             return Loaded(name, n) + Lang.T(WhatYouHad);
         }
@@ -368,7 +370,7 @@ namespace Monolith
             int kept = KeepMyExperimental(p);
             if (string.Equals(p.Name, Before, StringComparison.OrdinalIgnoreCase)) p.Name = "imported";
             // what you had is kept, so one Load brings it back
-            Put(Capture(Before));
+            Put(Capture(Before)); _undone = false;
             string name = p.Name;
             for (int i = 2; Find(p.Name) != null && i < 100; i++) p.Name = Clean(name.Length > 21 ? name.Substring(0, 21) : name) + " " + i;
             Put(p);
@@ -382,7 +384,7 @@ namespace Monolith
         private static MenuPage _page;
 
         // the lines the menu shows after a load
-        private const string WhatYouHad = " What you had is \"" + Before + "\".";
+        private const string WhatYouHad = " Undo load brings back what you had.";
         private static string Loaded(string name, int n)
         {
             return Lang.T("Loaded ") + name + (Lang.Ru ? ". " : ": ") + Lang.Count(n, " setting changed", " settings changed", "Settings changed: ") + ".";
@@ -403,19 +405,23 @@ namespace Monolith
         {
             MenuPage pg = _page;
             pg.Rows.Clear(); pg.Cur = null;
-            if (Find(Before) != null) pg.Rows.Add(new MenuRow { Kind = RowKind.Action, Label = "Undo last load", Info = "Back to what you had before the last load or import, keybinds included.", Take = s => { string r = Undo(); Fill(); return r; } });
-            pg.Rows.Add(new MenuRow { Kind = RowKind.Entry, Label = "Load keybinds", Entry = GameConfig.TakeKeys });
-            pg.Rows.Add(new MenuRow { Kind = RowKind.Action, Label = "Copy my config to clipboard", Info = "Your config as one line of text. Paste it to a friend.", Take = s => ExportNow() });
-            pg.Rows.Add(new MenuRow { Kind = RowKind.Action, Label = "Import from clipboard", Info = "Copy a line from a friend (it starts with MONOLITH:), then press Enter here. Yours is kept as \"" + Before + "\".", Take = s => { string r = Import(); Fill(); return r; } });
-            pg.Rows.Add(new MenuRow { Kind = RowKind.Action, Label = "Save my config as", Ask = "name", Info = "Type a name and press Enter. A config with the same name is replaced.", Take = s => { string r = SaveAs(s); Fill(); return r; } });
+            if (Find(Before) != null) pg.Rows.Add(_undone
+                ? new MenuRow { Kind = RowKind.Action, Label = "Redo load", Info = "Back to the config you loaded last.", Take = s => { string r = Undo(); Fill(); return r; } }
+                : new MenuRow { Kind = RowKind.Action, Label = "Undo load", Info = "Back to what you had before the last load or import, keybinds included.", Take = s => { string r = Undo(); Fill(); return r; } });
+            pg.Rows.Add(new MenuRow { Kind = RowKind.Action, Label = "Save as new", Ask = "name", Info = "Saves your current config under a name. A config with the same name is replaced.", Take = s => { string r = SaveAs(s); Fill(); return r; } });
+            pg.Rows.Add(new MenuRow { Kind = RowKind.Action, Label = "Export to clipboard", Info = "Your config as one line of text. Paste it to a friend.", Take = s => ExportNow() });
+            pg.Rows.Add(new MenuRow { Kind = RowKind.Action, Label = "Import from clipboard", Info = "Copy a line from a friend (it starts with MONOLITH:), then press Enter here. It is saved under its name.", Take = s => { string r = Import(); Fill(); return r; } });
+            pg.Rows.Add(new MenuRow { Kind = RowKind.Entry, Label = "Include keybinds", Entry = GameConfig.TakeKeys });
+            bool saved = false;
             foreach (Profile each in All)
             {
                 Profile p = each;
                 if (string.Equals(p.Name, Before, StringComparison.OrdinalIgnoreCase)) continue;   // the Undo row stands for it
+                if (!saved) { pg.Head("Saved"); saved = true; }
                 var sub = new MenuPage(pg, p.Name, Lang.Count(Differs(p), " setting differs from the defaults.", " settings differ from the defaults.", "Differences from the defaults: ") + (Lang.Ru ? "." : ""));
-                sub.Rows.Add(new MenuRow { Kind = RowKind.Action, Label = "Load", Info = "Loads everything except sensitivity. Keybinds only when Load keybinds is on.", Take = s => { string r = Load(p); Fill(); return r; } });
-                sub.Rows.Add(new MenuRow { Kind = RowKind.Action, Label = "Copy to clipboard", Info = "This config as one line of text. Paste it to a friend.", Take = s => Export(p) });
-                sub.Rows.Add(new MenuRow { Kind = RowKind.Action, Label = "Overwrite with current config", Confirm = true, Info = "Saves your current config under this name.", Take = s => { string r = SaveAs(p.Name); Fill(); return r; } });
+                sub.Rows.Add(new MenuRow { Kind = RowKind.Action, Label = "Load", Info = "Loads everything except sensitivity. Keybinds only when Include keybinds is on.", Take = s => { string r = Load(p); Fill(); return r; } });
+                sub.Rows.Add(new MenuRow { Kind = RowKind.Action, Label = "Export to clipboard", Info = "This config as one line of text. Paste it to a friend.", Take = s => Export(p) });
+                sub.Rows.Add(new MenuRow { Kind = RowKind.Action, Label = "Overwrite", Confirm = true, Info = "Saves your current config under this name.", Take = s => { string r = SaveAs(p.Name); Fill(); return r; } });
                 sub.Rows.Add(new MenuRow { Kind = RowKind.Action, Label = "Delete", Confirm = true, Info = "", Take = s => { string r = Delete(p); Fill(); return r; } });
                 pg.Go(sub);
             }
