@@ -1,7 +1,7 @@
 # MONOLITH changelog
 
 ## 1.0.4
-- The icon is the original drawing again, only compressed.
+- The icon is the original drawing again, scaled to 256 x 256 without blending: every pixel is one of its own colors.
 - Readme: plainer wording about Mod Menu.
 - Hide hats is now Hide dropped hats (NoGore 1.3.2). Your setting is kept.
 - Match stats make no garbage per hit any more.
