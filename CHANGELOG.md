@@ -1,5 +1,8 @@
 # MONOLITH changelog
 
+## 1.0.9
+- The update line no longer updates by itself: a click opens the Thunderstore page, and installed with a mod manager it says to update there. Thunderstore leaves updating to the mod manager.
+
 ## 1.0.8
 - When a newer MONOLITH is on Thunderstore, a line in the game's main menu says so. A click updates it, a second click restarts the game. Installed with a mod manager (r2modman, Thunderstore Mod Manager, Gale): the line says to update there.
 - The menu's title shows the version you have.
