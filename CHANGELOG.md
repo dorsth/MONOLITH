@@ -1,5 +1,8 @@
 # MONOLITH changelog
 
+## 1.1.1
+- The update line in the main menu now says to close the game first: a mod manager can't replace a mod's files while the game is open.
+
 ## 1.1.0
 - E opens and takes in the menu, next to Q for back and WASD to move. The key bar shows these keys. Arrows, Enter and Backspace still work.
 

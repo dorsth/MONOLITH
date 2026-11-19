@@ -43,8 +43,8 @@ namespace Monolith
             {
                 if (_line == null)
                     _line = _manager != null
-                        ? Me + " " + _latest + Lang.T(" is out. Update it in ") + _manager + "."
-                        : Me + " " + _latest + Lang.T(" is out. Click to get it on Thunderstore.");
+                        ? Me + " " + _latest + Lang.T(" is out. Close the game, then update it in ") + _manager + "."
+                        : Me + " " + _latest + Lang.T(" is out. Click to get it on Thunderstore, and close the game before you install it.");
                 if (_st == null)
                 {
                     _st = new GUIStyle(GUI.skin.label) { fontSize = Mathf.RoundToInt(Screen.height / 50f), alignment = TextAnchor.MiddleCenter, fontStyle = FontStyle.Italic, richText = false };

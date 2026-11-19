@@ -182,7 +182,7 @@ T = [
 # ---- values
 ('Squared', 'Прямые', 'W15'), ('Rounded', 'Скруглённые', 'W15'), ('Spiked', 'Острые', 'W15'),
 ('Off', 'Выкл', 'W15'), ('Text', 'Текст', 'W15'), ('Bar', 'Полоса', 'W15'),
-    (' is out. Update it in ', ' вышел. Обновите в ', ''), (' is out. Click to get it on Thunderstore.', ' вышел. Нажмите, чтобы открыть его на Thunderstore.', ''), ('your mod manager', 'ваш менеджер модов', ''),
+    (' is out. Close the game, then update it in ', ' вышел. Закройте игру и обновите в ', ''), (' is out. Click to get it on Thunderstore, and close the game before you install it.', ' вышел. Нажмите, чтобы открыть Thunderstore, и устанавливайте при закрытой игре.', ''), ('your mod manager', 'ваш менеджер модов', ''),
 ]
 for folder in ['HitSounds', 'HeadHitSounds', 'KillSounds', 'MeleeKillSounds']:
     T.append(('You hear each one in the list. Add yours: a sound file in plugins/MONOLITH/' + folder + '.',
