@@ -1,6 +1,6 @@
 # MONOLITH changelog
 
-## 1.0.10
+## 1.1.0
 - E opens and takes in the menu, next to Q for back and WASD to move. The key bar shows these keys. Arrows, Enter and Backspace still work.
 
 ## 1.0.9
