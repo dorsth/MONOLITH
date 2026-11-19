@@ -153,14 +153,6 @@ namespace Monolith
 
         internal static void Install(Harmony h)
         {
-            // your own shots: every weapon that traces a shot, so a drawn hat comes off when you shoot it
-            MethodInfo shot = typeof(Players).GetMethod(nameof(ShotPre), BindingFlags.Static | BindingFlags.NonPublic);
-            foreach (Type w in new[] { typeof(BeamGun), typeof(ChargeGun), typeof(Gun), typeof(LargeRaycastGun), typeof(Minigun), typeof(Shotgun) })
-                foreach (string name in new[] { "ShootServer", "ShootServerBox" })
-                {
-                    MethodInfo m = AccessTools.DeclaredMethod(w, name);
-                    if (m != null) h.Patch(m, prefix: new HarmonyMethod(shot));
-                }
             MethodInfo tr = typeof(Players).GetMethod(nameof(MatTr), BindingFlags.Static | BindingFlags.NonPublic);
             MethodInfo post = typeof(Players).GetMethod(nameof(Dressed), BindingFlags.Static | BindingFlags.NonPublic);
             MethodInfo saved = typeof(Players).GetMethod(nameof(SavedInGame), BindingFlags.Static | BindingFlags.NonPublic);
@@ -336,41 +328,12 @@ namespace Monolith
             catch (Exception e) { BundlePlugin.Log.LogInfo("Players: a hat was left as it was: " + e.Message); }
         }
 
-        // Your shot, before the game traces it: a drawn hat the shot passes before it reaches a wall comes off. Worked out on
-        // the hat's drawn box, not with a collider, so the game's own trace, its trail points and its hits are as without it.
-        private const int PassThrough = (1 << 11) | (1 << 14) | (1 << 18) | (1 << 19) | (1 << 24);   // layers the game's trace goes through
-        private static void ShotPre(Weapon __instance, Vector3 position, Vector3 direction)
-        {
-            if (Knock.All.Count == 0) return;
-            try
-            {
-                RaycastHit wall;
-                float reach = Physics.Raycast(position, direction, out wall, float.PositiveInfinity, __instance.defaultLayer & ~PassThrough) ? wall.distance : float.PositiveInfinity;
-                var ray = new Ray(position, direction);
-                for (int i = Knock.All.Count - 1; i >= 0; i--) Knock.All[i].Shot(ray, reach);
-            }
-            catch (Exception e) { BundlePlugin.Log.LogInfo("Players: a shot was not checked against drawn hats: " + e.Message); }
-        }
-
-        // A drawn hat on a player who wears none. It comes off when you shoot it (ShotPre) or when the player is killed, the
-        // way a shot hat does, and is gone two seconds later. No collider, so nothing can hit it or stand on it.
+        // A drawn hat on a player who wears none: flies off when the player is killed, the way a shot hat does, and is gone
+        // two seconds later. No collider, so nothing can hit it or stand on it.
         internal sealed class Knock : MonoBehaviour
         {
-            internal static readonly List<Knock> All = new List<Knock>();
             internal PlayerHealth Health;
             private float _goneAt = -1f; private bool _seenAlive;
-            private Renderer[] _parts;
-
-            private void Awake() { _parts = GetComponentsInChildren<Renderer>(true); All.Add(this); }
-            private void OnDestroy() { All.Remove(this); }
-
-            internal void Shot(Ray ray, float reach)
-            {
-                if (_goneAt >= 0f) return;
-                float d;
-                foreach (Renderer r in _parts)
-                    if (r != null && r.enabled && r.bounds.IntersectRay(ray, out d) && d <= reach) { Off(ray.direction); return; }
-            }
 
             private void LateUpdate()
             {
@@ -385,7 +348,6 @@ namespace Monolith
             private void Off(Vector3 dir)
             {
                 if (dir.sqrMagnitude < 0.01f) dir = -transform.forward;
-                All.Remove(this);
                 HatPosition pos = GetComponent<HatPosition>(); if (pos != null) Destroy(pos);
                 transform.SetParent(null, true);
                 var rb = gameObject.AddComponent<Rigidbody>();
