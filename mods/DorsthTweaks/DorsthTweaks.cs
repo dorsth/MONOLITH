@@ -35,7 +35,7 @@ using PlanarReflection = UnityStandardAssets.Water.PlanarReflection;
 
 [assembly: AssemblyTitle("DorsthTweaks")]
 [assembly: AssemblyDescription("Hitmarker, HUD, viewmodel and FPS tweaks for STRAFTAT.")]
-[assembly: AssemblyVersion("1.3.4.0")]
+[assembly: AssemblyVersion("1.3.5.0")]
 [assembly: AssemblyFileVersion("1.2.7.0")]
 
 // Only changes what you see on your own screen, so matchmaking with unmodded players still works.
@@ -49,7 +49,7 @@ namespace DorsthTweaks
     {
         public const string Guid = "dorsth.straftat.dorsthtweaks";
         public const string Name = "DorsthTweaks";
-        public const string Version = "1.3.4";
+        public const string Version = "1.3.5";
 
         internal static ManualLogSource Log;
         internal static ConfigEntry<bool> Detail;
@@ -680,7 +680,9 @@ namespace DorsthTweaks
 
         internal static void Install()
         {
-            _panel = AccessTools.TypeByName("ModMenu.Behaviours.OptionList.OptionListPanel");
+            // looked up without AccessTools, which writes a warning when Mod Menu is not installed
+            _panel = null;
+            foreach (System.Reflection.Assembly a in AppDomain.CurrentDomain.GetAssemblies()) { _panel = a.GetType("ModMenu.Behaviours.OptionList.OptionListPanel", false); if (_panel != null) break; }
             if (_panel == null) return;     // no Mod Menu
             _boxed = AccessTools.TypeByName("ModMenu.Behaviours.OptionList.ValueControllers.BoxedValueController");
             Type option = AccessTools.TypeByName("ModMenu.Options.Option");

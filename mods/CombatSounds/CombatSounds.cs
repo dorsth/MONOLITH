@@ -17,7 +17,7 @@ using UnityEngine.Networking;
 
 [assembly: AssemblyTitle("CombatSounds")]
 [assembly: AssemblyDescription("Your own hit, head hit, kill and melee kill sounds, and gun volume. Only you hear it.")]
-[assembly: AssemblyVersion("1.1.4.0")]
+[assembly: AssemblyVersion("1.1.5.0")]
 [assembly: AssemblyFileVersion("1.1.3.0")]
 
 // Only changes what you hear, so matchmaking with unmodded players still works.
@@ -34,7 +34,7 @@ namespace CombatSounds
 #endif
         public const string Guid = "dorsth.straftat.combatsounds";
         public const string Name = "CombatSounds";
-        public const string Version = "1.1.4";
+        public const string Version = "1.1.5";
 
         internal static ManualLogSource Log;
         internal static SoundSlot Hit, HeadHit, Kill, MeleeKill;
@@ -348,7 +348,8 @@ namespace CombatSounds
             foreach (Type type in AccessTools.GetTypesFromAssembly(typeof(Weapon).Assembly))
             {
                 if (!typeof(Weapon).IsAssignableFrom(type)) continue;
-                MethodInfo localSound = AccessTools.DeclaredMethod(type, "LocalSound", new[] { typeof(int) });
+                // not every weapon has its own: asked quietly (AccessTools writes a warning for every one that does not)
+                MethodInfo localSound = type.GetMethod("LocalSound", BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.DeclaredOnly, null, new[] { typeof(int) }, null);
                 if (localSound != null) harmony.Patch(localSound, gameSound);
             }
         }

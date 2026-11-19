@@ -477,7 +477,8 @@ namespace UltimateTweaks
             });
             Try("GunSoundsNoScanInPlay", () =>
             {
-                var reg = AccessTools.TypeByName("GunSounds.Registry"); if (reg == null) return;   // GunSounds is not installed: nothing to do
+                Type reg = null; foreach (System.Reflection.Assembly a in AppDomain.CurrentDomain.GetAssemblies()) { reg = a.GetType("GunSounds.Registry", false); if (reg != null) break; }
+                if (reg == null) return;   // GunSounds is not installed: nothing to do (asked quietly: AccessTools would write a warning)
                 var scan = AccessTools.Method(reg, "Scan", Type.EmptyTypes); gsLast = AccessTools.Field(reg, "lastScan");
                 if (scan == null || gsLast == null || gsLast.FieldType != typeof(float)) throw new Exception("GunSounds is not the version this was written for (2.2.0)");
                 gsScan = (Action)Delegate.CreateDelegate(typeof(Action), scan);

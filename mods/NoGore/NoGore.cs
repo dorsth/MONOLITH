@@ -25,7 +25,7 @@ using UnityEngine;
 
 [assembly: AssemblyTitle("NoGore")]
 [assembly: AssemblyDescription("STRAFTAT: no blood and no ragdolls, only on your screen.")]
-[assembly: AssemblyVersion("1.3.2.0")]
+[assembly: AssemblyVersion("1.3.3.0")]
 [assembly: AssemblyFileVersion("1.3.0.0")]
 
 // Only changes what you see on your own screen, so matchmaking with unmodded players still works.
@@ -39,7 +39,7 @@ namespace NoGore
     {
         public const string Guid = "dorsth.straftat.nogore";
         public const string Name = "NoGore";
-        public const string Version = "1.3.2";
+        public const string Version = "1.3.3";
 
         internal static ManualLogSource Log;
         internal static ConfigEntry<bool> HideBodies, HideRagdolls, HideHats, NoBlood, NoHitBlood, NoDeathBlood, NoBloodStains;
@@ -515,7 +515,9 @@ namespace NoGore
 
         internal static void Install(Harmony harmony)
         {
-            _panel = AccessTools.TypeByName("ModMenu.Behaviours.OptionList.OptionListPanel");
+            // looked up without AccessTools, which writes a warning when Mod Menu is not installed
+            _panel = null;
+            foreach (System.Reflection.Assembly a in AppDomain.CurrentDomain.GetAssemblies()) { _panel = a.GetType("ModMenu.Behaviours.OptionList.OptionListPanel", false); if (_panel != null) break; }
             if (_panel == null) return;     // no Mod Menu
             _boxed = AccessTools.TypeByName("ModMenu.Behaviours.OptionList.ValueControllers.BoxedValueController");
             Type option = AccessTools.TypeByName("ModMenu.Options.Option");
