@@ -2,7 +2,7 @@
     "name": "MONOLITH",
     "version_number": "1.1.8",
     "website_url": "",
-    "description": "All my STRAFTAT mods in one plugin, with one menu (F2).",
+    "description": "A competitive mod bundle for STRAFTAT. Press F2 for the menu.",
     "dependencies": [
         "BepInEx-BepInExPack-5.4.2305"
     ]
