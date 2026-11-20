@@ -494,7 +494,10 @@ namespace Monolith
                 _cv.renderMode = RenderMode.WorldSpace; _sc.enabled = false;
                 var ct = (RectTransform)_canvas.transform;
                 ct.sizeDelta = _back.sizeDelta;
-                float s = 0.6f * h / (22f * 0.7f);   // its letters 60% as tall as the sign's (a capital is about 0.7 of the font size)
+                // its letters at most 60% as tall as the sign's (a capital is about 0.7 of the font size), and the board at most
+                // 2.6 times as wide as the word REMATCH, so it stays over its own sign
+                float wSign = Mathf.Max(0.1f, b.size.x * Mathf.Abs(at.lossyScale.x));
+                float s = Mathf.Min(0.6f * h / (22f * 0.7f), 2.6f * wSign / Mathf.Max(1f, _back.sizeDelta.x));
                 ct.localScale = new Vector3(s, s, s);
                 ct.rotation = at.rotation;
                 ct.position = top + at.up * (h * 0.8f + _back.sizeDelta.y * s * 0.5f);
