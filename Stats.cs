@@ -520,9 +520,9 @@ namespace Monolith
             // after 10 seconds without it, it stays flat and the log says why.
             private Canvas _cv; private CanvasScaler _sc; private Image _backImage; private bool _world; private float _worldUntil = -1f;
             private string _whyFlat;
-            private const float Turn = 45f;      // degrees toward the middle of the room
+            private const float Turn = 55f;      // degrees toward the middle of the room
             private const float Wide = 6.5f;      // the board is this many times as wide as the word REMATCH
-            private const float Clear = 2.2f, Out = 0f;
+            private const float Clear = 2.6f, Out = 0f;
             private void Flat()
             {
                 _world = false;
