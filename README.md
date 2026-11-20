@@ -4,7 +4,7 @@ A competitive mod bundle for STRAFTAT. Press F2 for the menu.
 
 Only your own screen and sound change, so it works in any lobby, with players who don't have it.
 
-Thanks to kestrel: the weapon camera is based on [Minimal Viewmodels Reborn](https://github.com/kestrel-straftat/minimal-viewmodels-reborn), and mods made for [Mod Menu](https://github.com/kestrel-straftat/mod-menu) work in MONOLITH's menu through its API.
+Weapon camera based on [Minimal Viewmodels Reborn](https://github.com/kestrel-straftat/minimal-viewmodels-reborn) by kestrel. Works with mods made for [Mod Menu](https://github.com/kestrel-straftat/mod-menu) by kestrel.
 
 ## Install
 
