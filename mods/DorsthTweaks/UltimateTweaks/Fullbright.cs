@@ -31,7 +31,7 @@ namespace UltimateTweaks
             if (want == applied && shine == appliedShine && Mathf.Approximately(appliedB, b) && !sceneChanged && StillOurs()) { if (want == "FillLight") { SunCheck(); if (shine != "Keep") QueueNewScenes(); } return; }
             try
             {
-                Undo(sceneChanged);
+                Undo();
                 sceneHandle = scene; applied = want; appliedB = b; appliedShine = shine; sunSaid = null;
                 if (want == "FillLight") { Fill(b); sunScenes.Clear(); SunCheck(); if (shine != "Keep") QueueNewScenes(); }
             }
@@ -45,7 +45,7 @@ namespace UltimateTweaks
             return true;
         }
 
-        static void Undo(bool sceneChanged)
+        static void Undo()
         {
             if (fill != null) { UnityEngine.Object.Destroy(fill); fill = null; }
             foreach (var d in dulled) { if (!d.M) continue; if (d.Keyword) { d.M.DisableKeyword(SpecOff); continue; } if (d.IsColor) d.M.SetColor(d.Id, d.C); else d.M.SetFloat(d.Id, d.F); }

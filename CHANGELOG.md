@@ -12,6 +12,7 @@
 - The kestrel line at the top of the README uses the same words as the menu.
 - The match stats board on the victory screen stands in the victory room as a second wall, left of the blue wall and facing into the room. If the sign isn't there, it shows on the screen as before.
 - The dll's description says what MONOLITH is, and each mod in it prints its name, version and "Dorsth was here." once in the BepInEx console at start.
+- Removed code that was no longer used. Nothing you see changes.
 
 ## 1.1.8
 - Replaces 1.1.7, an older build uploaded by mistake: Mod Menu's API is back, so mods that need Mod Menu load again.

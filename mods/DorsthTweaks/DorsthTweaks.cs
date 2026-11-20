@@ -1240,7 +1240,7 @@ namespace DorsthTweaks
         {
             Rect r = src.textureRect;
             int w = Mathf.RoundToInt(r.width), h = Mathf.RoundToInt(r.height);
-            Color[] px = Read(src, w, h);
+            Color[] px = Read(src);
             float cx = w / 2f, cy = h / 2f;
 
             // each quarter's pixels: their weighted middle and spread
@@ -1387,7 +1387,7 @@ namespace DorsthTweaks
         private static Color32[] Warp(Sprite src, Measured m, float width, float gap, float length, int W, int H, float scale, float hx, float hy)
         {
             int w = m.W, h = m.H;
-            Color[] px = Read(src, w, h);
+            Color[] px = Read(src);
             float cx = w / 2f, cy = h / 2f;
             int ss = Mathf.Clamp(Mathf.CeilToInt(1f / scale), 1, 4);
             var outPx = new Color32[W * H];
@@ -1486,7 +1486,7 @@ namespace DorsthTweaks
             {
                 Rect r = sprite.textureRect;
                 int w = Mathf.RoundToInt(r.width), h = Mathf.RoundToInt(r.height);
-                Color[] px = Read(sprite, w, h);
+                Color[] px = Read(sprite);
                 // not in yet: white for now, and asked again next time
                 if (px == null) return Failed.Contains(sprite) ? (Tints[sprite] = c) : c;
                 float sr = 0f, sg = 0f, sb = 0f, n = 0f;
@@ -1547,7 +1547,7 @@ namespace DorsthTweaks
         }
 
         /// <summary>The picture's pixels, or null while they aren't in yet (they're asked for).</summary>
-        private static Color[] Read(Sprite sprite, int w, int h)
+        private static Color[] Read(Sprite sprite)
         {
             Color[] px;
             if (Pixels.TryGetValue(sprite, out px)) return px;

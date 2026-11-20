@@ -572,8 +572,7 @@ namespace Monolith
                 v = Fit(LabelOf(row, e.BoxedValue), room); used = v.Length + 2;
                 return "<color=" + Val + ">" + Esc(v) + "</color><color=" + Hot + "> ▼</color>";
             }
-            float a, b;
-            if (Range(e, out a, out b))
+            if (Range(e, out _, out _))
             {
                 // the slider itself is drawn over these cells (Knob)
                 v = Show(e); if (v.Length > NumberCells) v = v.Substring(0, NumberCells);
@@ -596,7 +595,7 @@ namespace Monolith
             return v.Length == 0 || IsName<KeyCode>(v) || IsName<UnityEngine.InputSystem.Key>(v);
         }
 
-        private static bool IsName<T>(string v) where T : struct { T x; return Enum.TryParse(v, true, out x) && !int.TryParse(v, out _); }
+        private static bool IsName<T>(string v) where T : struct { return Enum.TryParse(v, true, out T _) && !int.TryParse(v, out _); }
 
         private static string KeyName(ConfigEntryBase e, KeyCode k)
         {
@@ -689,8 +688,7 @@ namespace Monolith
 
         private bool OnBar(MenuRow row, float mouseX, MenuPage page)
         {
-            float a, b;
-            if (!IsSlider(row, out a, out b)) return false;
+            if (!IsSlider(row, out _, out _)) return false;
             float x0 = SliderX(ColsFor(page));
             return mouseX >= x0 - _cw * 0.5f && mouseX <= x0 + (BarCells + 0.5f) * _cw;
         }

@@ -205,7 +205,7 @@ namespace MatchStats
         }
 
         // the round-end screen: the last take of the map is over; the small board
-        private static void RoundEnd(int winningTeamId)
+        private static void RoundEnd()
         {
             try
             {
