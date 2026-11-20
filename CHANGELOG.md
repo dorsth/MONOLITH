@@ -1,5 +1,8 @@
 # MONOLITH changelog
 
+## 1.1.5
+- The Viewmodel page and the top of the README now say the weapon camera works the way Minimal Viewmodels Reborn by kestrel does it.
+
 ## 1.1.4
 - MONOLITH no longer comes with a stand-in for Mod Menu. It works next to Mod Menu: install Mod Menu itself if a mod needs it. If you update by hand, delete ModMenu.dll from the MONOLITH folder.
 - Without Mod Menu, Other mods leaves out sections named Internal or Hidden, the settings mods usually hide.

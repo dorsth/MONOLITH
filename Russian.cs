@@ -28,7 +28,7 @@ namespace Monolith
             { "Taunts", "Насмешки" },
             { "search", "поиск" },
             { "Style, color, size.", "Стиль, цвет, размер." },
-            { "Where your weapon sits, how much it moves.", "Где находится оружие и как сильно оно двигается." },
+            { "Where your weapon sits, how much it moves. The weapon camera works the way Minimal Viewmodels Reborn by kestrel does it.", "Где находится оружие и как сильно оно двигается. Камера оружия работает как в Minimal Viewmodels Reborn от kestrel." },
             { "Tilt, shake, recoil.", "Наклон, тряска, отдача." },
             { "Hitmarkers, prompts, counters.", "Хитмаркеры, подсказки, счётчики." },
             { "Shape, size, animation, colors.", "Форма, размер, анимация, цвета." },

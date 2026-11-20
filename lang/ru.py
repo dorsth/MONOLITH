@@ -15,7 +15,7 @@ T = [
 ('Hitmarkers', 'Хитмаркеры', 'L30'), ('Prompts', 'Подсказки', 'L30'), ('Per weapon', 'Для отдельного оружия', 'L30'),
 ('Taunts', 'Насмешки', 'L30'), ('search', 'поиск', 'W16'),
 ('Style, color, size.', 'Стиль, цвет, размер.', 'info'),
-('Where your weapon sits, how much it moves.', 'Где находится оружие и как сильно оно двигается.', 'info'),
+('Where your weapon sits, how much it moves. The weapon camera works the way Minimal Viewmodels Reborn by kestrel does it.', 'Где находится оружие и как сильно оно двигается. Камера оружия работает как в Minimal Viewmodels Reborn от kestrel.', 'info'),
 ('Tilt, shake, recoil.', 'Наклон, тряска, отдача.', 'info'),
 ('Hitmarkers, prompts, counters.', 'Хитмаркеры, подсказки, счётчики.', 'info'),
 ('Shape, size, animation, colors.', 'Форма, размер, анимация, цвета.', 'info'),

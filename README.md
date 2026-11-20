@@ -8,7 +8,7 @@ Each mod in it is the same source as its own release, loads under its own name a
 
 ## Switching to MONOLITH
 
-MONOLITH replaces Minimal Viewmodels Reborn, so you can remove it. The settings of every other mod you install can be changed in MONOLITH's menu too, and MONOLITH works next to [Mod Menu](https://github.com/kestrel-straftat/mod-menu) by kestrel.
+The viewmodel camera is adapted from [Minimal Viewmodels Reborn](https://github.com/kestrel-straftat/minimal-viewmodels-reborn) by kestrel and does its job, so you can remove it. The settings of every other mod you install can be changed in MONOLITH's menu too, and MONOLITH works next to [Mod Menu](https://github.com/kestrel-straftat/mod-menu) by kestrel.
 
 Your settings come along:
 

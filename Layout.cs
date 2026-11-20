@@ -284,7 +284,7 @@ namespace Monolith
 
             // ---------------------------------------------------------------- viewmodel
             {
-                var p = new MenuPage(null, "Viewmodel", "Where your weapon sits, how much it moves.");
+                var p = new MenuPage(null, "Viewmodel", "Where your weapon sits, how much it moves. The weapon camera works the way Minimal Viewmodels Reborn by kestrel does it.");
                 ConfigEntryBase gone = E(View, "Viewmodel", "Invisible Viewmodel");
                 Func<bool> seen = () => !On(gone);
                 p.Set("FOV", E(View, "Viewmodel", "Viewmodel FOV"), seen, "")
