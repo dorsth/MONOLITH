@@ -5,7 +5,7 @@ namespace Monolith
 {
     internal static partial class Lang
     {
-        private static readonly Dictionary<string, string> Table = new Dictionary<string, string>(298)
+        private static readonly Dictionary<string, string> Table = new Dictionary<string, string>(307)
         {
             { "Crosshair", "Прицел" },
             { "Viewmodel", "Вьюмодель" },
@@ -223,7 +223,16 @@ namespace Monolith
             { "Saved", "Сохранённые" },
             { "Version", "Версия" },
             { "Credits", "Благодарности" },
-            { "Menu: klammvs (STRAFTAT theme for Far Manager). Slide timer: Glizzmn (MovementPro). Tilt and shake switches: Kevnator (NoCameraRoll). Weapon camera and Mod Menu support: kestrel. Press to see them on GitHub.", "Меню: klammvs (тема STRAFTAT для Far Manager). Таймер подката: Glizzmn (MovementPro). Наклон и тряска: Kevnator (NoCameraRoll). Камера оружия и поддержка Mod Menu: kestrel. Нажмите, чтобы открыть на GitHub." },
+            { "Menu", "Меню" },
+            { "Menu inspired by the STRAFTAT theme for Far Manager by klammvs.", "Меню по теме STRAFTAT для Far Manager от klammvs." },
+            { "Slide timer", "Таймер подката" },
+            { "Slide cooldown timer based on MovementPro by Glizzmn.", "Таймер подката основан на MovementPro от Glizzmn." },
+            { "Tilt and shake switches", "Наклон и тряска" },
+            { "Camera tilt and shake switches build on NoCameraRoll by Kevnator.", "Переключатели наклона и тряски основаны на NoCameraRoll от Kevnator." },
+            { "Weapon camera", "Камера оружия" },
+            { "Weapon camera based on Minimal Viewmodels Reborn by kestrel.", "Камера оружия основана на Minimal Viewmodels Reborn от kestrel." },
+            { "Mod Menu support", "Поддержка Mod Menu" },
+            { "Works with mods made for Mod Menu by kestrel.", "Работает с модами для Mod Menu от kestrel." },
             { "Undo load", "Отменить загрузку" },
             { "Redo load", "Вернуть загрузку" },
             { "Save as new", "Сохранить как новый" },
@@ -238,7 +247,7 @@ namespace Monolith
             { "Nothing to undo.", "Нечего отменять." },
             { "Back to what you had before the last load.", "Возвращено то, что было до последней загрузки." },
             { "The load is back.", "Загрузка возвращена." },
-            { "Opens MONOLITH on Thunderstore.", "Открывает MONOLITH на Thunderstore." },
+            { "The MONOLITH version you have. When a newer one is out, the main menu says so.", "Ваша версия MONOLITH. Когда выйдет новая, главное меню об этом скажет." },
             { "Your config as one line of text. Paste it to a friend.", "Ваш конфиг одной строкой текста. Отправьте её другу." },
             { "Import from clipboard", "Импорт из буфера" },
             { "Copy a line from a friend (it starts with MONOLITH:), then press Enter here. Yours is kept as \"previous config\".", "Скопируйте строку от друга (она начинается с MONOLITH:) и нажмите здесь Enter. Ваш конфиг сохранится как «previous config»." },

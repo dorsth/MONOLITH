@@ -516,6 +516,11 @@ namespace Monolith
                     string act = Lang.T(row.Label);
                     if (row == _editRow) return "<color=" + Mint + ">" + Esc(act) + ": </color><color=" + Hot + ">" + Esc(Fit(_edit, cols - act.Length - 4)) + "_</color>";
                     if (row == _armed) return "<color=" + Hot + ">" + Esc(Pad(act + Lang.T(": Enter again"), cols)) + "</color>";
+                    if (row.Take == null && row.Dyn != null)   // a line to read (credits): the text, its value on the right, nothing to press
+                    {
+                        string v = ""; try { v = row.Dyn() ?? ""; } catch { }
+                        return "<color=" + Mint + ">" + Esc(Pad(act, cols - v.Length)) + "</color><color=" + Dim + ">" + Esc(v) + "</color>";
+                    }
                     if (row.Take == null) return "<color=" + Dim + ">" + Esc(Fit(act, cols)) + "</color>";   // a line of text a mod put on its page
                     if (row.Dyn != null)
                     {

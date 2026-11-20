@@ -612,10 +612,14 @@ namespace Monolith
                  .Set("Open this menu", BundleMenu.Key, null, "Press Enter, then the key.")
                  .Set("Fewer UI animations", E(Tweaks, "Menus", "Reduce UI Animations"), null, "No animations in menus and on the HUD.")
                  .Set("Hide default playlists", E(Tweaks, "Menus", "Hide Default Playlists"), null, "Only your own playlists show when you host.");
-                p.Rows.Add(new MenuRow { Kind = RowKind.Action, Label = "Version", Dyn = () => BundlePlugin.Version, Info = "Opens MONOLITH on Thunderstore.",
-                                         Take = s => { UnityEngine.Application.OpenURL(Updates.Page); return null; } });
-                p.Rows.Add(new MenuRow { Kind = RowKind.Action, Label = "Credits", Info = "Menu: klammvs (STRAFTAT theme for Far Manager). Slide timer: Glizzmn (MovementPro). Tilt and shake switches: Kevnator (NoCameraRoll). Weapon camera and Mod Menu support: kestrel. Press to see them on GitHub.",
-                                         Take = s => { UnityEngine.Application.OpenURL("https://github.com/dorsth/MONOLITH#credits"); return null; } });
+                p.Rows.Add(new MenuRow { Kind = RowKind.Action, Label = "Version", Dyn = () => BundlePlugin.Version, Info = "The MONOLITH version you have. When a newer one is out, the main menu says so." });
+                // who MONOLITH builds on: a line each, the name on the right; nothing to press
+                p.Head("Credits");
+                p.Rows.Add(new MenuRow { Kind = RowKind.Action, Label = "Menu", Dyn = () => "klammvs", Info = "Menu inspired by the STRAFTAT theme for Far Manager by klammvs." });
+                p.Rows.Add(new MenuRow { Kind = RowKind.Action, Label = "Slide timer", Dyn = () => "Glizzmn", Info = "Slide cooldown timer based on MovementPro by Glizzmn." });
+                p.Rows.Add(new MenuRow { Kind = RowKind.Action, Label = "Tilt and shake switches", Dyn = () => "Kevnator", Info = "Camera tilt and shake switches build on NoCameraRoll by Kevnator." });
+                p.Rows.Add(new MenuRow { Kind = RowKind.Action, Label = "Weapon camera", Dyn = () => "kestrel", Info = "Weapon camera based on Minimal Viewmodels Reborn by kestrel." });
+                p.Rows.Add(new MenuRow { Kind = RowKind.Action, Label = "Mod Menu support", Dyn = () => "kestrel", Info = "Works with mods made for Mod Menu by kestrel." });
                 if (p.Rows.Count > 0) cats.Add(p);
             }
 
