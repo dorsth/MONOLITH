@@ -399,7 +399,7 @@ namespace Monolith
                 _full = full; _waitOnly = false; _hideAt = -1f;
                 if (_canvas == null) Make();
                 if (_root == null) return;
-                Flat(); _worldUntil = full ? Time.unscaledTime + 4f : -1f;
+                Flat(); _worldUntil = full ? Time.unscaledTime + 10f : -1f; _whyFlat = null;
                 int me = -1;
                 try { if (LobbyController.Instance != null && LobbyController.Instance.LocalPlayerController != null) me = LobbyController.Instance.LocalPlayerController.PlayerId; } catch { }
                 Color self = new Color32(0xAC, 0xBC, 0xFC, 0xFF), enemy = new Color32(0xE8, 0x80, 0x68, 0xFF), c;
@@ -471,7 +471,7 @@ namespace Monolith
 
             // The victory board stands in the victory room as a twin of the game's blue ranking wall: as wide, at the same height
             // and distance from you, turned 55 degrees to your right of it, facing you the way the wall does. Until that wall is
-            // there (it comes over the network) the board shows flat on the screen; after 4 seconds without it, it stays flat.
+            // there (it comes over the network) the board shows flat on the screen; after 10 seconds without it, it stays flat and the log says why.
             private Canvas _cv; private CanvasScaler _sc; private Image _backImage; private bool _world; private float _worldUntil = -1f;
             private const float Turn = 55f;
             private void Flat()
@@ -481,18 +481,44 @@ namespace Monolith
                 if (_sc != null) _sc.enabled = true;
                 if (_backImage != null) _backImage.color = new Color(0f, 0f, 0f, 0.45f);
             }
+            private string _whyFlat;
             private bool InRoom()
             {
                 VictoryMenuUI ranks = FindObjectOfType<VictoryMenuUI>();
+                if (ranks == null) { _whyFlat = "no ranking wall"; return false; }
                 Camera eye = Camera.main;
-                if (ranks == null || eye == null) return false;
+                if (eye == null) foreach (Camera cam in Camera.allCameras) if (eye == null || cam.depth > eye.depth) eye = cam;
+                if (eye == null) { _whyFlat = "no camera"; return false; }
+
+                // the wall: the game's world canvas if it is one, else the biggest flat mesh it is drawn on
+                Vector3 mid, right, up; float wide, tall; Quaternion facing;
                 Canvas wall = ranks.GetComponentInParent<Canvas>();
-                if (wall == null || wall.renderMode != RenderMode.WorldSpace) return false;
-                var wr = (RectTransform)wall.transform;
-                var c = new Vector3[4]; wr.GetWorldCorners(c);   // bottom left, top left, top right, bottom right
-                Vector3 mid = (c[0] + c[2]) * 0.5f;
-                float wide = Vector3.Distance(c[0], c[3]), tall = Vector3.Distance(c[0], c[1]);
-                if (wide < 0.01f || tall < 0.01f) return false;
+                if (wall != null && wall.renderMode == RenderMode.WorldSpace)
+                {
+                    var wr = (RectTransform)wall.transform;
+                    var c = new Vector3[4]; wr.GetWorldCorners(c);   // bottom left, top left, top right, bottom right
+                    mid = (c[0] + c[2]) * 0.5f; wide = Vector3.Distance(c[0], c[3]); tall = Vector3.Distance(c[0], c[1]);
+                    facing = wr.rotation;
+                }
+                else
+                {
+                    MeshFilter best = null; float area = 0f;
+                    Transform top = ranks.transform.root;
+                    foreach (MeshFilter mf in top.GetComponentsInChildren<MeshFilter>(true))
+                    {
+                        if (mf.sharedMesh == null || mf.GetComponent<TMP_Text>() != null) continue;
+                        Vector3 sz = Vector3.Scale(mf.sharedMesh.bounds.size, mf.transform.lossyScale);
+                        float a2 = Mathf.Max(sz.x * sz.y, Mathf.Max(sz.x * sz.z, sz.y * sz.z));
+                        if (a2 > area) { area = a2; best = mf; }
+                    }
+                    if (best == null) { _whyFlat = "wall not found (" + (wall != null ? wall.renderMode.ToString() : "no canvas") + ")"; return false; }
+                    Bounds mb = best.sharedMesh.bounds; Transform bt = best.transform;
+                    mid = bt.TransformPoint(mb.center);
+                    wide = Mathf.Abs(mb.size.x * bt.lossyScale.x); tall = Mathf.Abs(mb.size.y * bt.lossyScale.y);
+                    facing = bt.rotation;
+                }
+                if (wide < 0.01f || tall < 0.01f) { _whyFlat = "wall has no size"; return false; }
+
                 Quaternion turn = Quaternion.AngleAxis(Turn, Vector3.up);
                 Vector3 me = eye.transform.position, away = mid - me; float y = away.y; away.y = 0f;
                 Vector3 at = me + turn * away; at.y = me.y + y;
@@ -500,12 +526,13 @@ namespace Monolith
                 if (_backImage != null) _backImage.color = new Color(0.03f, 0.04f, 0.05f, 0.85f);   // solid enough to read against the sky
                 var ct = (RectTransform)_canvas.transform;
                 ct.sizeDelta = _back.sizeDelta;
-                float s = Mathf.Min(wide / Mathf.Max(1f, _back.sizeDelta.x), tall / Mathf.Max(1f, _back.sizeDelta.y));
-                ct.localScale = new Vector3(s, s, s);
-                ct.rotation = turn * wr.rotation;
+                float sc = Mathf.Min(wide / Mathf.Max(1f, _back.sizeDelta.x), tall / Mathf.Max(1f, _back.sizeDelta.y));
+                ct.localScale = new Vector3(sc, sc, sc);
+                ct.rotation = turn * facing;
                 ct.position = at;
                 _root.localScale = Vector3.one; _to = Vector2.zero;
                 _world = true; _flyAt = Time.unscaledTime;   // rises into place from just below
+                if (BundlePlugin.Log != null) BundlePlugin.Log.LogInfo("Match stats: the victory board stands in the room (" + (wall != null && wall.renderMode == RenderMode.WorldSpace ? "canvas" : "mesh") + ").");
                 return true;
             }
 
@@ -650,6 +677,11 @@ namespace Monolith
                 if (_full && !_world && Time.unscaledTime < _worldUntil && _root != null)
                 {
                     try { if (InRoom()) _worldUntil = -1f; } catch (Exception e) { _worldUntil = -1f; Flat(); Quiet(e); }
+                }
+                else if (_full && !_world && _worldUntil > 0f)
+                {
+                    if (BundlePlugin.Log != null) BundlePlugin.Log.LogInfo("Match stats: the victory board stays on the screen: " + (_whyFlat ?? "?"));
+                    _worldUntil = -1f;
                 }
                 if (_full && _flyAt >= 0f && _root != null)
                 {
