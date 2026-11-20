@@ -476,6 +476,7 @@ namespace Monolith
             private string _whyFlat;
             private const float Turn = 40f;      // degrees toward the middle of the room
             private const float Wide = 4f;       // the board is this many times as wide as the word REMATCH
+            private const float Clear = 1.3f, Out = 0.6f;
             private void Flat()
             {
                 _world = false;
@@ -504,9 +505,10 @@ namespace Monolith
                 float sc = Wide * wSign / Mathf.Max(1f, _back.sizeDelta.x);
                 float bw = _back.sizeDelta.x * sc, bh = _back.sizeDelta.y * sc;
                 ct.localScale = new Vector3(sc, sc, sc);
-                // its right edge over the left end of REMATCH, its bottom a sign's height above it, turned on its right edge
+                // its right edge left of REMATCH by Clear words (past the left side of the blue wall behind the signs) and Out
+                // words toward you (clear of that wall), its bottom a sign's height above it, turned on its right edge
                 Quaternion turned = at.rotation * Quaternion.Euler(0f, -Turn, 0f);
-                Vector3 rightBottom = leftTop + at.up * hSign;
+                Vector3 rightBottom = leftTop + at.up * hSign - at.right * (Clear * wSign) - at.forward * (Out * wSign);
                 ct.rotation = turned;
                 ct.position = rightBottom - (turned * Vector3.right) * (bw * 0.5f) + at.up * (bh * 0.5f);
                 _root.localScale = Vector3.one; _to = Vector2.zero;
