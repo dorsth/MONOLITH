@@ -70,6 +70,9 @@ namespace Monolith
                 h.Patch(taunts, transpiler: new HarmonyMethod(typeof(Keys).GetMethod(nameof(TauntTr), BindingFlags.Static | BindingFlags.NonPublic)));
                 if (_tauntHits != 20) BundlePlugin.Log.LogInfo("Keys: the game asks for a taunt key in " + _tauntHits + " places (20 expected).");
             }
+            // an extra jump set to no key before 1.1.9 was saved as "none" and read "off"
+            if (Jump1.Value == Off) Jump1.Value = "";
+            if (Jump2.Value == Off) Jump2.Value = "";
             foreach (ConfigEntry<string> e in All())
             {
                 ConfigEntry<string> each = e;
@@ -199,6 +202,9 @@ namespace Monolith
         }
 
         /// <summary>The value a key just pressed gives a row. On Swap weapons either wheel direction means the whole wheel.</summary>
+        // "no key": an extra jump with no key is simply not set; a taunt or swap set to none turns the game's own key off
+        internal static string NoKey(ConfigEntryBase row) { return row == Jump1 || row == Jump2 ? "" : Off; }
+
         internal static string Taken(ConfigEntryBase row, string got)
         {
             if (row != Swap || got == null || !got.StartsWith(Wheel, StringComparison.Ordinal)) return got;

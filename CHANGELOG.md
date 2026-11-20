@@ -1,6 +1,8 @@
 # MONOLITH changelog
 
 ## 1.1.9
+- R resets the setting under the mouse again. Before, it could reset the row the keyboard cursor was on.
+- An extra jump key set to no key with Enter reads "not set", the same as its default, not "off".
 - General has a Version line. Press it to open MONOLITH on Thunderstore. The version is no longer at the end of the General text.
 - General says the menu colors are inspired by the STRAFTAT theme for Far Manager by klammvs.
 - The kestrel line at the top of the README uses the same words as the menu.
