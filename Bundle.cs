@@ -70,12 +70,7 @@ namespace Monolith
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
         private void ModMenuPage()
         {
-            // the stand-in for Mod Menu that MONOLITH carried up to 1.1.3, left behind by a manual update: it has no window
-            if (HarmonyLib.AccessTools.TypeByName("ModMenu.Pages") != null)
-            {
-                Logger.LogWarning("ModMenu.dll in the MONOLITH folder is left from an older MONOLITH. Delete it with the game closed; install Mod Menu itself if a mod needs it.");
-                return;
-            }
+            if (HarmonyLib.AccessTools.TypeByName("ModMenu.Pages") != null) return;   // MONOLITH's own stand-in: no window of its own
             System.Type manager = HarmonyLib.AccessTools.TypeByName("ModMenu.ModMenuManager");
             MethodInfo init = manager != null ? HarmonyLib.AccessTools.Method(manager, "Init") : null;
             _mods = manager != null ? HarmonyLib.AccessTools.Field(manager, "mods") : null;

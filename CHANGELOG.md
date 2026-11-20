@@ -1,9 +1,9 @@
 # MONOLITH changelog
 
 ## 1.1.5
+- Mod Menu's API is back in MONOLITH (ModMenu.dll), credited to kestrel: mods that need Mod Menu, like Spawn Viewer 2.1, load and show under Other mods again.
+- The Viewmodel page, the Other mods page and the top of the README credit kestrel for Minimal Viewmodels Reborn and Mod Menu.
 - The dll's description is just "Dorsth was here." now. It said it held every Dorsth mod, and STRAFTH and Straftat Tournaments are not in it.
-- Other mods shows only the key that opens STRAFTH and Straftat Tournaments, as before: their other settings are in their own menus. Without Mod Menu they all showed.
-- The Viewmodel page and the top of the README now say the weapon camera works the way Minimal Viewmodels Reborn by kestrel does it.
 
 ## 1.1.4
 - MONOLITH no longer comes with a stand-in for Mod Menu. It works next to Mod Menu: install Mod Menu itself if a mod needs it. If you update by hand, delete ModMenu.dll from the MONOLITH folder.

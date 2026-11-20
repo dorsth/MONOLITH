@@ -40,7 +40,7 @@ namespace Monolith
             { "Sensitivity in cm/360, extra keys, taunts.", "Чувствительность в см/360, доп. клавиши, насмешки." },
             { "Only your own playlists show when you host.", "При создании лобби видны только ваши плейлисты." },
             { "More FPS, steadier frames.", "Больше FPS, ровнее кадры." },
-            { "Settings of the other mods you have installed. Not part of MONOLITH.", "Настройки других установленных модов. Не часть MONOLITH." },
+            { "Settings of the other mods you have installed. Not part of MONOLITH. Mods made for Mod Menu by kestrel work here through its API.", "Настройки других установленных модов. Не часть MONOLITH. Моды для Mod Menu от kestrel работают здесь через его API." },
             { "no options", "нет настроек" },
             { "Move a taunt to another key, or switch it off.", "Перенесите насмешку на другую клавишу или отключите её." },
             { "Save, load and share configs: every setting, the game's included. Sensitivity is never included.", "Сохранение, загрузка и обмен конфигами: все настройки, включая настройки игры. Чувствительность не входит никогда." },
