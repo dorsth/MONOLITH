@@ -104,10 +104,10 @@ namespace Monolith
     internal static class MenuLayout
     {
         private const string Tweaks = "dorsth.straftat.dorsthtweaks", View = "dorsth.straftat.viewmodeltweaks", Cam = "dorsth.straftat.cameratweaks",
-            Cross = "dorsth.straftat.ezcrosshair", Sens = "dorsth.straftat.truesens", Sounds = "dorsth.straftat.combatsounds", Gore = "dorsth.straftat.nogore";
+            Cross = "dorsth.straftat.ezcrosshair", Sens = "dorsth.straftat.truesens", Sounds = "dorsth.straftat.combatsounds", Gore = "dorsth.straftat.nogore", Match = "dorsth.straftat.matchstats";
 
         /// <summary>The mods whose settings the menu and its search cover.</summary>
-        internal static readonly string[] Mods = { Cross, View, Cam, Tweaks, Gore, Sounds, Sens };
+        internal static readonly string[] Mods = { Cross, View, Cam, Tweaks, Gore, Sounds, Sens, Match };
 
         private static readonly List<string> Missing = new List<string>();
 
@@ -498,7 +498,7 @@ namespace Monolith
 
                 p.Go(hm, () => On(noHm) ? "hidden" : On(still) ? "static" : "")
                  .Go(pr, () => On(noPick) && On(noUse) ? "hidden" : "")
-                 .Set("Match stats", Stats.On, null, "Kills, deaths and damage of each round on the round-end screen, the match so far over each name on the Tab screen, and a full board after the match.")
+                 .Set("Match stats", E(Match, "Match Stats", "Enabled"), null, "Kills, deaths and damage of each round on the round-end screen, the match so far over each name on the Tab screen, and a full board after the match.")
                  .Set("Hide FPS", E(Tweaks, "HUD", "Hide FPS"), null, "")
                  .Set("Hide ping", E(Tweaks, "HUD", "Hide Ping"), null, "")
                  .Set("Slide cooldown timer", E(Tweaks, "HUD", "Slide Cooldown Timer"), null, "Shows the time until you can slide again under the crosshair, as text or a bar.")

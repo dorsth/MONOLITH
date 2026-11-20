@@ -1,6 +1,7 @@
 # MONOLITH changelog
 
 ## 1.1.9
+- Match stats are now their own mod, MatchStats, and MONOLITH holds it like the others. If you turned them off, they stay off.
 - Long names on the game's end of round and Tab screens stay on one line and shrink to fit, instead of wrapping over the score or running into the next name.
 - Match stats keep the name of a player who left the lobby, instead of "player 4".
 - Match stats leave out spectators (Straftat Tournaments spectator seats).

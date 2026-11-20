@@ -50,8 +50,6 @@ namespace Monolith
             catch (System.Exception e) { Logger.LogWarning("Extra keys are off: " + e.Message); }
             try { Players.Bind(Config); Players.Install(new HarmonyLib.Harmony(Guid + ".players")); }
             catch (System.Exception e) { Logger.LogWarning("Forced outfits and hats are off: " + e.Message); }
-            try { Stats.Bind(Config, new HarmonyLib.Harmony(Guid + ".stats")); }
-            catch (System.Exception e) { Logger.LogWarning("Match stats are off: " + e.Message); }
             try { FrameCap.Bind(Config); }
             catch (System.Exception e) { Logger.LogWarning("Frame cap is off: " + e.Message); }
             if (BepInEx.Bootstrap.Chainloader.PluginInfos.ContainsKey(ModMenuGuid))

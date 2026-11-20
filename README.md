@@ -30,7 +30,7 @@ Your old settings come along.
 | Configs | save, load and share every setting as one line of text |
 | Other mods | settings of the other mods you have installed |
 
-Match stats show kills, deaths and damage between rounds and after the match.
+Match stats show kills, deaths and damage between rounds and after the match. They are also on their own as [MatchStats](https://thunderstore.io/c/straftat/p/Dorsth/MatchStats/).
 
 ## Menu
 
