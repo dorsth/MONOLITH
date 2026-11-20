@@ -469,14 +469,14 @@ namespace Monolith
             private Vector2 _to; private float _flyAt = -1f;
             private const float Fly = 0.55f;
 
-            // The victory board stands in the victory room, tied to the rematch sign: up and to the left of it, turned toward
-            // the middle of the room. Until that sign is there (it comes over the network) the board shows flat on the screen;
+            // The victory board stands in the victory room, tied to the rematch sign: up and to the left of it, flat in line
+            // with the signs and the blue wall, so it does not slide over the wall when you walk around. Until that sign is there (it comes over the network) the board shows flat on the screen;
             // after 10 seconds without it, it stays flat and the log says why.
             private Canvas _cv; private CanvasScaler _sc; private Image _backImage; private bool _world; private float _worldUntil = -1f;
             private string _whyFlat;
-            private const float Turn = 25f;      // degrees toward the middle of the room
-            private const float Wide = 3.6f;      // the board is this many times as wide as the word REMATCH
-            private const float Clear = 0.6f, Out = 0.6f;
+            private const float Turn = 0f;      // degrees toward the middle of the room
+            private const float Wide = 5f;        // the board is this many times as wide as the word REMATCH
+            private const float Clear = 1f, Out = 0f;
             private void Flat()
             {
                 _world = false;
