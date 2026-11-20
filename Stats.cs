@@ -54,7 +54,7 @@ namespace Monolith
         private static readonly Dictionary<int, int> IdOf = new Dictionary<int, int>();                 // instance -> player id
         private struct Death { public int Victim, Killer; public float At; }
         private static readonly List<Death> RoundDeaths = new List<Death>();
-        private static bool _firstDone, _takeOn;
+        private static bool _firstDone, _takeOn, _matchOver;
 
         internal static void Bind(ConfigFile c, Harmony h)
         {
@@ -297,10 +297,13 @@ namespace Monolith
         private static void Scene(string name)
         {
             Known.Clear(); KillerOf.Clear(); IdOfKiller.Clear(); Waiting.Clear(); IdOf.Clear(); Tagged.Clear();
-            if (name == "VictoryScene") { FinishTake(); Names(); if (On.Value && All.Count > 0) { Board.Me.Show(true); } return; }
+            if (name == "VictoryScene") { FinishTake(); Names(); _matchOver = true; if (On.Value && All.Count > 0) { Board.Me.Show(true); } return; }
             Board.Me.Hide();
-            if (name == "MainMenu") MatchReset();
-            else if (On.Value) { FinishTake(); _takeOn = true; foreach (var kv in All) { kv.Value.RK = 0; kv.Value.RD = 0; kv.Value.RDmg = 0f; } if (RoundManager.Instance != null && Board.Me != null) Board.Me.Prepare(); }   // a map: its first take, and a new round
+            // only the host's game resets its scores (ScoreManager.ResetScores), and a rematch skips the main menu: on every
+            // other player's game the next match went on counting from the last one. The first map after a victory screen
+            // starts a new match.
+            if (name == "MainMenu" || _matchOver) { MatchReset(); _matchOver = false; }
+            if (name != "MainMenu" && On.Value) { FinishTake(); _takeOn = true; foreach (var kv in All) { kv.Value.RK = 0; kv.Value.RD = 0; kv.Value.RDmg = 0f; } if (RoundManager.Instance != null && Board.Me != null) Board.Me.Prepare(); }   // a map: its first take, and a new round
         }
 
         private static P Get(int id) { P p; if (!All.TryGetValue(id, out p)) { p = new P(); All[id] = p; } return p; }
@@ -443,12 +446,27 @@ namespace Monolith
                 float height = (rows.Count + 1) * (rowH + 4f) - 4f;
                 _back.anchoredPosition = new Vector2(-Pad, Pad); _back.sizeDelta = new Vector2(right + 2f * Pad, height + 2f * Pad);
                 _root.sizeDelta = new Vector2(right, height);
-                if (full) { _root.anchorMin = _root.anchorMax = _root.pivot = new Vector2(0.5f, 0.5f); _root.anchoredPosition = new Vector2(0f, -298f); }   // its middle in the middle of the free floor: as far from the rematch signs as from the health line
-                else { _root.anchorMin = _root.anchorMax = _root.pivot = new Vector2(0f, 1f); _root.anchoredPosition = new Vector2(Edge + Pad, -(Edge + Pad)); }   // the panel ends above the dark band of the round-end screen
+                _root.localScale = Vector3.one;
+                if (full)
+                {
+                    _root.anchorMin = _root.anchorMax = _root.pivot = new Vector2(0.5f, 0.5f);
+                    // never more than the lower part of the screen: someone's board filled theirs. On a screen that isn't
+                    // 16:9, or with a lot of players, it gets smaller instead.
+                    Rect screen = ((RectTransform)_canvas.transform).rect;
+                    float fit = Mathf.Min(1f, screen.width * 0.8f / (right + 2f * Pad), screen.height * 0.36f / (height + 2f * Pad));
+                    _root.localScale = new Vector3(fit, fit, 1f);
+                    _to = new Vector2(0f, -screen.height * 0.5f + screen.height * 0.225f);   // its middle in the middle of the free floor, below the rematch signs
+                    _flyAt = Time.unscaledTime + 0.5f;   // flies up into place once the victory screen is there
+                    _root.anchoredPosition = _to + new Vector2(0f, -screen.height * 0.6f);
+                }
+                else { _root.anchorMin = _root.anchorMax = _root.pivot = new Vector2(0f, 1f); _root.anchoredPosition = new Vector2(Edge + Pad, -(Edge + Pad)); _flyAt = -1f; }   // the panel ends above the dark band of the round-end screen
                 _canvas.SetActive(true);
                 Counters(false);
                 enabled = true;
             }
+
+            private Vector2 _to; private float _flyAt = -1f;
+            private const float Fly = 0.55f;
 
             private string _digit;
             // digits only: a "-" or "/" as wide as a digit made "4-0" read as "4 - 0"
@@ -588,6 +606,14 @@ namespace Monolith
             {
                 if (Waiting.Count > 0) Flush();
                 if (_waitOnly) { if (Waiting.Count == 0) { _waitOnly = false; enabled = false; } return; }
+                if (_full && _flyAt >= 0f && _root != null)
+                {
+                    float t = Mathf.Clamp01((Time.unscaledTime - _flyAt) / Fly);
+                    float e = 1f - Mathf.Pow(1f - t, 3f);   // fast, then settling
+                    Vector2 from = _to + new Vector2(0f, -((RectTransform)_canvas.transform).rect.height * 0.6f);
+                    _root.anchoredPosition = Vector2.LerpUnclamped(from, _to, e);
+                    if (t >= 1f) _flyAt = -1f;
+                }
                 if (!_full)
                 {
                     PauseManager pm = PauseManager.Instance;

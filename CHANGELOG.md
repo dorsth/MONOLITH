@@ -1,5 +1,9 @@
 # MONOLITH changelog
 
+## 1.1.2
+- Match stats start over at every new match for every player. Before, only the host's reset, and a rematch kept counting from the last match.
+- The match stats board flies up into the victory screen, and gets smaller when it wouldn't fit, so it never fills the screen.
+
 ## 1.1.1
 - The update line in the main menu now says to close the game first: a mod manager can't replace a mod's files while the game is open.
 
