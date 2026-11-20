@@ -399,6 +399,7 @@ namespace Monolith
                 _full = full; _waitOnly = false; _hideAt = -1f;
                 if (_canvas == null) Make();
                 if (_root == null) return;
+                Flat(); _worldUntil = full ? Time.unscaledTime + 4f : -1f;
                 int me = -1;
                 try { if (LobbyController.Instance != null && LobbyController.Instance.LocalPlayerController != null) me = LobbyController.Instance.LocalPlayerController.PlayerId; } catch { }
                 Color self = new Color32(0xAC, 0xBC, 0xFC, 0xFF), enemy = new Color32(0xE8, 0x80, 0x68, 0xFF), c;
@@ -467,6 +468,40 @@ namespace Monolith
 
             private Vector2 _to; private float _flyAt = -1f;
             private const float Fly = 0.55f;
+
+            // The victory board stands in the victory room, above the rematch sign, like the game's own 3D signs. Until that
+            // sign is there (it comes over the network) it shows flat on the screen; after 4 seconds without it, it stays flat.
+            private Canvas _cv; private CanvasScaler _sc; private bool _world; private float _worldUntil = -1f;
+            private void Flat()
+            {
+                _world = false;
+                if (_cv != null) _cv.renderMode = RenderMode.ScreenSpaceOverlay;
+                if (_sc != null) _sc.enabled = true;
+            }
+            private bool InRoom()
+            {
+                VictoryMenu rematch = null;
+                foreach (VictoryMenu m in FindObjectsOfType<VictoryMenu>())
+                    if (Traverse.Create(m).Field("restartGame").GetValue<bool>()) { rematch = m; break; }
+                if (rematch == null) return false;
+                var sign = Traverse.Create(rematch).Field("textObject").GetValue<GameObject>();
+                TMP_Text text = sign != null ? sign.GetComponentInChildren<TMP_Text>() : null;
+                if (text == null) text = rematch.GetComponentInChildren<TMP_Text>();
+                Transform at = text != null ? text.transform : rematch.transform;
+                Bounds b = text != null && text.bounds.size.y > 0f ? text.bounds : new Bounds(Vector3.zero, new Vector3(1f, 0.3f, 0f));
+                float h = Mathf.Max(0.05f, b.size.y * Mathf.Abs(at.lossyScale.y));   // the height of the rematch letters in the room
+                Vector3 top = at.TransformPoint(new Vector3(b.center.x, b.max.y, b.center.z));
+                _cv.renderMode = RenderMode.WorldSpace; _sc.enabled = false;
+                var ct = (RectTransform)_canvas.transform;
+                ct.sizeDelta = _back.sizeDelta;
+                float s = 0.6f * h / (22f * 0.7f);   // its letters 60% as tall as the sign's (a capital is about 0.7 of the font size)
+                ct.localScale = new Vector3(s, s, s);
+                ct.rotation = at.rotation;
+                ct.position = top + at.up * (h * 0.8f + _back.sizeDelta.y * s * 0.5f);
+                _root.localScale = Vector3.one; _to = Vector2.zero;
+                _world = true; _flyAt = Time.unscaledTime;   // rises into place from just below
+                return true;
+            }
 
             private string _digit;
             // digits only: a "-" or "/" as wide as a digit made "4-0" read as "4 - 0"
@@ -554,8 +589,8 @@ namespace Monolith
             {
                 _canvas = new GameObject("MONOLITH.StatsBoard");
                 DontDestroyOnLoad(_canvas); _canvas.hideFlags = HideFlags.HideAndDontSave;
-                var cv = _canvas.AddComponent<Canvas>(); cv.renderMode = RenderMode.ScreenSpaceOverlay; cv.sortingOrder = 400;
-                var sc = _canvas.AddComponent<CanvasScaler>(); sc.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize; sc.referenceResolution = new Vector2(1920f, 1080f); sc.matchWidthOrHeight = 0.5f;
+                var cv = _cv = _canvas.AddComponent<Canvas>(); cv.renderMode = RenderMode.ScreenSpaceOverlay; cv.sortingOrder = 400;
+                var sc = _sc = _canvas.AddComponent<CanvasScaler>(); sc.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize; sc.referenceResolution = new Vector2(1920f, 1080f); sc.matchWidthOrHeight = 0.5f;
                 var go = new GameObject("board"); go.transform.SetParent(_canvas.transform, false);
                 _root = go.AddComponent<RectTransform>();
                 // one dark see-through panel behind the whole board, like the game's own boxes (kill feed, Tab screen)
@@ -606,6 +641,10 @@ namespace Monolith
             {
                 if (Waiting.Count > 0) Flush();
                 if (_waitOnly) { if (Waiting.Count == 0) { _waitOnly = false; enabled = false; } return; }
+                if (_full && !_world && Time.unscaledTime < _worldUntil && _root != null)
+                {
+                    try { if (InRoom()) _worldUntil = -1f; } catch (Exception e) { _worldUntil = -1f; Flat(); Quiet(e); }
+                }
                 if (_full && _flyAt >= 0f && _root != null)
                 {
                     float t = Mathf.Clamp01((Time.unscaledTime - _flyAt) / Fly);
