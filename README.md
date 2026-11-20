@@ -9,7 +9,7 @@ Mods made for [Mod Menu](https://github.com/kestrel-straftat/mod-menu) by kestre
 ## Install
 
 1. Put the `MONOLITH` folder from the zip into `BepInEx/plugins`, or install it with a mod manager.
-2. Remove separate copies of my mods. You don't need Minimal Viewmodels Reborn or Mod Menu next to it, and Mod Menu can't be installed together with it.
+2. Remove separate copies of my mods. Use either Minimal Viewmodels Reborn or MONOLITH, since both move the weapon camera. Mod Menu and MONOLITH can't be installed at the same time, since they share a plugin id.
 3. Start the game and press **F2**.
 
 Your old settings come along.
