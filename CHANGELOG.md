@@ -1,6 +1,7 @@
 # MONOLITH changelog
 
-## 1.1.5
+## 1.1.8
+- Replaces 1.1.7, an older build uploaded by mistake: Mod Menu's API is back, so mods that need Mod Menu load again.
 - Other mods: key settings of other mods (like Spawn Viewer's Toggle Key) take the key you press. Before, pressing a key did nothing.
 - Camera, No sprint FOV (CameraTweaks 1.1.9): switch it off and your FOV widens when you sprint and slide, like in the game. On by default, as before.
 - Mod Menu's API is back in MONOLITH (ModMenu.dll), credited to kestrel: mods that need Mod Menu, like Spawn Viewer 2.1, load and show under Other mods again.
