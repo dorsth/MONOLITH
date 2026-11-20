@@ -1,12 +1,8 @@
 # MONOLITH changelog
 
-## 1.1.7
-- The dll's description is just "Dorsth was here." now. It said it held every Dorsth mod, and STRAFTH and Straftat Tournaments are not in it.
-
-## 1.1.6
-- Other mods shows only the key that opens STRAFTH and Straftat Tournaments, as before: their other settings are in their own menus. Without Mod Menu they all showed.
-
 ## 1.1.5
+- The dll's description is just "Dorsth was here." now. It said it held every Dorsth mod, and STRAFTH and Straftat Tournaments are not in it.
+- Other mods shows only the key that opens STRAFTH and Straftat Tournaments, as before: their other settings are in their own menus. Without Mod Menu they all showed.
 - The Viewmodel page and the top of the README now say the weapon camera works the way Minimal Viewmodels Reborn by kestrel does it.
 
 ## 1.1.4
