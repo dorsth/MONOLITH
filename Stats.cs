@@ -515,16 +515,14 @@ namespace Monolith
             private Vector2 _to; private float _flyAt = -1f;
             private const float Fly = 0.55f;
 
-            // The victory board stands in the victory room as the blue ranking wall's twin: a panel of the same size, in the
-            // same line, just left of it, deep blue so the two read as a pair. Placed from the rematch sign (the one thing
-            // the game always builds there), measured in widths of the word REMATCH; the depth comes from the ranking wall.
-            // Until the sign is there (it comes over the network) the board shows flat on the screen; after 10 seconds
-            // without it, it stays flat and the log says why.
+            // The victory board stands in the victory room as a second wall, tied to the rematch sign: past the left side of
+            // the blue wall and turned to face into the room, about as big as the blue wall. Until that sign is there (it comes over the network) the board shows flat on the screen;
+            // after 10 seconds without it, it stays flat and the log says why.
             private Canvas _cv; private CanvasScaler _sc; private Image _backImage; private bool _world; private float _worldUntil = -1f;
             private string _whyFlat;
-            private const float PanelW = 5f, PanelH = 2.35f;   // the blue wall, in REMATCH widths
-            private const float RightEdge = 1.05f;             // left of REMATCH: the wall starts 0.8 left of it, then a gap
-            private const float Below = 0.15f;                 // the wall reaches this far below the top of REMATCH
+            private const float Turn = 45f;      // degrees toward the middle of the room
+            private const float Wide = 6.5f;      // the board is this many times as wide as the word REMATCH
+            private const float Clear = 2.2f, Out = 0f;
             private void Flat()
             {
                 _world = false;
@@ -546,30 +544,19 @@ namespace Monolith
                 float wSign = b.size.x * Mathf.Abs(at.lossyScale.x), hSign = b.size.y * Mathf.Abs(at.lossyScale.y);
                 Vector3 leftTop = at.TransformPoint(new Vector3(b.min.x, b.max.y, b.center.z));
 
-                float w = wSign;
-                // how far behind the sign the ranking wall stands, to stand in its line (0 when it can't be told)
-                float depth = 0f;
-                VictoryMenuUI ranks = FindObjectOfType<VictoryMenuUI>();
-                if (ranks != null)
-                {
-                    float d = Vector3.Dot(ranks.transform.position - at.position, at.forward);
-                    if (d > 0f && d < 20f * w) depth = d;
-                }
-
                 _cv.renderMode = RenderMode.WorldSpace; _sc.enabled = false;
-                if (_backImage != null) _backImage.color = new Color(0.07f, 0.11f, 0.26f, 0.88f);
+                if (_backImage != null) _backImage.color = new Color(0.05f, 0.06f, 0.07f, 0.6f);   // enough to read against the sky, light enough to see it through
                 var ct = (RectTransform)_canvas.transform;
-                float tableW = _back.sizeDelta.x, tableH = _back.sizeDelta.y;
-                float sc = Mathf.Min(0.9f * PanelW * w / Mathf.Max(1f, tableW), 0.8f * PanelH * w / Mathf.Max(1f, tableH));
-                float bw = PanelW * w / sc, bh = PanelH * w / sc;   // the panel, in board units
-                ct.sizeDelta = new Vector2(bw, bh);
+                ct.sizeDelta = _back.sizeDelta;
+                float sc = Wide * wSign / Mathf.Max(1f, _back.sizeDelta.x);
+                float bw = _back.sizeDelta.x * sc, bh = _back.sizeDelta.y * sc;
                 ct.localScale = new Vector3(sc, sc, sc);
-                // the table in the middle of the panel
-                float right = tableW - 2f * Pad, height = tableH - 2f * Pad;
-                _back.sizeDelta = new Vector2(bw, bh);
-                _back.anchoredPosition = new Vector2((right - bw) * 0.5f, (bh - height) * 0.5f);
-                ct.rotation = at.rotation;
-                ct.position = leftTop - at.right * ((RightEdge + PanelW * 0.5f) * w) + at.up * ((PanelH * 0.5f - Below) * w) + at.forward * depth;
+                // its right edge left of REMATCH by Clear words (past the left side of the blue wall behind the signs) and Out
+                // words toward you (clear of that wall), its bottom a sign's height above it, turned on its right edge
+                Quaternion turned = at.rotation * Quaternion.Euler(0f, -Turn, 0f);
+                Vector3 rightBottom = leftTop + at.up * hSign - at.right * (Clear * wSign) - at.forward * (Out * wSign);
+                ct.rotation = turned;
+                ct.position = rightBottom - (turned * Vector3.right) * (bw * 0.5f) + at.up * (bh * 0.5f);
                 _root.localScale = Vector3.one; _to = Vector2.zero;
                 _world = true; _flyAt = Time.unscaledTime;   // rises into place from just below
                 if (BundlePlugin.Log != null) BundlePlugin.Log.LogInfo("Match stats: the victory board stands in the room.");
