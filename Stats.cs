@@ -469,11 +469,13 @@ namespace Monolith
             private Vector2 _to; private float _flyAt = -1f;
             private const float Fly = 0.55f;
 
-            // The victory board stands in the victory room as a twin of the game's blue ranking wall: as wide, at the same height
-            // and distance from you, turned 55 degrees to your right of it, facing you the way the wall does. Until that wall is
-            // there (it comes over the network) the board shows flat on the screen; after 10 seconds without it, it stays flat and the log says why.
+            // The victory board stands in the victory room, tied to the rematch sign: up and to the left of it, turned toward
+            // the middle of the room. Until that sign is there (it comes over the network) the board shows flat on the screen;
+            // after 10 seconds without it, it stays flat and the log says why.
             private Canvas _cv; private CanvasScaler _sc; private Image _backImage; private bool _world; private float _worldUntil = -1f;
-            private const float Turn = 55f;
+            private string _whyFlat;
+            private const float Turn = 40f;      // degrees toward the middle of the room
+            private const float Wide = 4f;       // the board is this many times as wide as the word REMATCH
             private void Flat()
             {
                 _world = false;
@@ -481,58 +483,35 @@ namespace Monolith
                 if (_sc != null) _sc.enabled = true;
                 if (_backImage != null) _backImage.color = new Color(0f, 0f, 0f, 0.45f);
             }
-            private string _whyFlat;
             private bool InRoom()
             {
-                VictoryMenuUI ranks = FindObjectOfType<VictoryMenuUI>();
-                if (ranks == null) { _whyFlat = "no ranking wall"; return false; }
-                Camera eye = Camera.main;
-                if (eye == null) foreach (Camera cam in Camera.allCameras) if (eye == null || cam.depth > eye.depth) eye = cam;
-                if (eye == null) { _whyFlat = "no camera"; return false; }
+                VictoryMenu rematch = null;
+                foreach (VictoryMenu m in FindObjectsOfType<VictoryMenu>())
+                    if (Traverse.Create(m).Field("restartGame").GetValue<bool>()) { rematch = m; break; }
+                if (rematch == null) { _whyFlat = "no rematch sign"; return false; }
+                var sign = Traverse.Create(rematch).Field("textObject").GetValue<GameObject>();
+                TMP_Text text = sign != null ? sign.GetComponentInChildren<TMP_Text>() : null;
+                if (text == null) text = rematch.GetComponentInChildren<TMP_Text>();
+                if (text == null || text.bounds.size.x <= 0f) { _whyFlat = "rematch sign has no text"; return false; }
+                Transform at = text.transform; Bounds b = text.bounds;
+                float wSign = b.size.x * Mathf.Abs(at.lossyScale.x), hSign = b.size.y * Mathf.Abs(at.lossyScale.y);
+                Vector3 leftTop = at.TransformPoint(new Vector3(b.min.x, b.max.y, b.center.z));
 
-                // the wall: the game's world canvas if it is one, else the biggest flat mesh it is drawn on
-                Vector3 mid, right, up; float wide, tall; Quaternion facing;
-                Canvas wall = ranks.GetComponentInParent<Canvas>();
-                if (wall != null && wall.renderMode == RenderMode.WorldSpace)
-                {
-                    var wr = (RectTransform)wall.transform;
-                    var c = new Vector3[4]; wr.GetWorldCorners(c);   // bottom left, top left, top right, bottom right
-                    mid = (c[0] + c[2]) * 0.5f; wide = Vector3.Distance(c[0], c[3]); tall = Vector3.Distance(c[0], c[1]);
-                    facing = wr.rotation;
-                }
-                else
-                {
-                    MeshFilter best = null; float area = 0f;
-                    Transform top = ranks.transform.root;
-                    foreach (MeshFilter mf in top.GetComponentsInChildren<MeshFilter>(true))
-                    {
-                        if (mf.sharedMesh == null || mf.GetComponent<TMP_Text>() != null) continue;
-                        Vector3 sz = Vector3.Scale(mf.sharedMesh.bounds.size, mf.transform.lossyScale);
-                        float a2 = Mathf.Max(sz.x * sz.y, Mathf.Max(sz.x * sz.z, sz.y * sz.z));
-                        if (a2 > area) { area = a2; best = mf; }
-                    }
-                    if (best == null) { _whyFlat = "wall not found (" + (wall != null ? wall.renderMode.ToString() : "no canvas") + ")"; return false; }
-                    Bounds mb = best.sharedMesh.bounds; Transform bt = best.transform;
-                    mid = bt.TransformPoint(mb.center);
-                    wide = Mathf.Abs(mb.size.x * bt.lossyScale.x); tall = Mathf.Abs(mb.size.y * bt.lossyScale.y);
-                    facing = bt.rotation;
-                }
-                if (wide < 0.01f || tall < 0.01f) { _whyFlat = "wall has no size"; return false; }
-
-                Quaternion turn = Quaternion.AngleAxis(Turn, Vector3.up);
-                Vector3 me = eye.transform.position, away = mid - me; float y = away.y; away.y = 0f;
-                Vector3 at = me + turn * away; at.y = me.y + y;
                 _cv.renderMode = RenderMode.WorldSpace; _sc.enabled = false;
                 if (_backImage != null) _backImage.color = new Color(0.03f, 0.04f, 0.05f, 0.85f);   // solid enough to read against the sky
                 var ct = (RectTransform)_canvas.transform;
                 ct.sizeDelta = _back.sizeDelta;
-                float sc = Mathf.Min(wide / Mathf.Max(1f, _back.sizeDelta.x), tall / Mathf.Max(1f, _back.sizeDelta.y));
+                float sc = Wide * wSign / Mathf.Max(1f, _back.sizeDelta.x);
+                float bw = _back.sizeDelta.x * sc, bh = _back.sizeDelta.y * sc;
                 ct.localScale = new Vector3(sc, sc, sc);
-                ct.rotation = turn * facing;
-                ct.position = at;
+                // its right edge over the left end of REMATCH, its bottom a sign's height above it, turned on its right edge
+                Quaternion turned = at.rotation * Quaternion.Euler(0f, -Turn, 0f);
+                Vector3 rightBottom = leftTop + at.up * hSign;
+                ct.rotation = turned;
+                ct.position = rightBottom - (turned * Vector3.right) * (bw * 0.5f) + at.up * (bh * 0.5f);
                 _root.localScale = Vector3.one; _to = Vector2.zero;
                 _world = true; _flyAt = Time.unscaledTime;   // rises into place from just below
-                if (BundlePlugin.Log != null) BundlePlugin.Log.LogInfo("Match stats: the victory board stands in the room (" + (wall != null && wall.renderMode == RenderMode.WorldSpace ? "canvas" : "mesh") + ").");
+                if (BundlePlugin.Log != null) BundlePlugin.Log.LogInfo("Match stats: the victory board stands in the room.");
                 return true;
             }
 
