@@ -16,7 +16,7 @@ T = [
 ('Taunts', 'Насмешки', 'L30'), ('search', 'поиск', 'W16'),
 ('Style, color, size.', 'Стиль, цвет, размер.', 'info'),
 ('Where your weapon sits, how much it moves. The weapon camera works the way Minimal Viewmodels Reborn by kestrel does it.', 'Где находится оружие и как сильно оно двигается. Камера оружия работает как в Minimal Viewmodels Reborn от kestrel.', 'info'),
-('Tilt, shake, recoil.', 'Наклон, тряска, отдача.', 'info'),
+('Tilt, shake, sprint FOV, recoil.', 'Наклон, тряска, FOV при беге, отдача.', 'info'),
 ('Hitmarkers, prompts, counters.', 'Хитмаркеры, подсказки, счётчики.', 'info'),
 ('Shape, size, animation, colors.', 'Форма, размер, анимация, цвета.', 'info'),
 ('The texts on weapons, doors and buttons.', 'Надписи на оружии, дверях и кнопках.', 'info'),
@@ -58,7 +58,8 @@ T = [
 ('No tilt', 'Без наклона', 'L52'), ('No roll when you strafe, slide or turn.', 'Камера не кренится при стрейфе, подкате и повороте.', 'tip'),
 ('No landing shake', 'Без тряски при приземлении', 'L52'), ('No jump shake', 'Без тряски при прыжке', 'L52'),
 ('Slide jumps, wall jumps and ceiling hits.', 'Прыжки из подката, прыжки от стен и удары о потолок.', 'tip'),
-('No vault shake', 'Без тряски при перелезании', 'L52'), ('Better recoil', 'Улучшенная отдача', 'L52'),
+('No vault shake', 'Без тряски при перелезании', 'L52'), ('No sprint FOV', 'Без FOV при беге', 'L52'),
+('Your FOV stays the same when you sprint and slide. Off: it widens like in the game.', 'FOV не меняется при беге и подкате. Выкл.: расширяется как в игре.', 'tip'), ('Better recoil', 'Улучшенная отдача', 'L52'),
 ('With the AR, AK and Warden, recoil moves your aim instead of shaking the camera.', 'У AR, AK и Warden отдача двигает прицел, а не трясёт камеру.', 'tip'),
 ('No near miss vignette', 'Без виньетки при пролёте пуль', 'L52'),
 # ---- hud: hitmarkers (35 cells)

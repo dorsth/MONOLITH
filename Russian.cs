@@ -5,7 +5,7 @@ namespace Monolith
 {
     internal static partial class Lang
     {
-        private static readonly Dictionary<string, string> Table = new Dictionary<string, string>(292)
+        private static readonly Dictionary<string, string> Table = new Dictionary<string, string>(294)
         {
             { "Crosshair", "Прицел" },
             { "Viewmodel", "Вьюмодель" },
@@ -29,7 +29,7 @@ namespace Monolith
             { "search", "поиск" },
             { "Style, color, size.", "Стиль, цвет, размер." },
             { "Where your weapon sits, how much it moves. The weapon camera works the way Minimal Viewmodels Reborn by kestrel does it.", "Где находится оружие и как сильно оно двигается. Камера оружия работает как в Minimal Viewmodels Reborn от kestrel." },
-            { "Tilt, shake, recoil.", "Наклон, тряска, отдача." },
+            { "Tilt, shake, sprint FOV, recoil.", "Наклон, тряска, FOV при беге, отдача." },
             { "Hitmarkers, prompts, counters.", "Хитмаркеры, подсказки, счётчики." },
             { "Shape, size, animation, colors.", "Форма, размер, анимация, цвета." },
             { "The texts on weapons, doors and buttons.", "Надписи на оружии, дверях и кнопках." },
@@ -85,6 +85,8 @@ namespace Monolith
             { "No jump shake", "Без тряски при прыжке" },
             { "Slide jumps, wall jumps and ceiling hits.", "Прыжки из подката, прыжки от стен и удары о потолок." },
             { "No vault shake", "Без тряски при перелезании" },
+            { "No sprint FOV", "Без FOV при беге" },
+            { "Your FOV stays the same when you sprint and slide. Off: it widens like in the game.", "FOV не меняется при беге и подкате. Выкл.: расширяется как в игре." },
             { "Better recoil", "Улучшенная отдача" },
             { "With the AR, AK and Warden, recoil moves your aim instead of shaking the camera.", "У AR, AK и Warden отдача двигает прицел, а не трясёт камеру." },
             { "No near miss vignette", "Без виньетки при пролёте пуль" },

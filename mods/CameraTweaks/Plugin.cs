@@ -16,21 +16,20 @@ using UnityEngine;
 
 [assembly: AssemblyTitle("CameraTweaks")]
 [assembly: AssemblyDescription("CameraTweaks for STRAFTAT. Dorsth was here.")]
-[assembly: AssemblyVersion("1.1.8.0")]
+[assembly: AssemblyVersion("1.1.9.0")]
 // only changes your own camera on your own screen: fine to play with people who don't have it
 [assembly: StraftatMod(isVanillaCompatible: true)]
 
 namespace CameraTweaks
 {
     // Competitive camera tweaks: the camera movements the game adds on top of your aim, each one with its own toggle.
-    // Five toggles: NoTilt, NoFallShake, NoJumpShake, NoVaultShake and BetterRecoil. On takes that movement out,
-    // off leaves the game as it is. The FOV also never widens when you sprint and slide: always, without
-    // a toggle. ViewmodelTweaks leaves the camera's FOV to this mod.
+    // Six toggles: NoTilt, NoFallShake, NoJumpShake, NoVaultShake, NoSpeedFov and BetterRecoil. On takes that movement out,
+    // off leaves the game as it is. ViewmodelTweaks leaves the camera's FOV to this mod.
     [BepInDependency("kestrel.straftat.modmenu", BepInDependency.DependencyFlags.SoftDependency)]
     [BepInPlugin(Guid, Name, Version)]
     public sealed class Plugin : BaseUnityPlugin
     {
-        public const string Guid = "dorsth.straftat.cameratweaks", Name = "CameraTweaks", Version = "1.1.8";
+        public const string Guid = "dorsth.straftat.cameratweaks", Name = "CameraTweaks", Version = "1.1.9";
         internal static ManualLogSource Log;
 
         // NoTilt: all of SideTilt's roll (tiltAmount, slideTiltAmount, wallSlideLean, rotationAmount)
@@ -38,11 +37,12 @@ namespace CameraTweaks
         // NoFallShake: fallShake + highFallShake. NoJumpShake: jumpSlope, wall jump, ceiling hit. NoVaultShake: vault.
         internal static ConfigEntry<bool> NoFallShake, NoJumpShake, NoVaultShake;
         internal static ConfigEntry<bool> BetterRecoil;
+        internal static ConfigEntry<bool> NoSpeedFov;
 
 #if !DORSTH_BUNDLE
         // Mod Menu (if installed) shows this next to the mod. Its own method, so nothing of Mod Menu is needed without it.
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
-        private static void ModMenuDescription() { ModMenu.Api.ModMenuCustomisation.SetPluginDescription("Camera without roll, landing and jump shake, and recoil that kicks your aim instead of the camera."); }
+        private static void ModMenuDescription() { ModMenu.Api.ModMenuCustomisation.SetPluginDescription("Camera without roll, landing and jump shake, or sprint FOV, and recoil that kicks your aim instead of the camera."); }
 #endif
 
         private void Awake()
@@ -60,6 +60,8 @@ namespace CameraTweaks
             NoFallShake = Config.Bind(shake, "NoFallShake", true, "On: no camera shake or dip when you land.");
             NoJumpShake = Config.Bind(shake, "NoJumpShake", true, "On: no camera shake when you jump out of a slide, wall jump or hit a ceiling.");
             NoVaultShake = Config.Bind(shake, "NoVaultShake", false, "On: no camera shake when you vault over something.");
+            NoSpeedFov = Config.Bind(roll, "NoSpeedFov", true, "On: the FOV stays what you set in the game when you sprint and slide. Off: it widens like in the game.");
+            NoSpeedFov.SettingChanged += (o, e) => SpeedFov.ApplyAll();
             BetterRecoil = Config.Bind(recoil, "BetterRecoil", true, "On: the AR, AK and warden kick your aim instead of the camera. When you let go it comes back down by the kick you didn't pull down yourself, so taps and bursts come back to where you aimed and a pulled down spray doesn't swing below it.");
 
             var h = new Harmony(Guid);
@@ -82,11 +84,26 @@ namespace CameraTweaks
     }
 
     // How much the FOV widens when you sprint and slide: three numbers the game works out once, when a player starts
-    // (distToRunFov, distToSlideFov, distToRunSlideFov). Set to 0 right after: the FOV stays what you set in the game.
+    // (distToRunFov, distToSlideFov, distToRunSlideFov), and adds to your FOV every frame. With NoSpeedFov they are set to 0,
+    // so the FOV stays what you set in the game. The game's own numbers are kept from the first player, to put back.
     internal static class SpeedFov
     {
         private static AccessTools.FieldRef<FirstPersonController, float> Run, Slide, RunSlide;
-        private static bool failed;
+        private static bool failed, known;
+        private static float run, slide, runSlide;
+
+        // the switch was flipped: every player there is now, at once (players that start later get it in Started)
+        internal static void ApplyAll()
+        {
+            if (!known) return;
+            foreach (var p in UnityEngine.Object.FindObjectsOfType<FirstPersonController>()) Set(p);
+        }
+
+        private static void Set(FirstPersonController p)
+        {
+            bool off = Plugin.NoSpeedFov.Value;
+            Run(p) = off ? 0f : run; Slide(p) = off ? 0f : slide; RunSlide(p) = off ? 0f : runSlide;
+        }
 
         internal static void Started(FirstPersonController __instance)
         {
@@ -99,7 +116,8 @@ namespace CameraTweaks
                     Slide = AccessTools.FieldRefAccess<FirstPersonController, float>("distToSlideFov");
                     RunSlide = AccessTools.FieldRefAccess<FirstPersonController, float>("distToRunSlideFov");
                 }
-                Run(__instance) = 0f; Slide(__instance) = 0f; RunSlide(__instance) = 0f;
+                if (!known) { known = true; run = Run(__instance); slide = Slide(__instance); runSlide = RunSlide(__instance); }
+                Set(__instance);
             }
             catch (Exception e) { failed = true; Plugin.Log.LogWarning("The sprint and slide FOV could not be switched off (game update?): " + e.Message); }
         }
