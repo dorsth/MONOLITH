@@ -579,6 +579,34 @@ namespace Monolith
             return "<color=" + Val + ">" + Esc(v) + "</color>";
         }
 
+        // Some mods keep a key as text ("L", "Semicolon"): a text box made you type the name. A text setting called a key,
+        // whose value is a key name or empty, asks for a key press like a real key setting, and gets the name written the
+        // way it already was: the game's key names (KeyCode) or the input system's (Key: "Digit1", "Enter").
+        private static bool TextKey(ConfigEntryBase e)
+        {
+            if (e == null || e.SettingType != typeof(string) || e.Definition == null) return false;
+            string name = e.Definition.Key ?? "";
+            if (!name.EndsWith("Key", StringComparison.OrdinalIgnoreCase) && !name.EndsWith("Keybind", StringComparison.OrdinalIgnoreCase) && !name.EndsWith("Hotkey", StringComparison.OrdinalIgnoreCase)) return false;
+            string v = (e.BoxedValue as string ?? "").Trim();
+            return v.Length == 0 || IsName<KeyCode>(v) || IsName<UnityEngine.InputSystem.Key>(v);
+        }
+
+        private static bool IsName<T>(string v) where T : struct { T x; return Enum.TryParse(v, true, out x) && !int.TryParse(v, out _); }
+
+        private static string KeyName(ConfigEntryBase e, KeyCode k)
+        {
+            if (k == KeyCode.None) return "";
+            string v = (e.BoxedValue as string ?? "").Trim();
+            bool input = v.Length > 0 && !IsName<KeyCode>(v) && IsName<UnityEngine.InputSystem.Key>(v);
+            if (input)
+            {
+                // the input system's name of the key just pressed
+                var kb = UnityEngine.InputSystem.Keyboard.current;
+                if (kb != null) foreach (var kc in kb.allKeys) if (kc != null && kc.wasPressedThisFrame) return kc.keyCode.ToString();
+            }
+            return k.ToString();
+        }
+
         private static bool IsPick(MenuRow row)
         {
             if (row.Options != null) return true;
@@ -903,6 +931,7 @@ namespace Monolith
                     {
                         if (_editRow.Entry == Key && set == KeyCode.None) { }   // the menu's own key is never "none": there would be no way back in
                         else if (_editRow.Entry.SettingType == typeof(KeyCode)) _editRow.Entry.BoxedValue = set;
+                        else if (_editRow.Entry.SettingType == typeof(string)) _editRow.Entry.BoxedValue = KeyName(_editRow.Entry, set);
                         else _editRow.Entry.BoxedValue = new KeyboardShortcut(set);
                     }
                     catch { }
@@ -1025,7 +1054,7 @@ namespace Monolith
             ConfigEntryBase e = row.Entry; Type t = e.SettingType;
             if (row.Bind) { _bindRow = row; _bindEnterUp = false; _modeFrame = Time.frameCount; return; }
             if (t == typeof(bool)) { e.BoxedValue = !(bool)e.BoxedValue; return; }
-            if (t == typeof(KeyCode) || t == typeof(KeyboardShortcut)) { _editRow = row; _capture = true; _modeFrame = Time.frameCount; return; }
+            if (t == typeof(KeyCode) || t == typeof(KeyboardShortcut) || TextKey(e)) { _editRow = row; _capture = true; _modeFrame = Time.frameCount; return; }
             // one of several, or a color: a list or a palette opens over the page
             if (t == typeof(Color) || IsPick(row))
             {

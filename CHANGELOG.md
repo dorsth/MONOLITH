@@ -1,5 +1,9 @@
 # MONOLITH changelog
 
+## 1.1.3
+- With an extra jump on one scroll direction, swap weapons keeps the other one: jump on scroll down, swap on scroll up. Before, a jump anywhere on the wheel took the whole wheel from swap.
+- Other mods that keep a key as text (like Spawn Viewer's Toggle Key) take a key press in the menu, the same as any other key setting.
+
 ## 1.1.2
 - Match stats start over at every new match for every player. Before, only the host's reset, and a rematch kept counting from the last match.
 - The match stats board flies up into the victory screen, and gets smaller when it wouldn't fit, so it never fills the screen.
