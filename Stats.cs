@@ -474,9 +474,9 @@ namespace Monolith
             // after 10 seconds without it, it stays flat and the log says why.
             private Canvas _cv; private CanvasScaler _sc; private Image _backImage; private bool _world; private float _worldUntil = -1f;
             private string _whyFlat;
-            private const float Turn = 40f;      // degrees toward the middle of the room
-            private const float Wide = 4f;       // the board is this many times as wide as the word REMATCH
-            private const float Clear = 1.3f, Out = 0.6f;
+            private const float Turn = 25f;      // degrees toward the middle of the room
+            private const float Wide = 3.6f;      // the board is this many times as wide as the word REMATCH
+            private const float Clear = 0.6f, Out = 0.6f;
             private void Flat()
             {
                 _world = false;
@@ -499,7 +499,7 @@ namespace Monolith
                 Vector3 leftTop = at.TransformPoint(new Vector3(b.min.x, b.max.y, b.center.z));
 
                 _cv.renderMode = RenderMode.WorldSpace; _sc.enabled = false;
-                if (_backImage != null) _backImage.color = new Color(0.03f, 0.04f, 0.05f, 0.85f);   // solid enough to read against the sky
+                if (_backImage != null) _backImage.color = new Color(0.05f, 0.06f, 0.07f, 0.6f);   // enough to read against the sky, light enough to see it through
                 var ct = (RectTransform)_canvas.transform;
                 ct.sizeDelta = _back.sizeDelta;
                 float sc = Wide * wSign / Mathf.Max(1f, _back.sizeDelta.x);
