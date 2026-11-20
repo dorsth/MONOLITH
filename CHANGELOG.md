@@ -3,6 +3,8 @@
 ## 1.1.5
 - Mod Menu's API is back in MONOLITH (ModMenu.dll), credited to kestrel: mods that need Mod Menu, like Spawn Viewer 2.1, load and show under Other mods again.
 - The Viewmodel page, the Other mods page and the top of the README credit kestrel for Minimal Viewmodels Reborn and Mod Menu.
+- The menu title is just MONOLITH. The version shows on the General page.
+- Shorter README, with what MONOLITH has and how to use it.
 - The dll's description is just "Dorsth was here." now. It said it held every Dorsth mod, and STRAFTH and Straftat Tournaments are not in it.
 
 ## 1.1.4

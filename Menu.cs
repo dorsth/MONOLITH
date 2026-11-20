@@ -379,7 +379,7 @@ namespace Monolith
 
             Fill(_win, Back);
             // the categories
-            Box(_navR, "MONOLITH " + BundlePlugin.Version, !pageOn);
+            Box(_navR, "MONOLITH", !pageOn);
             for (int i = 0; i < _cats.Count; i++)
             {
                 Rect r = new Rect(_navR.x + _cw, _navR.y + (i + 1) * _ch, _navR.width - 2 * _cw, _ch);
@@ -421,7 +421,7 @@ namespace Monolith
             Box(info, null, false);
             bool said = _say != null && Time.unscaledTime < _sayUntil;
             MenuRow told = said ? null : over >= 0 && over < _vis.Count ? _vis[over] : overCat >= 0 || !pageOn ? null : ci >= 0 && ci < _vis.Count ? _vis[ci] : null;
-            string text = said ? _say : over >= 0 && over < _vis.Count ? Describe(_vis[over]) : overCat >= 0 ? Lang.T(_cats[overCat].Info) : !pageOn ? Lang.T(_cats[_cat].Info) : ci >= 0 ? Describe(_vis[ci]) : _searching && _query.Length > 0 ? Lang.T("Nothing found.") : "";
+            string text = said ? _say : over >= 0 && over < _vis.Count ? Describe(_vis[over]) : overCat >= 0 ? Lang.T(_cats[overCat].Info) + _cats[overCat].Tail : !pageOn ? Lang.T(_cats[_cat].Info) + _cats[_cat].Tail : ci >= 0 ? Describe(_vis[ci]) : _searching && _query.Length > 0 ? Lang.T("Nothing found.") : "";
             // the mouse went from a row down to this box (to click Reset): the box keeps telling about that row
             if (!said && info.Contains(mouse) && _told != null && _vis.Contains(_told)) { told = _told; text = Describe(told); }
             else _told = told;
