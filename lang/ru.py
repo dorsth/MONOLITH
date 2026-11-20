@@ -29,7 +29,7 @@ T = [
 ('Settings of the other mods you have installed. Not part of MONOLITH. Works with mods made for Mod Menu by kestrel.', 'Настройки других установленных модов. Не часть MONOLITH. Работает с модами для Mod Menu от kestrel.', 'info'), ('no options', 'нет настроек', 'L20'),
 ('Move a taunt to another key, or switch it off.', 'Перенесите насмешку на другую клавишу или отключите её.', 'info'),
 ('Save, load and share configs: every setting, the game\'s included. Sensitivity is never included.', 'Сохранение, загрузка и обмен конфигами: все настройки, включая настройки игры. Чувствительность не входит никогда.', 'info'),
-('Language, the menu key, menu animations, playlists.', 'Язык, клавиша меню, анимации меню, плейлисты.', 'info'),
+('Language, the menu key, menu animations, playlists. Menu colors inspired by the STRAFTAT theme for Far Manager by klammvs.', 'Язык, клавиша меню, анимации меню, плейлисты. Цвета меню по теме STRAFTAT для Far Manager от klammvs.', 'info'),
 ('A weapon listed here uses its own FOV and position.', 'У оружия из этого списка свои FOV и положение.', 'info'),
 # ---- crosshair (31 cells)
 ('Custom crosshair', 'Свой прицел', 'L27'), ('Off: the game crosshair.', 'Выкл: прицел игры.', 'tip'),

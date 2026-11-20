@@ -608,7 +608,7 @@ namespace Monolith
 
             // ---------------------------------------------------------------- general
             {
-                var p = new MenuPage(null, "General", "Language, the menu key, menu animations, playlists.") { Tail = " MONOLITH " + BundlePlugin.Version };
+                var p = new MenuPage(null, "General", "Language, the menu key, menu animations, playlists. Menu colors inspired by the STRAFTAT theme for Far Manager by klammvs.") { Tail = " MONOLITH " + BundlePlugin.Version };
                 p.Set("Language / Язык", Lang.Pick, null, "")
                  .Set("Open this menu", BundleMenu.Key, null, "Press Enter, then the key.")
                  .Set("Fewer UI animations", E(Tweaks, "Menus", "Reduce UI Animations"), null, "No animations in menus and on the HUD.")

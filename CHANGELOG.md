@@ -1,6 +1,7 @@
 # MONOLITH changelog
 
 ## 1.1.9
+- General says the menu colors are inspired by the STRAFTAT theme for Far Manager by klammvs.
 - The kestrel line at the top of the README uses the same words as the menu.
 - The match stats board on the victory screen stands in the victory room as a twin of the blue ranking wall: as wide, at the same height, off to your right and facing you. If the wall isn't there, it shows on the screen as before.
 - The dll's description says what MONOLITH is, and each mod in it prints its name, version and "Dorsth was here." once in the BepInEx console at start.

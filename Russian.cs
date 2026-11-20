@@ -44,7 +44,7 @@ namespace Monolith
             { "no options", "нет настроек" },
             { "Move a taunt to another key, or switch it off.", "Перенесите насмешку на другую клавишу или отключите её." },
             { "Save, load and share configs: every setting, the game's included. Sensitivity is never included.", "Сохранение, загрузка и обмен конфигами: все настройки, включая настройки игры. Чувствительность не входит никогда." },
-            { "Language, the menu key, menu animations, playlists.", "Язык, клавиша меню, анимации меню, плейлисты." },
+            { "Language, the menu key, menu animations, playlists. Menu colors inspired by the STRAFTAT theme for Far Manager by klammvs.", "Язык, клавиша меню, анимации меню, плейлисты. Цвета меню по теме STRAFTAT для Far Manager от klammvs." },
             { "A weapon listed here uses its own FOV and position.", "У оружия из этого списка свои FOV и положение." },
             { "Custom crosshair", "Свой прицел" },
             { "Off: the game crosshair.", "Выкл: прицел игры." },
