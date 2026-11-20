@@ -15,8 +15,8 @@ using HarmonyLib;
 using UnityEngine;
 
 [assembly: AssemblyTitle("CameraTweaks")]
-[assembly: AssemblyDescription("CameraTweaks for STRAFTAT. Dorsth was here.")]
-[assembly: AssemblyVersion("1.1.9.0")]
+[assembly: AssemblyDescription("Takes out the camera movement STRAFTAT adds on its own, one switch each.")]
+[assembly: AssemblyVersion("1.2.0.0")]
 // only changes your own camera on your own screen: fine to play with people who don't have it
 [assembly: StraftatMod(isVanillaCompatible: true)]
 
@@ -29,7 +29,7 @@ namespace CameraTweaks
     [BepInPlugin(Guid, Name, Version)]
     public sealed class Plugin : BaseUnityPlugin
     {
-        public const string Guid = "dorsth.straftat.cameratweaks", Name = "CameraTweaks", Version = "1.1.9";
+        public const string Guid = "dorsth.straftat.cameratweaks", Name = "CameraTweaks", Version = "1.2.0";
         internal static ManualLogSource Log;
 
         // NoTilt: all of SideTilt's roll (tiltAmount, slideTiltAmount, wallSlideLean, rotationAmount)

@@ -16,8 +16,8 @@ using UnityEngine;
 using UnityEngine.Networking;
 
 [assembly: AssemblyTitle("CombatSounds")]
-[assembly: AssemblyDescription("Your own hit, head hit, kill and melee kill sounds, and gun volume. Only you hear it.")]
-[assembly: AssemblyVersion("1.1.7.0")]
+[assembly: AssemblyDescription("Your own hit, head hit, kill and melee kill sounds, and gun volume.")]
+[assembly: AssemblyVersion("1.1.8.0")]
 [assembly: AssemblyFileVersion("1.1.6.0")]
 
 // Only changes what you hear, so matchmaking with unmodded players still works.
@@ -34,7 +34,7 @@ namespace CombatSounds
 #endif
         public const string Guid = "dorsth.straftat.combatsounds";
         public const string Name = "CombatSounds";
-        public const string Version = "1.1.7";
+        public const string Version = "1.1.8";
 
         internal static ManualLogSource Log;
         internal static SoundSlot Hit, HeadHit, Kill, MeleeKill;
@@ -43,7 +43,7 @@ namespace CombatSounds
         private void Awake()
         {
             Log = Logger;
-            Log.LogMessage("Dorsth was here");
+            Log.LogInfo(Name + " " + Version + " loaded. Dorsth was here.");
             // the volume table also drops removed guns and casings when a scene loads, not only every 256 new ones
             // (a heap walk found ~135 destroyed sound sources of earlier takes still in it)
             UnityEngine.SceneManagement.SceneManager.sceneLoaded += (s, m) => GunSounds.Prune();

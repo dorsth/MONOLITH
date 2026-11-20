@@ -9,8 +9,8 @@ using UnityEngine;
 using System.Reflection;
 
 [assembly: AssemblyTitle("TrueSens")]
-[assembly: AssemblyDescription("TrueSens for STRAFTAT. Dorsth was here.")]
-[assembly: AssemblyVersion("1.2.3.0")]
+[assembly: AssemblyDescription("Set your sensitivity in cm/360 from your mouse DPI, with every zoom scaled from it.")]
+[assembly: AssemblyVersion("1.2.4.0")]
 // only changes your own aim on your own screen: fine to play with people who don't have it
 [assembly: StraftatMod(isVanillaCompatible: true)]
 
@@ -31,7 +31,7 @@ namespace TrueSens
     [BepInPlugin(Guid, Name, Version)]
     public sealed class Plugin : BaseUnityPlugin
     {
-        public const string Guid = "dorsth.straftat.truesens", Name = "TrueSens", Version = "1.2.3";
+        public const string Guid = "dorsth.straftat.truesens", Name = "TrueSens", Version = "1.2.4";
         internal static ManualLogSource Log;
 
         internal static ConfigEntry<bool> On;

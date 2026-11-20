@@ -14,8 +14,8 @@ using UnityEngine;
 using UnityEngine.LowLevel;
 
 [assembly: AssemblyTitle("ViewmodelTweaks")]
-[assembly: AssemblyDescription("Viewmodel FOV, position, sway, bob and arms, with its own values for any weapon you pick. Dorsth was here.")]
-[assembly: AssemblyVersion("2.0.5.0")]
+[assembly: AssemblyDescription("Viewmodel FOV, position, sway, bob and arms, with its own values for any weapon you add.")]
+[assembly: AssemblyVersion("2.0.6.0")]
 [assembly: StraftatMod(isVanillaCompatible: true)]
 
 namespace ViewmodelTweaks
@@ -55,7 +55,7 @@ namespace ViewmodelTweaks
     {
         public const string Guid = "dorsth.straftat.viewmodeltweaks";
         public const string Name = "ViewmodelTweaks";
-        public const string Version = "2.0.5";
+        public const string Version = "2.0.6";
         internal const int MaxSlots = 10;
 
         internal static ManualLogSource Log;
@@ -668,6 +668,7 @@ namespace ViewmodelTweaks
         private void Awake()
         {
             Log = Logger;
+            Log.LogInfo(Name + " " + Version + " loaded. Dorsth was here.");
             Detail = Config.Bind("Internal", "Detailed Log", false, "Writes what One Camera does to the log (for measuring). Off: only problems are written.");
             FromSwordStance();
             NoSword();
@@ -733,7 +734,6 @@ namespace ViewmodelTweaks
             }
 #endif
             Ready();
-            Log.LogMessage("Dorsth was here");
             // BepInEx's manager object (every plugin's home) is a plain object the game destroys on the way into a lobby, unless something hides it (Mod Menu does): hidden here too, so this works without Mod Menu.
             gameObject.hideFlags = HideFlags.HideAndDontSave;
         }

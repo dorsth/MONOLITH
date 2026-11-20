@@ -19,8 +19,8 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 [assembly: AssemblyTitle("ezCrosshair")]
-[assembly: AssemblyDescription("STRAFTAT: pick your own crosshair, its color and size.")]
-[assembly: AssemblyVersion("1.2.4.0")]
+[assembly: AssemblyDescription("Pick your own crosshair, its color and size.")]
+[assembly: AssemblyVersion("1.2.5.0")]
 [assembly: AssemblyFileVersion("1.2.1.0")]
 
 // Only changes what you see on your own screen, so matchmaking with unmodded players still works.
@@ -34,7 +34,7 @@ namespace EzCrosshair
     {
         public const string Guid = "dorsth.straftat.ezcrosshair";
         public const string Name = "ezCrosshair";
-        public const string Version = "1.2.4";
+        public const string Version = "1.2.5";
         internal const string ModMenuGuid = "kestrel.straftat.modmenu";
 
         // in the order they're shown (Images.cs has each one's picture)
@@ -57,7 +57,7 @@ namespace EzCrosshair
         private void Awake()
         {
             Log = Logger;
-            Log.LogMessage("Dorsth was here");
+            Log.LogInfo(Name + " " + Version + " loaded. Dorsth was here.");
             // BepInEx's manager object (every plugin's home) is a plain object the game destroys on the way into a lobby, unless something hides it (Mod Menu does): hidden here too, so this works without Mod Menu.
             gameObject.hideFlags = HideFlags.HideAndDontSave;
 

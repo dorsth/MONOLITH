@@ -9,8 +9,8 @@ using BepInEx;
 using ComputerysModdingUtilities;
 
 [assembly: AssemblyTitle("MONOLITH")]
-[assembly: AssemblyDescription("Dorsth was here.")]
-[assembly: AssemblyVersion("1.1.8.0")]
+[assembly: AssemblyDescription("A competitive mod bundle for STRAFTAT.")]
+[assembly: AssemblyVersion("1.1.9.0")]
 // only changes things on your own screen: fine to play with people who don't have it
 [assembly: StraftatMod(isVanillaCompatible: true)]
 
@@ -20,7 +20,7 @@ namespace Monolith
     [BepInDependency(ModMenuGuid, BepInDependency.DependencyFlags.SoftDependency)]
     public sealed class BundlePlugin : BaseUnityPlugin
     {
-        public const string Guid = "dorsth.straftat.monolith", Name = "MONOLITH", Version = "1.1.8";
+        public const string Guid = "dorsth.straftat.monolith", Name = "MONOLITH", Version = "1.1.9";
         // filled in by build.sh: the mods and versions this file was built from
         internal const string Contents = "@CONTENTS@";
 
@@ -31,8 +31,8 @@ namespace Monolith
         private void Awake()
         {
             Log = Logger; I = this;
-            Logger.LogMessage("Dorsth was here");
-            Logger.LogInfo(Name + " " + Version + " holds: " + Contents);
+            Logger.LogInfo(Name + " " + Version + " loaded. Dorsth was here.");
+            Logger.LogInfo("It holds: " + Contents);
             // as the mods in here do: the object BepInEx keeps its plugins on is hidden, so the game does not destroy it
             gameObject.hideFlags = UnityEngine.HideFlags.HideAndDontSave;
             BundleMenu.Key = Config.Bind("Keys", "Menu", UnityEngine.KeyCode.F2, "Opens the menu with the settings of every mod in the bundle.");

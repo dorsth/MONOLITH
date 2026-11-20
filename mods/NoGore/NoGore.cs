@@ -24,8 +24,8 @@ using TMPro;
 using UnityEngine;
 
 [assembly: AssemblyTitle("NoGore")]
-[assembly: AssemblyDescription("STRAFTAT: no blood and no ragdolls, only on your screen.")]
-[assembly: AssemblyVersion("1.3.4.0")]
+[assembly: AssemblyDescription("Hides ragdolls, body pieces and hats that fall off players, and removes blood.")]
+[assembly: AssemblyVersion("1.3.5.0")]
 [assembly: AssemblyFileVersion("1.3.0.0")]
 
 // Only changes what you see on your own screen, so matchmaking with unmodded players still works.
@@ -39,7 +39,7 @@ namespace NoGore
     {
         public const string Guid = "dorsth.straftat.nogore";
         public const string Name = "NoGore";
-        public const string Version = "1.3.4";
+        public const string Version = "1.3.5";
 
         internal static ManualLogSource Log;
         internal static ConfigEntry<bool> HideBodies, HideRagdolls, HideHats, NoBlood, NoHitBlood, NoDeathBlood, NoBloodStains;
@@ -75,7 +75,7 @@ namespace NoGore
         private void Awake()
         {
             Log = Logger;
-            Log.LogMessage("Dorsth was here");
+            Log.LogInfo(Name + " " + Version + " loaded. Dorsth was here.");
 #if !DORSTH_BUNDLE
             if (BepInEx.Bootstrap.Chainloader.PluginInfos.ContainsKey("kestrel.straftat.modmenu"))
             { try { ModMenuDescription(); } catch (Exception e) { Logger.LogInfo("Mod Menu description: " + e.Message); } }

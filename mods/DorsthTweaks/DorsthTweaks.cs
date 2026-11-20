@@ -34,8 +34,8 @@ using WaterBasic = UnityStandardAssets.Water.WaterBasic;
 using PlanarReflection = UnityStandardAssets.Water.PlanarReflection;
 
 [assembly: AssemblyTitle("DorsthTweaks")]
-[assembly: AssemblyDescription("Hitmarker, HUD, viewmodel and FPS tweaks for STRAFTAT.")]
-[assembly: AssemblyVersion("1.3.8.0")]
+[assembly: AssemblyDescription("Small client-side tweaks for STRAFTAT: bullet trails, HUD, prompts, menus and performance.")]
+[assembly: AssemblyVersion("1.3.9.0")]
 [assembly: AssemblyFileVersion("1.3.7.0")]
 
 // Only changes what you see on your own screen, so matchmaking with unmodded players still works.
@@ -49,7 +49,7 @@ namespace DorsthTweaks
     {
         public const string Guid = "dorsth.straftat.dorsthtweaks";
         public const string Name = "DorsthTweaks";
-        public const string Version = "1.3.8";
+        public const string Version = "1.3.9";
 
         internal static ManualLogSource Log;
         internal static ConfigEntry<bool> Detail;
@@ -114,8 +114,8 @@ namespace DorsthTweaks
         private void Awake()
         {
             Log = Logger;
+            Log.LogInfo(Name + " " + Version + " loaded. Dorsth was here.");
             Detail = Config.Bind("Internal", "Detailed Log", false, "Writes what each tweak did to the log (for measuring). Off: only problems are written.");
-            Log.LogMessage("Dorsth was here");
             // BepInEx's manager object (every plugin's home) is a plain object the game destroys on the way into a lobby,
             // unless something hides it (Mod Menu does, so does BepInEx's HideManagerGameObject). Hidden here too.
             gameObject.hideFlags = HideFlags.HideAndDontSave;

@@ -1,5 +1,8 @@
 # MONOLITH changelog
 
+## 1.1.9
+- The dll's description says what MONOLITH is, and each mod in it prints its name, version and "Dorsth was here." once in the BepInEx console at start.
+
 ## 1.1.8
 - Replaces 1.1.7, an older build uploaded by mistake: Mod Menu's API is back, so mods that need Mod Menu load again.
 - Other mods: key settings of other mods (like Spawn Viewer's Toggle Key) take the key you press. Before, pressing a key did nothing.
