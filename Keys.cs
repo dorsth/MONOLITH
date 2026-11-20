@@ -13,8 +13,8 @@
 //    binding, changed and saved the way the game's own settings change and save it.
 //    A press here is a press, one for one: nothing is repeated or timed for you.
 //  * No key is asked for every frame: the input system calls in when one is pressed. A key that is not set costs nothing.
-//  * While a jump of yours is on the wheel, the game's swap does not hear the wheel (a prefix on the routine that hears
-//    it), so one notch does one thing.
+//  * While a jump of yours is on a wheel direction, the game's swap does not hear that direction (a prefix on the routine
+//    that hears it), so one notch does one thing: jump on scroll down and swap on the wheel swaps on scroll up.
 //  * Taunts: the game asks for the ten number keys every frame. Those questions are answered here: for a taunt you
 //    did not change, with the game's own answer.
 using System;
@@ -37,7 +37,7 @@ namespace Monolith
 
         private static readonly Dictionary<ConfigEntry<string>, InputAction> Actions = new Dictionary<ConfigEntry<string>, InputAction>();
         private static readonly int[] TauntFrame = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
-        private static bool _wheelMine;
+        private static bool _jumpUp, _jumpDown;   // a jump of yours on scroll up, on scroll down (the whole wheel is both)
         private static ConfigFile _swapFile;
         private static string _oldSwap;          // a Swap weapons key from before 0.9.74, moved into the game's binding once
         private static bool _swapSync;
@@ -101,8 +101,14 @@ namespace Monolith
                     a.Enable();
                     Actions[e] = a;
                 }
-                _wheelMine = false;
-                foreach (ConfigEntry<string> k in All()) if (k.Value != null && k.Value.IndexOf("/scroll", StringComparison.Ordinal) >= 0) _wheelMine = true;
+                _jumpUp = _jumpDown = false;
+                foreach (ConfigEntry<string> k in All())
+                {
+                    if (k.Value == null || k.Value.IndexOf("/scroll", StringComparison.Ordinal) < 0) continue;
+                    bool up = k.Value.EndsWith("/up", StringComparison.Ordinal), down = k.Value.EndsWith("/down", StringComparison.Ordinal);
+                    if (up || !down) _jumpUp = true;     // the whole wheel takes both
+                    if (down || !up) _jumpDown = true;
+                }
             }
             catch (Exception x) { BundlePlugin.Log.LogWarning("Keys: " + e.Definition.Key + " could not be set to " + e.Value + ": " + x.Message); }
         }
@@ -123,12 +129,18 @@ namespace Monolith
             catch (Exception) { }
         }
 
-        // While a jump of yours is on the wheel, the game's swap does not hear the wheel.
+        // While a jump of yours is on a wheel direction, the game's swap does not hear that direction. The other one still
+        // swaps: a jump on scroll down leaves scroll up to swap.
         private static bool WheelPrefix(InputAction.CallbackContext __0)
         {
-            if (!_wheelMine) return true;
+            if (!_jumpUp && !_jumpDown) return true;
             InputControl c = __0.control;
-            return c == null || !(c.device is Mouse) || c.path.IndexOf("/scroll", StringComparison.Ordinal) < 0;
+            if (c == null || !(c.device is Mouse) || c.path.IndexOf("/scroll", StringComparison.Ordinal) < 0) return true;
+            bool up;
+            if (c.path.EndsWith("/up", StringComparison.Ordinal)) up = true;
+            else if (c.path.EndsWith("/down", StringComparison.Ordinal)) up = false;
+            else { float y = 0f; try { y = Mouse.current != null ? Mouse.current.scroll.ReadValue().y : 0f; } catch { } if (y == 0f) return true; up = y > 0f; }
+            return up ? !_jumpUp : !_jumpDown;
         }
 
         internal const string Wheel = "<Mouse>/scroll";
