@@ -1,7 +1,7 @@
 # MONOLITH changelog
 
 ## 1.1.7
-- The dll no longer says it holds every Dorsth mod (STRAFTH and Straftat Tournaments are not in it).
+- The dll's description is just "Dorsth was here." now. It said it held every Dorsth mod, and STRAFTH and Straftat Tournaments are not in it.
 
 ## 1.1.6
 - Other mods shows only the key that opens STRAFTH and Straftat Tournaments, as before: their other settings are in their own menus. Without Mod Menu they all showed.

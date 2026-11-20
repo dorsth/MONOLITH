@@ -9,6 +9,7 @@ using BepInEx;
 using ComputerysModdingUtilities;
 
 [assembly: AssemblyTitle("MONOLITH")]
+[assembly: AssemblyDescription("Dorsth was here.")]
 [assembly: AssemblyVersion("1.1.7.0")]
 // only changes things on your own screen: fine to play with people who don't have it
 [assembly: StraftatMod(isVanillaCompatible: true)]
