@@ -44,7 +44,7 @@ When a new version is out, a line shows in the main menu. Update with your mod m
 
 ## Credits
 
-- Menu colors inspired by the STRAFTAT theme for Far Manager by [klammvs](https://github.com/vsklamm).
+- Menu inspired by the STRAFTAT theme for Far Manager by [klammvs](https://github.com/vsklamm).
 - Slide cooldown timer based on MovementPro by Glizzmn.
 - Camera tilt and shake switches build on [NoCameraRoll](https://thunderstore.io/c/straftat/p/Kevnator/NoCameraRoll/) by Kevnator.
 - Weapon camera based on [Minimal Viewmodels Reborn](https://github.com/kestrel-straftat/minimal-viewmodels-reborn) by kestrel, under the MIT License. The license text is `mods/ViewmodelTweaks/LICENSE-MinimalViewmodelsReborn.txt`.
