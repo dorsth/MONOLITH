@@ -188,7 +188,7 @@ namespace Monolith
                 foreach (var kv in All)
                 {
                     P p = kv.Value;
-                    if (!ClientInstance.playerInstances.ContainsKey(kv.Key)) continue;
+                    if (!ClientInstance.playerInstances.ContainsKey(kv.Key) || !Playing(kv.Key)) continue;
                     p.Takes++;
                     if (p.Alive) p.Survived++;
                     if (p.LastAlive && TeamAlive(Team(kv.Key))) p.Clutch++;
@@ -366,9 +366,14 @@ namespace Monolith
 
         internal static string Num(float f) { return Mathf.RoundToInt(f).ToString(CultureInfo.InvariantCulture); }
 
+        // The game has 4 player places (ids 0 to 3). A higher id is a spectator seat (Straftat Tournaments): not on the
+        // boards and not counted in takes.
+        private static bool Playing(int id) { return id >= 0 && id < 4; }
+
         internal static List<KeyValuePair<int, P>> Sorted()
         {
-            var l = new List<KeyValuePair<int, P>>(All);
+            var l = new List<KeyValuePair<int, P>>();
+            foreach (var kv in All) if (Playing(kv.Key)) l.Add(kv);
             l.Sort((a, b) => Team(a.Key) != Team(b.Key) ? Team(a.Key).CompareTo(Team(b.Key)) : b.Value.Kills != a.Value.Kills ? b.Value.Kills.CompareTo(a.Value.Kills) : b.Value.Dmg.CompareTo(a.Value.Dmg));
             return l;
         }
