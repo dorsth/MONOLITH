@@ -17,7 +17,7 @@ using UnityEngine.Networking;
 
 [assembly: AssemblyTitle("CombatSounds")]
 [assembly: AssemblyDescription("Your own hit, head hit, kill and melee kill sounds, and gun volume. Only you hear it.")]
-[assembly: AssemblyVersion("1.1.6.0")]
+[assembly: AssemblyVersion("1.1.7.0")]
 [assembly: AssemblyFileVersion("1.1.6.0")]
 
 // Only changes what you hear, so matchmaking with unmodded players still works.
@@ -34,7 +34,7 @@ namespace CombatSounds
 #endif
         public const string Guid = "dorsth.straftat.combatsounds";
         public const string Name = "CombatSounds";
-        public const string Version = "1.1.6";
+        public const string Version = "1.1.7";
 
         internal static ManualLogSource Log;
         internal static SoundSlot Hit, HeadHit, Kill, MeleeKill;

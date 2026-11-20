@@ -1052,7 +1052,8 @@ namespace Monolith
                 default: return;
             }
             ConfigEntryBase e = row.Entry; Type t = e.SettingType;
-            if (row.Bind) { _bindRow = row; _bindEnterUp = false; _modeFrame = Time.frameCount; return; }
+            // MONOLITH's own keys are text (an input path); another mod's KeyCode or KeyboardShortcut is set by the key capture below
+            if (row.Bind && t == typeof(string)) { _bindRow = row; _bindEnterUp = false; _modeFrame = Time.frameCount; return; }
             if (t == typeof(bool)) { e.BoxedValue = !(bool)e.BoxedValue; return; }
             if (t == typeof(KeyCode) || t == typeof(KeyboardShortcut) || TextKey(e)) { _editRow = row; _capture = true; _modeFrame = Time.frameCount; return; }
             // one of several, or a color: a list or a palette opens over the page

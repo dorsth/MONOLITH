@@ -15,7 +15,7 @@ using UnityEngine.LowLevel;
 
 [assembly: AssemblyTitle("ViewmodelTweaks")]
 [assembly: AssemblyDescription("Viewmodel FOV, position, sway, bob and arms, with its own values for any weapon you pick. Dorsth was here.")]
-[assembly: AssemblyVersion("2.0.4.0")]
+[assembly: AssemblyVersion("2.0.5.0")]
 [assembly: StraftatMod(isVanillaCompatible: true)]
 
 namespace ViewmodelTweaks
@@ -55,7 +55,7 @@ namespace ViewmodelTweaks
     {
         public const string Guid = "dorsth.straftat.viewmodeltweaks";
         public const string Name = "ViewmodelTweaks";
-        public const string Version = "2.0.4";
+        public const string Version = "2.0.5";
         internal const int MaxSlots = 10;
 
         internal static ManualLogSource Log;
