@@ -469,38 +469,41 @@ namespace Monolith
             private Vector2 _to; private float _flyAt = -1f;
             private const float Fly = 0.55f;
 
-            // The victory board stands in the victory room, above the rematch sign, like the game's own 3D signs. Until that
-            // sign is there (it comes over the network) it shows flat on the screen; after 4 seconds without it, it stays flat.
-            private Canvas _cv; private CanvasScaler _sc; private bool _world; private float _worldUntil = -1f;
+            // The victory board stands in the victory room as a twin of the game's blue ranking wall: as wide, at the same height
+            // and distance from you, turned 55 degrees to your right of it, facing you the way the wall does. Until that wall is
+            // there (it comes over the network) the board shows flat on the screen; after 4 seconds without it, it stays flat.
+            private Canvas _cv; private CanvasScaler _sc; private Image _backImage; private bool _world; private float _worldUntil = -1f;
+            private const float Turn = 55f;
             private void Flat()
             {
                 _world = false;
                 if (_cv != null) _cv.renderMode = RenderMode.ScreenSpaceOverlay;
                 if (_sc != null) _sc.enabled = true;
+                if (_backImage != null) _backImage.color = new Color(0f, 0f, 0f, 0.45f);
             }
             private bool InRoom()
             {
-                VictoryMenu rematch = null;
-                foreach (VictoryMenu m in FindObjectsOfType<VictoryMenu>())
-                    if (Traverse.Create(m).Field("restartGame").GetValue<bool>()) { rematch = m; break; }
-                if (rematch == null) return false;
-                var sign = Traverse.Create(rematch).Field("textObject").GetValue<GameObject>();
-                TMP_Text text = sign != null ? sign.GetComponentInChildren<TMP_Text>() : null;
-                if (text == null) text = rematch.GetComponentInChildren<TMP_Text>();
-                Transform at = text != null ? text.transform : rematch.transform;
-                Bounds b = text != null && text.bounds.size.y > 0f ? text.bounds : new Bounds(Vector3.zero, new Vector3(1f, 0.3f, 0f));
-                float h = Mathf.Max(0.05f, b.size.y * Mathf.Abs(at.lossyScale.y));   // the height of the rematch letters in the room
-                Vector3 top = at.TransformPoint(new Vector3(b.center.x, b.max.y, b.center.z));
+                VictoryMenuUI ranks = FindObjectOfType<VictoryMenuUI>();
+                Camera eye = Camera.main;
+                if (ranks == null || eye == null) return false;
+                Canvas wall = ranks.GetComponentInParent<Canvas>();
+                if (wall == null || wall.renderMode != RenderMode.WorldSpace) return false;
+                var wr = (RectTransform)wall.transform;
+                var c = new Vector3[4]; wr.GetWorldCorners(c);   // bottom left, top left, top right, bottom right
+                Vector3 mid = (c[0] + c[2]) * 0.5f;
+                float wide = Vector3.Distance(c[0], c[3]), tall = Vector3.Distance(c[0], c[1]);
+                if (wide < 0.01f || tall < 0.01f) return false;
+                Quaternion turn = Quaternion.AngleAxis(Turn, Vector3.up);
+                Vector3 me = eye.transform.position, away = mid - me; float y = away.y; away.y = 0f;
+                Vector3 at = me + turn * away; at.y = me.y + y;
                 _cv.renderMode = RenderMode.WorldSpace; _sc.enabled = false;
+                if (_backImage != null) _backImage.color = new Color(0.03f, 0.04f, 0.05f, 0.85f);   // solid enough to read against the sky
                 var ct = (RectTransform)_canvas.transform;
                 ct.sizeDelta = _back.sizeDelta;
-                // its letters at most 60% as tall as the sign's (a capital is about 0.7 of the font size), and the board at most
-                // 2.6 times as wide as the word REMATCH, so it stays over its own sign
-                float wSign = Mathf.Max(0.1f, b.size.x * Mathf.Abs(at.lossyScale.x));
-                float s = Mathf.Min(0.6f * h / (22f * 0.7f), 2.6f * wSign / Mathf.Max(1f, _back.sizeDelta.x));
+                float s = Mathf.Min(wide / Mathf.Max(1f, _back.sizeDelta.x), tall / Mathf.Max(1f, _back.sizeDelta.y));
                 ct.localScale = new Vector3(s, s, s);
-                ct.rotation = at.rotation;
-                ct.position = top + at.up * (h * 0.8f + _back.sizeDelta.y * s * 0.5f);
+                ct.rotation = turn * wr.rotation;
+                ct.position = at;
                 _root.localScale = Vector3.one; _to = Vector2.zero;
                 _world = true; _flyAt = Time.unscaledTime;   // rises into place from just below
                 return true;
@@ -598,7 +601,7 @@ namespace Monolith
                 _root = go.AddComponent<RectTransform>();
                 // one dark see-through panel behind the whole board, like the game's own boxes (kill feed, Tab screen)
                 var back = new GameObject("backdrop"); back.transform.SetParent(_root, false);
-                var bi = back.AddComponent<Image>(); bi.color = new Color(0f, 0f, 0f, 0.45f); bi.raycastTarget = false;
+                var bi = _backImage = back.AddComponent<Image>(); bi.color = new Color(0f, 0f, 0f, 0.45f); bi.raycastTarget = false;
                 _back = bi.rectTransform; _back.anchorMin = _back.anchorMax = _back.pivot = new Vector2(0f, 1f);
                 // the font and material of the round-end screen's names, so it reads like the game
                 try
