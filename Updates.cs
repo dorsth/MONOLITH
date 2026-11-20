@@ -17,7 +17,7 @@ namespace Monolith
     {
         private const string Package = "Dorsth/MONOLITH";
         private const string Api = "https://thunderstore.io/api/experimental/package/" + Package + "/";
-        private const string Page = "https://thunderstore.io/c/straftat/p/" + Package + "/";
+        internal const string Page = "https://thunderstore.io/c/straftat/p/" + Package + "/";
         private const string Me = "MONOLITH";
         // line heights up from the bottom of the screen: MONOLITH lowest, then STRAFTH, then Straftat Tournaments, so they never overlap
         private const float Spot = 1.6f;

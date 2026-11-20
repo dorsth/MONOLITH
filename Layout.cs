@@ -50,7 +50,6 @@ namespace Monolith
         public string Info;                 // what is in it (shown while it is picked in the list, or its link is)
         public readonly List<MenuRow> Rows = new List<MenuRow>();
         public MenuRow Cur; public int Last, Top;
-        public string Tail = "";            // added after the translated info, untranslated (the version on General)
         public bool Outside;                // not part of MONOLITH (the other mods you have): dimmer in the list
         // a box on the right of the page that the page draws itself (the crosshair): its size in cells, its title
         public Action<UnityEngine.Rect> Draw; public int SideCols, SideRows; public string SideTitle;
@@ -608,11 +607,13 @@ namespace Monolith
 
             // ---------------------------------------------------------------- general
             {
-                var p = new MenuPage(null, "General", "Language, the menu key, menu animations, playlists. Menu colors inspired by the STRAFTAT theme for Far Manager by klammvs.") { Tail = " MONOLITH " + BundlePlugin.Version };
+                var p = new MenuPage(null, "General", "Language, the menu key, menu animations, playlists. Menu colors inspired by the STRAFTAT theme for Far Manager by klammvs.");
                 p.Set("Language / Язык", Lang.Pick, null, "")
                  .Set("Open this menu", BundleMenu.Key, null, "Press Enter, then the key.")
                  .Set("Fewer UI animations", E(Tweaks, "Menus", "Reduce UI Animations"), null, "No animations in menus and on the HUD.")
                  .Set("Hide default playlists", E(Tweaks, "Menus", "Hide Default Playlists"), null, "Only your own playlists show when you host.");
+                p.Rows.Add(new MenuRow { Kind = RowKind.Action, Label = "Version", Dyn = () => BundlePlugin.Version, Info = "Opens MONOLITH on Thunderstore.",
+                                         Take = s => { UnityEngine.Application.OpenURL(Updates.Page); return null; } });
                 if (p.Rows.Count > 0) cats.Add(p);
             }
 

@@ -5,7 +5,7 @@ namespace Monolith
 {
     internal static partial class Lang
     {
-        private static readonly Dictionary<string, string> Table = new Dictionary<string, string>(294)
+        private static readonly Dictionary<string, string> Table = new Dictionary<string, string>(296)
         {
             { "Crosshair", "Прицел" },
             { "Viewmodel", "Вьюмодель" },
@@ -221,6 +221,7 @@ namespace Monolith
             { "Press Enter, then the key.", "Нажмите Enter, затем клавишу." },
             { "Presets", "Пресеты" },
             { "Saved", "Сохранённые" },
+            { "Version", "Версия" },
             { "Undo load", "Отменить загрузку" },
             { "Redo load", "Вернуть загрузку" },
             { "Save as new", "Сохранить как новый" },
@@ -235,6 +236,7 @@ namespace Monolith
             { "Nothing to undo.", "Нечего отменять." },
             { "Back to what you had before the last load.", "Возвращено то, что было до последней загрузки." },
             { "The load is back.", "Загрузка возвращена." },
+            { "Opens MONOLITH on Thunderstore.", "Открывает MONOLITH на Thunderstore." },
             { "Your config as one line of text. Paste it to a friend.", "Ваш конфиг одной строкой текста. Отправьте её другу." },
             { "Import from clipboard", "Импорт из буфера" },
             { "Copy a line from a friend (it starts with MONOLITH:), then press Enter here. Yours is kept as \"previous config\".", "Скопируйте строку от друга (она начинается с MONOLITH:) и нажмите здесь Enter. Ваш конфиг сохранится как «previous config»." },
