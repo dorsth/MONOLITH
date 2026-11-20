@@ -5,7 +5,7 @@ namespace Monolith
 {
     internal static partial class Lang
     {
-        private static readonly Dictionary<string, string> Table = new Dictionary<string, string>(296)
+        private static readonly Dictionary<string, string> Table = new Dictionary<string, string>(298)
         {
             { "Crosshair", "Прицел" },
             { "Viewmodel", "Вьюмодель" },
@@ -44,7 +44,7 @@ namespace Monolith
             { "no options", "нет настроек" },
             { "Move a taunt to another key, or switch it off.", "Перенесите насмешку на другую клавишу или отключите её." },
             { "Save, load and share configs: every setting, the game's included. Sensitivity is never included.", "Сохранение, загрузка и обмен конфигами: все настройки, включая настройки игры. Чувствительность не входит никогда." },
-            { "Language, the menu key, menu animations, playlists. Menu inspired by the STRAFTAT theme for Far Manager by klammvs.", "Язык, клавиша меню, анимации меню, плейлисты. Меню по теме STRAFTAT для Far Manager от klammvs." },
+            { "Language, the menu key, menu animations, playlists.", "Язык, клавиша меню, анимации меню, плейлисты." },
             { "A weapon listed here uses its own FOV and position.", "У оружия из этого списка свои FOV и положение." },
             { "Custom crosshair", "Свой прицел" },
             { "Off: the game crosshair.", "Выкл: прицел игры." },
@@ -222,6 +222,8 @@ namespace Monolith
             { "Presets", "Пресеты" },
             { "Saved", "Сохранённые" },
             { "Version", "Версия" },
+            { "Credits", "Благодарности" },
+            { "Menu: klammvs (STRAFTAT theme for Far Manager). Slide timer: Glizzmn (MovementPro). Tilt and shake switches: Kevnator (NoCameraRoll). Weapon camera and Mod Menu support: kestrel. Press to see them on GitHub.", "Меню: klammvs (тема STRAFTAT для Far Manager). Таймер подката: Glizzmn (MovementPro). Наклон и тряска: Kevnator (NoCameraRoll). Камера оружия и поддержка Mod Menu: kestrel. Нажмите, чтобы открыть на GitHub." },
             { "Undo load", "Отменить загрузку" },
             { "Redo load", "Вернуть загрузку" },
             { "Save as new", "Сохранить как новый" },

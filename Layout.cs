@@ -607,13 +607,15 @@ namespace Monolith
 
             // ---------------------------------------------------------------- general
             {
-                var p = new MenuPage(null, "General", "Language, the menu key, menu animations, playlists. Menu inspired by the STRAFTAT theme for Far Manager by klammvs.");
+                var p = new MenuPage(null, "General", "Language, the menu key, menu animations, playlists.");
                 p.Set("Language / Язык", Lang.Pick, null, "")
                  .Set("Open this menu", BundleMenu.Key, null, "Press Enter, then the key.")
                  .Set("Fewer UI animations", E(Tweaks, "Menus", "Reduce UI Animations"), null, "No animations in menus and on the HUD.")
                  .Set("Hide default playlists", E(Tweaks, "Menus", "Hide Default Playlists"), null, "Only your own playlists show when you host.");
                 p.Rows.Add(new MenuRow { Kind = RowKind.Action, Label = "Version", Dyn = () => BundlePlugin.Version, Info = "Opens MONOLITH on Thunderstore.",
                                          Take = s => { UnityEngine.Application.OpenURL(Updates.Page); return null; } });
+                p.Rows.Add(new MenuRow { Kind = RowKind.Action, Label = "Credits", Info = "Menu: klammvs (STRAFTAT theme for Far Manager). Slide timer: Glizzmn (MovementPro). Tilt and shake switches: Kevnator (NoCameraRoll). Weapon camera and Mod Menu support: kestrel. Press to see them on GitHub.",
+                                         Take = s => { UnityEngine.Application.OpenURL("https://github.com/dorsth/MONOLITH#credits"); return null; } });
                 if (p.Rows.Count > 0) cats.Add(p);
             }
 
