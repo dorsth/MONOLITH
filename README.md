@@ -4,7 +4,7 @@ A competitive mod bundle for STRAFTAT. Press F2 for the menu.
 
 Only your own screen and sound change, so it works in any lobby, with players who don't have it.
 
-Mods made for [Mod Menu](https://github.com/kestrel-straftat/mod-menu) by kestrel work in MONOLITH's menu. The weapon camera works the way [Minimal Viewmodels Reborn](https://github.com/kestrel-straftat/minimal-viewmodels-reborn) by kestrel does it.
+Thanks to kestrel: the weapon camera is based on [Minimal Viewmodels Reborn](https://github.com/kestrel-straftat/minimal-viewmodels-reborn), and mods made for [Mod Menu](https://github.com/kestrel-straftat/mod-menu) work in MONOLITH's menu through its API.
 
 ## Install
 
@@ -47,5 +47,5 @@ When a new version is out, a line shows in the main menu. Update with your mod m
 - Menu colors inspired by the STRAFTAT theme for Far Manager by klammvs.
 - Slide cooldown timer based on MovementPro by Glizzmn.
 - Camera tilt and shake switches build on [NoCameraRoll](https://thunderstore.io/c/straftat/p/Kevnator/NoCameraRoll/) by Kevnator.
-- The weapon camera works the way [Minimal Viewmodels Reborn](https://github.com/kestrel-straftat/minimal-viewmodels-reborn) by kestrel does it, under the MIT License. The license text is `mods/ViewmodelTweaks/LICENSE-MinimalViewmodelsReborn.txt`.
-- Mods made for [Mod Menu](https://github.com/kestrel-straftat/mod-menu) by kestrel work in MONOLITH's menu through its API. `modmenu/` follows that API, under the MIT License. The license text is `modmenu/LICENSE-ModMenu.txt`. The two can't be installed together.
+- Weapon camera based on [Minimal Viewmodels Reborn](https://github.com/kestrel-straftat/minimal-viewmodels-reborn) by kestrel, under the MIT License. The license text is `mods/ViewmodelTweaks/LICENSE-MinimalViewmodelsReborn.txt`.
+- Mod Menu API by kestrel, so mods made for [Mod Menu](https://github.com/kestrel-straftat/mod-menu) work in MONOLITH's menu. `modmenu/` follows that API, under the MIT License. The license text is `modmenu/LICENSE-ModMenu.txt`. The two can't be installed together.

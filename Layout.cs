@@ -162,7 +162,7 @@ namespace Monolith
         /// (every mod is loaded by then); nothing per frame.</summary>
         private static MenuPage OtherMods()
         {
-            var page = new MenuPage(null, "Other mods", "Settings of the other mods you have installed. Not part of MONOLITH. Mods made for Mod Menu by kestrel work here through its API.");
+            var page = new MenuPage(null, "Other mods", "Settings of the other mods you have installed. Not part of MONOLITH. Thanks to kestrel: mods made for Mod Menu work here through its API.");
             HashSet<ConfigEntryBase> hidden = null; Dictionary<string, string> said = null;
             try
             {
@@ -408,7 +408,7 @@ namespace Monolith
 
             // ---------------------------------------------------------------- viewmodel
             {
-                var p = new MenuPage(null, "Viewmodel", "Where your weapon sits, how much it moves. The weapon camera works the way Minimal Viewmodels Reborn by kestrel does it.");
+                var p = new MenuPage(null, "Viewmodel", "Where your weapon sits, how much it moves. Thanks to kestrel: the weapon camera is based on Minimal Viewmodels Reborn.");
                 ConfigEntryBase gone = E(View, "Viewmodel", "Invisible Viewmodel");
                 Func<bool> seen = () => !On(gone);
                 p.Set("FOV", E(View, "Viewmodel", "Viewmodel FOV"), seen, "")
