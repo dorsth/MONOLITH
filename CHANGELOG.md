@@ -1,6 +1,8 @@
 # MONOLITH changelog
 
 ## 1.1.9
+- Long names on the game's end of round and Tab screens stay on one line and shrink to fit, instead of wrapping over the score or running into the next name.
+- Match stats keep the name of a player who left the lobby, instead of "player 4".
 - Match stats leave out spectators (Straftat Tournaments spectator seats).
 - R resets the setting under the mouse again. Before, it could reset the row the keyboard cursor was on.
 - An extra jump key set to no key with Enter reads "not set", the same as its default, not "off".

@@ -62,7 +62,7 @@ namespace Monolith
             Type ph = AccessTools.TypeByName("PlayerHealth");
             h.Patch(AccessTools.Method(ph, "sync___set_value_health"), postfix: new HarmonyMethod(typeof(Stats), nameof(HealthPost)));
             h.Patch(AccessTools.Method(ph, "sync___set_value_killer"), postfix: new HarmonyMethod(typeof(Stats), nameof(KillerPost)));
-            h.Patch(AccessTools.Method(typeof(RoundManager), "NextRoundCall"), prefix: new HarmonyMethod(typeof(Stats), nameof(RoundEnd)));
+            h.Patch(AccessTools.Method(typeof(RoundManager), "NextRoundCall"), prefix: new HarmonyMethod(typeof(Stats), nameof(RoundEnd)), postfix: new HarmonyMethod(typeof(Stats), nameof(RoundNames)));
             // the Tab screen: the same label over each player's name
             MethodInfo shown = AccessTools.Method(typeof(PlayerListItem), "SetPlayerValues");
             if (shown != null) h.Patch(shown, postfix: new HarmonyMethod(typeof(Stats), nameof(TabTag)));
@@ -227,9 +227,38 @@ namespace Monolith
         {
             try
             {
-                if (__instance == null || Tagged.Contains(__instance)) return;
+                if (__instance == null) return;
+                Fit(__instance.PlayerNameText);
+                if (Tagged.Contains(__instance)) return;
                 Tagged.Add(__instance);
                 if (__instance.GetComponentInParent<TabScreen>(true) != null) KillTag.Put(__instance.PlayerNameText, __instance.PlayerIdNumber);
+            }
+            catch (Exception e) { Quiet(e); }
+        }
+
+        // Long names on the game's own screens (end of round, Tab): its name boxes wrap, so a name with spaces became a
+        // tower of big words over the score, or ran into the next name. They stay on one line and shrink to fit their box.
+        // Only the size and wrapping change, never the text: other mods find rows by it.
+        private static readonly AccessTools.FieldRef<RoundManager, TextMeshProUGUI> RoundSelf = AccessTools.FieldRefAccess<RoundManager, TextMeshProUGUI>("playerName");
+        private static readonly AccessTools.FieldRef<RoundManager, TextMeshProUGUI[]> RoundOthers = AccessTools.FieldRefAccess<RoundManager, TextMeshProUGUI[]>("enemyName");
+
+        private static void Fit(TMP_Text t)
+        {
+            if (t == null || t.enableAutoSizing) return;
+            float max = t.fontSize;
+            t.enableWordWrapping = false;
+            t.enableAutoSizing = true; t.fontSizeMax = max; t.fontSizeMin = Mathf.Max(8f, max * 0.3f);
+            t.overflowMode = TextOverflowModes.Overflow;
+        }
+
+        private static void RoundNames(RoundManager __instance)
+        {
+            try
+            {
+                Fit(RoundSelf(__instance));
+                TextMeshProUGUI[] others = RoundOthers(__instance);
+                if (others != null) foreach (var t in others) Fit(t);
+                Names();
             }
             catch (Exception e) { Quiet(e); }
         }
@@ -306,8 +335,20 @@ namespace Monolith
             if (name != "MainMenu" && On.Value) { FinishTake(); _takeOn = true; foreach (var kv in All) { kv.Value.RK = 0; kv.Value.RD = 0; kv.Value.RDmg = 0f; } if (RoundManager.Instance != null && Board.Me != null) Board.Me.Prepare(); }   // a map: its first take, and a new round
         }
 
-        private static P Get(int id) { P p; if (!All.TryGetValue(id, out p)) { p = new P(); All[id] = p; } return p; }
+        // a new entry takes the player's name right away, so someone who leaves before a round ends keeps it too
+        private static P Get(int id)
+        {
+            P p;
+            if (!All.TryGetValue(id, out p))
+            {
+                p = new P(); All[id] = p;
+                ClientInstance ci;
+                if (ClientInstance.playerInstances.TryGetValue(id, out ci) && ci != null) p.Name = Untag(ci.PlayerName);
+            }
+            return p;
+        }
 
+        // called each round end and at the end of the match: a player who left keeps the last name seen
         private static void Names()
         {
             foreach (var kv in All)
@@ -479,9 +520,9 @@ namespace Monolith
             // after 10 seconds without it, it stays flat and the log says why.
             private Canvas _cv; private CanvasScaler _sc; private Image _backImage; private bool _world; private float _worldUntil = -1f;
             private string _whyFlat;
-            private const float Turn = 60f;      // degrees toward the middle of the room
+            private const float Turn = 45f;      // degrees toward the middle of the room
             private const float Wide = 6.5f;      // the board is this many times as wide as the word REMATCH
-            private const float Clear = 1.2f, Out = 0f;
+            private const float Clear = 2.2f, Out = 0f;
             private void Flat()
             {
                 _world = false;
