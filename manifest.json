@@ -1,6 +1,6 @@
 {
     "name": "MONOLITH",
-    "version_number": "1.1.3",
+    "version_number": "1.1.4",
     "website_url": "",
     "description": "All my STRAFTAT mods in one plugin, with one menu (F2).",
     "dependencies": [

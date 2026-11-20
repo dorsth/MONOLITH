@@ -8,7 +8,7 @@ Each mod in it is the same source as its own release, loads under its own name a
 
 ## Switching to MONOLITH
 
-MONOLITH replaces Mod Menu and Minimal Viewmodels Reborn, so you can remove both. The settings of every other mod you install can be changed in MONOLITH's menu, the same way as in Mod Menu.
+MONOLITH replaces Minimal Viewmodels Reborn, so you can remove it. The settings of every other mod you install can be changed in MONOLITH's menu too, and MONOLITH works next to [Mod Menu](https://github.com/kestrel-straftat/mod-menu) by kestrel.
 
 Your settings come along:
 
@@ -44,13 +44,13 @@ Every key of it is a letter, Enter, Esc, Tab or `/`: nothing a small keyboard la
 * Not every setting has a row. The search finds all of them.
 * Saved at once, in each mod's own `.cfg`.
 
-## Replaces Mod Menu
+## With Mod Menu
 
-MONOLITH does what [Mod Menu](https://github.com/kestrel-straftat/mod-menu) does, in its own menu. `ModMenu.dll` in the MONOLITH folder has Mod Menu's plugin id and API, so mods made for Mod Menu see it as installed and work the same: settings they hide are hidden, the description they set is shown, and the rows they add with a content builder show on their page under Other mods, where Mod Menu would put them.
+MONOLITH works next to [Mod Menu](https://github.com/kestrel-straftat/mod-menu). With it installed, MONOLITH shows in Mod Menu as one entry with the key that opens it, and the settings other mods hide from Mod Menu are hidden under Other mods too. Rows a mod adds to its Mod Menu page show in Mod Menu's own window.
 
-It loads no asset bundles, so it also runs on macOS ARM64, where Mod Menu does not.
+Without Mod Menu, Other mods still lists the settings of every mod, and leaves out sections named Internal or Hidden.
 
-Remove Mod Menu if you have it. MONOLITH comes with its own copy.
+Up to 1.1.3 MONOLITH carried a stand-in for Mod Menu (`ModMenu.dll` in the MONOLITH folder). If you update by hand, delete that file.
 
 ## Updates
 
@@ -137,7 +137,7 @@ Saved in `BepInEx/config/dorsth.straftat.monolith.profiles.txt`.
 * Take the mods above (and Ultimate Tweaks, if you had it) out of `BepInEx/plugins`.
 * Put the `MONOLITH` folder from the zip into `BepInEx/plugins`.
 * Hit and kill sounds: `plugins/CombatSounds` is used if it is still there (your own sounds), else the sound folders in `plugins/MONOLITH`.
-* Minimal Viewmodels Reborn and Mod Menu are not needed. Remove Mod Menu: MONOLITH has its own copy of its API.
+* Minimal Viewmodels Reborn is not needed. Mod Menu can stay.
 
 A mod that is installed twice is loaded once, and which copy is not up to you: do not leave an old copy next to MONOLITH.
 
@@ -151,16 +151,13 @@ The camera tilt and shake switches (CameraTweaks) build on the idea of [NoCamera
 
 The viewmodel's weapon camera (its offset, FOV and mirroring) is adapted from [Minimal Viewmodels Reborn](https://github.com/kestrel-straftat/minimal-viewmodels-reborn) by kestrel, under the MIT License. The license text is `mods/ViewmodelTweaks/LICENSE-MinimalViewmodelsReborn.txt`.
 
-`modmenu/` follows the public API of [Mod Menu](https://github.com/kestrel-straftat/mod-menu) by kestrel, under the MIT License. The license text is `modmenu/LICENSE-ModMenu.txt`.
-
 ## Building
 
-`build.sh` compiles everything under `mods/` into `MONOLITH.dll`. It needs the .NET SDK and two paths: `LIB` (the game's `STRAFTAT_Data/Managed`) and `BEP` (`BepInEx/core`). It builds `modmenu/ModMenu.dll` first. The source of each mod is used as it is; only their `[assembly: ...]` lines are left out.
+`build.sh` compiles everything under `mods/` into `MONOLITH.dll`. It needs the .NET SDK and two paths: `LIB` (the game's `STRAFTAT_Data/Managed`) and `BEP` (`BepInEx/core`). The source of each mod is used as it is; only their `[assembly: ...]` lines are left out.
 
 | File | Holds |
 |---|---|
 | `Bundle.cs` | the plugin |
-| `modmenu/` | the stand-in for Mod Menu's API |
 | `Menu.cs` | how the menu is drawn and used |
 | `Layout.cs` | what is on which page |
 | `Profiles.cs` | configs |

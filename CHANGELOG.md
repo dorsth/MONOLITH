@@ -1,5 +1,9 @@
 # MONOLITH changelog
 
+## 1.1.4
+- MONOLITH no longer comes with a stand-in for Mod Menu. It works next to Mod Menu: install Mod Menu itself if a mod needs it. If you update by hand, delete ModMenu.dll from the MONOLITH folder.
+- Without Mod Menu, Other mods leaves out sections named Internal or Hidden, the settings mods usually hide.
+
 ## 1.1.3
 - With an extra jump on one scroll direction, swap weapons keeps the other one: jump on scroll down, swap on scroll up. Before, a jump anywhere on the wheel took the whole wheel from swap.
 - Other mods that keep a key as text (like Spawn Viewer's Toggle Key) take a key press in the menu, the same as any other key setting.

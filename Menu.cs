@@ -718,23 +718,8 @@ namespace Monolith
             return t == typeof(string) && s.Length == 0 ? Lang.T("(empty)") : s;
         }
 
-        private static MenuRow _hovered;
-
         private static string Describe(MenuRow row)
         {
-            // a row a mod made with Mod Menu's API: told the cursor is on it, as Mod Menu tells it; the mod may then
-            // put a text in the info panel, which is this line
-            if (row != _hovered)
-            {
-                try { if (_hovered != null && _hovered.Unhover != null) _hovered.Unhover(); if (row.Hover != null) row.Hover(); } catch { }
-                _hovered = row;
-            }
-            if (row.Says != null)
-            {
-                string said = null;
-                try { said = row.Says(); } catch { }
-                if (!string.IsNullOrEmpty(said)) return said;
-            }
             switch (row.Kind)
             {
                 case RowKind.Up: return Lang.T("Back one page.");
