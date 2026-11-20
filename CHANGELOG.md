@@ -1,5 +1,8 @@
 # MONOLITH changelog
 
+## 1.1.6
+- Other mods shows only the key that opens STRAFTH and Straftat Tournaments, as before: their other settings are in their own menus. Without Mod Menu they all showed.
+
 ## 1.1.5
 - The Viewmodel page and the top of the README now say the weapon camera works the way Minimal Viewmodels Reborn by kestrel does it.
 

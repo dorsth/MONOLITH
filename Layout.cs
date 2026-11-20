@@ -200,6 +200,8 @@ namespace Monolith
                         ConfigEntryBase e = ce.Value;
                         if (e == null || hidden != null && hidden.Contains(e)) continue;
                         if (hidden == null && Internal(e.Definition.Section)) continue;
+                        string only;
+                        if (OnlyKey.TryGetValue(pi.Metadata.GUID, out only) && !(e.Definition.Section == "Keys" && e.Definition.Key == only)) continue;
                         if (e.Definition.Section != sec) { sec = e.Definition.Section; mod.Head(sec); }
                         string[] named;
                         if (e.SettingType == typeof(UnityEngine.KeyCode) || e.SettingType == typeof(KeyboardShortcut)) mod.Key(e.Definition.Key, e, "none");
@@ -214,6 +216,13 @@ namespace Monolith
 
         // As Mod Menu: the mod's own folder directly under plugins (none for a dll lying in plugins itself), searched for
         // manifest.json; its name (underscores as spaces) and description.
+        // STRAFTH and Straftat Tournaments have a menu of their own: only the key that opens it is shown here, as they
+        // ask of Mod Menu (each one's ModMenuBridge). Mod Menu isn't always there to ask, so it is set here too.
+        private static readonly Dictionary<string, string> OnlyKey = new Dictionary<string, string>
+        {
+            { "dorsth.straftat.strafth", "Menu" }, { "dorsth.straftat.straftattournaments", "Panel Key" },
+        };
+
         // what mods usually hide from Mod Menu: their bookkeeping, kept in a section of its own
         private static bool Internal(string section)
         {
