@@ -1,5 +1,9 @@
 # MONOLITH changelog
 
+## 1.4.8
+- The preview is a Far dialog over the page: a shadow, its own lighter ground, a double frame named "preview", and inside it two named groups (dark and light, or enemies and teammates), as in Far's Color dialog.
+- The version is on the bottom line of the MONOLITH panel again, and off General.
+
 ## 1.4.7
 - The preview is one group, as in a Far dialog: a single line box named "preview", the dark and light halves inside it with no frames of their own. On Players, "enemies" and "teammates" name the two halves.
 - The version is back on General.

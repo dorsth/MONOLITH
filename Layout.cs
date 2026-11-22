@@ -401,7 +401,7 @@ namespace Monolith
                  .Set("Show when scoped", E(Cross, "Crosshair", "Show While Scoped"), own, "")
                  .Set("Hit color", hit, own, "The crosshair changes color for a moment on a hit.")
                  .Set("  color", E(Cross, "Crosshair", "Hit Color Value"), () => On(on) && On(hit), "");
-                if (on != null) { p.Draw = r => BundleMenu.I.CrosshairPreview(r); p.SideCols = 24; p.SideRows = () => 10f; }
+                if (on != null) { p.Draw = r => BundleMenu.I.CrosshairPreview(r); p.SideCols = 24; p.SideRows = () => 11f; }
                 if (p.Rows.Count > 0) cats.Add(p);
             }
 
@@ -484,7 +484,7 @@ namespace Monolith
                   .Set("Headshot color", E(Tweaks, "HUD", "Hitmarker Headshot Color"), shown, "")
                   .Set("Kill hitmarker", kill, shown, "The hit that kills shows in the kill color.")
                   .Set("Kill color", E(Tweaks, "HUD", "Hitmarker Kill Color"), () => !On(noHm) && On(kill), "");
-                if (noHm != null) { hm.Draw = r => BundleMenu.I.HitmarkerPreview(r); hm.SideCols = 24; hm.SideRows = () => 10f + (On(kill) ? BundleMenu.MarkerRows : 0f); }
+                if (noHm != null) { hm.Draw = r => BundleMenu.I.HitmarkerPreview(r); hm.SideCols = 24; hm.SideRows = () => 11f + (On(kill) ? BundleMenu.MarkerRows : 0f); }
 
                 var pr = new MenuPage(p, "Prompts", "The texts on weapons, doors and buttons.");
                 ConfigEntryBase noPick = E(Tweaks, "Interaction", "Hide Pickup Prompts"), noUse = E(Tweaks, "Interaction", "Hide Interaction Prompts");
@@ -548,7 +548,7 @@ namespace Monolith
                  .Set("Enemy outlines when I host", Players.HostOutlines, null, "The game's lobby option, kept between launches. In other lobbies the host decides.")
                  .Set("Friendly fire when I host", Players.HostFriendlyFire, null, "The game's lobby option, kept between launches. In other lobbies the host decides.")
                  .Set("Join message", E(Tweaks, "Menus", "Join Message"), null, "The line everyone sees when you join a lobby. {name} is your name. Color, bold, italic, underline and strikethrough tags work. Up to 120 letters, tags not counted. Leave it empty for the game's line.");
-                if (p.Rows.Count > 2) { p.Draw = r => BundleMenu.I.PlayersPreview(r); p.SideCols = 24; p.SideRows = () => 15f; cats.Add(p); }
+                if (p.Rows.Count > 2) { p.Draw = r => BundleMenu.I.PlayersPreview(r); p.SideCols = 24; p.SideRows = () => 16f; cats.Add(p); }
             }
 
             // ---------------------------------------------------------------- sound
@@ -612,7 +612,6 @@ namespace Monolith
                  .Set("Open this menu", BundleMenu.Key, null, "Press Enter, then the key.")
                  .Set("Fewer UI animations", E(Tweaks, "Menus", "Reduce UI Animations"), null, "No animations in menus and on the HUD.")
                  .Set("Hide default playlists", E(Tweaks, "Menus", "Hide Default Playlists"), null, "Only your own playlists show when you host.");
-                p.Rows.Add(new MenuRow { Kind = RowKind.Action, Label = "Version", Dyn = () => BundlePlugin.Version, Info = "The MONOLITH version you have. When a newer one is out, the main menu says so." });
                 // who MONOLITH builds on: a line each, the name on the right; nothing to press
                 p.Head("Credits");
                 p.Rows.Add(new MenuRow { Kind = RowKind.Action, Label = "Menu", Dyn = () => "klammvs", Info = "Menu inspired by the STRAFTAT theme for Far Manager by klammvs." });

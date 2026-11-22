@@ -270,7 +270,7 @@ namespace Monolith
         // the palette of the screenshot it was modelled on
         private static readonly Color Back = new Color32(0x0B, 0x11, 0x0D, 0xFF), Frame = new Color32(0x9F, 0xB8, 0xA8, 0xFF), Bar = new Color32(0x26, 0x38, 0x2D, 0xFF),
             FrameDim = new Color32(0x5C, 0x6D, 0x62, 0xFF), Panel = new Color32(0x12, 0x1C, 0x16, 0xFF),
-            BarDim = new Color32(0x18, 0x22, 0x1B, 0xFF), Hover = new Color32(0x14, 0x1D, 0x17, 0xFF), KeyBar = new Color32(0x16, 0x1F, 0x19, 0xFF);
+            BarDim = new Color32(0x18, 0x22, 0x1B, 0xFF), Shadow = new Color(0f, 0f, 0f, 0.55f), Hover = new Color32(0x14, 0x1D, 0x17, 0xFF), KeyBar = new Color32(0x16, 0x1F, 0x19, 0xFF);
         private const string Txt = "#D5E3D9", Dim = "#7F9186", Hot = "#E8E05A", Mint = "#B6F0C2", Val = "#FFFFFF", Head = "#9FB8A8";
 
         private void Style()
@@ -320,6 +320,14 @@ namespace Monolith
         }
 
         private void Line(float x, float y, string rich) { GUI.Label(new Rect(x, y, _win.xMax - x, _ch), rich, _st); }
+
+        // a word in the middle of a panel's bottom line, as Far puts its totals there
+        private void Footer(Rect r, string text)
+        {
+            float g = Thin * 2f, w = (text.Length + 2) * _cw, x = Mathf.Round(r.x + (r.width - w) * 0.5f);
+            Fill(new Rect(x, r.yMax - _ch * 0.5f - g, w, _ch), Back);
+            GUI.Label(new Rect(x + _cw, r.yMax - _ch * 0.5f - g * 0.5f - Thin, w, _ch), "<color=" + Dim + ">" + Esc(text) + "</color>", _st);
+        }
 
         // A long page has a scroll bar on its right frame, as a Far panel has: ▲ on the first row, ▼ on the last, the
         // part shown as a bar on the line between them.
@@ -421,6 +429,7 @@ namespace Monolith
                 if (cur) Fill(r, pageOn ? BarDim : Bar); else if (i == overCat) Fill(r, Hover);
                 Line(r.x + _cw * 0.5f, r.y, "<color=" + (cur ? Val : _cats[i].Outside ? Dim : Txt) + ">" + Pad(Lang.T(_cats[i].Path[0]), NavCols - 3) + "</color>");
             }
+            Footer(_navR, BundlePlugin.Version);
             string title = _searching ? Lang.T("search: ") + _query + "_" : PathText(page);
             Box(_pageR, Fit(title, (int)(_pageR.width / _cw) - 8), pageOn);
             int side = page.Draw != null ? page.SideCols + 1 : 0;
@@ -437,12 +446,16 @@ namespace Monolith
             }
             if (_vis.Count > vis) ScrollBar(page.Top, vis, _vis.Count);
 
-            // the preview: a box beside the rows, which fills it with smaller boxes of its own
+            // the preview: a Far dialog over the page beside the rows, with its shadow, its own lighter ground and
+            // a double frame, the samples in named groups inside it
             if (page.Draw != null)
             {
                 Rect sr = SideRect(page);
-                Box(sr, Lang.T("preview"), false, Back, 1);
-                page.Draw(sr);
+                Fill(new Rect(sr.x + _cw * 0.5f, sr.y + _ch * 0.5f, sr.width, sr.height), Shadow);
+                Fill(sr, Panel);
+                var frame = new Rect(sr.x + _cw * 0.5f, sr.y + _ch * 0.5f, sr.width - _cw, sr.height - _ch);
+                Box(frame, Lang.T("preview"), false, Panel);
+                page.Draw(frame);
             }
 
             // what the row under the cursor is
@@ -506,8 +519,8 @@ namespace Monolith
 
         private Rect SideRect(MenuPage page)
         {
-            // its title sits on its top line: that line is put where the title comes level with the text of the first row
-            return new Rect(_pageR.xMax - (page.SideCols + 1.5f) * _cw, _pageR.y + _ch * 1.5f - Thin, page.SideCols * _cw, page.SideRows() * _ch);
+            // the dialog with its half cell of ground around the frame: the title on the frame comes level with the first row
+            return new Rect(_pageR.xMax - (page.SideCols + 1.5f) * _cw, _pageR.y + _ch - Thin, page.SideCols * _cw, page.SideRows() * _ch);
         }
 
         private static string K(string key, string what) { return "<color=" + Hot + ">" + Lang.T(key) + "</color><color=" + Txt + "> " + Lang.T(what) + "</color>  "; }
