@@ -5,7 +5,7 @@ namespace Monolith
 {
     internal static partial class Lang
     {
-        private static readonly Dictionary<string, string> Table = new Dictionary<string, string>(312)
+        private static readonly Dictionary<string, string> Table = new Dictionary<string, string>(310)
         {
             { "Crosshair", "Прицел" },
             { "Viewmodel", "Вьюмодель" },
@@ -225,7 +225,6 @@ namespace Monolith
             { "Press Enter, then the key.", "Нажмите Enter, затем клавишу." },
             { "Presets", "Пресеты" },
             { "Saved", "Сохранённые" },
-            { "Version", "Версия" },
             { "Credits", "Благодарности" },
             { "Menu", "Меню" },
             { "Menu inspired by the STRAFTAT theme for Far Manager by klammvs.", "Меню по теме STRAFTAT для Far Manager от klammvs." },
@@ -252,7 +251,6 @@ namespace Monolith
             { "Nothing to undo.", "Нечего отменять." },
             { "Back to what you had before the last load.", "Возвращено то, что было до последней загрузки." },
             { "The load is back.", "Загрузка возвращена." },
-            { "The MONOLITH version you have. When a newer one is out, the main menu says so.", "Ваша версия MONOLITH. Когда выйдет новая, главное меню об этом скажет." },
             { "Your config as one line of text. Paste it to a friend.", "Ваш конфиг одной строкой текста. Отправьте её другу." },
             { "Import from clipboard", "Импорт из буфера" },
             { "Copy a line from a friend (it starts with MONOLITH:), then press Enter here. Yours is kept as \"previous config\".", "Скопируйте строку от друга (она начинается с MONOLITH:) и нажмите здесь Enter. Ваш конфиг сохранится как «previous config»." },

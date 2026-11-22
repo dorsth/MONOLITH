@@ -1,5 +1,11 @@
 # MONOLITH changelog
 
+## 1.4.1
+- The version is on the bottom line of the MONOLITH panel, as Far puts its totals. The Version row on General is gone.
+- A long page has a scroll bar on its right frame: ▲, ▼ and the part you see. It replaces the count.
+- A line runs between the names and the values of the settings, one cell after the longest name. A page where a value would reach it has none.
+- R resets the row under the mouse even when the categories have the keys. Before, you had to click a row first.
+
 ## 1.4.0
 - Section headings are drawn as Far draws them: a line across the page, joined to its frame, with the name in the middle.
 

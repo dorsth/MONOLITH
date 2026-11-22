@@ -321,8 +321,54 @@ namespace Monolith
 
         private void Line(float x, float y, string rich) { GUI.Label(new Rect(x, y, _win.xMax - x, _ch), rich, _st); }
 
+        // a word in the middle of a panel's bottom line, as Far puts its totals there
+        private void Footer(Rect r, string text)
+        {
+            float g = Thin * 2f, w = (text.Length + 2) * _cw, x = Mathf.Round(r.x + (r.width - w) * 0.5f);
+            Fill(new Rect(x, r.yMax - _ch * 0.5f - g, w, _ch), Back);
+            GUI.Label(new Rect(x + _cw, r.yMax - _ch * 0.5f - g * 0.5f - Thin, w, _ch), "<color=" + Dim + ">" + Esc(text) + "</color>", _st);
+        }
+
+        // A long page has a scroll bar on its right frame, as a Far panel has: ▲ on the first row, ▼ on the last, the
+        // part shown as a bar on the line between them.
+        private void ScrollBar(int top, int shown, int count)
+        {
+            float x = _pageR.xMax - _cw, y0 = _rowY0, h = shown * _ch, t = Thin;
+            Fill(new Rect(x, y0, _cw, h), Back);
+            GUI.Label(new Rect(x, y0, _cw * 2f, _ch), "<color=" + Head + ">▲</color>", _st);
+            GUI.Label(new Rect(x, y0 + h - _ch, _cw * 2f, _ch), "<color=" + Head + ">▼</color>", _st);
+            float ty = y0 + _ch, th = h - 2f * _ch, mid = Mathf.Round(x + _cw * 0.5f);
+            if (th <= 0f) return;
+            Fill(new Rect(mid - t * 0.5f, ty, t, th), FrameDim);
+            float bh = Mathf.Max(_ch * 0.5f, th * shown / count), by = ty + (th - bh) * top / Mathf.Max(1, count - shown);
+            Fill(new Rect(Mathf.Round(mid - _cw * 0.3f), Mathf.Round(by), Mathf.Round(_cw * 0.6f), Mathf.Round(bh)), Frame);
+        }
+
         // A section heading as Far draws one: a single line joined to the inner line of the page frame, its name in the
         // middle. Beside a preview it ends where the rows end.
+        // A line between the names and the values of the settings on a page, as Far draws between its columns: one cell
+        // after the longest name. Left out on a page where a value would reach it.
+        private void Divider(MenuPage page, int cols, int vis)
+        {
+            int longest = 0, first = int.MaxValue; bool any = false;
+            for (int i = 0; i < vis && page.Top + i < _vis.Count; i++)
+            {
+                MenuRow row = _vis[page.Top + i];
+                if (!Columned(row)) continue;
+                int used = 4, len = Lang.T(row.Label).Length;
+                if (row.Kind == RowKind.Entry) ValueText(row, cols, out used);
+                string side = row.Kind == RowKind.Entry ? Fit(Side(row), 16) : "";
+                if (side.Length > 0 && len <= cols - used - side.Length - 2) used += side.Length + 1;
+                any = true; longest = Mathf.Max(longest, len); first = Mathf.Min(first, cols - used);
+            }
+            if (!any || longest + 2 >= first) return;
+            float x = Mathf.Round(_pageR.x + _cw * 1.5f + (longest + 0.5f) * _cw - Thin * 0.5f);
+            for (int i = 0; i < vis && page.Top + i < _vis.Count; i++)
+                if (Columned(_vis[page.Top + i])) Fill(new Rect(x, _rowY0 + i * _ch, Thin, _ch), FrameDim);
+        }
+
+        private bool Columned(MenuRow row) { return (row.Kind == RowKind.Entry || row.Kind == RowKind.Group) && row != _editRow && row != _bindRow; }
+
         private void Separator(Rect row, string title, bool full, bool active)
         {
             float t = Thin, x0 = _pageR.x + 2f * t, x1 = full ? _pageR.xMax - 2f * t : row.xMax, y = Mathf.Round(row.y + _ch * 0.5f - t * 0.5f);
@@ -404,6 +450,7 @@ namespace Monolith
                 if (cur) Fill(r, pageOn ? BarDim : Bar); else if (i == overCat) Fill(r, Hover);
                 Line(r.x + _cw * 0.5f, r.y, "<color=" + (cur ? Val : _cats[i].Outside ? Dim : Txt) + ">" + Pad(Lang.T(_cats[i].Path[0]), NavCols - 3) + "</color>");
             }
+            Footer(_navR, BundlePlugin.Version);
             string title = _searching ? Lang.T("search: ") + _query + "_" : PathText(page);
             Box(_pageR, Fit(title, (int)(_pageR.width / _cw) - 8), pageOn);
             int side = page.Draw != null ? page.SideCols + 1 : 0;
@@ -418,13 +465,8 @@ namespace Monolith
                 else Line(r.x + _cw * 0.5f, r.y, RowText(row, cols, cur));
                 Knob(row, r.y, cols, cur);
             }
-            if (_vis.Count > vis)
-            {
-                string count = " " + (ci + 1) + "/" + _vis.Count + " ";
-                Rect cr = new Rect(_pageR.xMax - (count.Length + 2) * _cw, _pageR.yMax - _ch * 0.5f - 2f, count.Length * _cw, _ch);
-                Fill(cr, Back);
-                GUI.Label(cr, "<color=" + Head + ">" + count + "</color>", _st);
-            }
+            Divider(page, cols, vis);
+            if (_vis.Count > vis) ScrollBar(page.Top, vis, _vis.Count);
 
             // the preview: a box beside the rows, which fills it with smaller boxes of its own
             if (page.Draw != null)
@@ -1000,6 +1042,14 @@ namespace Monolith
             else if (k == KeyCode.E) k = KeyCode.Return;      // open or take: Q and E sit either side of W, so one hand does it all
             // the search starts on the character, so it is the same key on every keyboard layout
             if (ch == '/' || k == KeyCode.Slash) { _searching = true; _query = ""; _searchPage = null; _modeFrame = Time.frameCount; ev.Use(); return; }
+            // reset: the row under the mouse, wherever the keys are; without one, the cursor's row on the page
+            if (k == KeyCode.Delete)
+            {
+                int at = RowAt(_lastMouse, page);
+                MenuRow r = at >= 0 ? _vis[at] : _inNav ? null : row;
+                if (r != null) Default(r);
+                ev.Use(); return;
+            }
             if (_inNav)
             {
                 if (k == KeyCode.UpArrow) SetCat(_cat - 1);
@@ -1013,7 +1063,6 @@ namespace Monolith
             else if (k == KeyCode.PageUp) Move(page, ci, -Mathf.Max(1, _visRows - 1));
             else if (k == KeyCode.PageDown) Move(page, ci, Mathf.Max(1, _visRows - 1));
             else if (k == KeyCode.Backspace) GoBack();
-            else if (k == KeyCode.Delete) { MenuRow r = ResetTarget(_lastMouse, page, row); if (r != null) Default(r); }
             else if (k == KeyCode.LeftArrow) { if (row == null || !Change(row, -1, ev.shift)) GoBack(); }
             else if (k == KeyCode.RightArrow) { if (row != null) { if (row.Kind == RowKind.Link) Activate(row); else Change(row, 1, ev.shift); } }
             else if (k == KeyCode.Return || k == KeyCode.KeypadEnter || k == KeyCode.Space) { if (row != null) Activate(row); }
