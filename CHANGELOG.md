@@ -1,5 +1,8 @@
 # MONOLITH changelog
 
+## 1.3.7
+- Color picker and lists end at their frame, so they no longer cover the page frame, and the picker sits a cell from the preview. The picked color has a line right around it.
+
 ## 1.3.6
 - CameraTweaks 1.2.3: Sprint FOV increase goes in whole degrees.
 

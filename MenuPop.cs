@@ -191,8 +191,10 @@ namespace Monolith
             p.R = new Rect(Mathf.Round(x), Mathf.Round(y), w, h);
             if (mouseMoved) { int at = PopAt(mouse); if (at >= 0) PopMove(at); }
 
-            Fill(p.R, Panel);
-            Box(new Rect(p.R.x + _cw * 0.5f, p.R.y + _ch * 0.5f, p.R.width - _cw, p.R.height - _ch), Lang.T(p.Row.Label.Trim()), true, Panel);
+            // filled up to its frame and no further: the half cell around it stays free, so it never covers a frame of the page
+            var frame = new Rect(p.R.x + _cw * 0.5f, p.R.y + _ch * 0.5f, p.R.width - _cw, p.R.height - _ch);
+            Fill(frame, Panel);
+            Box(frame, Lang.T(p.Row.Label.Trim()), true, Panel);
             if (p.Palette)
             {
                 for (int i = 0; i < n; i++)
@@ -200,13 +202,8 @@ namespace Monolith
                     int col = i % p.Cols, row = i / p.Cols;
                     float cx = Mathf.Round(p.R.x + _cw * (PalLeft + col * Pitch)), cy = p.R.y + _ch + row * _ch, sw = Mathf.Round(_cw * Swatch);
                     Color c = (Color)p.Values[i];
-                    if (i == p.Cur)
-                    {
-                        // the one picked: a line around it
-                        float t = Thin, o = t + 1f;
-                        Fill(new Rect(cx - o, cy + 1f, sw + 2f * o, _ch - 2f), KnobCur);
-                        Fill(new Rect(cx - o + t, cy + 1f + t, sw + 2f * (o - t), _ch - 2f - 2f * t), Panel);
-                    }
+                    // the one picked: a line right around it
+                    if (i == p.Cur) { float t = Thin; Fill(new Rect(cx - t, cy + 3f - t, sw + 2f * t, _ch - 6f + 2f * t), KnobCur); }
                     Fill(new Rect(cx, cy + 3f, sw, _ch - 6f), new Color(c.r, c.g, c.b, 1f));
                 }
                 string hex = p.Typed.Length > 0 ? "<color=" + Hot + ">#" + p.Typed + "_</color>" : "<color=" + Val + ">#" + p.Row.Entry.GetSerializedValue() + "</color>";
