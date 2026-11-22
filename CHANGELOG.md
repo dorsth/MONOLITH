@@ -1,5 +1,8 @@
 # MONOLITH changelog
 
+## 1.6.1
+- The color picker is simpler: the 16 colors in two rows and a field with the hex value, which you type over for any other color. Delete sets the default. No dot, no buttons.
+
 ## 1.6.0
 - Colors measured off Far with the STRAFTAT theme and matched one to one: yellow headings and keys (#E8FF8A), the active title on a mint badge (#B4F6B7), panel frames #6F857B, dialog frames #8FA59B, the cursor row #2B3929, inactive titles #909790, black between the panels.
 - The dots of a scroll bar are centered on it.

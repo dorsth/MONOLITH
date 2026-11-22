@@ -2,8 +2,8 @@
 //
 // Both open on Enter (or a click) on a row and lie over the page, in the manner of a Far dialog. What the cursor is on
 // is applied at once, so you see or hear it; Enter keeps it, Escape (or a click beside it) puts back what was there.
-// A list: up and down, page up and down, or type the first letters of a name. A palette, as Far's Color dialog: the 16
-// console colors and the default, the arrows to pick, a hex value typed for any other color, Set, Reset and Cancel.
+// A list: up and down, page up and down, or type the first letters of a name. A palette: Far's 16 console colors in two
+// rows, the arrows to pick, a hex value typed for any other color, Delete for the default.
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -19,7 +19,6 @@ namespace Monolith
             public MenuRow Row; public object Was;
             public object[] Values; public string[] Labels;
             public bool Palette; public int Cols = 1, Cur, Top;
-            public Rect SetR, ResetR, CancelR; // the palette's buttons
             public string Typed = ""; public float TypedAt;
             public float AnchorRight, AnchorY;
             public bool Free, Dragging;        // the view was scrolled away from the cursor (wheel, scroll bar); the scroll bar is held
@@ -112,10 +111,10 @@ namespace Monolith
             if (p.Palette && k == KeyCode.Delete) { p.Typed = ""; PopMove(DefaultSlot); PopClose(true); ev.Use(); return; }
             if (p.Palette)
             {
-                // two rows of eight, then Default under them
+                // two rows of eight
                 int c = p.Cur;
-                if (k == KeyCode.UpArrow) { p.Typed = ""; PopMove(c == DefaultSlot ? PaletteCols : c >= PaletteCols ? c - PaletteCols : Mathf.Max(c, 0)); }
-                else if (k == KeyCode.DownArrow) { p.Typed = ""; PopMove(c < 0 ? 0 : c < PaletteCols ? c + PaletteCols : DefaultSlot); }
+                if (k == KeyCode.UpArrow) { p.Typed = ""; PopMove(c >= PaletteCols && c < DefaultSlot ? c - PaletteCols : Mathf.Max(c, 0)); }
+                else if (k == KeyCode.DownArrow) { p.Typed = ""; PopMove(c < 0 ? 0 : c < PaletteCols ? c + PaletteCols : c); }
                 else if (k == KeyCode.LeftArrow) { p.Typed = ""; PopMove(c < 0 ? 0 : c < DefaultSlot && c % PaletteCols > 0 ? c - 1 : c); }
                 else if (k == KeyCode.RightArrow) { p.Typed = ""; PopMove(c < 0 ? 0 : c < DefaultSlot && c % PaletteCols < PaletteCols - 1 ? c + 1 : c); }
             }
@@ -168,7 +167,6 @@ namespace Monolith
             {
                 float gx, sw, hx; PalLayout(p, out gx, out sw, out hx);
                 int col = Mathf.FloorToInt((m.x - gx) / sw), row = Mathf.FloorToInt((m.y - p.R.y - _ch) / _ch);
-                if (row == 2 && m.x >= gx && m.x < hx) return DefaultSlot;
                 if (col < 0 || col >= PaletteCols || row < 0 || row > 1) return -1;
                 return row * PaletteCols + col;
             }
@@ -199,12 +197,6 @@ namespace Monolith
             if (ev.type != EventType.MouseDown) return;
             if (scrolls && ev.button == 0 && PopBar(p).Contains(ev.mousePosition)) { p.Dragging = true; PopScrollTo(p, ev.mousePosition.y); return; }
             Vector2 m = ev.mousePosition;
-            if (p.Palette && ev.button == 0)
-            {
-                if (p.SetR.Contains(m)) { if (p.Typed.Length > 0) TryHex(p); PopClose(true); return; }
-                if (p.ResetR.Contains(m)) { p.Typed = ""; PopMove(DefaultSlot); PopClose(true); return; }
-                if (p.CancelR.Contains(m)) { PopClose(false); return; }
-            }
             int i = PopAt(m);
             // a click beside it puts back what was there; a click on it between its items does nothing
             if (ev.button != 0 || i < 0) { if (ev.button != 0 || !p.R.Contains(m)) PopClose(false); return; }
@@ -222,39 +214,23 @@ namespace Monolith
             gx = Mathf.Round(p.R.x + (p.R.width - all) * 0.5f); hx = gx + PaletteCols * sw + gap;
         }
 
-        private void PaletteDraw(Pop p, Rect frame)
+        private void PaletteDraw(Pop p)
         {
             float gx, sw, hx; PalLayout(p, out gx, out sw, out hx);
             float y0 = p.R.y + _ch, t = Thin;
-            Color now = (Color)p.Row.Entry.BoxedValue;
-            for (int i = 0; i <= DefaultSlot; i++)
+            for (int i = 0; i < DefaultSlot; i++)
             {
-                Rect s = i == DefaultSlot ? new Rect(gx, y0 + 2f * _ch, sw, _ch) : new Rect(gx + (i % PaletteCols) * sw, y0 + (i / PaletteCols) * _ch, sw, _ch);
+                Rect s = new Rect(gx + (i % PaletteCols) * sw, y0 + (i / PaletteCols) * _ch, sw, _ch);
                 Color c = (Color)p.Values[i];
                 Fill(s, new Color(c.r, c.g, c.b, 1f));
-                // the color in use: a dot in it, in black or white, whichever shows on it
-                if (Same(c, now)) { float d = Mathf.Round(_cw * 0.4f), l = c.r * 0.3f + c.g * 0.59f + c.b * 0.11f; Fill(new Rect(Mathf.Round(s.center.x - d / 2f), Mathf.Round(s.center.y - d / 2f), d, d), l > 0.5f ? Color.black : Color.white); }
                 // the cursor: a line around it
                 if (i == p.Cur) { Fill(new Rect(s.x, s.y, s.width, t), KnobCur); Fill(new Rect(s.x, s.yMax - t, s.width, t), KnobCur); Fill(new Rect(s.x, s.y, t, s.height), KnobCur); Fill(new Rect(s.xMax - t, s.y, t, s.height), KnobCur); }
             }
-            GUI.Label(new Rect(gx + sw + _cw * 0.5f, y0 + 2f * _ch, hx - gx, _ch), "<color=" + (p.Cur == DefaultSlot ? Val : Txt) + ">" + Esc(Lang.T("Default")) + "</color>", _st);
-            // the hex value: any color, typed; in a sunken field as Far's
+            // any other color: its hex value, typed, in a sunken field as Far's, level between the two rows
             string hex = p.Typed.Length > 0 ? p.Typed + "_" : p.Row.Entry.GetSerializedValue();
-            GUI.Label(new Rect(hx, y0, 11f * _cw, _ch), "<color=" + Dim + ">RRGGBBAA</color>", _st);
-            Fill(new Rect(hx, y0 + _ch, 11f * _cw, _ch), Well);
-            GUI.Label(new Rect(hx + _cw, y0 + _ch, 10f * _cw, _ch), "<color=" + (p.Typed.Length > 0 ? Hot : Dim) + ">" + Esc(hex) + "</color>", _st);
-            GUI.Label(new Rect(hx, y0 + 2f * _ch, 11f * _cw, _ch), "<color=" + Dim + ">" + Esc(Lang.T("or type one")) + "</color>", _st);
-            // a line joined to the frame, then the buttons, Set in the dialog's own green as Far's default button
-            float ly = Mathf.Round(y0 + 3.5f * _ch - t * 0.5f);
-            Fill(new Rect(frame.x + 2f * t, ly, frame.width - 4f * t, t), Frame);
-            string set = "{ " + Lang.T("Set") + " }", reset = "[ " + Lang.T("Reset") + " ]", cancel = "[ " + Lang.T("Cancel") + " ]";
-            float bw = (set.Length + reset.Length + cancel.Length + 2) * _cw, bx = Mathf.Round(p.R.x + (p.R.width - bw) * 0.5f), by = y0 + 4f * _ch;
-            p.SetR = new Rect(bx, by, set.Length * _cw, _ch);
-            p.ResetR = new Rect(p.SetR.xMax + _cw, by, reset.Length * _cw, _ch);
-            p.CancelR = new Rect(p.ResetR.xMax + _cw, by, cancel.Length * _cw, _ch);
-            GUI.Label(p.SetR, "<color=" + Mint + ">" + Esc(set) + "</color>", _st);
-            GUI.Label(p.ResetR, "<color=" + Txt + ">" + Esc(reset) + "</color>", _st);
-            GUI.Label(p.CancelR, "<color=" + Txt + ">" + Esc(cancel) + "</color>", _st);
+            float fy = y0 + _ch * 0.5f;
+            Fill(new Rect(hx, fy, 11f * _cw, _ch), Well);
+            GUI.Label(new Rect(hx + _cw, fy, 10f * _cw, _ch), "<color=" + (p.Typed.Length > 0 ? Hot : Val) + ">" + Esc(hex) + "</color>", _st);
         }
 
         // the pop-up under its row, centered on it: its frame half a cell in from each end of the row, so its filled room
@@ -272,8 +248,8 @@ namespace Monolith
             Pop p = _pop;
             int n = p.Values.Length;
             float w, h;
-            // the palette: two rows of colors and Default, a line, the buttons
-            if (p.Palette) { w = Span(p); h = 7f * _ch; }
+            // the palette: two rows of colors
+            if (p.Palette) { w = Span(p); h = 4f * _ch; }
             else
             {
                 string title = Lang.T(p.Row.Label.Trim());
@@ -300,7 +276,7 @@ namespace Monolith
             Clipped(new Rect(p.R.x + _cw * 0.5f, p.R.y + _ch * 0.5f, p.R.width, p.R.height), room, Shadow);
             Clipped(p.R, room, Panel);
             Box(frame, Lang.T(p.Row.Label.Trim()), true, Panel);
-            if (p.Palette) { PaletteDraw(p, frame); return; }
+            if (p.Palette) { PaletteDraw(p); return; }
             // the cursor is kept in view, unless the list was scrolled away from it
             if (!p.Free && p.Cur < p.Top) p.Top = p.Cur;
             if (!p.Free && p.Cur >= p.Top + p.Shown) p.Top = p.Cur - p.Shown + 1;

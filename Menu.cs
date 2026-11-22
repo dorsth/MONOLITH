@@ -528,7 +528,7 @@ namespace Monolith
             // the key bar
             Rect kb = new Rect(_win.x, _win.yMax - _ch, _win.width, _ch);
             Fill(kb, KeyBar);
-            string keys = _pop != null ? K("↑↓", "move") + K("Enter", "take") + K("Esc", "cancel") + (_pop.Palette ? K("0-9 A-F", "hex value") : K("A-Z", "jump to a name"))
+            string keys = _pop != null ? (_pop.Palette ? K("←↑↓→", "move") : K("↑↓", "move")) + K("Enter", "take") + K("Esc", "cancel") + (_pop.Palette ? K("Del", "reset") + K("0-9 A-F", "hex value") : K("A-Z", "jump to a name"))
                 : _bindRow != null ? K("Key", "press one") + K("Enter", "none") + K("Esc", "cancel")
                 : _capture ? K("Key", "press one") + K("Esc", "cancel")
                 : _editRow != null ? K("Enter", "ok") + K("←", "delete") + K("Esc", "cancel")
