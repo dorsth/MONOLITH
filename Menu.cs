@@ -334,7 +334,7 @@ namespace Monolith
         private void Footer(Rect r, string text)
         {
             float g = Thin * 2f, w = (text.Length + 2) * _cw, x = Mathf.Round(r.x + (r.width - w) * 0.5f);
-            Fill(new Rect(x, r.yMax - _ch * 0.5f - g, w, _ch), Back);
+            Fill(new Rect(x, r.yMax - _ch * 0.5f - g, w, _ch * 0.5f + g), Back);   // over the frame only: below it is the ground
             GUI.Label(new Rect(x + _cw, r.yMax - _ch * 0.5f - g * 0.5f - Thin, w, _ch), "<color=" + Dim + ">" + Esc(text) + "</color>", _st);
         }
 

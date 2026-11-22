@@ -1,5 +1,8 @@
 # MONOLITH changelog
 
+## 1.7.7
+- The version on the bottom frame no longer has a dark block under the frame.
+
 ## 1.7.6
 - The clock and the titles no longer have a dark block above the frame.
 - The yellow is #F1FAC3, measured from Far.
