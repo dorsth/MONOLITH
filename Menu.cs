@@ -257,11 +257,12 @@ namespace Monolith
 
         private static readonly MenuRow UpRow = new MenuRow { Kind = RowKind.Up, Label = ".." };
         private MenuRow _dragRow; private Vector2 _lastMouse;
-        private int ColsFor(MenuPage page) { return Mathf.RoundToInt((_pageR.width - 2 * _cw) / _cw) - 1 - (page.Draw != null ? page.SideCols + 1 : 0); }
+        // a long page gives its scroll bar a cell
+        private int ColsFor(MenuPage page) { return Mathf.RoundToInt((_pageR.width - 2 * _cw) / _cw) - 1 - (page.Draw != null ? page.SideCols + 1 : 0) - (Scrolls ? 1 : 0); }
 
         // ---- drawing
 
-        private static Font _font; private static GUIStyle _st; private static Texture2D _white; private static int _fontFor; private static bool _fontSaid;
+        private static Font _font; private static GUIStyle _st; private static Texture2D _white, _dots; private static int _fontFor; private static bool _fontSaid;
         private float _cw, _ch; private Rect _win, _navR, _pageR;
         // where the first category and the first row are and how far apart they sit: set when it is drawn, used by the mouse
         private float _navY0, _navStep, _rowY0, _rowStep; private int _visRows = RowsHigh - 6;
@@ -329,16 +330,18 @@ namespace Monolith
             GUI.Label(new Rect(x + _cw, r.yMax - _ch * 0.5f - g * 0.5f - Thin, w, _ch), "<color=" + Dim + ">" + Esc(text) + "</color>", _st);
         }
 
-        // A long page has a scroll bar on its right frame, as a Far panel has: ▲ on the first row, ▼ on the last, the
-        // part shown as a bar on the line between them.
+        // A long page has a scroll bar inside its right frame, as Far draws one beside text in a panel: ▲ on the first
+        // row, ▼ on the last, a dotted track between them and the part shown as a solid block on it.
         private void ScrollBar(int top, int shown, int count) { ScrollBar(BarX(_pageR.xMax), _rowY0, top, shown, count, Back); }
 
-        // where a scroll bar goes: in place of the double line of a frame whose outer edge is at right, as Far draws it
-        private float BarX(float right) { return Mathf.Round(right - Thin * 1.5f - _cw * 0.5f); }
+        // where a scroll bar goes: the last cell before the frame whose outer edge is at right
+        private const float BarW = 0.8f;
+        private float BarX(float right) { return Mathf.Round(right - _cw * 1.9f); }
+        private bool Scrolls { get { return _vis.Count > _visRows; } }
 
         // a page's scroll bar, held with the mouse: the cursor goes to the row at that height of the bar
         private bool _barHeld;
-        private Rect PageBar(MenuPage page) { return _vis.Count > _visRows ? new Rect(BarX(_pageR.xMax), _rowY0, _cw, _visRows * _ch) : new Rect(); }
+        private Rect PageBar(MenuPage page) { return Scrolls ? new Rect(BarX(_pageR.xMax), _rowY0, _cw * BarW, _visRows * _ch) : new Rect(); }
         private void BarTo(MenuPage page, int ci, float y)
         {
             Rect b = PageBar(page);
@@ -349,15 +352,24 @@ namespace Monolith
         // a scroll bar one cell wide at x, over the rows from y0 down (a page's, or a list's in a pop-up)
         private void ScrollBar(float x, float y0, int top, int shown, int count, Color under)
         {
-            float h = shown * _ch, t = Thin;
-            Fill(new Rect(x, y0, _cw, h), under);
-            GUI.Label(new Rect(x, y0, _cw * 2f, _ch), "<color=" + Head + ">▲</color>", _st);
-            GUI.Label(new Rect(x, y0 + h - _ch, _cw * 2f, _ch), "<color=" + Head + ">▼</color>", _st);
-            float ty = y0 + _ch, th = h - 2f * _ch, mid = Mathf.Round(x + _cw * 0.5f);
+            float h = shown * _ch, w = Mathf.Round(_cw * BarW), ax = Mathf.Round(x + (w - _cw) * 0.5f);
+            Fill(new Rect(x, y0, w, h), under);
+            GUI.Label(new Rect(ax, y0, _cw * 2f, _ch), "<color=" + Head + ">▲</color>", _st);
+            GUI.Label(new Rect(ax, y0 + h - _ch, _cw * 2f, _ch), "<color=" + Head + ">▼</color>", _st);
+            float ty = y0 + _ch, th = h - 2f * _ch;
             if (th <= 0f) return;
-            Fill(new Rect(mid - t * 0.5f, ty, t, th), FrameDim);
+            // the track: dots, as Far's light shade character
+            if (_dots == null)
+            {
+                _dots = new Texture2D(3, 3, TextureFormat.RGBA32, false) { hideFlags = HideFlags.HideAndDontSave, filterMode = FilterMode.Point, wrapMode = TextureWrapMode.Repeat };
+                for (int i = 0; i < 9; i++) _dots.SetPixel(i % 3, i / 3, i == 4 ? Color.white : Color.clear);
+                _dots.Apply();
+            }
+            Color was = GUI.color; GUI.color = FrameDim;
+            GUI.DrawTextureWithTexCoords(new Rect(x, ty, w, th), _dots, new Rect(0f, 0f, w / 3f, th / 3f));
+            GUI.color = was;
             float bh = Mathf.Max(_ch * 0.5f, th * shown / count), by = ty + (th - bh) * top / Mathf.Max(1, count - shown);
-            Fill(new Rect(Mathf.Round(mid - _cw * 0.3f), Mathf.Round(by), Mathf.Round(_cw * 0.6f), Mathf.Round(bh)), Frame);
+            Fill(new Rect(x, Mathf.Round(by), w, Mathf.Round(bh)), Frame);
         }
 
         // A section heading as Far heads a column: its name alone, in the middle, in the color of a column title.
@@ -450,7 +462,7 @@ namespace Monolith
             for (int i = 0; i < vis && page.Top + i < _vis.Count; i++)
             {
                 int idx = page.Top + i; MenuRow row = _vis[idx];
-                Rect r = new Rect(_pageR.x + _cw, _pageR.y + (i + 1) * _ch, _pageR.width - 2 * _cw - side * _cw, _ch);
+                Rect r = new Rect(_pageR.x + _cw, _pageR.y + (i + 1) * _ch, _pageR.width - 2 * _cw - side * _cw - (Scrolls ? _cw : 0f), _ch);
                 bool cur = idx == ci && pageOn;
                 if (cur) Fill(r, Bar); else if (idx == over && row.Kind != RowKind.Header) Fill(r, Hover);
                 if (row.Kind == RowKind.Header) Heading(r, Lang.T(row.Label), page.Draw != null ? SideRect(page) : new Rect());

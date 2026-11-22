@@ -1,5 +1,8 @@
 # MONOLITH changelog
 
+## 1.5.7
+- Scroll bars as Far draws them beside text: inside the frame, a dotted track and a solid block for the part shown, ▲ and ▼ at the ends. The rows give it a cell.
+
 ## 1.5.6
 - Lists and the color picker are centered under their row: the same room on the left and the right.
 

@@ -164,7 +164,7 @@ namespace Monolith
         }
 
         // the scroll bar of a long list: one cell wide on its right frame, over its rows
-        private Rect PopBar(Pop p) { return new Rect(BarX(p.R.xMax - _cw * 0.5f), p.R.y + _ch, _cw, p.Shown * _ch); }
+        private Rect PopBar(Pop p) { return new Rect(BarX(p.R.xMax - _cw * 0.5f), p.R.y + _ch, _cw * BarW, p.Shown * _ch); }
 
         // the list shows from where the mouse is on its scroll bar
         private void PopScrollTo(Pop p, float y)
@@ -259,11 +259,12 @@ namespace Monolith
             if (!p.Free && p.Cur < p.Top) p.Top = p.Cur;
             if (!p.Free && p.Cur >= p.Top + p.Shown) p.Top = p.Cur - p.Shown + 1;
             p.Top = Mathf.Clamp(p.Top, 0, Mathf.Max(0, n - p.Shown));
-            int cols = (int)(p.R.width / _cw) - 6;
+            bool bar = n > p.Shown;   // a long list gives its scroll bar a cell
+            int cols = (int)(p.R.width / _cw) - 6 - (bar ? 1 : 0);
             for (int i = 0; i < p.Shown; i++)
             {
                 int idx = p.Top + i;
-                Rect r = new Rect(p.R.x + _cw * 1.5f, p.R.y + _ch + i * _ch, p.R.width - _cw * 3f, _ch);
+                Rect r = new Rect(p.R.x + _cw * 1.5f, p.R.y + _ch + i * _ch, p.R.width - _cw * (bar ? 4f : 3f), _ch);
                 bool cur = idx == p.Cur, was = Equals(p.Values[idx], p.Was);
                 if (cur) Fill(r, Bar);
                 GUI.Label(new Rect(r.x + _cw * 0.5f, r.y, r.width, _ch), "<color=" + Hot + ">" + (was ? "√ " : "  ") + "</color><color=" + (cur ? Val : Txt) + ">" + Esc(Fit(p.Labels[idx], cols)) + "</color>", _st);
