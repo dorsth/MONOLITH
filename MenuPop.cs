@@ -322,7 +322,7 @@ namespace Monolith
                 int idx = p.Top + i;
                 Rect r = new Rect(inL, p.R.y + _ch + i * _ch, inR - inL, _ch);
                 bool cur = idx == p.Cur, was = Equals(p.Values[idx], p.Was);
-                if (cur) Fill(r, Bar);
+                if (cur) Fill(r, MenuBar);   // a list is a menu: its cursor is the menu one
                 GUI.Label(new Rect(r.x + _cw * 0.5f, r.y, r.width, _ch), "<color=" + Hot + ">" + (was ? "√ " : "  ") + "</color><color=" + (cur ? Val : Txt) + ">" + Esc(Fit(p.Labels[idx], cols)) + "</color>", _st);
             }
             // a long list has the scroll bar a long page has, on its right frame

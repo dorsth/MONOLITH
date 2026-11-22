@@ -270,11 +270,11 @@ namespace Monolith
 
         // the STRAFTAT theme for Far (straftat-lobby, STRAFCOLORS), measured off Far with it: panel glass, gunmetal-sage
         // frames (lighter on dialogs), the active title on a mint badge, yellow column titles and keys
-        private static readonly Color Back = new Color32(0x09, 0x0A, 0x05, 0xFF), Frame = new Color32(0x8F, 0xA5, 0x9B, 0xFF), Bar = new Color32(0x2B, 0x39, 0x29, 0xFF),
+        private static readonly Color Back = new Color32(0x09, 0x0A, 0x05, 0xFF), Frame = new Color32(0x8F, 0xA5, 0x9B, 0xFF), Bar = new Color32(0x34, 0x45, 0x32, 0xFF), MenuBar = new Color32(0x2B, 0x39, 0x29, 0xFF), Window = new Color32(0x13, 0x14, 0x11, 0xFF),
             FrameDim = new Color32(0x6F, 0x85, 0x7B, 0xFF), Panel = new Color32(0x13, 0x18, 0x0F, 0xFF),
             BarDim = new Color32(0x13, 0x18, 0x10, 0xFF), Shadow = new Color(0f, 0f, 0f, 0.5f), Hover = new Color32(0x1A, 0x22, 0x17, 0xFF), KeyBar = new Color32(0x17, 0x1C, 0x13, 0xFF),
             Well = new Color32(0x07, 0x08, 0x03, 0xFF), Badge = new Color32(0xB4, 0xF6, 0xB7, 0xFF);
-        private const string Txt = "#A9B0AA", Dim = "#909790", Hot = "#E8FF8A", Mint = "#B4F6B7", Val = "#F4FEF4", Head = "#909790", Ink = "#070803";
+        private const string Txt = "#A9B0AA", Dim = "#909790", Hot = "#EEFF77", Mint = "#B4F6B7", Val = "#F4FEF4", Head = "#8FA59B", Ink = "#070803";
 
         private void Style()
         {
@@ -456,7 +456,7 @@ namespace Monolith
             // a heading just above the first row shown is shown with it
             if (page.Top == 1 && _vis.Count > 0 && _vis[0].Kind == RowKind.Header) page.Top = 0;
 
-            Fill(_win, Color.black);   // the ground between the panels, black as Far's
+            Fill(_win, Window);   // the ground between the panels
             Fill(_navR, Back); Fill(_pageR, Back);
             // the categories
             Box(_navR, "MONOLITH", !pageOn);
@@ -634,7 +634,7 @@ namespace Monolith
 
         private const int BarCells = 10, NumberCells = 6;
         private static readonly string BarGap = new string(' ', BarCells + 1);
-        private static readonly Color LineRest = new Color32(0x6F, 0x85, 0x7B, 0xFF), KnobCur = new Color32(0xE8, 0xFF, 0x8A, 0xFF), KnobRest = new Color32(0xA9, 0xB0, 0xAA, 0xFF), Tick = new Color32(0x8F, 0xA5, 0x9B, 0xFF);
+        private static readonly Color LineRest = new Color32(0x6F, 0x85, 0x7B, 0xFF), KnobCur = new Color32(0xEE, 0xFF, 0x77, 0xFF), KnobRest = new Color32(0xA9, 0xB0, 0xAA, 0xFF), Tick = new Color32(0x8F, 0xA5, 0x9B, 0xFF);
 
         // what a setting is set to, drawn as what it is: a switch, a key, a color, one of a list (▼ opens the list),
         // or a number with a bar that shows where it sits between its lowest and highest
