@@ -1,5 +1,8 @@
 # MONOLITH changelog
 
+## 1.2.9
+- Hitmarker preview: turning on Kill hitmarker adds its hitmarker under the other two, which stay where they are.
+
 ## 1.2.8
 - DorsthTweaks 1.4.1: "Shotgun color" is gone. The shotgun shows the same hitmarker as every other gun, in the bodyshot, headshot and kill colors.
 

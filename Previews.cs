@@ -81,6 +81,9 @@ namespace Monolith
 
         private static GameObject _marker; private static float _markerAt = -99f;
 
+        // how many rows of the box each hitmarker has: one more hitmarker makes the box this much higher and moves nothing
+        internal const float MarkerRows = 3.5f;
+
         // the hitmarker most guns use: the mod knows it once a weapon is in the map; before that, any weapon the game has loaded
         private static GameObject Marker()
         {
@@ -125,11 +128,12 @@ namespace Monolith
                 for (int tone = 0; tone < 2; tone++)
                 {
                     Rect s = Tone(r, tone);
+                    float cell = MarkerRows * _ch, y0 = Mathf.Round((s.height - n * cell) / 2f);
                     GUI.BeginGroup(s);
                     for (int i = 0; i < n; i++)
                     {
                         Color c = (i == 0 ? DorsthTweaks.DorsthTweaksPlugin.BodyshotColor : i == 1 ? DorsthTweaks.DorsthTweaksPlugin.HeadshotColor : DorsthTweaks.DorsthTweaksPlugin.KillColor).Color;
-                        Pic(new Rect(0f, i * s.height / n, s.width, s.height / n), sp, c, px, py);
+                        Pic(new Rect(0f, y0 + i * cell, s.width, cell), sp, c, px, py);
                     }
                     GUI.EndGroup();
                 }
