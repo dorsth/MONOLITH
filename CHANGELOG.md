@@ -1,5 +1,8 @@
 # MONOLITH changelog
 
+## 1.6.9
+- The yellow is paler, measured from Far.
+
 ## 1.6.8
 - Titles, headings and the clock are bold, as in Far.
 
