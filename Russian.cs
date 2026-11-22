@@ -5,7 +5,7 @@ namespace Monolith
 {
     internal static partial class Lang
     {
-        private static readonly Dictionary<string, string> Table = new Dictionary<string, string>(308)
+        private static readonly Dictionary<string, string> Table = new Dictionary<string, string>(307)
         {
             { "Crosshair", "Прицел" },
             { "Viewmodel", "Вьюмодель" },
@@ -174,7 +174,6 @@ namespace Monolith
             { "Gun sound volume", "Громкость оружия" },
             { "Shots, reloads, clicks, casings.", "Выстрелы, перезарядка, щелчки, гильзы." },
             { "Default", "Стандарт" },
-            { "Previous", "Прежний" },
             { "Same as Hit", "Как попадание" },
             { "Same as Kill", "Как убийство" },
             { "Sensitivity in cm/360", "Чувствительность в см/360" },

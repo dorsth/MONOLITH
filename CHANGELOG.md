@@ -1,5 +1,10 @@
 # MONOLITH changelog
 
+## 1.8.0
+- The color picker has three rows of colors and a Default button under the hex value; Previous is gone.
+- The hex value waits selected with a blinking caret after it, so it is clear that typing writes over it.
+- The Default button lights up exactly over its text.
+
 ## 1.7.9
 - The panels are #131411, the same as the ground around them, with no darker fill.
 
