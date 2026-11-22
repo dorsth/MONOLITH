@@ -20,7 +20,7 @@ using UnityEngine.UI;
 
 [assembly: AssemblyTitle("ezCrosshair")]
 [assembly: AssemblyDescription("Pick your own crosshair, its color and size.")]
-[assembly: AssemblyVersion("1.2.5.0")]
+[assembly: AssemblyVersion("1.2.6.0")]
 [assembly: AssemblyFileVersion("1.2.1.0")]
 
 // Only changes what you see on your own screen, so matchmaking with unmodded players still works.
@@ -34,7 +34,7 @@ namespace EzCrosshair
     {
         public const string Guid = "dorsth.straftat.ezcrosshair";
         public const string Name = "ezCrosshair";
-        public const string Version = "1.2.5";
+        public const string Version = "1.2.6";
         internal const string ModMenuGuid = "kestrel.straftat.modmenu";
 
         // in the order they're shown (Images.cs has each one's picture)
@@ -340,11 +340,12 @@ namespace EzCrosshair
             }
         }
 
-        // how many screen pixels the crosshair covers: its own size times the scale, on a 1080 high screen
+        // how many screen pixels the crosshair covers: its own size times the scale, on a 1080 high screen, rounded to a
+        // whole number of screen pixels per picture pixel. A size in between drew some pixels wider than others.
         public static Vector2Int ScreenSize(Texture2D tex, float scale)
         {
-            float f = scale * Screen.height / 1080f;
-            return new Vector2Int(Mathf.RoundToInt(tex.width * f), Mathf.RoundToInt(tex.height * f));
+            int k = Mathf.Max(1, Mathf.RoundToInt(scale * Screen.height / 1080f));
+            return new Vector2Int(tex.width * k, tex.height * k);
         }
 
         private static bool ShouldShow() { return WhyHidden() == null; }

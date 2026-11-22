@@ -1,5 +1,8 @@
 # MONOLITH changelog
 
+## 1.8.2
+- ezCrosshair 1.2.6: every crosshair drawn again pixel by pixel, with no soft edges, and its size rounded to whole pixels so it stays sharp.
+
 ## 1.8.1
 - A color picked stays when you click beside the color picker or close the menu. Esc still puts back the old one.
 
