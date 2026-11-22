@@ -35,7 +35,7 @@ using PlanarReflection = UnityStandardAssets.Water.PlanarReflection;
 
 [assembly: AssemblyTitle("DorsthTweaks")]
 [assembly: AssemblyDescription("Small client-side tweaks for STRAFTAT: bullet trails, HUD, prompts, menus and performance.")]
-[assembly: AssemblyVersion("1.4.2.0")]
+[assembly: AssemblyVersion("1.4.3.0")]
 [assembly: AssemblyFileVersion("1.3.7.0")]
 
 // Only changes what you see on your own screen, so matchmaking with unmodded players still works.
@@ -49,7 +49,7 @@ namespace DorsthTweaks
     {
         public const string Guid = "dorsth.straftat.dorsthtweaks";
         public const string Name = "DorsthTweaks";
-        public const string Version = "1.4.2";
+        public const string Version = "1.4.3";
 
         internal static ManualLogSource Log;
         internal static ConfigEntry<bool> Detail;
@@ -4782,6 +4782,7 @@ namespace DorsthTweaks
                 _msaa = QualitySettings.antiAliasing;
                 _aniso = QualitySettings.anisotropicFiltering;
                 _saved = true;
+                DorsthTweaksPlugin.Log.LogInfo("The game's quality level " + QualitySettings.GetQualityLevel() + ": anisotropic filtering " + _aniso + ".");
             }
             // only what differs is set: a new texture size limit reloads every texture
             ShadowQuality shadows = reduce ? ShadowQuality.Disable : _shadows;
@@ -4796,7 +4797,8 @@ namespace DorsthTweaks
             // anisotropic filtering, at its highest (16x) on every texture: without it the graphics card takes a smaller copy
             // of a texture seen at an angle, so a floor goes blurry from a line that moves with you
             bool aniso = DorsthTweaksPlugin.Anisotropic.Value;
-            if (aniso) Texture.SetGlobalAnisotropicFilteringLimits(16, 16);
+            // off: Unity's own limits again (-1), so the game's setting is exactly as it was
+            if (aniso) Texture.SetGlobalAnisotropicFilteringLimits(16, 16); else Texture.SetGlobalAnisotropicFilteringLimits(-1, -1);
             AnisotropicFiltering af = aniso ? AnisotropicFiltering.ForceEnable : _aniso;
             if (QualitySettings.anisotropicFiltering != af) QualitySettings.anisotropicFiltering = af;
         }

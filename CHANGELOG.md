@@ -1,5 +1,8 @@
 # MONOLITH changelog
 
+## 1.9.3
+- DorsthTweaks 1.4.3: Anisotropic filtering off puts back Unity's own limits too, and the log says what the game's quality level has.
+
 ## 1.9.2
 - ezCrosshair 1.3.4: the brackets curve smoothly; their sides were flat in the middle.
 
