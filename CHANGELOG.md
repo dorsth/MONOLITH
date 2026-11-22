@@ -1,5 +1,8 @@
 # MONOLITH changelog
 
+## 1.8.7
+- ezCrosshair 1.3.0: the crosshairs are the first pictures again, only made even on both sides, and the brackets without their dark rim. The size slider is smooth again.
+
 ## 1.8.6
 - ezCrosshair 1.2.9: every crosshair drawn again as a clean shape with its first shape and size, the same on all four sides, with an even soft edge. Bigger sizes stay smooth.
 - The crosshairs that come with it are no longer copied into the Crosshairs folder; it is for your own.

@@ -20,7 +20,7 @@ using UnityEngine.UI;
 
 [assembly: AssemblyTitle("ezCrosshair")]
 [assembly: AssemblyDescription("Pick your own crosshair, its color and size.")]
-[assembly: AssemblyVersion("1.2.9.0")]
+[assembly: AssemblyVersion("1.3.0.0")]
 [assembly: AssemblyFileVersion("1.2.1.0")]
 
 // Only changes what you see on your own screen, so matchmaking with unmodded players still works.
@@ -34,7 +34,7 @@ namespace EzCrosshair
     {
         public const string Guid = "dorsth.straftat.ezcrosshair";
         public const string Name = "ezCrosshair";
-        public const string Version = "1.2.9";
+        public const string Version = "1.3.0";
         internal const string ModMenuGuid = "kestrel.straftat.modmenu";
 
         // in the order they're shown (Images.cs has each one's picture)
@@ -386,14 +386,14 @@ namespace EzCrosshair
             }
         }
 
-        // how many screen pixels the crosshair covers: its own size times the scale on a 1080 high screen, rounded to a
-        // whole number of screen pixels per picture pixel, so every pixel of it is drawn the same size. Every picture is an
-        // even number of pixels a side, so it sits exactly on the middle of an even screen (1920x1080: between 959 and 960)
+        // how many screen pixels the crosshair covers: its own size times the scale, on a 1080 high screen. Any size works:
+        // Pictures.At shrinks or grows the picture to it, averaging what each screen pixel covers, so no pixel comes out
+        // wider than another
         public static Vector2Int ScreenSize(Texture2D tex, float scale)
         {
-            int k = Mathf.Max(1, Mathf.RoundToInt(scale * Screen.height / 1080f));
+            float f = scale * Screen.height / 1080f;
             Vector2 n = Pictures.Native(tex);
-            return new Vector2Int(Mathf.RoundToInt(n.x) * k, Mathf.RoundToInt(n.y) * k);
+            return new Vector2Int(Mathf.Max(1, Mathf.RoundToInt(n.x * f)), Mathf.Max(1, Mathf.RoundToInt(n.y * f)));
         }
 
         private static bool ShouldShow() { return WhyHidden() == null; }
