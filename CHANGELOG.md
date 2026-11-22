@@ -1,5 +1,8 @@
 # MONOLITH changelog
 
+## 1.7.0
+- The yellow is back to how it was.
+
 ## 1.6.9
 - The yellow is paler, measured from Far.
 
