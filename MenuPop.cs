@@ -27,17 +27,17 @@ namespace Monolith
 
         private Pop _pop;
         private const int PaletteCols = 8, PaletteRows = 4, ListRows = 14, DefaultSlot = PaletteCols * PaletteRows;
-        // Far's 16 colors, the dark eight then the bright eight, then a light row in the same columns and a row of the colors between
+        // the colors in rows: grays from white to black, then the same eight hues light, full and dark
         private static readonly Color32[] Swatches =
         {
-            new Color32(0x00, 0x00, 0x00, 0xFF), new Color32(0x00, 0x00, 0x80, 0xFF), new Color32(0x00, 0x80, 0x00, 0xFF), new Color32(0x00, 0x80, 0x80, 0xFF),
-            new Color32(0x80, 0x00, 0x00, 0xFF), new Color32(0x80, 0x00, 0x80, 0xFF), new Color32(0x80, 0x80, 0x00, 0xFF), new Color32(0xC0, 0xC0, 0xC0, 0xFF),
-            new Color32(0x80, 0x80, 0x80, 0xFF), new Color32(0x00, 0x00, 0xFF, 0xFF), new Color32(0x00, 0xFF, 0x00, 0xFF), new Color32(0x00, 0xFF, 0xFF, 0xFF),
-            new Color32(0xFF, 0x00, 0x00, 0xFF), new Color32(0xFF, 0x00, 0xFF, 0xFF), new Color32(0xFF, 0xFF, 0x00, 0xFF), new Color32(0xFF, 0xFF, 0xFF, 0xFF),
-            new Color32(0x40, 0x40, 0x40, 0xFF), new Color32(0x80, 0x80, 0xFF, 0xFF), new Color32(0x80, 0xFF, 0x80, 0xFF), new Color32(0x80, 0xFF, 0xFF, 0xFF),
-            new Color32(0xFF, 0x80, 0x80, 0xFF), new Color32(0xFF, 0x80, 0xFF, 0xFF), new Color32(0xFF, 0xFF, 0x80, 0xFF), new Color32(0xE0, 0xE0, 0xE0, 0xFF),
-            new Color32(0x20, 0x20, 0x20, 0xFF), new Color32(0x00, 0x80, 0xFF, 0xFF), new Color32(0x80, 0xFF, 0x00, 0xFF), new Color32(0x00, 0xFF, 0x80, 0xFF),
-            new Color32(0xFF, 0x80, 0x00, 0xFF), new Color32(0xFF, 0x00, 0x80, 0xFF), new Color32(0xFF, 0xC0, 0x00, 0xFF), new Color32(0x80, 0x00, 0xFF, 0xFF),
+            new Color32(0xFF, 0xFF, 0xFF, 0xFF), new Color32(0xDB, 0xDB, 0xDB, 0xFF), new Color32(0xB6, 0xB6, 0xB6, 0xFF), new Color32(0x92, 0x92, 0x92, 0xFF),
+            new Color32(0x6D, 0x6D, 0x6D, 0xFF), new Color32(0x49, 0x49, 0x49, 0xFF), new Color32(0x24, 0x24, 0x24, 0xFF), new Color32(0x00, 0x00, 0x00, 0xFF),
+            new Color32(0xFF, 0x80, 0x80, 0xFF), new Color32(0xFF, 0xC0, 0x80, 0xFF), new Color32(0xFF, 0xFF, 0x80, 0xFF), new Color32(0x80, 0xFF, 0x80, 0xFF),
+            new Color32(0x80, 0xFF, 0xFF, 0xFF), new Color32(0x80, 0x80, 0xFF, 0xFF), new Color32(0xC0, 0x80, 0xFF, 0xFF), new Color32(0xFF, 0x80, 0xFF, 0xFF),
+            new Color32(0xFF, 0x00, 0x00, 0xFF), new Color32(0xFF, 0x80, 0x00, 0xFF), new Color32(0xFF, 0xFF, 0x00, 0xFF), new Color32(0x00, 0xFF, 0x00, 0xFF),
+            new Color32(0x00, 0xFF, 0xFF, 0xFF), new Color32(0x00, 0x00, 0xFF, 0xFF), new Color32(0x80, 0x00, 0xFF, 0xFF), new Color32(0xFF, 0x00, 0xFF, 0xFF),
+            new Color32(0x80, 0x00, 0x00, 0xFF), new Color32(0x80, 0x40, 0x00, 0xFF), new Color32(0x80, 0x80, 0x00, 0xFF), new Color32(0x00, 0x80, 0x00, 0xFF),
+            new Color32(0x00, 0x80, 0x80, 0xFF), new Color32(0x00, 0x00, 0x80, 0xFF), new Color32(0x40, 0x00, 0x80, 0xFF), new Color32(0x80, 0x00, 0x80, 0xFF),
         };
 
         private static string LabelOf(MenuRow row, object v)
@@ -171,7 +171,7 @@ namespace Monolith
             if (p.Palette)
             {
                 float gx, sw, hx; PalLayout(p, out gx, out sw, out hx);
-                int col = Mathf.FloorToInt((m.x - gx) / sw), row = Mathf.FloorToInt((m.y - p.R.y - _ch) / _ch);
+                int col = Mathf.FloorToInt((m.x - gx) / sw), row = Mathf.FloorToInt((m.y - p.R.y - PalTop) / _ch);
                 if (col < 0 || col >= PaletteCols || row < 0 || row >= PaletteRows) return -1;
                 return row * PaletteCols + col;
             }
@@ -209,12 +209,15 @@ namespace Monolith
             if (!p.Palette) PopClose(true);
         }
 
-        // The palette, laid out as Far's Color dialog: the colors at gx, sw wide each and touching, the hex value at hx.
-        // The colors take what room there is, up to three cells each; the whole is centered in the frame.
+        // The palette: the colors at gx, sw apart each way, the hex value at hx. Each color is square,
+        // as wide as a row is high, or less when the room is short; the whole is centered in the frame.
+        // room between the frame and the colors, above and below them
+        private float PalTop { get { return 1.5f * _ch; } }
+
         private void PalLayout(Pop p, out float gx, out float sw, out float hx)
         {
-            float hexW = 11f * _cw, gap = _cw;
-            sw = Mathf.Floor(Mathf.Min(3f * _cw, (p.R.width - 3f * _cw - gap - hexW) / PaletteCols));
+            float hexW = 11f * _cw, gap = 2f * _cw;
+            sw = Mathf.Floor(Mathf.Min(_ch, (p.R.width - 5f * _cw - gap - hexW) / PaletteCols));
             float all = PaletteCols * sw + gap + hexW;
             gx = Mathf.Round(p.R.x + (p.R.width - all) * 0.5f); hx = gx + PaletteCols * sw + gap;
         }
@@ -222,13 +225,15 @@ namespace Monolith
         private void PaletteDraw(Pop p)
         {
             float gx, sw, hx; PalLayout(p, out gx, out sw, out hx);
-            float y0 = p.R.y + _ch, t = Thin;
+            float y0 = p.R.y + PalTop, t = Thin, gap = Mathf.Max(t * 2f, Mathf.Round(_ch * 0.12f));
             for (int i = 0; i < DefaultSlot; i++)
             {
-                Rect s = new Rect(gx + (i % PaletteCols) * sw, y0 + (i / PaletteCols) * _ch, sw, _ch);
+                // each color a block of its own, with ground around it
+                Rect s = new Rect(gx + (i % PaletteCols) * sw + gap, y0 + (i / PaletteCols) * _ch + gap, sw - 2f * gap, _ch - 2f * gap);
                 Color c = (Color)p.Values[i];
                 Fill(s, new Color(c.r, c.g, c.b, 1f));
-                // the cursor: a line around it
+                // the cursor: a line around it, in the ground
+                s = new Rect(s.x - gap, s.y - gap, s.width + 2f * gap, s.height + 2f * gap);
                 if (i == p.Cur) { Fill(new Rect(s.x, s.y, s.width, t), KnobCur); Fill(new Rect(s.x, s.yMax - t, s.width, t), KnobCur); Fill(new Rect(s.x, s.y, t, s.height), KnobCur); Fill(new Rect(s.xMax - t, s.y, t, s.height), KnobCur); }
             }
             // any other color: its hex value, typed, in a sunken field as Far's, level between the middle rows
@@ -254,7 +259,7 @@ namespace Monolith
             int n = p.Values.Length;
             float w, h;
             // the palette: its rows of colors
-            if (p.Palette) { w = Span(p); h = (PaletteRows + 2) * _ch; }
+            if (p.Palette) { w = Span(p); h = PaletteRows * _ch + 2f * PalTop; }
             else
             {
                 string title = Lang.T(p.Row.Label.Trim());

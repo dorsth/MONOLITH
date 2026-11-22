@@ -1,5 +1,8 @@
 # MONOLITH changelog
 
+## 1.6.4
+- The color picker has 32 colors as separate squares in four rows: grays from white to black, then eight colors light, full and dark, with more room around them.
+
 ## 1.6.3
 - The key bar at the bottom looks like Far: the keys share its width evenly, each with its word in a box.
 
