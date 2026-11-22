@@ -281,8 +281,8 @@ namespace EzCrosshair
             _shown = null;
         }
 
-        // Up to 1.2.2 every frame asked the engine about a dozen things again (the game canvas' order, the picture, the
-        // color, the scale, the screen size): about 3 microseconds a frame, measured in a match. Now a frame only works out
+        // Asking the engine about a dozen things every frame (the game canvas' order, the picture, the color, the scale,
+        // the screen size) cost about 3 microseconds a frame, measured in a match. So a frame only works out
         // whether the crosshair shows; the rest is done when something changed (a setting, the hit color going on or off,
         // the crosshair appearing) and looked at again 16 frames later at most (the screen size, the game canvas' order).
         internal static bool Dirty = true;
@@ -436,9 +436,9 @@ namespace EzCrosshair
                 // the hit markers' names, from everything loaded that has one (guns, grenades, mines, rockets). Read again
                 // when something new shows up that isn't one yet: a gun loaded after the last read (the list read in the
                 // main menu had none, so the colour only came once something else read it again)
-                // Up to 1.2.1 every new thing under the pause manager that was not a hit marker (a chat line, a kill line) started
-                // that read again, and the read looks through everything loaded, four times: a few milliseconds each time.
-                // Now a name that turned out not to be a marker is remembered until the next map.
+                // Every new thing under the pause manager that is not a hit marker (a chat line, a kill line) would start that
+                // read again, and the read looks through everything loaded, four times: a few milliseconds each time. So a
+                // name that turned out not to be a marker is remembered until the next map.
                 if (!MarkerNames.Contains(name))
                 {
                     if (NotMarkers.Contains(name) || Time.unscaledTime - _namesAt <= 0.5f) return;

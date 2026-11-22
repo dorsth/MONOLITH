@@ -408,8 +408,8 @@ namespace MatchStats
         internal static string Num(float f) { return Mathf.RoundToInt(f).ToString(CultureInfo.InvariantCulture); }
 
         // A spectator of Straftat Tournaments is not on the boards and not counted in takes. Any id can be one: the ids go
-        // by when someone joined, so with a spectator in early a player can have id 4 or 5. Up to 1.0.0 every id from 4 up
-        // was taken for a spectator, which left players out and kept spectators in.
+        // by when someone joined, so with a spectator in early a player can have id 4 or 5: every id from 4 up is not a
+        // spectator.
         private static bool Playing(int id)
         {
             if (id < 0) return false;

@@ -67,7 +67,7 @@ namespace ViewmodelTweaks
         private static Slot _shown;
         private static PlayerPickup _me;
 
-        // ---- One Camera (since 1.2.0)
+        // ---- One Camera
         // Your weapon is drawn with the game's second camera (View.cs). Having that camera on costs about 4% of the
         // frame rate whatever it draws (measured: 35 us a frame, with two different settings of that camera making no
         // difference). With One Camera on, that camera is off and your main camera draws the weapon, and the weapon is
@@ -102,8 +102,7 @@ namespace ViewmodelTweaks
         private static Vector3 ViewOffset() { Slot s = _shown; return s != null ? new Vector3(s.X.Value, s.Y.Value, s.Z.Value) : View.Offset; }
 
         // Your arms hang under that object too: the arms' model with its bones is a child of BobPosition/FPArms (read from
-        // the game's player prefab; an earlier note here said they were part of the body's model, which was
-        // wrong). A mesh with bones takes its bones' places once a frame, before any camera starts drawing. So with the move
+        // the game's player prefab). A mesh with bones takes its bones' places once a frame, before any camera starts drawing. So with the move
         // made only while the main camera draws (1.2.0's first tries), the gun was right and the arms were not:
         //   - nothing else done: the arms kept their real size and only followed the shift;
         //   - the arms drawn in a step of their own with the move as a changed view: the move twice, arms too far forward;
@@ -410,8 +409,8 @@ namespace ViewmodelTweaks
         // A melee weapon hits with a collider that hangs under the object One Camera moves (MeleeChildCollision, a child of
         // the weapon, swung by its animation), and its swing trail is made from that collider's place. While one is in your
         // hands nothing is moved: every frame is a two-camera frame, drawn and hit-tested exactly as without One Camera.
-        // Before 2.0.1 the weapon was moved like a gun: the trail was drawn as a wide white bar, and
-        // whether the moved collider changed a hit was never tested, so it is not left to chance.
+        // Moved like a gun, the trail was drawn as a wide white bar, and whether the moved collider changes a hit was
+        // never tested, so it is not left to chance.
         private static bool _heldMelee;
         private static bool Melee(GameObject weapon) { return weapon != null && weapon.GetComponent<MeleeWeapon>() != null; }
         private static readonly List<ParticleSystemRenderer> _heldParts = new List<ParticleSystemRenderer>(), _partBuf = new List<ParticleSystemRenderer>();
@@ -913,8 +912,7 @@ namespace ViewmodelTweaks
         {
             if (_me == null)
             {
-                // none yet, or the last one is gone (a new round): your own player, as the game itself keeps it. Up to 1.1.2 this
-                // searched every object in the game once a second for as long as you had no player (menus, between rounds).
+                // none yet, or the last one is gone (a new round): your own player, as the game itself keeps it
                 Settings st = Settings.Instance;
                 FirstPersonController mine = st != null ? st.localPlayer : null;
                 if (mine == null) return null;

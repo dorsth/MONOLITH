@@ -1,5 +1,10 @@
 # MONOLITH changelog
 
+## 1.9.5
+- The tips of the second and third jump keys are in Russian again.
+- The Crosshairs folder in the download has the smooth brackets too; its old copy took their place.
+- Removed leftover notes and two Russian texts nothing used.
+
 ## 1.9.4
 - DorsthTweaks 1.4.4: Anisotropic filtering off really turns it off. After the game set its quality, it read back its own value and kept it on.
 

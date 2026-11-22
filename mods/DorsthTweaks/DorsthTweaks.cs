@@ -4782,7 +4782,7 @@ namespace DorsthTweaks
                 _msaa = QualitySettings.antiAliasing;
                 _saved = true;
                 // read once, before this sets it: the game's quality change leaves it as it finds it, so read again later it
-                // would be this mod's own value and off would stay on (1.4.2, 1.4.3)
+                // would be this mod's own value and off would stay on
                 if (!_anisoRead) { _aniso = QualitySettings.anisotropicFiltering; _anisoRead = true; DorsthTweaksPlugin.Log.LogInfo("The game's anisotropic filtering: " + _aniso + "."); }
             }
             // only what differs is set: a new texture size limit reloads every texture

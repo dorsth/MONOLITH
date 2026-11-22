@@ -4,7 +4,6 @@
 # 'W<n>' at most n cells | '' not checked (a part that is put together with others).
 # Row names: a full page has 56 cells, a page with a preview box 31.
 # Of those a switch takes 4, a slider 18, a color 14; a list or text value gives way to the name (it keeps 7).
-B  = 'previous config'          # the name the last setup is kept under (a profile name: not translated)
 HOW_EN = ' Press E, then a key, mouse button or scroll.'
 HOW_RU = ' Нажмите E, затем клавишу, кнопку мыши или прокрутку.'
 T = [
@@ -60,7 +59,6 @@ T = [
 ('No landing shake', 'Без тряски при приземлении', 'L52'), ('No jump shake', 'Без тряски при прыжке', 'L52'),
 ('Slide jumps, wall jumps and ceiling hits.', 'Прыжки из подката, прыжки от стен и удары о потолок.', 'tip'),
 ('No vault shake', 'Без тряски при перелезании', 'L52'),
-('Your FOV stays the same when you sprint and slide. Off: it widens by the amount below.', 'FOV не меняется при беге и подкате. Выкл.: расширяется на величину ниже.', 'tip'),
 ('Sprint FOV increase', 'Рост FOV при беге', 'L38'), ('Degrees your FOV widens when you sprint. Sliding widens it by the same share. 0: no change.', 'На сколько градусов расширяется FOV при беге. При подкате в той же доле. 0: без изменений.', 'tip'), ('Better recoil', 'Улучшенная отдача', 'L52'),
 ('With the AR, AK and Warden, recoil moves your aim instead of shaking the camera.', 'У AR, AK и Warden отдача двигает прицел, а не трясёт камеру.', 'tip'),
 ('No near miss vignette', 'Без виньетки при пролёте пуль', 'L52'),
@@ -138,8 +136,8 @@ T = [
 ('Kills, deaths and damage of each round on the round-end screen, the match so far over each name on the Tab screen, and a full board after the match.', 'Убийства, смерти и урон за раунд на экране конца раунда, итог матча над именами на экране Tab и полная таблица после матча.', 'tip'),
 # ---- keys
 ('Second jump key', 'Вторая клавиша прыжка', 'L40'), ('Third jump key', 'Третья клавиша прыжка', 'L40'), ('Swap weapons', 'Смена оружия', 'L40'),
-('Next to your own jump key.' + HOW_EN, 'В дополнение к вашей клавише прыжка.' + HOW_RU, 'tipb'),
-('Scroll up on one and scroll down on the other: jump on the whole wheel.' + HOW_EN, 'На одну прокрутку вверх, на другую вниз: прыжок на всём колесе.' + HOW_RU, 'tipb'),
+('Works next to your own jump key.' + HOW_EN, 'В дополнение к вашей клавише прыжка.' + HOW_RU, 'tipb'),
+('Put scroll up on one and scroll down on the other to jump with the whole wheel.' + HOW_EN, 'На одну прокрутку вверх, на другую вниз: прыжок на всём колесе.' + HOW_RU, 'tipb'),
 ("Same as Swap in the game's settings. Press E, then a key or mouse button, or scroll to use the wheel.", 'То же, что смена оружия в настройках игры. Нажмите E, затем клавишу, кнопку мыши или прокрутку для колеса.', 'tipb'),
 ('not set', 'не задано', 'W15'), ('scroll wheel', 'колесо мыши', 'W15'), ('number keys', 'цифры', 'W24'), ('changed: ', 'изменено: ', 'W12'),
 ('Press E, then its new key. Enter sets no key.', 'Нажмите E, затем новую клавишу. Enter: без клавиши.', 'tipb'),
@@ -165,7 +163,6 @@ T = [
 ('Nothing to undo.', 'Нечего отменять.', ''), ('Back to what you had before the last load.', 'Возвращено то, что было до последней загрузки.', ''), ('The load is back.', 'Загрузка возвращена.', ''),
 ('Your config as one line of text. Paste it to a friend.', 'Ваш конфиг одной строкой текста. Отправьте её другу.', 'info'),
 ('Import from clipboard', 'Импорт из буфера', 'L41'),
-('Copy a line from a friend (it starts with MONOLITH:), then press E here. Yours is kept as "' + B + '".', 'Скопируйте строку от друга (она начинается с MONOLITH:) и нажмите здесь E. Ваш конфиг сохранится как «' + B + '».', 'info'),
 ('Load', 'Загрузить', 'L41'), ('This config as one line of text. Paste it to a friend.', 'Этот конфиг одной строкой текста. Вставьте его другу.', 'info'),
 ('Saves your current config under this name.', 'Сохраняет текущий конфиг под этим именем.', 'info'),
 ('Delete', 'Удалить', 'L41'),

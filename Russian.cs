@@ -5,7 +5,7 @@ namespace Monolith
 {
     internal static partial class Lang
     {
-        private static readonly Dictionary<string, string> Table = new Dictionary<string, string>(309)
+        private static readonly Dictionary<string, string> Table = new Dictionary<string, string>(307)
         {
             { "Crosshair", "Прицел" },
             { "Viewmodel", "Вьюмодель" },
@@ -87,7 +87,6 @@ namespace Monolith
             { "No jump shake", "Без тряски при прыжке" },
             { "Slide jumps, wall jumps and ceiling hits.", "Прыжки из подката, прыжки от стен и удары о потолок." },
             { "No vault shake", "Без тряски при перелезании" },
-            { "Your FOV stays the same when you sprint and slide. Off: it widens by the amount below.", "FOV не меняется при беге и подкате. Выкл.: расширяется на величину ниже." },
             { "Sprint FOV increase", "Рост FOV при беге" },
             { "Degrees your FOV widens when you sprint. Sliding widens it by the same share. 0: no change.", "На сколько градусов расширяется FOV при беге. При подкате в той же доле. 0: без изменений." },
             { "Better recoil", "Улучшенная отдача" },
@@ -206,8 +205,8 @@ namespace Monolith
             { "Second jump key", "Вторая клавиша прыжка" },
             { "Third jump key", "Третья клавиша прыжка" },
             { "Swap weapons", "Смена оружия" },
-            { "Next to your own jump key. Press E, then a key, mouse button or scroll.", "В дополнение к вашей клавише прыжка. Нажмите E, затем клавишу, кнопку мыши или прокрутку." },
-            { "Scroll up on one and scroll down on the other: jump on the whole wheel. Press E, then a key, mouse button or scroll.", "На одну прокрутку вверх, на другую вниз: прыжок на всём колесе. Нажмите E, затем клавишу, кнопку мыши или прокрутку." },
+            { "Works next to your own jump key. Press E, then a key, mouse button or scroll.", "В дополнение к вашей клавише прыжка. Нажмите E, затем клавишу, кнопку мыши или прокрутку." },
+            { "Put scroll up on one and scroll down on the other to jump with the whole wheel. Press E, then a key, mouse button or scroll.", "На одну прокрутку вверх, на другую вниз: прыжок на всём колесе. Нажмите E, затем клавишу, кнопку мыши или прокрутку." },
             { "Same as Swap in the game's settings. Press E, then a key or mouse button, or scroll to use the wheel.", "То же, что смена оружия в настройках игры. Нажмите E, затем клавишу, кнопку мыши или прокрутку для колеса." },
             { "not set", "не задано" },
             { "scroll wheel", "колесо мыши" },
@@ -253,7 +252,6 @@ namespace Monolith
             { "The load is back.", "Загрузка возвращена." },
             { "Your config as one line of text. Paste it to a friend.", "Ваш конфиг одной строкой текста. Отправьте её другу." },
             { "Import from clipboard", "Импорт из буфера" },
-            { "Copy a line from a friend (it starts with MONOLITH:), then press E here. Yours is kept as \"previous config\".", "Скопируйте строку от друга (она начинается с MONOLITH:) и нажмите здесь E. Ваш конфиг сохранится как «previous config»." },
             { "Load", "Загрузить" },
             { "This config as one line of text. Paste it to a friend.", "Этот конфиг одной строкой текста. Вставьте его другу." },
             { "Saves your current config under this name.", "Сохраняет текущий конфиг под этим именем." },
