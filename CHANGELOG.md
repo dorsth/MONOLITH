@@ -1,5 +1,8 @@
 # MONOLITH changelog
 
+## 1.4.5
+- The color picker is a narrow column under the value: a column per shade, a row per hue. It no longer reaches under the name of the setting. Up and down go one color, left and right a shade.
+
 ## 1.4.4
 - Beside a preview, a section line runs into the preview's frame, so it is joined at both ends.
 
