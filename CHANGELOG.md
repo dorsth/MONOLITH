@@ -1,5 +1,8 @@
 # MONOLITH changelog
 
+## 1.9.2
+- ezCrosshair 1.3.4: the brackets curve smoothly; their sides were flat in the middle.
+
 ## 1.9.1
 - DorsthTweaks 1.4.2: Anisotropic filtering under Performance, on by default. Textures stay sharp at an angle, so a floor no longer turns blurry from a line that moves with you. The game leaves it off.
 
