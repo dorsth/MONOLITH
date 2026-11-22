@@ -2,7 +2,7 @@
 //
 // The game keeps its settings and keybinds in PlayerPrefs (Settings.Start reads them, InputManager.SaveBindingOverride
 // writes one value per binding). A config holds them next to the mods' settings, under the section "game".
-// Left out on purpose: sensitivity and the rest of the mouse feel, and what belongs to one PC (resolution, window mode,
+// Left out on purpose: what belongs to one PC (resolution, window mode,
 // V-Sync, the game's frame cap, voice chat, the path of a crosshair image).
 using System;
 using System.Collections.Generic;
@@ -31,6 +31,8 @@ namespace Monolith
             { "masterVolume", "f", null }, { "effectsVolume", "f", null }, { "musicVolume", "f", null }, { "ambientVolume", "f", null }, { "menuMusicVolume", "f", null },
             { "CrosshairSize", "f", null }, { "CrosshairTintColor", "s", null }, { "CrosshairFilteringDisabled", "i", null },
             { "OutlineWidthMultiplier", "f", null }, { "DisableVoiceChatUI", "i", null },
+            { "mouseSensitivity", "f", "mouseSensitivity" }, { "mouseAimSensitivity", "f", "mouseAimSensitivity" }, { "mouseAimScopeSensitivity", "f", "mouseAimScopeSensitivity" },
+            { "mouseXSensitivity", "f", "horizontalSensitivity" }, { "mouseYSensitivity", "f", "verticalSensitivity" },
         };
 
         internal static void Bind(ConfigFile c)

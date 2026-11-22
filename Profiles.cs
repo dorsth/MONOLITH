@@ -1,10 +1,10 @@
 // MONOLITH - profiles: a setup saved under a name, loaded again, or passed to someone else. Dorsth was here.
 //
 // A profile is every setting of every mod in the bundle that is not at its default, the game's own settings and every
-// keybind (GameConfig), EXCEPT:
-//  * sensitivity (never copied: it belongs to a hand and a mouse, not to a setup),
+// keybind (GameConfig), sensitivity included (the game's and TrueSens), EXCEPT:
 //  * what belongs to one PC (resolution, window mode, V-Sync), the menu's own key, a mod's internal notes, the join message.
 // Loading one puts every mod setting it does not name back to its default, so a loaded profile is the whole setup.
+// Sensitivity is only set from a config that holds it: one saved before it was included leaves yours as it is.
 // Keybinds are only loaded when "Include keybinds" is on; undoing a load always brings yours back.
 //
 // To pass one on it becomes one line of text on the clipboard: MONOLITH:<name>:<code>. The code is letters and digits
@@ -27,12 +27,12 @@ namespace Monolith
         internal sealed class Profile { public string Name; public readonly Dictionary<uint, string> Values = new Dictionary<uint, string>(); }
 
         internal static readonly List<Profile> All = new List<Profile>();
-        private const string Tag = "MONOLITH:", NotMine = "dorsth.straftat.truesens", Before = "previous config";
+        private const string Tag = "MONOLITH:", Sens = "dorsth.straftat.truesens", Before = "previous config";
         private static bool _read;
         private static string FilePath { get { return Path.Combine(Paths.ConfigPath, "dorsth.straftat.monolith.profiles.txt"); } }
 
-        // Game: a setting that belongs to the game and is only shown here too (the two outline colors). A profile sets it
-        // only when it holds a value for it: Defaults, and a profile from before these rows existed, leave yours as it is.
+        // Game: a setting a profile sets only when it holds a value for it (the two outline colors the game also has, and
+        // TrueSens): Defaults, and a profile from before these were in it, leave yours as it is.
         private struct Item { public uint Id; public ConfigEntryBase Entry; public bool Game, Key; }
 
         // FNV-1a over mod, section and name: a setting keeps its number as long as it keeps its name
@@ -53,7 +53,7 @@ namespace Monolith
         {
             var list = new List<Item>(); var seen = new HashSet<uint>();
             var files = new List<KeyValuePair<string, ConfigFile>>();
-            foreach (string mod in MenuLayout.Mods) if (mod != NotMine) files.Add(new KeyValuePair<string, ConfigFile>(mod, MenuLayout.File(mod)));
+            foreach (string mod in MenuLayout.Mods) files.Add(new KeyValuePair<string, ConfigFile>(mod, MenuLayout.File(mod)));
             files.Add(new KeyValuePair<string, ConfigFile>(BundlePlugin.Guid, MenuLayout.File(BundlePlugin.Guid)));
             foreach (var kv in files)
             {
@@ -68,7 +68,7 @@ namespace Monolith
                     uint id = Id(kv.Key, d);
                     if (!seen.Add(id)) continue;
                     bool key = d.Section == "Keys" || e.SettingType == typeof(KeyCode) || e.SettingType == typeof(KeyboardShortcut);
-                    list.Add(new Item { Id = id, Entry = e, Key = key, Game = ReferenceEquals(e, Players.EnemyOutline) || ReferenceEquals(e, Players.TeamOutline) });
+                    list.Add(new Item { Id = id, Entry = e, Key = key, Game = kv.Key == Sens || ReferenceEquals(e, Players.EnemyOutline) || ReferenceEquals(e, Players.TeamOutline) });
                 }
             }
             return list;
@@ -380,7 +380,7 @@ namespace Monolith
         internal static MenuPage Page()
         {
             Read();
-            if (_page == null) _page = new MenuPage(null, "Configs", "Save, load and share configs: every setting, the game's included. Sensitivity is never included.");
+            if (_page == null) _page = new MenuPage(null, "Configs", "Save, load and share configs: every setting, the game's and your sensitivity included.");
             Fill();
             return _page;
         }
@@ -403,7 +403,7 @@ namespace Monolith
                 if (string.Equals(p.Name, Before, StringComparison.OrdinalIgnoreCase)) continue;   // the Undo row stands for it
                 if (!saved) { pg.Head("Saved"); saved = true; }
                 var sub = new MenuPage(pg, p.Name, Lang.Count(Differs(p), " setting differs from the defaults.", " settings differ from the defaults.", "Differences from the defaults: ") + (Lang.Ru ? "." : ""));
-                sub.Rows.Add(new MenuRow { Kind = RowKind.Action, Label = "Load", Info = "Loads everything except sensitivity. Keybinds only when Include keybinds is on.", Take = s => { string r = Load(p); Fill(); return r; } });
+                sub.Rows.Add(new MenuRow { Kind = RowKind.Action, Label = "Load", Info = "Loads everything, sensitivity included. Keybinds only when Include keybinds is on.", Take = s => { string r = Load(p); Fill(); return r; } });
                 sub.Rows.Add(new MenuRow { Kind = RowKind.Action, Label = "Export to clipboard", Info = "This config as one line of text. Paste it to a friend.", Take = s => Export(p) });
                 sub.Rows.Add(new MenuRow { Kind = RowKind.Action, Label = "Overwrite", Confirm = true, Info = "Saves your current config under this name.", Take = s => { string r = SaveAs(p.Name); Fill(); return r; } });
                 sub.Rows.Add(new MenuRow { Kind = RowKind.Action, Label = "Delete", Confirm = true, Info = "", Take = s => { string r = Delete(p); Fill(); return r; } });

@@ -28,7 +28,7 @@ T = [
 ('More FPS, steadier frames.', 'Больше FPS, ровнее кадры.', 'info'),
 ('Settings of the other mods you have installed. Not part of MONOLITH. Works with mods made for Mod Menu by kestrel.', 'Настройки других установленных модов. Не часть MONOLITH. Работает с модами для Mod Menu от kestrel.', 'info'), ('no options', 'нет настроек', 'L20'),
 ('Move a taunt to another key, or switch it off.', 'Перенесите насмешку на другую клавишу или отключите её.', 'info'),
-('Save, load and share configs: every setting, the game\'s included. Sensitivity is never included.', 'Сохранение, загрузка и обмен конфигами: все настройки, включая настройки игры. Чувствительность не входит никогда.', 'info'),
+('Save, load and share configs: every setting, the game\'s and your sensitivity included.', 'Сохранение, загрузка и обмен конфигами: все настройки, включая настройки игры и чувствительность.', 'info'),
 ('Language, the menu key, menu animations, playlists.', 'Язык, клавиша меню, анимации меню, плейлисты.', 'info'),
 ('A weapon listed here uses its own FOV and position.', 'У оружия из этого списка свои FOV и положение.', 'info'),
 # ---- crosshair (31 cells)
@@ -156,7 +156,7 @@ T = [
 ('Undo load', 'Отменить загрузку', 'L41'), ('Redo load', 'Вернуть загрузку', 'L41'), ('Save as new', 'Сохранить как новый', 'L41'), ('Export to clipboard', 'Экспорт в буфер', 'L41'), ('Include keybinds', 'Вместе с клавишами', 'L41'), ('Overwrite', 'Перезаписать', 'L41'),
 ('Back to the config you loaded last.', 'Возврат к последнему загруженному конфигу.', 'info'),
 ('Copy a line from a friend (it starts with MONOLITH:), then press Enter here. It is saved under its name.', 'Скопируйте строку от друга (она начинается с MONOLITH:) и нажмите здесь Enter. Она сохранится под своим именем.', 'info'),
-('Loads everything except sensitivity. Keybinds only when Include keybinds is on.', 'Загружает всё, кроме чувствительности. Клавиши только при включённом пункте Вместе с клавишами.', 'info'),
+('Loads everything, sensitivity included. Keybinds only when Include keybinds is on.', 'Загружает всё, включая чувствительность. Клавиши только при включённом пункте Вместе с клавишами.', 'info'),
 ('Saves your current config under a name. A config with the same name is replaced.', 'Сохраняет текущий конфиг под именем. Конфиг с тем же именем заменяется.', 'info'),
 ('Back to what you had before the last load or import, keybinds included.', 'Возврат к тому, что было до последней загрузки или импорта, включая клавиши.', 'info'),
 ('Nothing to undo.', 'Нечего отменять.', ''), ('Back to what you had before the last load.', 'Возвращено то, что было до последней загрузки.', ''), ('The load is back.', 'Загрузка возвращена.', ''),
