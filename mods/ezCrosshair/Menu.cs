@@ -235,7 +235,7 @@ namespace EzCrosshair
             // the same backdrop as the rows under it
             var box = Ui.Panel(w, Ui.Tint(0.06f), Ui.RoundSmall);
             Ui.At(box.rectTransform, Pad, TopY, GridX - Pad - 24f, ColorY + 40f - TopY);
-            Texture2D tex = global::EzCrosshair.Pictures.At(EzCrosshairPlugin.Pick.Value, EzCrosshairPlugin.Scale.Value);
+            Texture2D tex = global::EzCrosshair.Pictures.Get(EzCrosshairPlugin.Pick.Value);
             if (tex == null) return;
             var pic = Ui.Node("preview", box.transform).gameObject.AddComponent<RawImage>();
             pic.texture = tex;
@@ -252,10 +252,8 @@ namespace EzCrosshair
         // screen, and snaps to whole pixels, drawn without smoothing like the crosshair itself)
         private void SizePreview()
         {
-            if (_preview == null) return;
-            _preview.texture = global::EzCrosshair.Pictures.At(EzCrosshairPlugin.Pick.Value, EzCrosshairPlugin.Scale.Value);
-            if (_preview.texture == null) return;
-            Vector2Int px = new Vector2Int(_preview.texture.width, _preview.texture.height);
+            if (_preview == null || _preview.texture == null) return;
+            Vector2Int px = Overlay.ScreenSize((Texture2D)_preview.texture, EzCrosshairPlugin.Scale.Value);
             float factor = Mathf.Max(0.01f, Screen.height / 1080f);
             _preview.rectTransform.sizeDelta = new Vector2(px.x, px.y) / factor;
         }
@@ -306,7 +304,7 @@ namespace EzCrosshair
             foreach (string n in names)
             {
                 Texture2D t = global::EzCrosshair.Pictures.Get(n);
-                if (t != null) { Vector2 own = global::EzCrosshair.Pictures.Native(t); biggest = Mathf.Max(biggest, Mathf.CeilToInt(Mathf.Max(own.x, own.y))); }
+                if (t != null) biggest = Mathf.Max(biggest, Mathf.Max(t.width, t.height));
             }
             int k = Mathf.Max(1, Mathf.FloorToInt((TileH - 12f) / biggest));
             for (int i = 0; i < names.Length; i++)
@@ -330,7 +328,7 @@ namespace EzCrosshair
                 pic.raycastTarget = false;
                 var rt = pic.rectTransform;
                 rt.anchorMin = rt.anchorMax = new Vector2(0.5f, 0.5f);
-                rt.sizeDelta = global::EzCrosshair.Pictures.Native(tex) * k;
+                rt.sizeDelta = new Vector2(tex.width * k, tex.height * k);
             }
         }
 

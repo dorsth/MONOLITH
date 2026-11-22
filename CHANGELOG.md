@@ -1,5 +1,8 @@
 # MONOLITH changelog
 
+## 1.9.0
+- ezCrosshair 1.3.3: every crosshair and the size slider are back to how they were before 1.8.2.
+
 ## 1.8.9
 - ezCrosshair 1.3.2: the other crosshairs are exactly the first pictures again.
 

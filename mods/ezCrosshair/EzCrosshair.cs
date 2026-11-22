@@ -20,7 +20,7 @@ using UnityEngine.UI;
 
 [assembly: AssemblyTitle("ezCrosshair")]
 [assembly: AssemblyDescription("Pick your own crosshair, its color and size.")]
-[assembly: AssemblyVersion("1.3.2.0")]
+[assembly: AssemblyVersion("1.3.3.0")]
 [assembly: AssemblyFileVersion("1.2.1.0")]
 
 // Only changes what you see on your own screen, so matchmaking with unmodded players still works.
@@ -34,7 +34,7 @@ namespace EzCrosshair
     {
         public const string Guid = "dorsth.straftat.ezcrosshair";
         public const string Name = "ezCrosshair";
-        public const string Version = "1.3.2";
+        public const string Version = "1.3.3";
         internal const string ModMenuGuid = "kestrel.straftat.modmenu";
 
         // in the order they're shown (Images.cs has each one's picture)
@@ -172,9 +172,17 @@ namespace EzCrosshair
             try
             {
                 System.IO.Directory.CreateDirectory(Folder);
-                // The crosshairs that come with it stay in the dll, so a new version of them reaches everyone; the folder is for
-                // your own. A file there with the same name as one of them takes its place. (Up to 1.2.8 they were written here
-                // once, and those copies then hid every later change to them.)
+                // once: the crosshairs that come with it become files like any other. One you delete afterwards stays gone.
+                ConfigEntry<bool> written = config.Bind("Internal", "Crosshair Files Written", false, "Set once the crosshairs that come with MONOLITH have been written to its Crosshairs folder.");
+                if (!written.Value)
+                {
+                    foreach (string n in EzCrosshairPlugin.Names)
+                    {
+                        string path = System.IO.Path.Combine(Folder, n + ".png");
+                        if (!System.IO.File.Exists(path)) System.IO.File.WriteAllBytes(path, Convert.FromBase64String(Images.Get(n)));
+                    }
+                    written.Value = true;
+                }
                 string[] found = System.IO.Directory.GetFiles(Folder, "*.png");
                 Array.Sort(found, StringComparer.OrdinalIgnoreCase);
                 foreach (string f in found)
@@ -203,61 +211,6 @@ namespace EzCrosshair
     internal static class Pictures
     {
         private static readonly Dictionary<string, Texture2D> Loaded = new Dictionary<string, Texture2D>();
-        // the built-in pictures are at Images.Density times their size; a file of your own is at its size
-        private static readonly HashSet<Texture2D> Dense = new HashSet<Texture2D>();
-        private static readonly Dictionary<string, Texture2D> Sized = new Dictionary<string, Texture2D>();
-
-        /// <summary>A picture's size at scale 1 on a 1080 high screen.</summary>
-        public static Vector2 Native(Texture2D tex) { float d = Dense.Contains(tex) ? Images.Density : 1f; return new Vector2(tex.width / d, tex.height / d); }
-
-        /// <summary>The picture at the size it covers on screen, one texture pixel a screen pixel.</summary>
-        public static Texture2D At(string name, float scale)
-        {
-            Texture2D src = Get(name);
-            if (src == null) return null;
-            Vector2Int size = Overlay.ScreenSize(src, scale);
-            string key = name + "|" + size.x + "x" + size.y;
-            Texture2D tex;
-            if (Sized.TryGetValue(key, out tex) && tex != null) return tex;
-            try { tex = Resample(src, size.x, size.y); }
-            catch (Exception e) { EzCrosshairPlugin.Log.LogError("Couldn't size crosshair " + name + ": " + e.Message); tex = src; }
-            Sized[key] = tex;
-            return tex;
-        }
-
-        // every pixel of the new size is the average of what it covers of the old one (weighted by how much it covers,
-        // and by how see-through it is, so a dark outline never bleeds into a clear edge)
-        private static Texture2D Resample(Texture2D src, int w, int h)
-        {
-            Color32[] from = src.GetPixels32(); int sw = src.width, sh = src.height;
-            var to = new Color32[w * h];
-            float fx = (float)sw / w, fy = (float)sh / h;
-            for (int j = 0; j < h; j++)
-            {
-                float y0 = j * fy, y1 = y0 + fy;
-                for (int i = 0; i < w; i++)
-                {
-                    float x0 = i * fx, x1 = x0 + fx, r = 0f, g = 0f, b = 0f, a = 0f;
-                    for (int y = (int)y0; y < Mathf.Min(sh, Mathf.CeilToInt(y1)); y++)
-                    {
-                        float wy = Mathf.Min(y + 1, y1) - Mathf.Max(y, y0);
-                        for (int x = (int)x0; x < Mathf.Min(sw, Mathf.CeilToInt(x1)); x++)
-                        {
-                            float wgt = wy * (Mathf.Min(x + 1, x1) - Mathf.Max(x, x0));
-                            Color32 c = from[y * sw + x];
-                            float aw = wgt * c.a;
-                            r += c.r * aw; g += c.g * aw; b += c.b * aw; a += aw;
-                        }
-                    }
-                    float area = fx * fy;
-                    to[j * w + i] = a > 0f ? new Color32((byte)Mathf.RoundToInt(r / a), (byte)Mathf.RoundToInt(g / a), (byte)Mathf.RoundToInt(b / a), (byte)Mathf.Clamp(Mathf.RoundToInt(a / area), 0, 255)) : new Color32(0, 0, 0, 0);
-                }
-            }
-            var tex = new Texture2D(w, h, TextureFormat.RGBA32, false) { wrapMode = TextureWrapMode.Clamp, filterMode = FilterMode.Point, name = src.name + " " + w + "x" + h };
-            tex.SetPixels32(to); tex.Apply(false, true);
-            UnityEngine.Object.DontDestroyOnLoad(tex);
-            return tex;
-        }
 
         public static Texture2D Get(string name)
         {
@@ -289,7 +242,7 @@ namespace EzCrosshair
                 {
                     tex = new Texture2D(2, 2, TextureFormat.RGBA32, false) { wrapMode = TextureWrapMode.Clamp, name = "ezCrosshair " + name };
                     if (!ImageConversion.LoadImage(tex, Convert.FromBase64String(data))) { UnityEngine.Object.Destroy(tex); tex = null; }
-                    else { tex.filterMode = FilterMode.Point; UnityEngine.Object.DontDestroyOnLoad(tex); Dense.Add(tex); }
+                    else { tex.filterMode = FilterMode.Point; UnityEngine.Object.DontDestroyOnLoad(tex); }
                 }
                 else EzCrosshairPlugin.Log.LogWarning("No crosshair called " + name);
             }
@@ -364,21 +317,22 @@ namespace EzCrosshair
             int order = game != null ? game.rootCanvas.sortingOrder : 0;
             if (_canvas.sortingOrder != order) _canvas.sortingOrder = order;
 
-            float scale = Mathf.Clamp(EzCrosshairPlugin.Scale.Value, 0f, 2f);
-            Texture2D tex = Pictures.At(EzCrosshairPlugin.Pick.Value, scale);
+            Texture2D tex = Pictures.Get(EzCrosshairPlugin.Pick.Value);
             if (tex == null) { _image.enabled = false; _showing = false; return; }
             if (_image.texture != tex) _image.texture = tex;
             Color tint = flash ? EzCrosshairPlugin.HitTint.Value : EzCrosshairPlugin.Tint.Value;
             if (_image.color != tint) _image.color = tint;
 
-            // the bottom left corner on a whole pixel, one texture pixel a screen pixel
+            // the bottom left corner on a whole pixel, drawn without smoothing: the pixel art stays sharp
+            float scale = Mathf.Clamp(EzCrosshairPlugin.Scale.Value, 0f, 2f);
             if (_shown != EzCrosshairPlugin.Pick.Value || scale != _scale || Screen.width != _screenW || Screen.height != _screenH)
             {
                 _shown = EzCrosshairPlugin.Pick.Value;
                 _scale = scale;
                 _screenW = Screen.width;
                 _screenH = Screen.height;
-                int w = tex.width, h = tex.height;
+                Vector2Int size = ScreenSize(tex, scale);
+                int w = size.x, h = size.y;
                 var rt = _image.rectTransform;
                 float factor = _canvas.scaleFactor > 0f ? _canvas.scaleFactor : 1f;
                 rt.sizeDelta = new Vector2(w, h) / factor;
@@ -386,14 +340,11 @@ namespace EzCrosshair
             }
         }
 
-        // how many screen pixels the crosshair covers: its own size times the scale, on a 1080 high screen. Any size works:
-        // Pictures.At shrinks or grows the picture to it, averaging what each screen pixel covers, so no pixel comes out
-        // wider than another
+        // how many screen pixels the crosshair covers: its own size times the scale, on a 1080 high screen
         public static Vector2Int ScreenSize(Texture2D tex, float scale)
         {
             float f = scale * Screen.height / 1080f;
-            Vector2 n = Pictures.Native(tex);
-            return new Vector2Int(Mathf.Max(1, Mathf.RoundToInt(n.x * f)), Mathf.Max(1, Mathf.RoundToInt(n.y * f)));
+            return new Vector2Int(Mathf.RoundToInt(tex.width * f), Mathf.RoundToInt(tex.height * f));
         }
 
         private static bool ShouldShow() { return WhyHidden() == null; }
