@@ -274,7 +274,7 @@ namespace Monolith
             FrameDim = new Color32(0x6F, 0x85, 0x7B, 0xFF), Panel = new Color32(0x13, 0x18, 0x0F, 0xFF),
             BarDim = new Color32(0x13, 0x18, 0x10, 0xFF), Shadow = new Color(0f, 0f, 0f, 0.5f), Hover = new Color32(0x1A, 0x22, 0x17, 0xFF), KeyBar = new Color32(0x17, 0x1C, 0x13, 0xFF),
             Well = new Color32(0x07, 0x08, 0x03, 0xFF), Badge = new Color32(0xB4, 0xF6, 0xB7, 0xFF);
-        private const string Txt = "#A9B0AA", Dim = "#909790", Hot = "#EEFF77", Mint = "#B4F6B7", Val = "#FCFEF9", Head = "#8FA59B", Faint = "#5F605D", Ink = "#070803";
+        private const string Txt = "#ADB3AC", Dim = "#909790", Hot = "#EEFF77", Mint = "#B4F6B7", Val = "#FCFEF9", Head = "#8FA59B", Faint = "#5F605D", Ink = "#070803";
 
         private void Style()
         {
@@ -635,7 +635,7 @@ namespace Monolith
 
         private const int BarCells = 10, NumberCells = 6;
         private static readonly string BarGap = new string(' ', BarCells + 1);
-        private static readonly Color LineRest = new Color32(0x6F, 0x85, 0x7B, 0xFF), KnobCur = new Color32(0xEE, 0xFF, 0x77, 0xFF), KnobRest = new Color32(0xA9, 0xB0, 0xAA, 0xFF), Tick = new Color32(0x8F, 0xA5, 0x9B, 0xFF);
+        private static readonly Color LineRest = new Color32(0x6F, 0x85, 0x7B, 0xFF), KnobCur = new Color32(0xEE, 0xFF, 0x77, 0xFF), KnobRest = new Color32(0xAD, 0xB3, 0xAC, 0xFF), Tick = new Color32(0x8F, 0xA5, 0x9B, 0xFF);
 
         // what a setting is set to, drawn as what it is: a switch, a key, a color, one of a list (▼ opens the list),
         // or a number with a bar that shows where it sits between its lowest and highest

@@ -1,5 +1,8 @@
 # MONOLITH changelog
 
+## 1.7.5
+- Regular text is #ADB3AC, as in Far.
+
 ## 1.7.4
 - Bright titles and values are #FCFEF9, as in Far.
 
