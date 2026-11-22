@@ -1,5 +1,8 @@
 # MONOLITH changelog
 
+## 1.9.8
+- ezCrosshair 1.3.5: the star's tips fade out, so its points no longer look square.
+
 ## 1.9.7
 - Lists and the color picker take the menu's own keys: WASD move, E takes, Q cancels, R resets a color (and the picker stays open). Arrows, Enter and Esc still work. Hex digits go in after a click on the field or a first digit.
 - The mouse wheel acts on the panel under the mouse: over the categories it changes category, over the page it scrolls.

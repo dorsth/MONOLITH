@@ -19,7 +19,7 @@ namespace EzCrosshair
                 case "pinhole": return "iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAbklEQVR4nJWQUQ3DMAwFT9NQhEB4mI0RpBCKJSD82IyG+5NMnaK22knvy6cn27BSRm5pQI60W8nM0swu5Qaku6eklJTuvshlNknKiaRzc3k9LT15Ax9gi4i91vod9N6JCIBtOP8d8yM/SefjlocfG0M/Yk1SZxgAAAAASUVORK5CYII=";
                 case "plus": return "iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAK0lEQVR4nGP8//8/AxqACTAiCzKhq8IFqK+QhQHhJnSAIk6SiYxoYoPN1wC5RgcU0AuUbwAAAABJRU5ErkJggg==";
                 case "square": return "iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAYAAACp8Z5+AAAAFklEQVR4nGP8////fwYkwMSABggLAAAGXQQE3kxYjAAAAABJRU5ErkJggg==";
-                case "star": return "iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAUklEQVR4nI2QUQrAMAxCdWfs7tjC7vj204yRpaNCQFRQYkAJIfgtHinUFnw/KEBAAzpf9OnJFCMr5OrfoCWdkkbhj+k5Nsb1tO/xcvW14PLuw29t+lWwzaChlAAAAABJRU5ErkJggg==";
+                case "star": return "iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAWElEQVR4XmP8//8/AxpogPJhNASAFCLhkP8IAGLD5ZjQTAtB4iOz4SaCdK9AMg0GQGJgk0FGN2BRgA4a0K3GDaAOJspqZF8juxPExunrNUh2I7MZGIkNcABIp7pB709GGgAAAABJRU5ErkJggg==";
                 default: return null;
             }
         }
