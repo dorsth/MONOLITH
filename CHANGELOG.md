@@ -1,5 +1,8 @@
 # MONOLITH changelog
 
+## 1.5.6
+- Lists and the color picker are centered under their row: the same room on the left and the right.
+
 ## 1.5.5
 - Scroll bars sit exactly where the double line of the frame was, as in Far, instead of half over it.
 

@@ -21,7 +21,6 @@ namespace Monolith
             public float Pitch;                // the palette: cells from one color to the next
             public string Typed = ""; public float TypedAt;
             public float AnchorRight, AnchorY;
-            public bool Beside;                // the page has a preview: the pop-up stops a cell short of it
             public bool Free, Dragging;        // the view was scrolled away from the cursor (wheel, scroll bar); the scroll bar is held
             public Rect R; public int Shown;
         }
@@ -45,7 +44,6 @@ namespace Monolith
         {
             p.AnchorRight = _pageR.xMax - _cw - (page.Draw != null ? (page.SideCols + 1) * _cw : 0f);
             p.AnchorY = _rowY0 + (ci - page.Top + 1) * _rowStep;
-            p.Beside = page.Draw != null;
         }
 
         private void OpenList(MenuRow row, MenuPage page, int ci)
@@ -191,8 +189,9 @@ namespace Monolith
             PopMove(i); PopApply(); PopClose(true);
         }
 
-        // the pop-up as wide as its row: its frame on the row's left edge and, beside a preview, a cell short of it
-        private float Span(Pop p) { return p.AnchorRight - _pageR.x - (p.Beside ? _cw : 0f); }
+        // the pop-up under its row, centered on it: its frame half a cell in from each end of the row, so its filled room
+        // ends on the row's ends and its shadow stops short of a preview beside the row
+        private float Span(Pop p) { return p.AnchorRight - _pageR.x - _cw; }
 
         private void Clipped(Rect r, Rect room, Color c)
         {
@@ -223,7 +222,7 @@ namespace Monolith
             // inside the page; under the row, or above it when there is no room under it. Its half cell of filled
             // room stops just inside the double line of the page.
             float edge = _cw * 0.5f;
-            float x = Mathf.Clamp(p.AnchorRight - (p.Beside ? _cw : 0f) - w, _pageR.x + edge, _pageR.xMax - w - edge), y = p.AnchorY;
+            float x = Mathf.Clamp(p.AnchorRight - w, _pageR.x + edge, _pageR.xMax - w - edge), y = p.AnchorY;
             x = Mathf.Clamp(x, _win.x + _cw, _win.xMax - w - _cw);
             if (y + h > _win.yMax - _ch * 1.5f) y = Mathf.Max(_win.y + _ch * 0.5f, p.AnchorY - _rowStep - h);
             p.R = new Rect(Mathf.Round(x), Mathf.Round(y), w, h);
