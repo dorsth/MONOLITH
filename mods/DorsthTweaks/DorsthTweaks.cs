@@ -35,7 +35,7 @@ using PlanarReflection = UnityStandardAssets.Water.PlanarReflection;
 
 [assembly: AssemblyTitle("DorsthTweaks")]
 [assembly: AssemblyDescription("Small client-side tweaks for STRAFTAT: bullet trails, HUD, prompts, menus and performance.")]
-[assembly: AssemblyVersion("1.4.3.0")]
+[assembly: AssemblyVersion("1.4.4.0")]
 [assembly: AssemblyFileVersion("1.3.7.0")]
 
 // Only changes what you see on your own screen, so matchmaking with unmodded players still works.
@@ -49,7 +49,7 @@ namespace DorsthTweaks
     {
         public const string Guid = "dorsth.straftat.dorsthtweaks";
         public const string Name = "DorsthTweaks";
-        public const string Version = "1.4.3";
+        public const string Version = "1.4.4";
 
         internal static ManualLogSource Log;
         internal static ConfigEntry<bool> Detail;
@@ -4718,7 +4718,7 @@ namespace DorsthTweaks
         private static ShadowQuality _shadows;
         private static bool _reflections;
         private static int _textures, _msaa;
-        private static AnisotropicFiltering _aniso;
+        private static AnisotropicFiltering _aniso; private static bool _anisoRead;
 
         internal static void Install()
         {
@@ -4780,9 +4780,10 @@ namespace DorsthTweaks
                 _reflections = QualitySettings.realtimeReflectionProbes;
                 _textures = QualitySettings.masterTextureLimit;
                 _msaa = QualitySettings.antiAliasing;
-                _aniso = QualitySettings.anisotropicFiltering;
                 _saved = true;
-                DorsthTweaksPlugin.Log.LogInfo("The game's quality level " + QualitySettings.GetQualityLevel() + ": anisotropic filtering " + _aniso + ".");
+                // read once, before this sets it: the game's quality change leaves it as it finds it, so read again later it
+                // would be this mod's own value and off would stay on (1.4.2, 1.4.3)
+                if (!_anisoRead) { _aniso = QualitySettings.anisotropicFiltering; _anisoRead = true; DorsthTweaksPlugin.Log.LogInfo("The game's anisotropic filtering: " + _aniso + "."); }
             }
             // only what differs is set: a new texture size limit reloads every texture
             ShadowQuality shadows = reduce ? ShadowQuality.Disable : _shadows;

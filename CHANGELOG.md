@@ -1,5 +1,8 @@
 # MONOLITH changelog
 
+## 1.9.4
+- DorsthTweaks 1.4.4: Anisotropic filtering off really turns it off. After the game set its quality, it read back its own value and kept it on.
+
 ## 1.9.3
 - DorsthTweaks 1.4.3: Anisotropic filtering off puts back Unity's own limits too, and the log says what the game's quality level has.
 
