@@ -34,7 +34,7 @@ Match stats show kills, deaths and damage between rounds and after the match. Th
 
 ## Menu
 
-**F2** opens it. Arrows or WASD move, Enter changes, Q goes back, `/` searches every setting, Esc closes. The mouse works too. Settings save at once.
+**F2** opens it. W and S move, A and D change a setting, E opens or picks, Q goes back, R resets, `/` searches every setting, Esc closes. The same keys work in lists and the color picker. The mouse works too. Settings save at once.
 
 The menu is in English or Russian (General, Language).
 
