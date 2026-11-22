@@ -1,7 +1,7 @@
 // MONOLITH - the menu's pop-ups: a list to pick one of several from, and a palette to pick a color from. Dorsth was here.
 //
-// Both open on Enter (or a click) on a row and lie over the page, in the manner of a Far dialog. What the cursor is on
-// is applied at once, so you see or hear it; Enter keeps it, Escape (or a click beside it) puts back what was there.
+// Both open on E (or a click) on a row and lie over the page, in the manner of a Far dialog. What the cursor is on
+// is applied at once, so you see or hear it; E or Enter keeps it, Q or Escape puts back what was there (a click beside a list does too; beside the palette it keeps the color).
 // A list: up and down, page up and down, or type the first letters of a name. A palette: Far's 16 console colors in two
 // rows, the arrows to pick, a hex value typed for any other color, Delete for the default.
 using System;
@@ -104,13 +104,26 @@ namespace Monolith
         {
             Pop p = _pop; KeyCode k = ev.keyCode; char ch = ev.character;
             if (k == KeyCode.None && Time.frameCount == _modeFrame) { ev.Use(); return; }
+            // the menu's own keys work here too: WASD move, E takes, Q cancels, R resets a color. In the hex field, once
+            // clicked or started with a digit, A, D and E are hex digits instead
+            bool hex = p.Palette && p.Editing;
+            char lc = char.ToLowerInvariant(ch);
+            if (k == KeyCode.None && ("wasdeq".IndexOf(lc) >= 0 || (p.Palette && lc == 'r')) && !(hex && Uri.IsHexDigit(ch))) { ev.Use(); return; }   // the letter itself: used as a key above
+            if (!(hex && (k == KeyCode.A || k == KeyCode.D || k == KeyCode.E)))
+            {
+                if (k == KeyCode.W) k = KeyCode.UpArrow; else if (k == KeyCode.S) k = KeyCode.DownArrow;
+                else if (k == KeyCode.A) k = KeyCode.LeftArrow; else if (k == KeyCode.D) k = KeyCode.RightArrow;
+                else if (k == KeyCode.E) k = KeyCode.Return; else if (k == KeyCode.Q) k = KeyCode.Escape;
+                else if (k == KeyCode.R && p.Palette) k = KeyCode.Delete;
+            }
             if (k == KeyCode.Escape) { PopClose(false); ev.Use(); return; }
             if (k == KeyCode.Return || k == KeyCode.KeypadEnter)
             {
                 if (p.Palette && p.Typed.Length > 0 && !TryHex(p)) { p.Typed = ""; ev.Use(); return; }
                 PopClose(true); ev.Use(); return;
             }
-            if (p.Palette && k == KeyCode.Delete) { p.Typed = ""; PopMove(DefaultSlot); PopClose(true); ev.Use(); return; }
+            // reset: the default, and the picker stays open
+            if (p.Palette && k == KeyCode.Delete) { p.Typed = ""; PopMove(DefaultSlot); ev.Use(); return; }
             int c = p.Cur;
             // the palette moves in its rows of eight; a typed hex value goes on below
             if (p.Palette && (k == KeyCode.UpArrow || k == KeyCode.DownArrow || k == KeyCode.LeftArrow || k == KeyCode.RightArrow))
@@ -135,7 +148,7 @@ namespace Monolith
                 if (p.Palette)
                 {
                     // a hex value, typed: taken as soon as it is whole
-                    if (Uri.IsHexDigit(ch) && p.Typed.Length < 8) { p.Typed += char.ToUpperInvariant(ch); if (p.Typed.Length == 6 || p.Typed.Length == 8) TryHex(p); }
+                    if ((hex ? Uri.IsHexDigit(ch) : char.IsDigit(ch)) && p.Typed.Length < 8) { p.Editing = true; p.Typed += char.ToUpperInvariant(ch); if (p.Typed.Length == 6 || p.Typed.Length == 8) TryHex(p); }
                 }
                 else
                 {
