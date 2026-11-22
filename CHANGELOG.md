@@ -1,5 +1,8 @@
 # MONOLITH changelog
 
+## 1.8.5
+- ezCrosshair 1.2.8: the brackets no longer have a dark rim around their soft edge.
+
 ## 1.8.4
 - A click outside the hex field of the color picker stops typing in it, and drops a half-typed value.
 

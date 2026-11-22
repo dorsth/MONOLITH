@@ -1,6 +1,9 @@
 # Writes src/Images.cs from the crosshair pictures in art/first (the pictures as they were made, 1.0).
 # Each is made even on both sides: a pixel and its mirror images left-right and up-down are averaged, so a soft edge
 # is as soft on one side as on the other. Nothing else changes: same size, same pixels where they were already even.
+# The brackets have no outline, yet their soft edge was drawn darker (gray to black) and showed as a dirty rim in any
+# color: there every pixel is white, at the same see-through-ness, so the edge fades in the crosshair's own color.
+NO_RIM = {'brackets.png'}
 import base64, io, os
 from PIL import Image
 here = os.path.dirname(os.path.abspath(__file__))
@@ -19,6 +22,7 @@ cases = []
 for f in sorted(os.listdir(src)):
     if not f.endswith('.png'): continue
     im = even(Image.open(os.path.join(src, f)))
+    if f in NO_RIM: im.putdata([(255, 255, 255, a) if a else (0, 0, 0, 0) for r, g, b, a in im.getdata()])
     b = io.BytesIO(); im.save(b, 'PNG'); im.save(os.path.join(out, f))
     cases.append('                case "%s": return "%s";' % (f[:-4].replace('_', ' '), base64.b64encode(b.getvalue()).decode()))
 open(os.path.join(here, '..', 'src', 'Images.cs'), 'w').write('''// ezCrosshair - a STRAFTAT mod (BepInEx 5). Dorsth was here.
