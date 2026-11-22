@@ -26,18 +26,14 @@ namespace Monolith
         }
 
         private Pop _pop;
-        private const int PaletteCols = 8, PaletteRows = 4, ListRows = 14, DefaultSlot = PaletteCols * PaletteRows;
-        // the colors in rows: grays from white to black, then the same eight hues light, full and dark
+        private const int PaletteCols = 8, PaletteRows = 2, ListRows = 14, DefaultSlot = PaletteCols * PaletteRows;
+        // the 16 colors of Far's Color dialog, in its order: the dark eight, then the bright eight
         private static readonly Color32[] Swatches =
         {
-            new Color32(0xFF, 0xFF, 0xFF, 0xFF), new Color32(0xDB, 0xDB, 0xDB, 0xFF), new Color32(0xB6, 0xB6, 0xB6, 0xFF), new Color32(0x92, 0x92, 0x92, 0xFF),
-            new Color32(0x6D, 0x6D, 0x6D, 0xFF), new Color32(0x49, 0x49, 0x49, 0xFF), new Color32(0x24, 0x24, 0x24, 0xFF), new Color32(0x00, 0x00, 0x00, 0xFF),
-            new Color32(0xFF, 0x80, 0x80, 0xFF), new Color32(0xFF, 0xC0, 0x80, 0xFF), new Color32(0xFF, 0xFF, 0x80, 0xFF), new Color32(0x80, 0xFF, 0x80, 0xFF),
-            new Color32(0x80, 0xFF, 0xFF, 0xFF), new Color32(0x80, 0x80, 0xFF, 0xFF), new Color32(0xC0, 0x80, 0xFF, 0xFF), new Color32(0xFF, 0x80, 0xFF, 0xFF),
-            new Color32(0xFF, 0x00, 0x00, 0xFF), new Color32(0xFF, 0x80, 0x00, 0xFF), new Color32(0xFF, 0xFF, 0x00, 0xFF), new Color32(0x00, 0xFF, 0x00, 0xFF),
-            new Color32(0x00, 0xFF, 0xFF, 0xFF), new Color32(0x00, 0x00, 0xFF, 0xFF), new Color32(0x80, 0x00, 0xFF, 0xFF), new Color32(0xFF, 0x00, 0xFF, 0xFF),
-            new Color32(0x80, 0x00, 0x00, 0xFF), new Color32(0x80, 0x40, 0x00, 0xFF), new Color32(0x80, 0x80, 0x00, 0xFF), new Color32(0x00, 0x80, 0x00, 0xFF),
-            new Color32(0x00, 0x80, 0x80, 0xFF), new Color32(0x00, 0x00, 0x80, 0xFF), new Color32(0x40, 0x00, 0x80, 0xFF), new Color32(0x80, 0x00, 0x80, 0xFF),
+            new Color32(0x00, 0x00, 0x00, 0xFF), new Color32(0x00, 0x00, 0x80, 0xFF), new Color32(0x00, 0x80, 0x00, 0xFF), new Color32(0x00, 0x80, 0x80, 0xFF),
+            new Color32(0x80, 0x00, 0x00, 0xFF), new Color32(0x80, 0x00, 0x80, 0xFF), new Color32(0x80, 0x80, 0x00, 0xFF), new Color32(0xC0, 0xC0, 0xC0, 0xFF),
+            new Color32(0x80, 0x80, 0x80, 0xFF), new Color32(0x00, 0x00, 0xFF, 0xFF), new Color32(0x00, 0xFF, 0x00, 0xFF), new Color32(0x00, 0xFF, 0xFF, 0xFF),
+            new Color32(0xFF, 0x00, 0x00, 0xFF), new Color32(0xFF, 0x00, 0xFF, 0xFF), new Color32(0xFF, 0xFF, 0x00, 0xFF), new Color32(0xFF, 0xFF, 0xFF, 0xFF),
         };
 
         private static string LabelOf(MenuRow row, object v)
@@ -117,8 +113,8 @@ namespace Monolith
             // the palette moves in its rows of eight; a typed hex value goes on below
             if (p.Palette && (k == KeyCode.UpArrow || k == KeyCode.DownArrow || k == KeyCode.LeftArrow || k == KeyCode.RightArrow))
             {
-                if (k == KeyCode.UpArrow) { p.Typed = ""; PopMove(c >= PaletteCols && c < DefaultSlot ? c - PaletteCols : Mathf.Max(c, 0)); }
-                else if (k == KeyCode.DownArrow) { p.Typed = ""; PopMove(c < 0 ? 0 : c < DefaultSlot - PaletteCols ? c + PaletteCols : c); }
+                if (k == KeyCode.UpArrow) { p.Typed = ""; PopMove(c == DefaultSlot ? PaletteCols : c >= PaletteCols ? c - PaletteCols : Mathf.Max(c, 0)); }
+                else if (k == KeyCode.DownArrow) { p.Typed = ""; PopMove(c < 0 ? 0 : c < DefaultSlot - PaletteCols ? c + PaletteCols : DefaultSlot); }
                 else if (k == KeyCode.LeftArrow) { p.Typed = ""; PopMove(c < 0 ? 0 : c < DefaultSlot && c % PaletteCols > 0 ? c - 1 : c); }
                 else if (k == KeyCode.RightArrow) { p.Typed = ""; PopMove(c < 0 ? 0 : c < DefaultSlot && c % PaletteCols < PaletteCols - 1 ? c + 1 : c); }
                 ev.Use(); return;
@@ -172,6 +168,8 @@ namespace Monolith
             {
                 float gx, sw, hx; PalLayout(p, out gx, out sw, out hx);
                 int col = Mathf.FloorToInt((m.x - gx) / sw), row = Mathf.FloorToInt((m.y - p.R.y - PalTop) / _ch);
+                // under the colors: Default, its color and its name
+                if (row == PaletteRows && m.x >= gx && m.x < gx + sw + (Lang.T("Default").Length + 2) * _cw) return DefaultSlot;
                 if (col < 0 || col >= PaletteCols || row < 0 || row >= PaletteRows) return -1;
                 return row * PaletteCols + col;
             }
@@ -202,8 +200,7 @@ namespace Monolith
             if (ev.type != EventType.MouseDown) return;
             if (scrolls && ev.button == 0 && PopBar(p).Contains(ev.mousePosition)) { p.Dragging = true; PopScrollTo(p, ev.mousePosition.y); return; }
             Vector2 m = ev.mousePosition;
-            if (p.Palette && ev.button == 0 && PalButton(p, 0).Contains(m)) { p.Typed = ""; PopMove(DefaultSlot); PopClose(true); return; }
-            if (p.Palette && ev.button == 0 && PalButton(p, 1).Contains(m)) { PopClose(false); return; }
+            if (p.Palette && ev.button == 0 && PrevButton(p).Contains(m)) { PopClose(false); return; }
             int i = PopAt(m);
             // a click beside it puts back what was there; a click on it between its items does nothing
             if (ev.button != 0 || i < 0) { if (ev.button != 0 || !p.R.Contains(m)) PopClose(false); return; }
@@ -211,24 +208,22 @@ namespace Monolith
             if (!p.Palette) PopClose(true);
         }
 
-        // The palette: the colors at gx, sw apart each way, the hex value at hx. Each color is square,
-        // as wide as a row is high, or less when the room is short; the whole is centered in the frame.
+        // The palette, laid out as Far's Color dialog: the colors at gx, sw wide each and touching, Default under them,
+        // the hex value at hx. The colors take up to three cells each; the whole is centered in the frame.
         // room between the frame and the colors, above and below them
         private float PalTop { get { return 1.5f * _ch; } }
-        // the ground around each color
-        private float PalGap { get { return Mathf.Max(Thin * 2f, Mathf.Round(_ch * 0.12f)); } }
 
-        // beside the hex value: Default (0) and Previous (1), each a whole line of the column
-        private Rect PalButton(Pop p, int which)
+        // under the hex value: Previous, the color it was before the picker opened
+        private Rect PrevButton(Pop p)
         {
             float gx, sw, hx; PalLayout(p, out gx, out sw, out hx);
-            return new Rect(hx, p.R.y + PalTop + (2 + which) * _ch, 14f * _cw, _ch);
+            return new Rect(hx, p.R.y + PalTop + PaletteRows * _ch, (Lang.T("Previous").Length + 4) * _cw, _ch);
         }
 
         private void PalLayout(Pop p, out float gx, out float sw, out float hx)
         {
             float hexW = 14f * _cw, gap = 2f * _cw;
-            sw = Mathf.Floor(Mathf.Min(_ch, (p.R.width - 5f * _cw - gap - hexW) / PaletteCols));
+            sw = Mathf.Floor(Mathf.Min(3f * _cw, (p.R.width - 3f * _cw - gap - hexW) / PaletteCols));
             float all = PaletteCols * sw + gap + hexW;
             gx = Mathf.Round(p.R.x + (p.R.width - all) * 0.5f); hx = gx + PaletteCols * sw + gap;
         }
@@ -236,33 +231,31 @@ namespace Monolith
         private void PaletteDraw(Pop p)
         {
             float gx, sw, hx; PalLayout(p, out gx, out sw, out hx);
-            float y0 = p.R.y + PalTop, t = Thin, gap = PalGap;
-            for (int i = 0; i < DefaultSlot; i++)
+            float y0 = p.R.y + PalTop;
+            for (int i = 0; i <= DefaultSlot; i++)
             {
-                // each color a block of its own, with ground around it
-                Rect s = new Rect(gx + (i % PaletteCols) * sw + gap, y0 + (i / PaletteCols) * _ch + gap, sw - 2f * gap, _ch - 2f * gap);
+                Rect s = i < DefaultSlot ? new Rect(gx + (i % PaletteCols) * sw, y0 + (i / PaletteCols) * _ch, sw, _ch) : new Rect(gx, y0 + PaletteRows * _ch, sw, _ch);
                 Color c = (Color)p.Values[i];
                 Fill(s, new Color(c.r, c.g, c.b, 1f));
-                // the cursor: a line around it, in the ground
-                s = new Rect(s.x - gap, s.y - gap, s.width + 2f * gap, s.height + 2f * gap);
-                if (i == p.Cur) { Fill(new Rect(s.x, s.y, s.width, t), KnobCur); Fill(new Rect(s.x, s.yMax - t, s.width, t), KnobCur); Fill(new Rect(s.x, s.y, t, s.height), KnobCur); Fill(new Rect(s.xMax - t, s.y, t, s.height), KnobCur); }
+                if (i == p.Cur) Outline(s, KnobCur);
             }
+            GUI.Label(new Rect(gx + sw + _cw, y0 + PaletteRows * _ch, 14f * _cw, _ch), "<color=" + Txt + ">" + Esc(Lang.T("Default")) + "</color>", _st);
             // any other color: its hex value, typed in a sunken field as Far's, under the order of its digits
             bool typing = p.Typed.Length > 0;
-            GUI.Label(new Rect(hx + _cw, y0, 13f * _cw, _ch), "<color=" + Hot + ">RRGGBBAA</color>", _st);
+            GUI.Label(new Rect(hx + _cw, y0, 13f * _cw, _ch), "<color=" + Txt + ">RRGGBBAA</color>", _st);
             Fill(new Rect(hx, y0 + _ch, 11f * _cw, _ch), Well);
             GUI.Label(new Rect(hx + _cw, y0 + _ch, 10f * _cw, _ch), "<color=" + (typing ? Hot : Mint) + ">" + Esc(typing ? p.Typed + "_" : p.Row.Entry.GetSerializedValue()) + "</color>", _st);
-            // the default and the color it was, each with its color, to go back to with a click
-            Vector2 m = Event.current.mousePosition;
-            for (int k = 0; k < 2; k++)
-            {
-                Rect b = PalButton(p, k);
-                Color c = k == 0 ? (Color)p.Values[DefaultSlot] : (Color)p.Was;
-                bool over = b.Contains(m);
-                if (over) Fill(b, Badge);
-                Fill(new Rect(b.x + gap, b.y + gap, _ch - 2f * gap, _ch - 2f * gap), new Color(c.r, c.g, c.b, 1f));
-                GUI.Label(new Rect(b.x + 2f * _cw, b.y, b.width - 2f * _cw, _ch), "<color=" + (over ? Ink : Txt) + ">[ " + Esc(Lang.T(k == 0 ? "Default" : "Previous")) + " ]</color>", _st);
-            }
+            // the color it was, a click away, as Far's buttons
+            Rect b = PrevButton(p);
+            bool over = b.Contains(Event.current.mousePosition);
+            if (over) Fill(b, Badge);
+            GUI.Label(new Rect(b.x + _cw, b.y, b.width, _ch), "<color=" + (over ? Ink : Txt) + ">[ " + Esc(Lang.T("Previous")) + " ]</color>", _st);
+        }
+
+        private void Outline(Rect s, Color c)
+        {
+            float t = Thin;
+            Fill(new Rect(s.x, s.y, s.width, t), c); Fill(new Rect(s.x, s.yMax - t, s.width, t), c); Fill(new Rect(s.x, s.y, t, s.height), c); Fill(new Rect(s.xMax - t, s.y, t, s.height), c);
         }
 
         // the pop-up under its row, centered on it: its frame half a cell in from each end of the row, so its filled room
@@ -281,7 +274,7 @@ namespace Monolith
             int n = p.Values.Length;
             float w, h;
             // the palette: its rows of colors
-            if (p.Palette) { w = Span(p); h = PaletteRows * _ch + 2f * PalTop; }
+            if (p.Palette) { w = Span(p); h = (PaletteRows + 1) * _ch + 2f * PalTop; }
             else
             {
                 string title = Lang.T(p.Row.Label.Trim());

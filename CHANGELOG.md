@@ -1,5 +1,8 @@
 # MONOLITH changelog
 
+## 1.7.8
+- The color picker is laid out as Far's: its 16 colors touching in two rows, Default under them, and Previous under the hex value.
+
 ## 1.7.7
 - The version on the bottom frame no longer has a dark block under the frame.
 
