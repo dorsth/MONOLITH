@@ -1,5 +1,10 @@
 # MONOLITH changelog
 
+## 1.2.0
+- Configs include your sensitivity: the game's own and TrueSens. A config saved before this leaves your sensitivity as it is.
+- TrueSens 1.2.5: cm/360 goes down to 1 cm (was 5 cm).
+- ViewmodelTweaks 2.0.7: with Performance viewmodel on, the placement preview of the AP mine, proximity mine and claymore shows where the mine goes again, on your crosshair.
+
 ## 1.1.9
 - Match stats are now their own mod, MatchStats, and MONOLITH holds it like the others. If you turned them off, they stay off.
 - Long names on the game's end of round and Tab screens stay on one line and shrink to fit, instead of wrapping over the score or running into the next name.
