@@ -281,7 +281,8 @@ namespace Monolith
             int size = Mathf.Clamp(Mathf.RoundToInt(Screen.height / 60f), 11, 30);
             if (_st != null && _fontFor == size && _font != null) return;
             _fontFor = size;
-            if (_font == null) _font = Font.CreateDynamicFontFromOSFont(new[] { "Consolas", "Cascadia Mono", "Lucida Console", "Menlo", "Monaco", "Courier New", "DejaVu Sans Mono", "Liberation Mono" }, size);
+            // Cascadia Mono first: the font of Windows Terminal, which Far runs in; Consolas where it is missing
+            if (_font == null) _font = Font.CreateDynamicFontFromOSFont(new[] { "Cascadia Mono", "Consolas", "Lucida Console", "Menlo", "Monaco", "Courier New", "DejaVu Sans Mono", "Liberation Mono" }, size);
             if (_white == null) { _white = new Texture2D(1, 1, TextureFormat.RGBA32, false) { hideFlags = HideFlags.HideAndDontSave }; _white.SetPixel(0, 0, Color.white); _white.Apply(); }
             _st = new GUIStyle { font = _font, fontSize = size, richText = true, wordWrap = false, alignment = TextAnchor.MiddleLeft, clipping = TextClipping.Clip };
             _st.normal.textColor = Color.white;
