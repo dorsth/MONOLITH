@@ -333,6 +333,16 @@ namespace Monolith
         // part shown as a bar on the line between them.
         private void ScrollBar(int top, int shown, int count) { ScrollBar(_pageR.xMax - _cw, _rowY0, top, shown, count, Back); }
 
+        // a page's scroll bar, held with the mouse: the cursor goes to the row at that height of the bar
+        private bool _barHeld;
+        private Rect PageBar(MenuPage page) { return _vis.Count > _visRows ? new Rect(_pageR.xMax - _cw, _rowY0, _cw, _visRows * _ch) : new Rect(); }
+        private void BarTo(MenuPage page, int ci, float y)
+        {
+            Rect b = PageBar(page);
+            float f = Mathf.Clamp01((y - b.y - _ch) / Mathf.Max(1f, b.height - 2f * _ch));
+            Move(page, ci, Mathf.RoundToInt(f * (_vis.Count - 1)) - Mathf.Max(ci, 0));
+        }
+
         // a scroll bar one cell wide at x, over the rows from y0 down (a page's, or a list's in a pop-up)
         private void ScrollBar(float x, float y0, int top, int shown, int count, Color under)
         {
@@ -395,13 +405,14 @@ namespace Monolith
             {
                 // a pop-up is open: everything goes to it
                 if (ev.type == EventType.KeyDown) PopKeys(ev);
-                else if (ev.type == EventType.ScrollWheel || ev.type == EventType.MouseDown) { PopMouse(ev); ev.Use(); }
+                else if (ev.type == EventType.ScrollWheel || ev.type == EventType.MouseDown || ev.type == EventType.MouseDrag || ev.type == EventType.MouseUp) { PopMouse(ev); ev.Use(); }
             }
             else if (ev.type == EventType.KeyDown) { if (binding) ev.Use(); else Keys(ev, page, ci); if (!Opened) return; }
             else if (ev.type == EventType.ScrollWheel) { if (!binding) Wheel(page, ci, ev.delta.y > 0 ? 3 : -3); ev.Use(); }
+            else if (ev.type == EventType.MouseDown && ev.button == 0 && !binding && PageBar(page).Contains(ev.mousePosition)) { _barHeld = true; BarTo(page, ci, ev.mousePosition.y); ev.Use(); }
             else if (ev.type == EventType.MouseDown) { if (!binding) Click(ev.mousePosition, page, ev.button); ev.Use(); if (!Opened) return; }
-            else if (ev.type == EventType.MouseDrag) { if (_dragRow != null) Slide(_dragRow, ev.mousePosition.x, page); ev.Use(); }
-            else if (ev.type == EventType.MouseUp) _dragRow = null;
+            else if (ev.type == EventType.MouseDrag) { if (_barHeld) BarTo(page, ci, ev.mousePosition.y); else if (_dragRow != null) Slide(_dragRow, ev.mousePosition.x, page); ev.Use(); }
+            else if (ev.type == EventType.MouseUp) { _dragRow = null; _barHeld = false; }
             if (ev.type != EventType.Repaint) return;
             page = Current(); ci = Lay(page);
             // As in Far Manager, the mouse moves the cursor only with a click, never by passing over a row.

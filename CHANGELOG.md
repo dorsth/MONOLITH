@@ -1,5 +1,9 @@
 # MONOLITH changelog
 
+## 1.5.4
+- In a list, the mouse wheel scrolls the list and leaves the setting alone.
+- Scroll bars can be dragged: in a list it scrolls the list, on a page it moves the cursor.
+
 ## 1.5.3
 - Lists are as wide as their row, so they hide whole rows and never half a name.
 - Beside a preview, lists and the color picker stop a cell short of it.

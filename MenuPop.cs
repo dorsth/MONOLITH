@@ -22,6 +22,7 @@ namespace Monolith
             public string Typed = ""; public float TypedAt;
             public float AnchorRight, AnchorY;
             public bool Beside;                // the page has a preview: the pop-up stops a cell short of it
+            public bool Free, Dragging;        // the view was scrolled away from the cursor (wheel, scroll bar); the scroll bar is held
             public Rect R; public int Shown;
         }
 
@@ -94,6 +95,7 @@ namespace Monolith
         {
             Pop p = _pop;
             to = Mathf.Clamp(to, 0, p.Values.Length - 1);
+            p.Free = false;
             if (to == p.Cur) return;
             p.Cur = to; p.Typed = p.Palette ? p.Typed : p.Typed;
             PopApply();
@@ -163,10 +165,27 @@ namespace Monolith
             return p.Top + line;
         }
 
+        // the scroll bar of a long list: one cell wide on its right frame, over its rows
+        private Rect PopBar(Pop p) { return new Rect(p.R.xMax - _cw * 1.25f, p.R.y + _ch, _cw, p.Shown * _ch); }
+
+        // the list shows from where the mouse is on its scroll bar
+        private void PopScrollTo(Pop p, float y)
+        {
+            Rect b = PopBar(p);
+            float f = Mathf.Clamp01((y - b.y - _ch) / Mathf.Max(1f, b.height - 2f * _ch));
+            p.Top = Mathf.RoundToInt(f * Mathf.Max(0, p.Values.Length - p.Shown)); p.Free = true;
+        }
+
         private void PopMouse(Event ev)
         {
-            if (ev.type == EventType.ScrollWheel) { if (!_pop.Palette) PopMove(_pop.Cur + (ev.delta.y > 0 ? 3 : -3)); return; }
+            Pop p = _pop;
+            bool scrolls = !p.Palette && p.Values.Length > p.Shown;
+            // the wheel scrolls the list, as in Far; it does not change the setting
+            if (ev.type == EventType.ScrollWheel) { if (scrolls) { p.Top = Mathf.Clamp(p.Top + (ev.delta.y > 0 ? 3 : -3), 0, p.Values.Length - p.Shown); p.Free = true; } return; }
+            if (ev.type == EventType.MouseUp) { p.Dragging = false; return; }
+            if (ev.type == EventType.MouseDrag) { if (p.Dragging) PopScrollTo(p, ev.mousePosition.y); return; }
             if (ev.type != EventType.MouseDown) return;
+            if (scrolls && ev.button == 0 && PopBar(p).Contains(ev.mousePosition)) { p.Dragging = true; PopScrollTo(p, ev.mousePosition.y); return; }
             int i = PopAt(ev.mousePosition);
             if (ev.button != 0 || i < 0) { PopClose(false); return; }
             PopMove(i); PopApply(); PopClose(true);
@@ -208,7 +227,7 @@ namespace Monolith
             x = Mathf.Clamp(x, _win.x + _cw, _win.xMax - w - _cw);
             if (y + h > _win.yMax - _ch * 1.5f) y = Mathf.Max(_win.y + _ch * 0.5f, p.AnchorY - _rowStep - h);
             p.R = new Rect(Mathf.Round(x), Mathf.Round(y), w, h);
-            if (mouseMoved) { int at = PopAt(mouse); if (at >= 0) PopMove(at); }
+            if (mouseMoved && !p.Dragging && !(p.Values.Length > p.Shown && !p.Palette && PopBar(p).Contains(mouse))) { int at = PopAt(mouse); if (at >= 0) PopMove(at); }
 
             // a filled panel with half a cell of room around its frame, as Far draws a dialog; never over the page's own lines
             var frame = new Rect(p.R.x + _cw * 0.5f, p.R.y + _ch * 0.5f, p.R.width - _cw, p.R.height - _ch);
@@ -237,8 +256,9 @@ namespace Monolith
                 GUI.Label(new Rect(hx + _cw, hy, hw, _ch), hex, _st);
                 return;
             }
-            if (p.Cur < p.Top) p.Top = p.Cur;
-            if (p.Cur >= p.Top + p.Shown) p.Top = p.Cur - p.Shown + 1;
+            // the cursor is kept in view, unless the list was scrolled away from it
+            if (!p.Free && p.Cur < p.Top) p.Top = p.Cur;
+            if (!p.Free && p.Cur >= p.Top + p.Shown) p.Top = p.Cur - p.Shown + 1;
             p.Top = Mathf.Clamp(p.Top, 0, Mathf.Max(0, n - p.Shown));
             int cols = (int)(p.R.width / _cw) - 6;
             for (int i = 0; i < p.Shown; i++)
@@ -250,7 +270,7 @@ namespace Monolith
                 GUI.Label(new Rect(r.x + _cw * 0.5f, r.y, r.width, _ch), "<color=" + Hot + ">" + (was ? "√ " : "  ") + "</color><color=" + (cur ? Val : Txt) + ">" + Esc(Fit(p.Labels[idx], cols)) + "</color>", _st);
             }
             // a long list has the scroll bar a long page has, on its right frame
-            if (n > p.Shown) ScrollBar(p.R.xMax - _cw * 1.25f, p.R.y + _ch, p.Top, p.Shown, n, Panel);
+            if (n > p.Shown) { Rect b = PopBar(p); ScrollBar(b.x, b.y, p.Top, p.Shown, n, Panel); }
         }
     }
 }
