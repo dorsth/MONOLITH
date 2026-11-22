@@ -469,7 +469,12 @@ namespace Monolith
             }
             Footer(_navR, BundlePlugin.Version);
             string title = _searching ? Lang.T("search: ") + _query + "_" : PathText(page);
-            Box(_pageR, Fit(title, (int)(_pageR.width / _cw) - 8), pageOn);
+            Box(_pageR, Fit(title, (int)(_pageR.width / _cw) - 24), pageOn);   // room on the right for the clock
+            // the clock on the top frame at the right, in yellow, as Far shows it
+            string clock = DateTime.Now.ToShortTimeString();
+            float cx = _pageR.xMax - (clock.Length + 3) * _cw;
+            Fill(new Rect(cx, _pageR.y - _ch * 0.5f + Thin * 2f, (clock.Length + 2) * _cw, _ch), Back);
+            GUI.Label(new Rect(cx + _cw, _pageR.y - _ch * 0.5f + Thin, (clock.Length + 1) * _cw, _ch), "<color=" + Hot + ">" + Esc(clock) + "</color>", _st);
             int side = page.Draw != null ? page.SideCols + 1 : 0;
             int cols = ColsFor(page), vis = _visRows;
             for (int i = 0; i < vis && page.Top + i < _vis.Count; i++)
@@ -526,16 +531,18 @@ namespace Monolith
                 }
             }
 
-            // the key bar, as Far's: the slots share the width evenly, each a key on black and its word in a box to the slot's end.
-            // The main bar keeps a slot for R, empty when there is nothing to reset, so the keys before it stay put.
-            bool canReset = over >= 0 && over < _vis.Count ? Changed(_vis[over]) : pageOn && ci >= 0 && ci < _vis.Count && Changed(_vis[ci]);
-            string[] keys = _pop != null ? (_pop.Palette ? new[] { "←↑↓→", "move", "Enter", "take", "Esc", "cancel", "Del", "reset", "0-9 A-F", "hex value" } : new[] { "↑↓", "move", "Enter", "take", "Esc", "cancel", "A-Z", "jump to a name" })
-                : _bindRow != null ? new[] { "Key", "press one", "Enter", "none", "Esc", "cancel" }
-                : _capture ? new[] { "Key", "press one", "Esc", "cancel" }
-                : _editRow != null ? new[] { "Enter", "ok", "←", "delete", "Esc", "cancel" }
-                : _searching ? new[] { "type", "to search", "Enter", "open", "Esc", "leave search" }
-                : new[] { "WS", "move", "AD", "set", "E", "open", "Q", "back", "/", "search", "Esc", "close", canReset ? "R" : "", canReset ? "reset" : "" };
-            KeyBarDraw(new Rect(_win.x, _win.yMax - _ch, _win.width, _ch), keys);
+            // the key bar
+            Rect kb = new Rect(_win.x, _win.yMax - _ch, _win.width, _ch);
+            Fill(kb, KeyBar);
+            string keys = _pop != null ? (_pop.Palette ? K("←↑↓→", "move") : K("↑↓", "move")) + K("Enter", "take") + K("Esc", "cancel") + (_pop.Palette ? K("Del", "reset") + K("0-9 A-F", "hex value") : K("A-Z", "jump to a name"))
+                : _bindRow != null ? K("Key", "press one") + K("Enter", "none") + K("Esc", "cancel")
+                : _capture ? K("Key", "press one") + K("Esc", "cancel")
+                : _editRow != null ? K("Enter", "ok") + K("←", "delete") + K("Esc", "cancel")
+                : _searching ? K("type", "to search") + K("Enter", "open") + K("Esc", "leave search")
+                : K("WS", "move") + K("AD", "set") + K("E", "open") + K("Q", "back") + K("/", "search") + K("Esc", "close")
+                    // last, so the keys before it stay put when it comes and goes
+                    + ((over >= 0 && over < _vis.Count ? Changed(_vis[over]) : pageOn && ci >= 0 && ci < _vis.Count && Changed(_vis[ci])) ? K("R", "reset") : "");
+            Line(kb.x + _cw * 2f, kb.y, keys);   // on the same column as the text of the panels and of the box above it
             if (_pop != null) PopDraw(mouse, mouseMoved);
         }
 
@@ -561,20 +568,7 @@ namespace Monolith
             return new Rect(_pageR.xMax - (page.SideCols + 1.5f) * _cw, _pageR.y + _ch - Thin, (page.SideCols - 0.5f) * _cw, page.SideRows() * _ch);
         }
 
-        // keys holds a key and its word in turn
-        private void KeyBarDraw(Rect kb, string[] keys)
-        {
-            int n = keys.Length / 2, cells = Mathf.RoundToInt(kb.width / _cw);
-            for (int i = 0; i < n; i++)
-            {
-                float x0 = kb.x + Mathf.Round(cells * i / n) * _cw, x1 = kb.x + Mathf.Round(cells * (i + 1) / n) * _cw;
-                string key = Lang.T(keys[2 * i]), what = keys[2 * i + 1].Length > 0 ? Lang.T(keys[2 * i + 1]) : "";
-                float bx = x0 + Mathf.Max(1, key.Length) * _cw;
-                Fill(new Rect(bx, kb.y, x1 - bx, _ch), KeyBar);
-                GUI.Label(new Rect(x0, kb.y, bx - x0, _ch), "<color=" + Hot + ">" + key + "</color>", _st);
-                GUI.Label(new Rect(bx, kb.y, x1 - bx, _ch), "<color=" + Txt + ">" + what + "</color>", _st);
-            }
-        }
+        private static string K(string key, string what) { return "<color=" + Hot + ">" + Lang.T(key) + "</color><color=" + Txt + "> " + Lang.T(what) + "</color>  "; }
 
         // "HUD \ Hitmarkers", each part in the menu's language (a profile's own name stays as it is)
         private static string PathText(MenuPage page)
@@ -624,7 +618,7 @@ namespace Monolith
                 {
                     int on = 0; foreach (ConfigEntryBase e in row.Parts) if ((bool)e.BoxedValue) on++;
                     string v = on == row.Parts.Length ? "[x]" : on == 0 ? "[ ]" : "[-]";
-                    return "<color=" + name + ">" + Esc(Pad(Lang.T(row.Label), cols - 4)) + "</color> <color=" + (Changed(row) ? Hot : Val) + ">" + v + "</color>";
+                    return "<color=" + name + ">" + Esc(Pad(Lang.T(row.Label), cols - 4)) + "</color> <color=" + Val + ">" + v + "</color>";
                 }
                 default:
                 {
@@ -648,32 +642,31 @@ namespace Monolith
         {
             ConfigEntryBase e = row.Entry; Type t = e.SettingType;
             string v;
-            // a value not at its default is yellow, as Far marks the files picked out in a panel
-            string vc = Changed(row) ? Hot : Val;
             int room = Mathf.Clamp(cols - Lang.T(row.Label).Length - 3, 4, cols / 2);   // cells a list or text value may take
             if (row == _bindRow) { v = Lang.T("press a key…"); used = v.Length; return "<color=" + Hot + ">" + v + "</color>"; }
             if (row == _editRow) { v = Fit(_capture ? Lang.T("press a key…") : _edit + "_", room + 2); used = v.Length; return "<color=" + Hot + ">" + Esc(v) + "</color>"; }
-            if (row.Bind) { v = Lang.T(Monolith.Keys.Name(e.GetSerializedValue(), row.Empty)); used = v.Length; return "<color=" + vc + ">" + Esc(v) + "</color>"; }
+            if (row.Bind) { v = Lang.T(Monolith.Keys.Name(e.GetSerializedValue(), row.Empty)); used = v.Length; return "<color=" + Val + ">" + Esc(v) + "</color>"; }
             if (t == typeof(Color))
             {
                 Color c = (Color)e.BoxedValue;
                 v = "#" + e.GetSerializedValue(); used = v.Length + 4;
-                return "<color=#" + ColorUtility.ToHtmlStringRGB(c) + ">■</color> <color=" + vc + ">" + v + " ▼</color>";
+                return "<color=#" + ColorUtility.ToHtmlStringRGB(c) + ">■</color> <color=" + Val + ">" + v + " ▼</color>";
             }
             if (t != typeof(bool) && IsPick(row))
             {
                 v = Fit(LabelOf(row, e.BoxedValue), room); used = v.Length + 2;
-                return "<color=" + vc + ">" + Esc(v) + " ▼</color>";
+                // the ▼ in the value's color: yellow is for keys, titles and headings
+                return "<color=" + Val + ">" + Esc(v) + " ▼</color>";
             }
             if (Range(e, out _, out _))
             {
                 // the slider itself is drawn over these cells (Knob)
                 v = Show(e); if (v.Length > NumberCells) v = v.Substring(0, NumberCells);
                 used = BarCells + 1 + NumberCells;
-                return BarGap + "<color=" + vc + ">" + v.PadLeft(NumberCells) + "</color>";
+                return BarGap + "<color=" + Val + ">" + v.PadLeft(NumberCells) + "</color>";
             }
             v = Fit(row.Empty != null && e.GetSerializedValue().Length == 0 ? Lang.T(row.Empty) : Show(e), room + 2); used = v.Length;
-            return "<color=" + vc + ">" + Esc(v) + "</color>";
+            return "<color=" + Val + ">" + Esc(v) + "</color>";
         }
 
         // Some mods keep a key as text ("L", "Semicolon"): a text box made you type the name. A text setting called a key,

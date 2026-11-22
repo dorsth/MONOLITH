@@ -1,5 +1,10 @@
 # MONOLITH changelog
 
+## 1.6.7
+- The key bar at the bottom is back to how it was.
+- Values not at their default are no longer yellow.
+- A clock in yellow on the top right of the menu, as in Far.
+
 ## 1.6.6
 - The menu uses Cascadia Mono, the font of Windows Terminal, and Consolas only where it is missing.
 
