@@ -1,5 +1,8 @@
 # MONOLITH changelog
 
+## 1.5.2
+- The shadow of the preview and the pop-ups is 50% black, as in Far.
+
 ## 1.5.1
 - The ▼ of a list or color is in the value's color. Yellow is for keys, titles and headings.
 - The preview dialog and its groups are capitalized: Preview, Dark, Light, Enemies, Teammates.

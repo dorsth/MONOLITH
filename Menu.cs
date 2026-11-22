@@ -270,7 +270,7 @@ namespace Monolith
         // the palette of the screenshot it was modelled on
         private static readonly Color Back = new Color32(0x0B, 0x11, 0x0D, 0xFF), Frame = new Color32(0x9F, 0xB8, 0xA8, 0xFF), Bar = new Color32(0x26, 0x38, 0x2D, 0xFF),
             FrameDim = new Color32(0x5C, 0x6D, 0x62, 0xFF), Panel = new Color32(0x12, 0x1C, 0x16, 0xFF),
-            BarDim = new Color32(0x18, 0x22, 0x1B, 0xFF), Shadow = new Color(0f, 0f, 0f, 0.55f), Hover = new Color32(0x14, 0x1D, 0x17, 0xFF), KeyBar = new Color32(0x16, 0x1F, 0x19, 0xFF);
+            BarDim = new Color32(0x18, 0x22, 0x1B, 0xFF), Shadow = new Color(0f, 0f, 0f, 0.5f), Hover = new Color32(0x14, 0x1D, 0x17, 0xFF), KeyBar = new Color32(0x16, 0x1F, 0x19, 0xFF);
         private const string Txt = "#D5E3D9", Dim = "#7F9186", Hot = "#E8E05A", Mint = "#B6F0C2", Val = "#FFFFFF", Head = "#9FB8A8";
 
         private void Style()
