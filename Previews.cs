@@ -68,7 +68,7 @@ namespace Monolith
             catch (Exception) { }
         }
 
-        // ---- hitmarkers: bodyshot, headshot and shotgun color, each on dark and on light, at the size on screen
+        // ---- hitmarkers: bodyshot, headshot, shotgun and (when it is on) kill color, each on dark and on light, at the size on screen
 
         private static GameObject _marker; private static float _markerAt = -99f;
 
@@ -111,11 +111,12 @@ namespace Monolith
                     DorsthTweaks.GapKept.Made made = DorsthTweaks.GapKept.Get(sp, DorsthTweaks.Hitmarkers.Width, DorsthTweaks.Hitmarkers.Gap, DorsthTweaks.Hitmarkers.Length, px);
                     if (made != null && made.Sprite != null) { sp = made.Sprite; px *= made.GrowX; py *= made.GrowY; }
                 }
-                float half = Swatch(r), cell = half / 3f;
+                int n = DorsthTweaks.Hitmarkers.KillOn ? 4 : 3;
+                float half = Swatch(r), cell = half / n;
                 GUI.BeginGroup(r);
-                for (int i = 0; i < 3; i++)
+                for (int i = 0; i < n; i++)
                 {
-                    Color c = (i == 0 ? DorsthTweaks.DorsthTweaksPlugin.BodyshotColor : i == 1 ? DorsthTweaks.DorsthTweaksPlugin.HeadshotColor : DorsthTweaks.DorsthTweaksPlugin.ShotgunHitmarkerColor).Color;
+                    Color c = (i == 0 ? DorsthTweaks.DorsthTweaksPlugin.BodyshotColor : i == 1 ? DorsthTweaks.DorsthTweaksPlugin.HeadshotColor : i == 2 ? DorsthTweaks.DorsthTweaksPlugin.ShotgunHitmarkerColor : DorsthTweaks.DorsthTweaksPlugin.KillColor).Color;
                     Pic(new Rect(i * cell, 0f, cell, r.height), sp, c, px, py);
                     Pic(new Rect(half + i * cell, 0f, cell, r.height), sp, c, px, py);
                 }

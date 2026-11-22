@@ -63,7 +63,7 @@ T = [
 ('Sprint FOV amount', 'Сила FOV при беге', 'L38'), ('How much your FOV widens when you sprint and slide. 1 is the game\'s.', 'Насколько расширяется FOV при беге и подкате. 1 как в игре.', 'tip'), ('Better recoil', 'Улучшенная отдача', 'L52'),
 ('With the AR, AK and Warden, recoil moves your aim instead of shaking the camera.', 'У AR, AK и Warden отдача двигает прицел, а не трясёт камеру.', 'tip'),
 ('No near miss vignette', 'Без виньетки при пролёте пуль', 'L52'),
-# ---- hud: hitmarkers (35 cells)
+# ---- hud: hitmarkers
 ('Hide hitmarkers', 'Скрыть хитмаркеры', 'L31'), ('Line ends', 'Концы линий', 'L15'), 
 ('Length', 'Длина', 'L17'), ('Width', 'Толщина', 'L38'), ('Thickness', 'Толщина', 'L17'), ('Gap', 'Зазор', 'L17'), ('Static hitmarkers', 'Статичные хитмаркеры', 'L31'), ('They fade out without popping.', 'Они исчезают без увеличения.', 'tip'),
 ('Animation size', 'Сила анимации', 'L17'),
@@ -72,6 +72,7 @@ T = [
 ('Headshots pop like bodyshots.', 'Анимация хедшота такая же, как при попадании в тело.', 'tip'),
 ('Bodyshot color', 'Цвет попадания в тело', 'L21'), ('Headshot color', 'Цвет хедшота', 'L21'), ('Shotgun color', 'Цвет для дробовика', 'L21'),
 ('The black bodyshot hitmarker of the shotgun and a few other guns.', 'Чёрный хитмаркер попадания в тело у дробовика и ещё нескольких пушек.', 'tip'),
+('Kill hitmarker', 'Хитмаркер убийства', 'L31'), ('The hit that kills shows in the kill color.', 'Попадание, которое убивает, показывается цветом убийства.', 'tip'), ('Kill color', 'Цвет убийства', 'L21'),
 ('hidden', 'скрыты', 'W16'), ('static', 'статичные', 'W16'),
 # ---- hud: prompts and the rest
 ('Hide prompts', 'Скрыть подсказки', 'L52'), ('On weapons, doors and buttons.', 'На оружии, дверях и кнопках.', 'info'),

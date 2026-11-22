@@ -1,5 +1,8 @@
 # MONOLITH changelog
 
+## 1.2.6
+- DorsthTweaks 1.4.0: HUD > Hitmarkers has "Kill hitmarker". With it on, the hit that kills shows in the kill color. Off by default.
+
 ## 1.2.5
 - New icon.
 

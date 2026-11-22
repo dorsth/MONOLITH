@@ -472,7 +472,7 @@ namespace Monolith
                 var p = new MenuPage(null, "HUD", "Hitmarkers, prompts, counters.");
 
                 var hm = new MenuPage(p, "Hitmarkers", "Shape, size, animation, colors.");
-                ConfigEntryBase noHm = E(Tweaks, "HUD", "Hide Hitmarkers"), still = E(Tweaks, "HUD", "Static Hitmarkers");
+                ConfigEntryBase noHm = E(Tweaks, "HUD", "Hide Hitmarkers"), still = E(Tweaks, "HUD", "Static Hitmarkers"), kill = E(Tweaks, "HUD", "Kill Hitmarker");
                 Func<bool> shown = () => !On(noHm);
                 hm.Set("Hide hitmarkers", noHm, null, "")
                   .Set("Line ends", E(Tweaks, "HUD", "Hitmarker Shape"), shown, "")
@@ -484,7 +484,9 @@ namespace Monolith
                   .Set("Same headshot animation", E(Tweaks, "HUD", "Same Headshot Animation"), () => !On(noHm) && !On(still), "Headshots pop like bodyshots.")
                   .Set("Bodyshot color", E(Tweaks, "HUD", "Hitmarker Bodyshot Color"), shown, "")
                   .Set("Headshot color", E(Tweaks, "HUD", "Hitmarker Headshot Color"), shown, "")
-                  .Set("Shotgun color", E(Tweaks, "HUD", "Hitmarker Shotgun Color"), shown, "The black bodyshot hitmarker of the shotgun and a few other guns.");
+                  .Set("Shotgun color", E(Tweaks, "HUD", "Hitmarker Shotgun Color"), shown, "The black bodyshot hitmarker of the shotgun and a few other guns.")
+                  .Set("Kill hitmarker", kill, shown, "The hit that kills shows in the kill color.")
+                  .Set("Kill color", E(Tweaks, "HUD", "Hitmarker Kill Color"), () => !On(noHm) && On(kill), "");
                 if (noHm != null) { hm.Draw = r => BundleMenu.I.HitmarkerPreview(r); hm.UnderRows = 5; }
 
                 var pr = new MenuPage(p, "Prompts", "The texts on weapons, doors and buttons.");
