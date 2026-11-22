@@ -170,6 +170,12 @@ namespace Monolith
             PopMove(i); PopApply(); PopClose(true);
         }
 
+        private void Clipped(Rect r, Rect room, Color c)
+        {
+            float x0 = Mathf.Max(r.x, room.x), y0 = Mathf.Max(r.y, room.y), x1 = Mathf.Min(r.xMax, room.xMax), y1 = Mathf.Min(r.yMax, room.yMax);
+            if (x1 > x0 && y1 > y0) Fill(new Rect(x0, y0, x1 - x0, y1 - y0), c);
+        }
+
         private void PopDraw(Vector2 mouse, bool mouseMoved)
         {
             Pop p = _pop;
@@ -203,8 +209,9 @@ namespace Monolith
             var frame = new Rect(p.R.x + _cw * 0.5f, p.R.y + _ch * 0.5f, p.R.width - _cw, p.R.height - _ch);
             float pt = Thin * 3f;
             var room = new Rect(_pageR.x + pt, _pageR.y + pt, _pageR.width - 2f * pt, _pageR.height - 2f * pt);
-            float x0 = Mathf.Max(p.R.x, room.x), y0 = Mathf.Max(p.R.y, room.y), x1 = Mathf.Min(p.R.xMax, room.xMax), y1 = Mathf.Min(p.R.yMax, room.yMax);
-            if (x1 > x0 && y1 > y0) Fill(new Rect(x0, y0, x1 - x0, y1 - y0), Panel);
+            // with the shadow the preview dialog has, half a cell down and to the right
+            Clipped(new Rect(p.R.x + _cw * 0.5f, p.R.y + _ch * 0.5f, p.R.width, p.R.height), room, Shadow);
+            Clipped(p.R, room, Panel);
             Box(frame, Lang.T(p.Row.Label.Trim()), true, Panel);
             if (p.Palette)
             {

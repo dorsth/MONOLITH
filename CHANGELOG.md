@@ -1,5 +1,8 @@
 # MONOLITH changelog
 
+## 1.5.0
+- Color pickers and lists have the shadow the preview dialog has.
+
 ## 1.4.9
 - Section headings are their name alone, in the middle and in yellow, as Far heads its columns. No lines.
 
