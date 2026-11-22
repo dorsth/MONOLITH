@@ -10,7 +10,7 @@ using System.Reflection;
 
 [assembly: AssemblyTitle("TrueSens")]
 [assembly: AssemblyDescription("Set your sensitivity in cm/360 from your mouse DPI, with every zoom scaled from it.")]
-[assembly: AssemblyVersion("1.2.4.0")]
+[assembly: AssemblyVersion("1.2.5.0")]
 // only changes your own aim on your own screen: fine to play with people who don't have it
 [assembly: StraftatMod(isVanillaCompatible: true)]
 
@@ -31,7 +31,7 @@ namespace TrueSens
     [BepInPlugin(Guid, Name, Version)]
     public sealed class Plugin : BaseUnityPlugin
     {
-        public const string Guid = "dorsth.straftat.truesens", Name = "TrueSens", Version = "1.2.4";
+        public const string Guid = "dorsth.straftat.truesens", Name = "TrueSens", Version = "1.2.5";
         internal static ManualLogSource Log;
 
         internal static ConfigEntry<bool> On;
@@ -39,7 +39,7 @@ namespace TrueSens
         internal static ConfigEntry<float> Cm360;
         internal static ConfigEntry<float> AdsMult, ScopedMult;
 
-        internal const float MinCm = 5f, MaxCm = 150f, MinMult = 0.1f, MaxMult = 3f;
+        internal const float MinCm = 1f, MaxCm = 150f, MinMult = 0.1f, MaxMult = 3f;
 
         private void Awake()
         {
