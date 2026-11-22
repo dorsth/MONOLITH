@@ -1,5 +1,8 @@
 # MONOLITH changelog
 
+## 1.8.9
+- ezCrosshair 1.3.2: the other crosshairs are exactly the first pictures again.
+
 ## 1.8.8
 - ezCrosshair 1.3.1: the brackets are the game's own reticle, white instead of cream.
 
