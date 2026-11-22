@@ -1,5 +1,8 @@
 # MONOLITH changelog
 
+## 1.4.9
+- Section headings are their name alone, in the middle and in yellow, as Far heads its columns. No lines.
+
 ## 1.4.8
 - The preview is a Far dialog over the page: a shadow, its own lighter ground, a double frame named "preview", and inside it two named groups (dark and light, or enemies and teammates), as in Far's Color dialog.
 - The version is on the bottom line of the MONOLITH panel again, and off General.

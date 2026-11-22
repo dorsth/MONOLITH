@@ -344,20 +344,16 @@ namespace Monolith
             Fill(new Rect(Mathf.Round(mid - _cw * 0.3f), Mathf.Round(by), Mathf.Round(_cw * 0.6f), Mathf.Round(bh)), Frame);
         }
 
-        // A section heading as Far draws one: a single line joined to the inner line of the page frame, its name in the
-        // middle. Beside a preview it runs into the preview's frame instead, so it is joined at both ends.
-        private void Separator(Rect row, string title, Rect side, bool active)
+        // A section heading as Far heads a column: its name alone, in the middle, in the color of a column title.
+        // Beside a preview it is in the middle of the rows.
+        private void Heading(Rect row, string title, Rect side)
         {
-            float t = Thin, y = Mathf.Round(row.y + _ch * 0.5f - t * 0.5f);
-            bool beside = side.width > 0f && y >= side.y - t && y <= side.yMax;
-            float x0 = _pageR.x + 2f * t, x1 = beside ? side.x : _pageR.xMax - 2f * t;
-            Fill(new Rect(x0, y, x1 - x0, t), active ? Frame : FrameDim);
-            title = Fit(title, (int)((x1 - x0) / _cw) - 4);
-            float w = (title.Length + 2) * _cw, x = Mathf.Round((x0 + x1 - w) * 0.5f);
-            Fill(new Rect(x, row.y, w, _ch), Back);
-            GUI.Label(new Rect(x + _cw, row.y, w, _ch), "<color=" + Head + ">" + Esc(title) + "</color>", _st);
+            bool beside = side.width > 0f && row.y + _ch * 0.5f >= side.y && row.y <= side.yMax;
+            float x0 = _pageR.x + _cw, x1 = beside ? side.x : _pageR.xMax - _cw;
+            title = Fit(title, (int)((x1 - x0) / _cw) - 2);
+            float w = title.Length * _cw, x = Mathf.Round((x0 + x1 - w) * 0.5f);
+            GUI.Label(new Rect(x, row.y, w + 2f, _ch), "<color=" + Hot + ">" + Esc(title) + "</color>", _st);
         }
-
 
         // long enough for a join message with color tags in it
         private const int EditMax = 200;
@@ -440,7 +436,7 @@ namespace Monolith
                 Rect r = new Rect(_pageR.x + _cw, _pageR.y + (i + 1) * _ch, _pageR.width - 2 * _cw - side * _cw, _ch);
                 bool cur = idx == ci && pageOn;
                 if (cur) Fill(r, Bar); else if (idx == over && row.Kind != RowKind.Header) Fill(r, Hover);
-                if (row.Kind == RowKind.Header) Separator(r, Lang.T(row.Label), page.Draw != null ? SideRect(page) : new Rect(), pageOn);
+                if (row.Kind == RowKind.Header) Heading(r, Lang.T(row.Label), page.Draw != null ? SideRect(page) : new Rect());
                 else Line(r.x + _cw * 0.5f, r.y, RowText(row, cols, cur));
                 Knob(row, r.y, cols, cur);
             }
