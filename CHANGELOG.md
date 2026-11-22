@@ -1,5 +1,8 @@
 # MONOLITH changelog
 
+## 1.6.8
+- Titles, headings and the clock are bold, as in Far.
+
 ## 1.6.7
 - The key bar at the bottom is back to how it was.
 - Values not at their default are no longer yellow.

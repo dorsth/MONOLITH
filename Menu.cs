@@ -321,10 +321,10 @@ namespace Monolith
             }
             if (string.IsNullOrEmpty(title)) return;
             float w = (title.Length + 2) * _cw, x = Mathf.Round(r.x + (r.width - w) * 0.5f);
-            // the title of the panel that has the keys sits on a mint badge, as in the theme; a dialog's is bright
+            // the title of the panel that has the keys sits on a mint badge, as in the theme; a dialog's is bright. Titles are bold, as Far's
             bool badge = active && panel;
             Fill(new Rect(x, r.y - _ch * 0.5f + g, w, _ch), badge ? Badge : under);
-            GUI.Label(new Rect(x + _cw, r.y - _ch * 0.5f + g * 0.5f, w, _ch), "<color=" + (badge ? Ink : panel ? Head : lines == 2 ? Val : Txt) + ">" + Esc(title) + "</color>", _st);
+            GUI.Label(new Rect(x + _cw, r.y - _ch * 0.5f + g * 0.5f, w, _ch), "<b><color=" + (badge ? Ink : panel ? Head : lines == 2 ? Val : Txt) + ">" + Esc(title) + "</color></b>", _st);
         }
 
         private void Line(float x, float y, string rich) { GUI.Label(new Rect(x, y, _win.xMax - x, _ch), rich, _st); }
@@ -392,7 +392,7 @@ namespace Monolith
             float x0 = _pageR.x + _cw, x1 = beside ? side.x : _pageR.xMax - _cw;
             title = Fit(title, (int)((x1 - x0) / _cw) - 2);
             float w = title.Length * _cw, x = Mathf.Round((x0 + x1 - w) * 0.5f);
-            GUI.Label(new Rect(x, row.y, w + 2f, _ch), "<color=" + Hot + ">" + Esc(title) + "</color>", _st);
+            GUI.Label(new Rect(x, row.y, w + 2f, _ch), "<b><color=" + Hot + ">" + Esc(title) + "</color></b>", _st);
         }
 
         // long enough for a join message with color tags in it
@@ -474,7 +474,7 @@ namespace Monolith
             string clock = DateTime.Now.ToShortTimeString();
             float cx = _pageR.xMax - (clock.Length + 3) * _cw;
             Fill(new Rect(cx, _pageR.y - _ch * 0.5f + Thin * 2f, (clock.Length + 2) * _cw, _ch), Back);
-            GUI.Label(new Rect(cx + _cw, _pageR.y - _ch * 0.5f + Thin, (clock.Length + 1) * _cw, _ch), "<color=" + Hot + ">" + Esc(clock) + "</color>", _st);
+            GUI.Label(new Rect(cx + _cw, _pageR.y - _ch * 0.5f + Thin, (clock.Length + 1) * _cw, _ch), "<b><color=" + Hot + ">" + Esc(clock) + "</color></b>", _st);
             int side = page.Draw != null ? page.SideCols + 1 : 0;
             int cols = ColsFor(page), vis = _visRows;
             for (int i = 0; i < vis && page.Top + i < _vis.Count; i++)
