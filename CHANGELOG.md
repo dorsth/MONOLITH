@@ -1,5 +1,8 @@
 # MONOLITH changelog
 
+## 1.3.6
+- CameraTweaks 1.2.3: Sprint FOV increase goes in whole degrees.
+
 ## 1.3.5
 - CameraTweaks 1.2.2: Camera has one row, "Sprint FOV increase": how many degrees your FOV widens when you sprint, 0 for none (the default). It replaces "No sprint FOV" and "Sprint FOV amount".
 

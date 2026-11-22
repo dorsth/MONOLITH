@@ -16,7 +16,7 @@ using UnityEngine;
 
 [assembly: AssemblyTitle("CameraTweaks")]
 [assembly: AssemblyDescription("Takes out the camera movement STRAFTAT adds on its own, one switch each.")]
-[assembly: AssemblyVersion("1.2.2.0")]
+[assembly: AssemblyVersion("1.2.3.0")]
 // only changes your own camera on your own screen: fine to play with people who don't have it
 [assembly: StraftatMod(isVanillaCompatible: true)]
 
@@ -30,7 +30,7 @@ namespace CameraTweaks
     [BepInPlugin(Guid, Name, Version)]
     public sealed class Plugin : BaseUnityPlugin
     {
-        public const string Guid = "dorsth.straftat.cameratweaks", Name = "CameraTweaks", Version = "1.2.2";
+        public const string Guid = "dorsth.straftat.cameratweaks", Name = "CameraTweaks", Version = "1.2.3";
         internal static ManualLogSource Log;
 
         // NoTilt: all of SideTilt's roll (tiltAmount, slideTiltAmount, wallSlideLean, rotationAmount)
@@ -38,7 +38,7 @@ namespace CameraTweaks
         // NoFallShake: fallShake + highFallShake. NoJumpShake: jumpSlope, wall jump, ceiling hit. NoVaultShake: vault.
         internal static ConfigEntry<bool> NoFallShake, NoJumpShake, NoVaultShake;
         internal static ConfigEntry<bool> BetterRecoil;
-        internal static ConfigEntry<float> SprintFov;
+        internal static ConfigEntry<int> SprintFov;
 
 #if !DORSTH_BUNDLE
         // Mod Menu (if installed) shows this next to the mod. Its own method, so nothing of Mod Menu is needed without it.
@@ -61,7 +61,7 @@ namespace CameraTweaks
             NoFallShake = Config.Bind(shake, "NoFallShake", true, "On: no camera shake or dip when you land.");
             NoJumpShake = Config.Bind(shake, "NoJumpShake", true, "On: no camera shake when you jump out of a slide, wall jump or hit a ceiling.");
             NoVaultShake = Config.Bind(shake, "NoVaultShake", false, "On: no camera shake when you vault over something.");
-            SprintFov = Config.Bind(roll, "SprintFovIncrease", 0f, new ConfigDescription("How many degrees the FOV widens when you sprint. Sliding widens it by the same share as in the game. 0: it stays what you set in the game.", new AcceptableValueRange<float>(0f, 30f)));
+            SprintFov = Config.Bind(roll, "SprintFovIncrease", 0, new ConfigDescription("How many degrees the FOV widens when you sprint. Sliding widens it by the same share as in the game. 0: it stays what you set in the game.", new AcceptableValueRange<int>(0, 30)));
             SprintFov.SettingChanged += (o, e) => SpeedFov.ApplyAll();
             BetterRecoil = Config.Bind(recoil, "BetterRecoil", true, "On: the AR, AK and warden kick your aim instead of the camera. When you let go it comes back down by the kick you didn't pull down yourself, so taps and bursts come back to where you aimed and a pulled down spray doesn't swing below it.");
 
@@ -103,7 +103,7 @@ namespace CameraTweaks
 
         private static void Set(FirstPersonController p)
         {
-            float k = run > 0.01f ? Mathf.Clamp(Plugin.SprintFov.Value, 0f, 30f) / run : 0f;
+            float k = run > 0.01f ? Mathf.Clamp(Plugin.SprintFov.Value, 0, 30) / run : 0f;
             Run(p) = run * k; Slide(p) = slide * k; RunSlide(p) = runSlide * k;
         }
 
