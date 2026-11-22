@@ -75,7 +75,7 @@ namespace Monolith
         private MenuRow _editRow; private string _edit; private bool _capture;
         // a key being set by pressing it (read from the input system: it knows mouse buttons and the wheel too)
         private MenuRow _bindRow; private int _bindEnd = -10;
-        // a row that wants Enter twice, and the line a row's action gave back
+        // a row that wants E twice, and the line a row's action gave back
         private MenuRow _armed; private string _say; private float _sayUntil;
         private void Say(string s) { _say = s; _sayUntil = Time.unscaledTime + 8f; }
         // the search
@@ -419,7 +419,8 @@ namespace Monolith
             _navY0 = _navR.y + _ch; _navStep = _ch; _rowY0 = _pageR.y + _ch; _rowStep = _ch; _visRows = RowsHigh - 6;
 
             // the mouse in use: the page shows no cursor, only the row under the mouse; a key brings the cursor back
-            if (ev.type == EventType.MouseDown) _byMouse = true;
+            bool wasMouse = _byMouse;
+            if (ev.type == EventType.MouseDown || ev.type == EventType.ScrollWheel) _byMouse = true;
             else if (ev.type == EventType.KeyDown && ev.keyCode != KeyCode.None) _byMouse = false;
             if (_bindRow != null) PollBind();
             bool binding = _bindRow != null || Time.frameCount - _bindEnd <= 1;
@@ -439,8 +440,19 @@ namespace Monolith
                 if (ev.type == EventType.KeyDown) PopKeys(ev);
                 else if (ev.type == EventType.ScrollWheel || ev.type == EventType.MouseDown || ev.type == EventType.MouseDrag || ev.type == EventType.MouseUp) { PopMouse(ev); ev.Use(); }
             }
-            else if (ev.type == EventType.KeyDown) { if (binding) ev.Use(); else Keys(ev, page, ci); if (!Opened) return; }
-            else if (ev.type == EventType.ScrollWheel) { if (!binding) Wheel(page, ci, ev.delta.y > 0 ? 3 : -3); ev.Use(); }
+            else if (ev.type == EventType.KeyDown)
+            {
+                if (binding) ev.Use();
+                else
+                {
+                    // the first key after the mouse acts on the row under the mouse, the one that was shaded, not on a hidden cursor
+                    int at = wasMouse && !_inNav && ev.keyCode != KeyCode.None ? RowAt(_lastMouse, page) : -1;
+                    if (at >= 0) { if (page.Cur != _vis[at]) { _armed = null; _say = null; } page.Cur = _vis[at]; page.Last = at; ci = at; }
+                    Keys(ev, page, ci);
+                }
+                if (!Opened) return;
+            }
+            else if (ev.type == EventType.ScrollWheel) { if (!binding) Wheel(page, ci, ev.delta.y > 0 ? 3 : -3, ev.mousePosition); ev.Use(); }
             else if (ev.type == EventType.MouseDown && ev.button == 0 && !binding && PageBar(page).Contains(ev.mousePosition)) { _barHeld = true; BarTo(page, ci, ev.mousePosition.y); ev.Use(); }
             else if (ev.type == EventType.MouseDown) { if (!binding) Click(ev.mousePosition, page, ev.button); ev.Use(); if (!Opened) return; }
             else if (ev.type == EventType.MouseDrag) { if (_barHeld) BarTo(page, ci, ev.mousePosition.y); else if (_dragRow != null) Slide(_dragRow, ev.mousePosition.x, page); ev.Use(); }
@@ -540,11 +552,12 @@ namespace Monolith
             // the key bar
             Rect kb = new Rect(_win.x, _win.yMax - _ch, _win.width, _ch);
             Fill(kb, KeyBar);
-            string keys = _pop != null ? (_pop.Palette ? K("←↑↓→", "move") : K("↑↓", "move")) + K("Enter", "take") + K("Esc", "cancel") + (_pop.Palette ? K("Del", "reset") + K("0-9 A-F", "hex value") : K("A-Z", "jump to a name"))
+            string keys = _pop != null ? (_pop.Palette ? K("WASD", "move") : K("WS", "move")) + K("E", "take") + K("Q", "cancel") + (_pop.Palette ? K("R", "reset") + K("0-9", "hex value") : K("A-Z", "jump to a name"))
                 : _bindRow != null ? K("Key", "press one") + K("Enter", "none") + K("Esc", "cancel")
                 : _capture ? K("Key", "press one") + K("Esc", "cancel")
-                : _editRow != null ? K("Enter", "ok") + K("←", "delete") + K("Esc", "cancel")
+                : _editRow != null ? K("Enter", "ok") + K("Backspace", "delete") + K("Esc", "cancel")
                 : _searching ? K("type", "to search") + K("Enter", "open") + K("Esc", "leave search")
+                : _inNav ? K("WS", "move") + K("E", "open") + K("Tab", "switch panel") + K("/", "search") + K("Esc", "close")
                 : K("WS", "move") + K("AD", "set") + K("E", "open") + K("Q", "back") + K("/", "search") + K("Esc", "close")
                     // last, so the keys before it stay put when it comes and goes
                     + ((over >= 0 && over < _vis.Count ? Changed(_vis[over]) : pageOn && ci >= 0 && ci < _vis.Count && Changed(_vis[ci])) ? K("R", "reset") : "");
@@ -552,13 +565,13 @@ namespace Monolith
             if (_pop != null) PopDraw(mouse, mouseMoved);
         }
 
-        // while a key is being set: the first thing pressed is it. Escape leaves it as it was; Enter again (or Backspace) sets "none".
+        // while a key is being set: the first thing pressed is it. Escape leaves it as it was; Enter (or Backspace) sets "none".
         private void PollBind()
         {
             if (Time.frameCount == _modeFrame) return;   // the press that started this is not the key
             string got = Monolith.Keys.Pressed();
             bool none = got == "<Keyboard>/backspace" || got == "<Keyboard>/enter" || got == "<Keyboard>/numpadEnter";
-            // the Enter that started this has to be let go before another Enter can mean "no key"
+            // an Enter held when this started has to be let go before an Enter can mean "no key"
             if (!_bindEnterUp) { if (Monolith.Keys.EnterHeld()) { if (none) return; } else _bindEnterUp = true; }
             if (got == null) return;
             MenuRow row = _bindRow;
@@ -959,7 +972,18 @@ namespace Monolith
             _armed = null; _say = null;
         }
 
-        private void Wheel(MenuPage page, int ci, int d) { if (_inNav && !_searching) SetCat(_cat + (d > 0 ? 1 : -1)); else Move(page, ci, d); }
+        // the wheel acts on the panel under the mouse: over the categories it changes category, over the page it scrolls the
+        // rows (the cursor, hidden while the mouse is in use, kept on a row in view)
+        private void Wheel(MenuPage page, int ci, int d, Vector2 m)
+        {
+            if (_navR.Contains(m) && !_searching) { SetCat(_cat + (d > 0 ? 1 : -1)); return; }
+            int n = _vis.Count; if (n == 0) return;
+            page.Top = Mathf.Clamp(page.Top + d, 0, Mathf.Max(0, n - _visRows));
+            int c = Mathf.Clamp(Mathf.Max(ci, 0), page.Top, Mathf.Min(n - 1, page.Top + _visRows - 1));
+            if (_vis[c].Kind == RowKind.Header) c = c + 1 < n && c + 1 < page.Top + _visRows ? c + 1 : c - 1;
+            if (c >= 0) { page.Cur = _vis[c]; page.Last = c; }
+            _armed = null; _say = null;
+        }
 
         private void SetCat(int i)
         {
@@ -1049,7 +1073,7 @@ namespace Monolith
                     if (done.Take != null) Took(done, _edit);
                     else try { done.Entry.SetSerializedValue(done.Entry.SettingType == typeof(Color) ? _edit.TrimStart('#') : _edit); } catch { }
                 }
-                else if (k == KeyCode.Backspace || k == KeyCode.LeftArrow) { if (_edit.Length > 0) _edit = _edit.Substring(0, _edit.Length - 1); }
+                else if (k == KeyCode.Backspace) { if (_edit.Length > 0) _edit = _edit.Substring(0, _edit.Length - 1); }
                 else if (ch >= ' ' && ch != 127 && _edit.Length < EditMax) _edit += ch;
                 ev.Use(); return;
             }
@@ -1088,7 +1112,7 @@ namespace Monolith
             {
                 if (k == KeyCode.UpArrow) SetCat(_cat - 1);
                 else if (k == KeyCode.DownArrow) SetCat(_cat + 1);
-                else if (k == KeyCode.RightArrow || k == KeyCode.E) _inNav = false;
+                else if (k == KeyCode.RightArrow || k == KeyCode.E || k == KeyCode.Space) _inNav = false;
                 else return;
                 ev.Use(); return;
             }
@@ -1097,7 +1121,7 @@ namespace Monolith
             else if (k == KeyCode.PageUp) Move(page, ci, -Mathf.Max(1, _visRows - 1));
             else if (k == KeyCode.PageDown) Move(page, ci, Mathf.Max(1, _visRows - 1));
             else if (k == KeyCode.Q) GoBack();
-            else if (k == KeyCode.LeftArrow) { if (row == null || !Change(row, -1, ev.shift)) GoBack(); }
+            else if (k == KeyCode.LeftArrow) { if (row == null || row.Kind == RowKind.Up) GoBack(); else Change(row, -1, ev.shift); }
             else if (k == KeyCode.RightArrow) { if (row != null) { if (row.Kind == RowKind.Link) Activate(row); else Change(row, 1, ev.shift); } }
             else if (k == KeyCode.E || k == KeyCode.Space) { if (row != null) Activate(row); }
             else return;
@@ -1109,7 +1133,13 @@ namespace Monolith
 
         private void Click(Vector2 m, MenuPage page, int button)
         {
-            if (_editRow != null) { _editRow = null; _capture = false; }
+            // a click away from a value being typed keeps it, if it is one the setting takes; an action's text is dropped
+            if (_editRow != null)
+            {
+                if (!_capture && _editRow.Take == null && _edit.Length > 0)
+                    try { _editRow.Entry.SetSerializedValue(_editRow.Entry.SettingType == typeof(Color) ? _edit.TrimStart('#') : _edit); } catch { }
+                _editRow = null; _capture = false;
+            }
             if (_navR.Contains(m))
             {
                 int i = Mathf.FloorToInt((m.y - _navY0) / _navStep);
@@ -1119,7 +1149,7 @@ namespace Monolith
             int at = RowAt(m, page);
             if (at < 0) return;
             MenuRow row = _vis[at];
-            // One click moves the cursor to the row and does what Enter does, as in a game's own settings. The row under
+            // One click moves the cursor to the row and does what E does, as in a game's own settings. The row under
             // the mouse is shaded and described in the box below, so it can be read before it is clicked.
             _inNav = false;
             if (page.Cur != row) { _armed = null; _say = null; }

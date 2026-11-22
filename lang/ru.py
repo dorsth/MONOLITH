@@ -184,7 +184,7 @@ T = [
 ('reset', 'сброс', ''), ('Reset', 'Сброс', 'W8'), ('move', 'выбор', ''), ('set', 'изменить', ''), ('open', 'открыть', ''), ('default', 'сброс', ''), ('back', 'назад', ''),
 ('close', 'закрыть', ''), ('take', 'выбрать', ''), ('cancel', 'отмена', ''), ('hex value', 'hex-код', ''),
 ('jump to a name', 'переход по имени', ''), ('A-Z', 'А-Я', ''), ('Key', 'Клавиша', ''), ('press one', 'нажмите', ''),
-('ok', 'ок', ''), ('delete', 'стереть', ''), ('type', 'текст', ''), ('to search', 'для поиска', ''), ('leave search', 'выйти из поиска', ''),
+('ok', 'ок', ''), ('switch panel', 'сменить панель', ''), ('delete', 'стереть', ''), ('type', 'текст', ''), ('to search', 'для поиска', ''), ('leave search', 'выйти из поиска', ''),
 # ---- values
 ('Squared', 'Прямые', 'W15'), ('Rounded', 'Скруглённые', 'W15'), ('Spiked', 'Острые', 'W15'),
 ('Off', 'Выкл', 'W15'), ('Text', 'Текст', 'W15'), ('Bar', 'Полоса', 'W15'),
@@ -196,10 +196,11 @@ for folder in ['HitSounds', 'HeadHitSounds', 'KillSounds', 'MeleeKillSounds']:
 # the key bars as the menu puts them together: (keys and words, in order)
 BARS = [
  [('WS','move'),('AD','set'),('E','open'),('R','reset'),('Q','back'),('/','search'),('Esc','close')],
- [('←↑↓→','move'),('Enter','take'),('Esc','cancel'),('Del','reset'),('0-9 A-F','hex value')],
- [('↑↓','move'),('Enter','take'),('Esc','cancel'),('A-Z','jump to a name')],
+ [('WASD','move'),('E','take'),('Q','cancel'),('R','reset'),('0-9','hex value')],
+ [('WS','move'),('E','take'),('Q','cancel'),('A-Z','jump to a name')],
+ [('WS','move'),('E','open'),('Tab','switch panel'),('/','search'),('Esc','close')],
  [('Key','press one'),('Enter','none'),('Esc','cancel')],
  [('Key','press one'),('Esc','cancel')],
- [('Enter','ok'),('←','delete'),('Esc','cancel')],
+ [('Enter','ok'),('Backspace','delete'),('Esc','cancel')],
  [('type','to search'),('Enter','open'),('Esc','leave search')],
 ]

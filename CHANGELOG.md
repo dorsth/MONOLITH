@@ -1,5 +1,12 @@
 # MONOLITH changelog
 
+## 1.9.7
+- Lists and the color picker take the menu's own keys: WASD move, E takes, Q cancels, R resets a color (and the picker stays open). Arrows, Enter and Esc still work. Hex digits go in after a click on the field or a first digit.
+- The mouse wheel acts on the panel under the mouse: over the categories it changes category, over the page it scrolls.
+- The first key after using the mouse acts on the row under the mouse.
+- Typing a value: Backspace deletes, the left arrow no longer does. A click away keeps the value instead of dropping it.
+- A no longer goes back on a row it can't change; Q and .. do. The category panel has its own key bar, with Tab.
+
 ## 1.9.6
 - DorsthTweaks 1.4.5: the SpawnViewer speed-up works with SpawnViewer 2.1 too: its refresh no longer searches every loaded object. 2.1 has no panel, so there is no panel layout to skip.
 

@@ -34,7 +34,7 @@ namespace Monolith
         public MenuPage To;
         public Func<string, string> Take;   // Action: does it and returns the line the menu shows; gets what was typed when Ask is set
         public string Ask;                  // Action: what to type first
-        public bool Confirm;                // Action: Enter twice
+        public bool Confirm;                // Action: E twice
         public Func<string[]> Options;      // Entry (text): what to pick from, asked when the row is used
         public string Empty;                // Entry (text): what an empty value reads as
         public bool Bind;                   // Entry (text): a key, mouse button or wheel direction, set by pressing it
