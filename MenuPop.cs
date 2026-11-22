@@ -232,7 +232,7 @@ namespace Monolith
                 string count = " " + (p.Cur + 1) + "/" + n + " ";
                 // on the frame's bottom line, from the end of the last row down (2 pixels higher it cuts a notch into the bar on the last row)
                 Rect cr = new Rect(p.R.xMax - (count.Length + 3) * _cw, p.R.yMax - _ch, count.Length * _cw, _ch);
-                Fill(cr, Panel);
+                Fill(cr, Back);
                 GUI.Label(cr, "<color=" + Head + ">" + count + "</color>", _st);
             }
         }
