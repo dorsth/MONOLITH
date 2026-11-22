@@ -14,7 +14,7 @@ What is new since 1.1.9, the last version on Thunderstore. Every step is listed 
 - Holds: CameraTweaks 1.2.3, CombatSounds 1.1.8, DorsthTweaks 1.4.5, MatchStats 1.0.4, NoGore 1.3.5, TrueSens 1.2.5, ViewmodelTweaks 2.0.7, ezCrosshair 1.3.5.
 
 ## 1.10.2
-- MatchStats 1.0.4: takes won and survived show the count; a player who missed takes shows x/y.
+- MatchStats 1.0.4: takes won and survived show the count; a player who missed takes shows x/y. The victory board stands where it was in 1.10.0 again.
 
 ## 1.10.1
 - MatchStats 1.0.3: the victory board stands twice as far back in the room.
