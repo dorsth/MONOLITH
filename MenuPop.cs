@@ -18,6 +18,7 @@ namespace Monolith
             public MenuRow Row; public object Was;
             public object[] Values; public string[] Labels;
             public bool Palette; public int Cols = 1, Cur, Top;
+            public float Left;                 // where the palette starts in it, in cells: wider for a long title, the colors in the middle
             public string Typed = ""; public float TypedAt;
             public float AnchorRight, AnchorY;
             public Rect R; public int Shown;
@@ -152,7 +153,7 @@ namespace Monolith
             if (!p.R.Contains(m)) return -1;
             if (p.Palette)
             {
-                int col = Mathf.FloorToInt((m.x - p.R.x - _cw * (PalLeft - (Pitch - Swatch) / 2f)) / (_cw * Pitch)), row = Mathf.FloorToInt((m.y - p.R.y - _ch) / (_ch * PalRow));
+                int col = Mathf.FloorToInt((m.x - p.R.x - _cw * (p.Left - (Pitch - Swatch) / 2f)) / (_cw * Pitch)), row = Mathf.FloorToInt((m.y - p.R.y - _ch) / (_ch * PalRow));
                 if (col < 0 || row < 0 || row >= p.Cols) return -1;
                 int i = col * p.Cols + row;
                 return i < p.Values.Length ? i : -1;
@@ -176,7 +177,12 @@ namespace Monolith
             Pop p = _pop;
             int n = p.Values.Length;
             float w, h;
-            if (p.Palette) { w = (n / p.Cols * Pitch - (Pitch - Swatch) + 2f * PalLeft) * _cw; h = (p.Cols * PalRow + 3.5f) * _ch; }
+            if (p.Palette)
+            {
+                float colors = n / p.Cols * Pitch - (Pitch - Swatch), cells = Mathf.Max(colors + 2f * PalLeft, Lang.T(p.Row.Label.Trim()).Length + 4f);
+                p.Left = (cells - colors) / 2f;
+                w = cells * _cw; h = (p.Cols * PalRow + 3.5f) * _ch;
+            }
             else
             {
                 string title = Lang.T(p.Row.Label.Trim());
@@ -207,14 +213,14 @@ namespace Monolith
                 for (int i = 0; i < n; i++)
                 {
                     int col = i / p.Cols, row = i % p.Cols;
-                    float rh = Mathf.Round(_ch * PalRow), cx = Mathf.Round(p.R.x + _cw * (PalLeft + col * Pitch)), cy = p.R.y + _ch + row * rh, sw = Mathf.Round(_cw * Swatch), sh = rh - 4f;
+                    float rh = Mathf.Round(_ch * PalRow), cx = Mathf.Round(p.R.x + _cw * (p.Left + col * Pitch)), cy = p.R.y + _ch + row * rh, sw = Mathf.Round(_cw * Swatch), sh = rh - 4f;
                     Color c = (Color)p.Values[i];
                     // the one picked: a line right around it
                     if (i == p.Cur) { float t = Thin; Fill(new Rect(cx - t, cy + 2f - t, sw + 2f * t, sh + 2f * t), KnobCur); }
                     Fill(new Rect(cx, cy + 2f, sw, sh), new Color(c.r, c.g, c.b, 1f));
                 }
                 string hex = p.Typed.Length > 0 ? "<color=" + Hot + ">#" + p.Typed + "_</color>" : "<color=" + Val + ">#" + p.Row.Entry.GetSerializedValue() + "</color>";
-                GUI.Label(new Rect(p.R.x + _cw * PalLeft, p.R.yMax - _ch * 2f, p.R.width, _ch), hex, _st);
+                GUI.Label(new Rect(p.R.x + _cw * p.Left, p.R.yMax - _ch * 2f, p.R.width, _ch), hex, _st);
                 return;
             }
             if (p.Cur < p.Top) p.Top = p.Cur;
