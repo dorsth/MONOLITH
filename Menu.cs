@@ -258,7 +258,7 @@ namespace Monolith
         private static readonly MenuRow UpRow = new MenuRow { Kind = RowKind.Up, Label = ".." };
         private MenuRow _dragRow; private Vector2 _lastMouse;
         // a long page gives its scroll bar a cell
-        private int ColsFor(MenuPage page) { return Mathf.RoundToInt((_pageR.width - 2 * _cw) / _cw) - 1 - (page.Draw != null ? page.SideCols + 1 : 0) - (Scrolls ? 1 : 0); }
+        private int ColsFor(MenuPage page) { return Mathf.RoundToInt((_pageR.width - 2 * _cw) / _cw) - 1 - (page.Draw != null ? page.SideCols + 1 : 0) - (Scrolls ? 2 : 0); }
 
         // ---- drawing
 
@@ -334,9 +334,12 @@ namespace Monolith
         // row, ▼ on the last, a dotted track between them and the part shown as a solid block on it.
         private void ScrollBar(int top, int shown, int count) { ScrollBar(BarX(_pageR.xMax), _rowY0, top, shown, count, Back); }
 
-        // where a scroll bar goes: the last cell before the frame whose outer edge is at right
+        // where a scroll bar goes, in a frame whose outer edge is at right: the same gap (Gap) between the frame's inner
+        // line and the bar, and between the bar and the rows. Gap is also what a pop-up has above its first row and
+        // below its last, so its rows have the same room on all four sides.
         private const float BarW = 0.8f;
-        private float BarX(float right) { return Mathf.Round(right - _cw * 1.9f); }
+        private float Gap { get { return Mathf.Round(_ch * 0.5f - Thin * 3f); } }
+        private float BarX(float right) { return Mathf.Round(right - Thin * 3f - Gap - _cw * BarW); }
         private bool Scrolls { get { return _vis.Count > _visRows; } }
 
         // a page's scroll bar, held with the mouse: the cursor goes to the row at that height of the bar
@@ -462,7 +465,7 @@ namespace Monolith
             for (int i = 0; i < vis && page.Top + i < _vis.Count; i++)
             {
                 int idx = page.Top + i; MenuRow row = _vis[idx];
-                Rect r = new Rect(_pageR.x + _cw, _pageR.y + (i + 1) * _ch, _pageR.width - 2 * _cw - side * _cw - (Scrolls ? _cw : 0f), _ch);
+                Rect r = new Rect(_pageR.x + _cw, _pageR.y + (i + 1) * _ch, Scrolls ? BarX(_pageR.xMax) - Gap - _pageR.x - _cw : _pageR.width - 2 * _cw - side * _cw, _ch);
                 bool cur = idx == ci && pageOn;
                 if (cur) Fill(r, Bar); else if (idx == over && row.Kind != RowKind.Header) Fill(r, Hover);
                 if (row.Kind == RowKind.Header) Heading(r, Lang.T(row.Label), page.Draw != null ? SideRect(page) : new Rect());

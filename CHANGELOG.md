@@ -1,5 +1,8 @@
 # MONOLITH changelog
 
+## 1.5.8
+- Lists: the rows have the same room on all four sides inside the frame, and the scroll bar has that room on both sides too.
+
 ## 1.5.7
 - Scroll bars as Far draws them beside text: inside the frame, a dotted track and a solid block for the part shown, ▲ and ▼ at the ends. The rows give it a cell.
 
