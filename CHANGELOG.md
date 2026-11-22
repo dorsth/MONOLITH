@@ -1,5 +1,8 @@
 # MONOLITH changelog
 
+## 1.8.1
+- A color picked stays when you click beside the color picker or close the menu. Esc still puts back the old one.
+
 ## 1.8.0
 - The color picker has three rows of colors and a Default button under the hex value; Previous is gone.
 - The hex value waits selected with a blinking caret after it, so it is clear that typing writes over it.

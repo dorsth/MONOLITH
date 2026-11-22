@@ -131,7 +131,7 @@ namespace Monolith
         private void Shut(bool restorePause)
         {
             if (!Opened) return;
-            if (_pop != null) PopClose(false);
+            if (_pop != null) PopClose(_pop.Palette);   // a color picked stays when the menu shuts
             _dragRow = null;
             Opened = false; enabled = false;
             _editRow = null; _capture = false; _searching = false; _searchPage = null; _bindRow = null;

@@ -202,8 +202,9 @@ namespace Monolith
             Vector2 m = ev.mousePosition;
             if (p.Palette && ev.button == 0 && DefaultButton(p).Contains(m)) { p.Typed = ""; PopMove(DefaultSlot); PopClose(true); return; }
             int i = PopAt(m);
-            // a click beside it puts back what was there; a click on it between its items does nothing
-            if (ev.button != 0 || i < 0) { if (ev.button != 0 || !p.R.Contains(m)) PopClose(false); return; }
+            // a click beside a list puts back what was there, since the mouse over it moved the cursor; beside the palette it
+            // keeps the color picked, which only a click or a key chose. A click on it between its items does nothing
+            if (ev.button != 0 || i < 0) { if (ev.button != 0 || !p.R.Contains(m)) PopClose(p.Palette); return; }
             PopMove(i); PopApply();
             if (!p.Palette) PopClose(true);
         }
