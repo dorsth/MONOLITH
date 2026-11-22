@@ -612,6 +612,7 @@ namespace Monolith
                  .Set("Open this menu", BundleMenu.Key, null, "Press Enter, then the key.")
                  .Set("Fewer UI animations", E(Tweaks, "Menus", "Reduce UI Animations"), null, "No animations in menus and on the HUD.")
                  .Set("Hide default playlists", E(Tweaks, "Menus", "Hide Default Playlists"), null, "Only your own playlists show when you host.");
+                p.Rows.Add(new MenuRow { Kind = RowKind.Action, Label = "Version", Dyn = () => BundlePlugin.Version, Info = "The MONOLITH version you have. When a newer one is out, the main menu says so." });
                 // who MONOLITH builds on: a line each, the name on the right; nothing to press
                 p.Head("Credits");
                 p.Rows.Add(new MenuRow { Kind = RowKind.Action, Label = "Menu", Dyn = () => "klammvs", Info = "Menu inspired by the STRAFTAT theme for Far Manager by klammvs." });

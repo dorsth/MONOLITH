@@ -321,14 +321,6 @@ namespace Monolith
 
         private void Line(float x, float y, string rich) { GUI.Label(new Rect(x, y, _win.xMax - x, _ch), rich, _st); }
 
-        // a word in the middle of a panel's bottom line, as Far puts its totals there
-        private void Footer(Rect r, string text)
-        {
-            float g = Thin * 2f, w = (text.Length + 2) * _cw, x = Mathf.Round(r.x + (r.width - w) * 0.5f);
-            Fill(new Rect(x, r.yMax - _ch * 0.5f - g, w, _ch), Back);
-            GUI.Label(new Rect(x + _cw, r.yMax - _ch * 0.5f - g * 0.5f - Thin, w, _ch), "<color=" + Dim + ">" + Esc(text) + "</color>", _st);
-        }
-
         // A long page has a scroll bar on its right frame, as a Far panel has: ▲ on the first row, ▼ on the last, the
         // part shown as a bar on the line between them.
         private void ScrollBar(int top, int shown, int count)
@@ -429,7 +421,6 @@ namespace Monolith
                 if (cur) Fill(r, pageOn ? BarDim : Bar); else if (i == overCat) Fill(r, Hover);
                 Line(r.x + _cw * 0.5f, r.y, "<color=" + (cur ? Val : _cats[i].Outside ? Dim : Txt) + ">" + Pad(Lang.T(_cats[i].Path[0]), NavCols - 3) + "</color>");
             }
-            Footer(_navR, BundlePlugin.Version);
             string title = _searching ? Lang.T("search: ") + _query + "_" : PathText(page);
             Box(_pageR, Fit(title, (int)(_pageR.width / _cw) - 8), pageOn);
             int side = page.Draw != null ? page.SideCols + 1 : 0;
@@ -450,7 +441,7 @@ namespace Monolith
             if (page.Draw != null)
             {
                 Rect sr = SideRect(page);
-                Box(sr, Lang.T("preview"), false);
+                Box(sr, Lang.T("preview"), false, Back, 1);
                 page.Draw(sr);
             }
 

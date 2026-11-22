@@ -41,7 +41,7 @@ T = [
 ("1 is the picture's own size at 1080p.", '1: размер самой картинки при 1080p.', 'tip'),
 ('Show when scoped', 'Показывать в оптике', 'L27'), ('Hit color', 'Цвет при попадании', 'L27'),
 ('The crosshair changes color for a moment on a hit.', 'При попадании прицел на мгновение меняет цвет.', 'tip'),
-('color', 'цвет', 'L15'), ('preview', 'превью', 'W16'), ('dark', 'темно', 'W7'), ('light', 'светло', 'W7'),
+('color', 'цвет', 'L15'), ('preview', 'превью', 'W16'),
 # ---- viewmodel
 ('FOV', 'FOV', 'L38'), ('Left / right', 'Влево / вправо', 'L38'), ('Down / up', 'Вниз / вверх', 'L38'), ('Back / forward', 'Назад / вперёд', 'L38'),
 ('Sway', 'Покачивание', 'L38'),
@@ -149,7 +149,7 @@ T = [
 ('Press Enter, then the key.', 'Нажмите Enter, затем клавишу.', 'tip'),
 # ---- profiles
 ('Presets', 'Пресеты', 'L50'), ('Saved', 'Сохранённые', 'L50'),
-('Credits', 'Благодарности', 'L50'), ('Menu', 'Меню', 'L52'),
+('Version', 'Версия', 'L52'), ('Credits', 'Благодарности', 'L50'), ('Menu', 'Меню', 'L52'),
 ('Menu inspired by the STRAFTAT theme for Far Manager by klammvs.', 'Меню по теме STRAFTAT для Far Manager от klammvs.', 'info'), ('Slide timer', 'Таймер подката', 'L52'),
 ('Slide cooldown timer based on MovementPro by Glizzmn.', 'Таймер подката основан на MovementPro от Glizzmn.', 'info'), ('Tilt and shake switches', 'Наклон и тряска', 'L52'),
 ('Camera tilt and shake switches build on NoCameraRoll by Kevnator.', 'Переключатели наклона и тряски основаны на NoCameraRoll от Kevnator.', 'info'), ('Weapon camera', 'Камера оружия', 'L52'),
@@ -162,6 +162,7 @@ T = [
 ('Saves your current config under a name. A config with the same name is replaced.', 'Сохраняет текущий конфиг под именем. Конфиг с тем же именем заменяется.', 'info'),
 ('Back to what you had before the last load or import, sensitivity and keybinds included.', 'Возврат к тому, что было до последней загрузки или импорта, включая чувствительность и клавиши.', 'info'),
 ('Nothing to undo.', 'Нечего отменять.', ''), ('Back to what you had before the last load.', 'Возвращено то, что было до последней загрузки.', ''), ('The load is back.', 'Загрузка возвращена.', ''),
+('The MONOLITH version you have. When a newer one is out, the main menu says so.', 'Ваша версия MONOLITH. Когда выйдет новая, главное меню об этом скажет.', 'info'),
 ('Your config as one line of text. Paste it to a friend.', 'Ваш конфиг одной строкой текста. Отправьте её другу.', 'info'),
 ('Import from clipboard', 'Импорт из буфера', 'L41'),
 ('Copy a line from a friend (it starts with MONOLITH:), then press Enter here. Yours is kept as "' + B + '".', 'Скопируйте строку от друга (она начинается с MONOLITH:) и нажмите здесь Enter. Ваш конфиг сохранится как «' + B + '».', 'info'),

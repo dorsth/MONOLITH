@@ -1,5 +1,9 @@
 # MONOLITH changelog
 
+## 1.4.7
+- The preview is one group, as in a Far dialog: a single line box named "preview", the dark and light halves inside it with no frames of their own. On Players, "enemies" and "teammates" name the two halves.
+- The version is back on General.
+
 ## 1.4.6
 - The color picker is exactly as wide as its row: its frame on the row's edges, the colors spread across it in rows again.
 
