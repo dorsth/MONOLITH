@@ -1,5 +1,8 @@
 # MONOLITH changelog
 
+## 1.4.2
+- The line between names and values is gone again.
+
 ## 1.4.1
 - The version is on the bottom line of the MONOLITH panel, as Far puts its totals. The Version row on General is gone.
 - A long page has a scroll bar on its right frame: ▲, ▼ and the part you see. It replaces the count.

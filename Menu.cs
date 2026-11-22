@@ -346,29 +346,6 @@ namespace Monolith
 
         // A section heading as Far draws one: a single line joined to the inner line of the page frame, its name in the
         // middle. Beside a preview it ends where the rows end.
-        // A line between the names and the values of the settings on a page, as Far draws between its columns: one cell
-        // after the longest name. Left out on a page where a value would reach it.
-        private void Divider(MenuPage page, int cols, int vis)
-        {
-            int longest = 0, first = int.MaxValue; bool any = false;
-            for (int i = 0; i < vis && page.Top + i < _vis.Count; i++)
-            {
-                MenuRow row = _vis[page.Top + i];
-                if (!Columned(row)) continue;
-                int used = 4, len = Lang.T(row.Label).Length;
-                if (row.Kind == RowKind.Entry) ValueText(row, cols, out used);
-                string side = row.Kind == RowKind.Entry ? Fit(Side(row), 16) : "";
-                if (side.Length > 0 && len <= cols - used - side.Length - 2) used += side.Length + 1;
-                any = true; longest = Mathf.Max(longest, len); first = Mathf.Min(first, cols - used);
-            }
-            if (!any || longest + 2 >= first) return;
-            float x = Mathf.Round(_pageR.x + _cw * 1.5f + (longest + 0.5f) * _cw - Thin * 0.5f);
-            for (int i = 0; i < vis && page.Top + i < _vis.Count; i++)
-                if (Columned(_vis[page.Top + i])) Fill(new Rect(x, _rowY0 + i * _ch, Thin, _ch), FrameDim);
-        }
-
-        private bool Columned(MenuRow row) { return (row.Kind == RowKind.Entry || row.Kind == RowKind.Group) && row != _editRow && row != _bindRow; }
-
         private void Separator(Rect row, string title, bool full, bool active)
         {
             float t = Thin, x0 = _pageR.x + 2f * t, x1 = full ? _pageR.xMax - 2f * t : row.xMax, y = Mathf.Round(row.y + _ch * 0.5f - t * 0.5f);
@@ -465,7 +442,6 @@ namespace Monolith
                 else Line(r.x + _cw * 0.5f, r.y, RowText(row, cols, cur));
                 Knob(row, r.y, cols, cur);
             }
-            Divider(page, cols, vis);
             if (_vis.Count > vis) ScrollBar(page.Top, vis, _vis.Count);
 
             // the preview: a box beside the rows, which fills it with smaller boxes of its own
