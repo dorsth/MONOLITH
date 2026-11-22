@@ -4,7 +4,7 @@ import os, re, sys
 here = os.path.dirname(os.path.abspath(__file__)); sys.path.insert(0, here)
 import ru
 INFO_W, INFO_LINES = 75, 3            # the box under the pages: 3 lines of 75 cells
-BAR_W = 79                            # the key bar: it starts on cell 2 and must end before cell 80
+BAR_W = 80                            # the key bar: the whole width of the menu, shared evenly by its slots
 DEFAULT_TAIL = ' По умолчанию: #FFFFFFFF. Сброс'   # the longest thing a row adds after its own line
 
 def wrap(s, width=INFO_W):
@@ -29,8 +29,9 @@ for en, r, check in ru.T:
         if n > INFO_LINES: bad.append('%d lines: %s' % (n, r))
         if max(len(w) for w in text.split(' ')) > INFO_W: bad.append('a word over the box: ' + r)
 for bar in ru.BARS:
-    width = 2 + sum(len(table.get(k, k)) + 1 + len(table.get(w, w)) + 2 for k, w in bar) - 2
-    if width > BAR_W: bad.append('key bar %d cells: %s' % (width, ' '.join(table.get(w, w) for k, w in bar)))
+    # each key and its word in its slot: the bar's width shared evenly
+    for k, w in bar:
+        if len(table.get(k, k)) + len(table.get(w, w)) > BAR_W // len(bar): bad.append('key bar slot over %d: %s %s' % (BAR_W // len(bar), table.get(k, k), table.get(w, w)))
 # every English text the menu's own files show should be in the table
 missing = []
 for f in ['Layout.cs', 'Profiles.cs']:

@@ -525,18 +525,16 @@ namespace Monolith
                 }
             }
 
-            // the key bar
-            Rect kb = new Rect(_win.x, _win.yMax - _ch, _win.width, _ch);
-            Fill(kb, KeyBar);
-            string keys = _pop != null ? (_pop.Palette ? K("←↑↓→", "move") : K("↑↓", "move")) + K("Enter", "take") + K("Esc", "cancel") + (_pop.Palette ? K("Del", "reset") + K("0-9 A-F", "hex value") : K("A-Z", "jump to a name"))
-                : _bindRow != null ? K("Key", "press one") + K("Enter", "none") + K("Esc", "cancel")
-                : _capture ? K("Key", "press one") + K("Esc", "cancel")
-                : _editRow != null ? K("Enter", "ok") + K("←", "delete") + K("Esc", "cancel")
-                : _searching ? K("type", "to search") + K("Enter", "open") + K("Esc", "leave search")
-                : K("WS", "move") + K("AD", "set") + K("E", "open") + K("Q", "back") + K("/", "search") + K("Esc", "close")
-                    // last, so the keys before it stay put when it comes and goes
-                    + ((over >= 0 && over < _vis.Count ? Changed(_vis[over]) : pageOn && ci >= 0 && ci < _vis.Count && Changed(_vis[ci])) ? K("R", "reset") : "");
-            Line(kb.x + _cw * 2f, kb.y, keys);   // on the same column as the text of the panels and of the box above it
+            // the key bar, as Far's: the slots share the width evenly, each a key on black and its word in a box to the slot's end.
+            // The main bar keeps a slot for R, empty when there is nothing to reset, so the keys before it stay put.
+            bool canReset = over >= 0 && over < _vis.Count ? Changed(_vis[over]) : pageOn && ci >= 0 && ci < _vis.Count && Changed(_vis[ci]);
+            string[] keys = _pop != null ? (_pop.Palette ? new[] { "←↑↓→", "move", "Enter", "take", "Esc", "cancel", "Del", "reset", "0-9 A-F", "hex value" } : new[] { "↑↓", "move", "Enter", "take", "Esc", "cancel", "A-Z", "jump to a name" })
+                : _bindRow != null ? new[] { "Key", "press one", "Enter", "none", "Esc", "cancel" }
+                : _capture ? new[] { "Key", "press one", "Esc", "cancel" }
+                : _editRow != null ? new[] { "Enter", "ok", "←", "delete", "Esc", "cancel" }
+                : _searching ? new[] { "type", "to search", "Enter", "open", "Esc", "leave search" }
+                : new[] { "WS", "move", "AD", "set", "E", "open", "Q", "back", "/", "search", "Esc", "close", canReset ? "R" : "", canReset ? "reset" : "" };
+            KeyBarDraw(new Rect(_win.x, _win.yMax - _ch, _win.width, _ch), keys);
             if (_pop != null) PopDraw(mouse, mouseMoved);
         }
 
@@ -562,7 +560,20 @@ namespace Monolith
             return new Rect(_pageR.xMax - (page.SideCols + 1.5f) * _cw, _pageR.y + _ch - Thin, (page.SideCols - 0.5f) * _cw, page.SideRows() * _ch);
         }
 
-        private static string K(string key, string what) { return "<color=" + Hot + ">" + Lang.T(key) + "</color><color=" + Txt + "> " + Lang.T(what) + "</color>  "; }
+        // keys holds a key and its word in turn
+        private void KeyBarDraw(Rect kb, string[] keys)
+        {
+            int n = keys.Length / 2, cells = Mathf.RoundToInt(kb.width / _cw);
+            for (int i = 0; i < n; i++)
+            {
+                float x0 = kb.x + Mathf.Round(cells * i / n) * _cw, x1 = kb.x + Mathf.Round(cells * (i + 1) / n) * _cw;
+                string key = Lang.T(keys[2 * i]), what = keys[2 * i + 1].Length > 0 ? Lang.T(keys[2 * i + 1]) : "";
+                float bx = x0 + Mathf.Max(1, key.Length) * _cw;
+                Fill(new Rect(bx, kb.y, x1 - bx, _ch), KeyBar);
+                GUI.Label(new Rect(x0, kb.y, bx - x0, _ch), "<color=" + Hot + ">" + key + "</color>", _st);
+                GUI.Label(new Rect(bx, kb.y, x1 - bx, _ch), "<color=" + Txt + ">" + what + "</color>", _st);
+            }
+        }
 
         // "HUD \ Hitmarkers", each part in the menu's language (a profile's own name stays as it is)
         private static string PathText(MenuPage page)

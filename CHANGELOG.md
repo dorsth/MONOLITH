@@ -1,7 +1,9 @@
 # MONOLITH changelog
 
-## 1.6.2
+## 1.6.3
+- The key bar at the bottom looks like Far: the keys share its width evenly, each with its word in a box.
 
+## 1.6.2
 - The color picker has 32 colors in four rows: a light row and a row of the colors between them, such as orange, pink and purple.
 - Typing a hex value in the color picker works again.
 
