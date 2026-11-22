@@ -76,8 +76,9 @@ namespace Monolith
             try
             {
                 if (EzCrosshair.EzCrosshairPlugin.Pick == null) return;
-                Texture2D tex = EzCrosshair.Pictures.Get(EzCrosshair.EzCrosshairPlugin.Pick.Value);
-                Vector2Int size = tex != null ? EzCrosshair.Overlay.ScreenSize(tex, Mathf.Clamp(EzCrosshair.EzCrosshairPlugin.Scale.Value, 0f, 2f)) : Vector2Int.zero;
+                // the crosshair as the game shows it: the same texture, one pixel a screen pixel
+                Texture2D tex = EzCrosshair.Pictures.At(EzCrosshair.EzCrosshairPlugin.Pick.Value, Mathf.Clamp(EzCrosshair.EzCrosshairPlugin.Scale.Value, 0f, 2f));
+                Vector2Int size = tex != null ? new Vector2Int(tex.width, tex.height) : Vector2Int.zero;
                 for (int i = 0; i < 2; i++)
                 {
                     Rect s = Tone(r, i);
