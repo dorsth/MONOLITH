@@ -12,8 +12,8 @@ using ComputerysModdingUtilities;
 
 [assembly: AssemblyTitle("MatchStats")]
 [assembly: AssemblyDescription("Kills, deaths and damage of every player, between rounds and after the match.")]
-[assembly: AssemblyVersion("1.0.2.0")]
-[assembly: AssemblyFileVersion("1.0.2.0")]
+[assembly: AssemblyVersion("1.0.3.0")]
+[assembly: AssemblyFileVersion("1.0.3.0")]
 
 // Only changes what you see, so matchmaking with unmodded players still works.
 [assembly: StraftatMod(isVanillaCompatible: true)]
@@ -25,7 +25,7 @@ namespace MatchStats
     {
         public const string Guid = "dorsth.straftat.matchstats";
         public const string Name = "MatchStats";
-        public const string Version = "1.0.2";
+        public const string Version = "1.0.3";
 
         internal static ManualLogSource Log;
 

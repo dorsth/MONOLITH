@@ -1,5 +1,8 @@
 # MONOLITH changelog
 
+## 1.10.1
+- MatchStats 1.0.3: the victory board stands twice as far back in the room.
+
 ## 1.10.0
 - MatchStats 1.0.2: damage on the full board is the match total; the full board shows only the columns that can happen in a 1v1, free-for-all or 2v2, with takes won when there are no teams; without teams the boards are in order of kills; the victory board stands a little further back.
 
