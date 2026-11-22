@@ -501,14 +501,12 @@ namespace MatchStats
                 bool solo = Solo(rows), duel = solo && rows.Count == 2;
                 // a column that can only be 0 in this kind of match is left out: trades and clutches need a teammate, a 2k a
                 // second enemy, and in a 1v1 the first kill of a take is its only one. Without teams, surviving a take is winning it
-                // takes won and survived: the count, with the match's takes once in the heading; a player who missed takes
-                // (joined late, left early) gets their own x/y
+                // takes won and survived: the count; a player who missed takes (joined late, left early) gets their own x/y
                 int most = 0; foreach (var kv in rows) most = Math.Max(most, kv.Value.Takes);
-                string of = " (" + most + ")";
                 string[] head = !full ? RoundHead
-                    : duel ? new[] { "player", "kills", "deaths", "damage", "takes won" + of }
-                    : solo ? new[] { "player", "kills", "deaths", "damage", "first k-d", "2k", "takes won" + of }
-                    : new[] { "player", "kills", "deaths", "damage", "first k-d", "trade", "2k", "clutch", "survived" + of };
+                    : duel ? new[] { "player", "kills", "deaths", "damage", "takes won" }
+                    : solo ? new[] { "player", "kills", "deaths", "damage", "first k-d", "2k", "takes won" }
+                    : new[] { "player", "kills", "deaths", "damage", "first k-d", "trade", "2k", "clutch", "survived" };
                 if (full && !_teamsSaid && MatchStatsPlugin.Log != null)
                 {
                     _teamsSaid = true;
