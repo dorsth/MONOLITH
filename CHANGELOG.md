@@ -1,5 +1,10 @@
 # MONOLITH changelog
 
+## 1.6.2
+
+- The color picker has 32 colors in four rows: a light row and a row of the colors between them, such as orange, pink and purple.
+- Typing a hex value in the color picker works again.
+
 ## 1.6.1
 - The color picker is simpler: the 16 colors in two rows and a field with the hex value, which you type over for any other color. Delete sets the default. No dot, no buttons.
 
