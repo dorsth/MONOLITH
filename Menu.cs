@@ -331,10 +331,13 @@ namespace Monolith
 
         // A long page has a scroll bar on its right frame, as a Far panel has: ▲ on the first row, ▼ on the last, the
         // part shown as a bar on the line between them.
-        private void ScrollBar(int top, int shown, int count)
+        private void ScrollBar(int top, int shown, int count) { ScrollBar(_pageR.xMax - _cw, _rowY0, top, shown, count, Back); }
+
+        // a scroll bar one cell wide at x, over the rows from y0 down (a page's, or a list's in a pop-up)
+        private void ScrollBar(float x, float y0, int top, int shown, int count, Color under)
         {
-            float x = _pageR.xMax - _cw, y0 = _rowY0, h = shown * _ch, t = Thin;
-            Fill(new Rect(x, y0, _cw, h), Back);
+            float h = shown * _ch, t = Thin;
+            Fill(new Rect(x, y0, _cw, h), under);
             GUI.Label(new Rect(x, y0, _cw * 2f, _ch), "<color=" + Head + ">▲</color>", _st);
             GUI.Label(new Rect(x, y0 + h - _ch, _cw * 2f, _ch), "<color=" + Head + ">▼</color>", _st);
             float ty = y0 + _ch, th = h - 2f * _ch, mid = Mathf.Round(x + _cw * 0.5f);

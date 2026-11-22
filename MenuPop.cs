@@ -21,13 +21,14 @@ namespace Monolith
             public float Pitch;                // the palette: cells from one color to the next
             public string Typed = ""; public float TypedAt;
             public float AnchorRight, AnchorY;
+            public bool Beside;                // the page has a preview: the pop-up stops a cell short of it
             public Rect R; public int Shown;
         }
 
         private Pop _pop;
         private const int PaletteCols = 12, ListRows = 14;
         // the palette is as wide as the row it sets: its frame on the row's edges, the colors spread over it
-        private const float PalLeft = 1.5f, SwatchShare = 0.83f;
+        private const float PalLeft = 2f, SwatchShare = 0.83f;
 
         private static string LabelOf(MenuRow row, object v)
         {
@@ -43,6 +44,7 @@ namespace Monolith
         {
             p.AnchorRight = _pageR.xMax - _cw - (page.Draw != null ? (page.SideCols + 1) * _cw : 0f);
             p.AnchorY = _rowY0 + (ci - page.Top + 1) * _rowStep;
+            p.Beside = page.Draw != null;
         }
 
         private void OpenList(MenuRow row, MenuPage page, int ci)
@@ -170,6 +172,9 @@ namespace Monolith
             PopMove(i); PopApply(); PopClose(true);
         }
 
+        // the pop-up as wide as its row: its frame on the row's left edge and, beside a preview, a cell short of it
+        private float Span(Pop p) { return p.AnchorRight - _pageR.x - (p.Beside ? _cw : 0f); }
+
         private void Clipped(Rect r, Rect room, Color c)
         {
             float x0 = Mathf.Max(r.x, room.x), y0 = Mathf.Max(r.y, room.y), x1 = Mathf.Min(r.xMax, room.xMax), y1 = Mathf.Min(r.yMax, room.yMax);
@@ -183,9 +188,9 @@ namespace Monolith
             float w, h;
             if (p.Palette)
             {
-                w = p.AnchorRight - _pageR.x;
+                w = Span(p);
                 p.Pitch = (w / _cw - 2f * PalLeft) / (p.Cols - 1f + SwatchShare);
-                h = (n / p.Cols + 4) * _ch;
+                h = (n / p.Cols + 2) * _ch;   // the hex value is on the bottom line of the frame
             }
             else
             {
@@ -193,13 +198,13 @@ namespace Monolith
                 int longest = Mathf.Max(8, title.Length);   // never narrower than its own title
                 foreach (string s in p.Labels) if (s.Length > longest) longest = s.Length;
                 p.Shown = Mathf.Min(n, ListRows);
-                w = (Mathf.Min(longest, 40) + 6) * _cw; h = (p.Shown + 2) * _ch;
+                // as wide as the row, so it hides whole rows and never half of a name; wider only for a long name
+                w = Mathf.Max(Span(p), (Mathf.Min(longest, 40) + 6) * _cw); h = (p.Shown + 2) * _ch;
             }
-            // under the row; above it when there is no room under it; never outside the window
-            // inside the page; under the row, or above it when there is no room under it
-            // its half cell of filled room stops just inside the double line of the page
+            // inside the page; under the row, or above it when there is no room under it. Its half cell of filled
+            // room stops just inside the double line of the page.
             float edge = _cw * 0.5f;
-            float x = Mathf.Clamp(p.AnchorRight - w, _pageR.x + edge, _pageR.xMax - w - edge), y = p.AnchorY;
+            float x = Mathf.Clamp(p.AnchorRight - (p.Beside ? _cw : 0f) - w, _pageR.x + edge, _pageR.xMax - w - edge), y = p.AnchorY;
             x = Mathf.Clamp(x, _win.x + _cw, _win.xMax - w - _cw);
             if (y + h > _win.yMax - _ch * 1.5f) y = Mathf.Max(_win.y + _ch * 0.5f, p.AnchorY - _rowStep - h);
             p.R = new Rect(Mathf.Round(x), Mathf.Round(y), w, h);
@@ -225,7 +230,11 @@ namespace Monolith
                     Fill(new Rect(cx, cy + 3f, sw, sh), new Color(c.r, c.g, c.b, 1f));
                 }
                 string hex = p.Typed.Length > 0 ? "<color=" + Hot + ">#" + p.Typed + "_</color>" : "<color=" + Val + ">#" + p.Row.Entry.GetSerializedValue() + "</color>";
-                GUI.Label(new Rect(p.R.x + _cw * PalLeft, p.R.yMax - _ch * 2f, p.R.width, _ch), hex, _st);
+                // on the bottom line of the frame, in the middle, as Far puts its totals there
+                int len = (p.Typed.Length > 0 ? p.Typed.Length + 2 : p.Row.Entry.GetSerializedValue().Length + 1) + 2;
+                float hw = len * _cw, hx = Mathf.Round(p.R.x + (p.R.width - hw) * 0.5f), hy = p.R.yMax - _ch;
+                Fill(new Rect(hx, hy, hw, _ch), Panel);
+                GUI.Label(new Rect(hx + _cw, hy, hw, _ch), hex, _st);
                 return;
             }
             if (p.Cur < p.Top) p.Top = p.Cur;
@@ -240,14 +249,8 @@ namespace Monolith
                 if (cur) Fill(r, Bar);
                 GUI.Label(new Rect(r.x + _cw * 0.5f, r.y, r.width, _ch), "<color=" + Hot + ">" + (was ? "√ " : "  ") + "</color><color=" + (cur ? Val : Txt) + ">" + Esc(Fit(p.Labels[idx], cols)) + "</color>", _st);
             }
-            if (n > p.Shown)
-            {
-                string count = " " + (p.Cur + 1) + "/" + n + " ";
-                // on the frame's bottom line, from the end of the last row down (2 pixels higher it cuts a notch into the bar on the last row)
-                Rect cr = new Rect(p.R.xMax - (count.Length + 3) * _cw, p.R.yMax - _ch, count.Length * _cw, _ch);
-                Fill(cr, Panel);
-                GUI.Label(cr, "<color=" + Head + ">" + count + "</color>", _st);
-            }
+            // a long list has the scroll bar a long page has, on its right frame
+            if (n > p.Shown) ScrollBar(p.R.xMax - _cw * 1.25f, p.R.y + _ch, p.Top, p.Shown, n, Panel);
         }
     }
 }

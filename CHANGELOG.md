@@ -1,5 +1,11 @@
 # MONOLITH changelog
 
+## 1.5.3
+- Lists are as wide as their row, so they hide whole rows and never half a name.
+- Beside a preview, lists and the color picker stop a cell short of it.
+- The color picker has a cell of room inside its frame on every side, and its hex value sits on the bottom line of the frame.
+- A long list has a scroll bar on its right frame, as a long page has, instead of a count.
+
 ## 1.5.2
 - The shadow of the preview and the pop-ups is 50% black, as in Far.
 
