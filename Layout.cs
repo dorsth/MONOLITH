@@ -596,6 +596,7 @@ namespace Monolith
                 p.Set("Reduce VFX+", E(Tweaks, "World", "Reduce VFX+"), null, "No shadows, rain, light rays or screen effects. Fewer lights and particles. No sparks, debris or smoke from explosions. No glass shards or broken off pieces.")
                  .Set("No post-processing", E(Tweaks, "World", "No Post-Processing"), null, "Turns off color grading and screen effects. Menus lose their blur and the brightness slider stops working.")
                  .Set("Lower textures", E(Tweaks, "World", "Lower Textures"), null, "Like picmip. 0 is full quality, 3 is the lowest.")
+                 .Set("Anisotropic filtering", E(Tweaks, "World", "Anisotropic Filtering"), null, "Keeps textures sharp when seen at an angle, such as a floor further away. The game leaves it off.")
                  .Set("Ultimate tweaks", E(Tweaks, "World", "Ultimate Tweaks"), null, "Fixes slow game code, uses fewer worker threads, removes the voice key freeze and compiles code at start.")
                  .Set("Performance viewmodel", E(View, "Viewmodel", "One Camera"), null, "One camera draws everything, your weapon included. Slightly more FPS. Not used while you hold a melee weapon.")
                  .Set("FPS cap", FrameCap.On, null, "Replaces the game's FPS cap, which can be up to 1 ms off per frame. This one keeps every frame the same length. Not in the main menu.")

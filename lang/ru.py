@@ -125,6 +125,7 @@ T = [
 ('No post-processing', 'Без постобработки', 'L52'),
 ('Turns off color grading and screen effects. Menus lose their blur and the brightness slider stops working.', 'Отключает цветокоррекцию и эффекты экрана. Меню без размытия, ползунок яркости не работает.', 'tip'),
 ('Lower textures', 'Уменьшить текстуры', 'L38'), ('Like picmip. 0 is full quality, 3 is the lowest.', 'Как picmip. 0: полное качество, 3: самое низкое.', 'tip'),
+('Anisotropic filtering', 'Анизотропная фильтрация', 'L38'), ('Keeps textures sharp when seen at an angle, such as a floor further away. The game leaves it off.', 'Текстуры остаются чёткими под углом, например пол вдали. В игре она выключена.', 'tip'),
 ('Ultimate tweaks', 'Ultimate-твики', 'L52'),
 ('Fixes slow game code, uses fewer worker threads, removes the voice key freeze and compiles code at start.', 'Исправляет медленный код игры, меньше рабочих потоков, без зависания на клавише голоса, код компилируется при запуске.', 'tip'),
 ('Performance viewmodel', 'Быстрая вьюмодель', 'L52'),

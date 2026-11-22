@@ -35,7 +35,7 @@ using PlanarReflection = UnityStandardAssets.Water.PlanarReflection;
 
 [assembly: AssemblyTitle("DorsthTweaks")]
 [assembly: AssemblyDescription("Small client-side tweaks for STRAFTAT: bullet trails, HUD, prompts, menus and performance.")]
-[assembly: AssemblyVersion("1.4.1.0")]
+[assembly: AssemblyVersion("1.4.2.0")]
 [assembly: AssemblyFileVersion("1.3.7.0")]
 
 // Only changes what you see on your own screen, so matchmaking with unmodded players still works.
@@ -49,7 +49,7 @@ namespace DorsthTweaks
     {
         public const string Guid = "dorsth.straftat.dorsthtweaks";
         public const string Name = "DorsthTweaks";
-        public const string Version = "1.4.1";
+        public const string Version = "1.4.2";
 
         internal static ManualLogSource Log;
         internal static ConfigEntry<bool> Detail;
@@ -100,6 +100,7 @@ namespace DorsthTweaks
         }
 
         internal static ConfigEntry<int> LowerTextures;
+        internal static ConfigEntry<bool> Anisotropic;
         internal static ConfigEntry<bool> HideDefaultPlaylists;
         internal static ConfigEntry<string> JoinMessage;
 
@@ -283,6 +284,7 @@ namespace DorsthTweaks
             };
             LowerTextures = Config.Bind(Map, "Lower Textures", 0, new ConfigDescription(
                 "Smaller textures on maps, guns and players. 0 is off, 3 is the smallest.", new AcceptableValueRange<int>(0, 3)));
+            Anisotropic = Config.Bind(Map, "Anisotropic Filtering", true, "Keeps textures sharp when seen at an angle, such as a floor further away. The game leaves it off.");
 
             // names these settings had in test builds
             Carry(HeadPopLikeBody, Hud, "Headshots Pop Like Bodyshots");
@@ -4716,11 +4718,13 @@ namespace DorsthTweaks
         private static ShadowQuality _shadows;
         private static bool _reflections;
         private static int _textures, _msaa;
+        private static AnisotropicFiltering _aniso;
 
         internal static void Install()
         {
             GameHook.Add(typeof(Settings), "SetQualityLevelDropdown", null, typeof(Quality), null, "QualityPostfix", () => true);
             DorsthTweaksPlugin.LowerTextures.SettingChanged += (sender, args) => Safe(ApplyLower);
+            DorsthTweaksPlugin.Anisotropic.SettingChanged += (sender, args) => Safe(Apply);
             // maps: WarmUp calls BeforeUnload and AfterLoad once a map has settled
             Safe(Apply);
         }
@@ -4776,6 +4780,7 @@ namespace DorsthTweaks
                 _reflections = QualitySettings.realtimeReflectionProbes;
                 _textures = QualitySettings.masterTextureLimit;
                 _msaa = QualitySettings.antiAliasing;
+                _aniso = QualitySettings.anisotropicFiltering;
                 _saved = true;
             }
             // only what differs is set: a new texture size limit reloads every texture
@@ -4788,6 +4793,12 @@ namespace DorsthTweaks
             // the game's texture size limit stays the game's: it would lower the menus and HUD too (Lower Textures
             // swaps in smaller copies of the world's textures instead, ApplyLower)
             if (QualitySettings.masterTextureLimit != _textures) QualitySettings.masterTextureLimit = _textures;
+            // anisotropic filtering, at its highest (16x) on every texture: without it the graphics card takes a smaller copy
+            // of a texture seen at an angle, so a floor goes blurry from a line that moves with you
+            bool aniso = DorsthTweaksPlugin.Anisotropic.Value;
+            if (aniso) Texture.SetGlobalAnisotropicFilteringLimits(16, 16);
+            AnisotropicFiltering af = aniso ? AnisotropicFiltering.ForceEnable : _aniso;
+            if (QualitySettings.anisotropicFiltering != af) QualitySettings.anisotropicFiltering = af;
         }
 
         // Lower Textures: every texture the map, guns, players and effects draw is swapped in their materials for a copy

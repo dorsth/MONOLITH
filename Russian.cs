@@ -5,7 +5,7 @@ namespace Monolith
 {
     internal static partial class Lang
     {
-        private static readonly Dictionary<string, string> Table = new Dictionary<string, string>(307)
+        private static readonly Dictionary<string, string> Table = new Dictionary<string, string>(309)
         {
             { "Crosshair", "Прицел" },
             { "Viewmodel", "Вьюмодель" },
@@ -191,6 +191,8 @@ namespace Monolith
             { "Turns off color grading and screen effects. Menus lose their blur and the brightness slider stops working.", "Отключает цветокоррекцию и эффекты экрана. Меню без размытия, ползунок яркости не работает." },
             { "Lower textures", "Уменьшить текстуры" },
             { "Like picmip. 0 is full quality, 3 is the lowest.", "Как picmip. 0: полное качество, 3: самое низкое." },
+            { "Anisotropic filtering", "Анизотропная фильтрация" },
+            { "Keeps textures sharp when seen at an angle, such as a floor further away. The game leaves it off.", "Текстуры остаются чёткими под углом, например пол вдали. В игре она выключена." },
             { "Ultimate tweaks", "Ultimate-твики" },
             { "Fixes slow game code, uses fewer worker threads, removes the voice key freeze and compiles code at start.", "Исправляет медленный код игры, меньше рабочих потоков, без зависания на клавише голоса, код компилируется при запуске." },
             { "Performance viewmodel", "Быстрая вьюмодель" },
