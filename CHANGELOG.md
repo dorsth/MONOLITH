@@ -1,5 +1,18 @@
 # MONOLITH changelog
 
+## 2.0.0
+What is new since 1.1.9, the last version on Thunderstore. Every step is listed under its own version below.
+
+- A new look, after Far Manager with the STRAFTAT colors: Cascadia Mono, bold titles, a clock, scroll bars you can drag, and previews as dialogs beside the settings.
+- New controls: W A S D move, E opens or takes, Q goes back, R resets, in lists and the color picker too. Enter and Backspace no longer open and go back on a page. The mouse wheel works on the panel under the mouse.
+- A new color picker: 24 colors, a hex field you click to type in, and Default.
+- New settings: Kill hitmarker and its color, Sprint FOV increase in degrees, Anisotropic filtering (on), and Include controls in configs (sensitivity and keybinds).
+- Configs carry your sensitivity, the game's and TrueSens.
+- Match stats: total damage, only the columns that can happen in a 1v1, 2v2 or free-for-all, ordered by kills when there are no teams, and the victory board further back in the room.
+- Crosshairs: the brackets curve smoothly and the star's tips fade out.
+- The SpawnViewer speed-up works with SpawnViewer 2.1.
+- Holds: CameraTweaks 1.2.3, CombatSounds 1.1.8, DorsthTweaks 1.4.5, MatchStats 1.0.4, NoGore 1.3.5, TrueSens 1.2.5, ViewmodelTweaks 2.0.7, ezCrosshair 1.3.5.
+
 ## 1.10.2
 - MatchStats 1.0.4: takes won and survived show the count, with the match's takes once in the heading; a player who missed takes shows x/y.
 
