@@ -571,7 +571,7 @@ namespace Monolith
 
             // ---------------------------------------------------------------- controls: sensitivity, and keys the game has no setting for
             {
-                var p = new MenuPage(null, "Controls", "Sensitivity in cm/360, extra keys, taunts.");
+                var p = new MenuPage(null, "Controls", "Sensitivity in cm/360, extra keybinds, taunts.");
                 ConfigEntryBase on = E(Sens, "Sensitivity", "Enabled");
                 Func<bool> own = () => On(on);
                 p.Head("Mouse")
@@ -581,7 +581,7 @@ namespace Monolith
                  .Set("ADS multiplier", E(Sens, "Sensitivity", "ADS Multiplier"), own, "1 feels the same as hip fire.")
                  .Set("Scoped multiplier", E(Sens, "Sensitivity", "Scoped Multiplier"), own, "1 feels the same as hip fire.");
                 const string how = " Press Enter, then a key, mouse button or scroll.";
-                p.Head("Keys")
+                p.Head("Keybinds")
                  .Key("Second jump key", Keys.Jump1, "not set", "Works next to your own jump key." + how)
                  .Key("Third jump key", Keys.Jump2, "not set", "Put scroll up on one and scroll down on the other to jump with the whole wheel." + how)
                  .Key("Swap weapons", Keys.Swap, "scroll wheel", "Same as Swap in the game's settings. Press Enter, then a key or mouse button, or scroll to use the wheel.");

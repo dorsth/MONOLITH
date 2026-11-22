@@ -2,6 +2,7 @@
 
 ## 1.2.2
 - Camera has "Sprint FOV amount": how much your FOV widens when you sprint and slide. 1 is the game's. It shows when No sprint FOV is off.
+- The menu and README say "keybinds" where they said "keys".
 
 ## 1.2.1
 - MatchStats 1.0.1: spectators of Straftat Tournaments are left out of the match stats, and every player is in them.

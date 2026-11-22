@@ -410,8 +410,8 @@ namespace Monolith
                 pg.Go(sub);
             }
             pg.Head("Presets");
-            pg.Rows.Add(new MenuRow { Kind = RowKind.Action, Label = "Dorsth", Confirm = true, Info = "The config Dorsth plays with, except sensitivity and keys.", Take = s => { string r = LoadMade("Dorsth", Dorsth); Fill(); return r; } });
-            pg.Rows.Add(new MenuRow { Kind = RowKind.Action, Label = "Defaults", Confirm = true, Info = "Every mod setting back to its default, except keys and outline colors. The game's own settings stay as they are.", Take = s => { string r = LoadMade("Defaults", new string[0, 4]); Fill(); return r; } });
+            pg.Rows.Add(new MenuRow { Kind = RowKind.Action, Label = "Dorsth", Confirm = true, Info = "The config Dorsth plays with, except sensitivity and keybinds.", Take = s => { string r = LoadMade("Dorsth", Dorsth); Fill(); return r; } });
+            pg.Rows.Add(new MenuRow { Kind = RowKind.Action, Label = "Defaults", Confirm = true, Info = "Every mod setting back to its default, except keybinds and outline colors. The game's own settings stay as they are.", Take = s => { string r = LoadMade("Defaults", new string[0, 4]); Fill(); return r; } });
         }
     }
 }

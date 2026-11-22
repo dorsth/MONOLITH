@@ -20,12 +20,12 @@ Your old settings come along.
 |---|---|
 | Crosshair | style, color, size; add your own PNGs in `plugins/MONOLITH/Crosshairs` |
 | Viewmodel | weapon FOV and position, per weapon if you want; sway, bob, left-handed, hide arms |
-| Camera | no tilt, no landing or jump shake, better recoil |
+| Camera | no tilt, no landing or jump shake, sprint FOV amount, better recoil |
 | HUD | hitmarkers, prompts, hide FPS or ping, slide cooldown timer |
 | Effects | tracers, casings, bodies, blood, vignette |
 | Players | one outfit and hat for enemies, one for teammates, outline colors |
 | Audio | hit and kill sounds, gun volume |
-| Controls | sensitivity in cm/360, extra jump keys, swap and taunt keys |
+| Controls | sensitivity in cm/360, extra jump keybinds, swap and taunt keybinds |
 | Performance | FPS cap with even frame pacing, Ultimate tweaks |
 | Configs | save, load and share every setting as one line of text |
 | Other mods | settings of the other mods you have installed |
