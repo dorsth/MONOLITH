@@ -1,5 +1,8 @@
 # MONOLITH changelog
 
+## 1.2.1
+- MatchStats 1.0.1: spectators of Straftat Tournaments are left out of the match stats, and every player is in them.
+
 ## 1.2.0
 - Configs include your sensitivity: the game's own and TrueSens. A config saved before this leaves your sensitivity as it is.
 - TrueSens 1.2.5: cm/360 goes down to 1 cm (was 5 cm).
