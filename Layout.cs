@@ -515,14 +515,15 @@ namespace Monolith
                 ConfigEntryBase mine = E(Tweaks, "Bullet Trails", "Hide My Trails"), others = E(Tweaks, "Bullet Trails", "Hide Other Players Trails");
                 Func<bool> trails = () => !(On(mine) && On(others));
                 ConfigEntryBase bodies = E(Gore, "Bodies", "Hide Bodies"), blood = E(Gore, "Blood", "No Blood");
-                p.Head("Tracers")
+                // the rows on their own first, then the groups
+                p.Set("No bullet casings", E(Tweaks, "Viewmodel", "No Bullet Casings"), null, "No casings from any gun, yours or other players. No casing sound.")
+                 .Set("No near miss vignette", E(Tweaks, "HUD", "Hide Near Miss Vignette"), null, "The dark edge when a shot passes close.")
+                 .Head("Tracers")
                  .Set("Hide my tracers", mine, null, "")
                  .Set("Hide other players tracers", others, null, "")
                  .Set("Color", E(Tweaks, "Bullet Trails", "Trail Color"), trails, "White keeps each gun's own color.")
                  .Set("Width", E(Tweaks, "Bullet Trails", "Trail Width"), trails, "")
                  .Set("Opacity", E(Tweaks, "Bullet Trails", "Trail Opacity"), trails, "Lower is fainter.")
-                 .Head("Weapon")
-                 .Set("No bullet casings", E(Tweaks, "Viewmodel", "No Bullet Casings"), null, "No casings from any gun, yours or other players. No casing sound.")
                  .Head("Bodies and blood")
                  .Set("Hide bodies", bodies, null, "Hides ragdolls, gibs and shot-off hats. Turn it off to pick which.")
                  .Set("  Hide ragdolls", E(Gore, "Bodies", "Hide Ragdolls"), () => Off(bodies), "")
@@ -530,9 +531,7 @@ namespace Monolith
                  .Set("No blood", blood, null, "Turn it off to pick which.")
                  .Set("  No hit blood", E(Gore, "Blood", "No Hit Blood"), () => Off(blood), "")
                  .Set("  No death blood", E(Gore, "Blood", "No Death Blood"), () => Off(blood), "")
-                 .Set("  No blood decals", E(Gore, "Blood", "No Blood Stains"), () => Off(blood), "")
-                 .Head("Screen")
-                 .Set("No near miss vignette", E(Tweaks, "HUD", "Hide Near Miss Vignette"), null, "The dark edge when a shot passes close.");
+                 .Set("  No blood decals", E(Gore, "Blood", "No Blood Stains"), () => Off(blood), "");
                 if (p.Rows.Count > 3) cats.Add(p);
             }
 

@@ -11,7 +11,7 @@ T = [
 # ---- categories and pages
 ('Crosshair', 'Прицел', 'nav'), ('Viewmodel', 'Вьюмодель', 'nav'), ('Camera', 'Камера', 'nav'), ('HUD', 'HUD', 'nav'),
 ('Effects', 'Эффекты', 'nav'), ('Players', 'Игроки', 'nav'), ('Audio', 'Звук', 'nav'), ('Controls', 'Управление', 'nav'), ('Mouse', 'Мышь', 'L50'),
-('Performance', 'Оптимизация', 'nav'), ('Other mods', 'Другие моды', 'nav'), ('Keybinds', 'Клавиши', 'L50'), ('Configs', 'Конфиги', 'nav'), ('General', 'Общее', 'nav'), ('Screen', 'Экран', 'L50'),
+('Performance', 'Оптимизация', 'nav'), ('Other mods', 'Другие моды', 'nav'), ('Keybinds', 'Клавиши', 'L50'), ('Configs', 'Конфиги', 'nav'), ('General', 'Общее', 'nav'),
 ('Hitmarkers', 'Хитмаркеры', 'L30'), ('Prompts', 'Подсказки', 'L30'), ('Per weapon', 'Для отдельного оружия', 'L30'),
 ('Taunts', 'Насмешки', 'L30'), ('search', 'поиск', 'W16'),
 ('Style, color, size.', 'Стиль, цвет, размер.', 'info'),

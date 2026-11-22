@@ -49,16 +49,16 @@ namespace Monolith
         }
 
         // A preview box holds two smaller boxes, each named on its top line: side by side, or one under the other.
-        // Draws box i and returns where it shows its samples. A cell of room around the boxes and two between them.
+        // Draws box i and returns where it shows its samples. All on whole cells and rows: a cell of room inside the
+        // frame on every side, two cells (or a row) between the boxes.
         private Rect Part(Rect box, int i, string title, bool under = false)
         {
-            float t = Thin, frame = 3f * t, top = Mathf.Round(_ch * 1.25f);
-            var all = new Rect(box.x + frame + _cw, box.y + top, box.width - 2f * (frame + _cw), box.height - top - frame - Mathf.Round(_ch * 0.5f));
-            float w = under ? all.width : Mathf.Floor((all.width - 2f * _cw) / 2f), h = under ? Mathf.Floor((all.height - _ch) / 2f) : all.height;
-            var b = new Rect(Mathf.Round(under ? all.x : i == 0 ? all.x : all.xMax - w), Mathf.Round(under && i == 1 ? all.yMax - h : all.y), w, h);
+            float x0 = box.x + _cw, x1 = box.xMax - _cw, y0 = box.y + _ch, y1 = box.yMax - _ch;
+            float w = under ? x1 - x0 : (x1 - x0 - 2f * _cw) / 2f, h = under ? (y1 - y0 - _ch) / 2f : y1 - y0;
+            var b = new Rect(Mathf.Round(under || i == 0 ? x0 : x1 - w), Mathf.Round(under && i == 1 ? y1 - h : y0), Mathf.Round(w), Mathf.Round(h));
             Box(b, Lang.T(title), false, Back, 1);
-            float pad = Mathf.Round(_cw * 0.8f), head = Mathf.Round(_ch * 0.5f) + pad * 0.5f;
-            return new Rect(b.x + t + pad, b.y + head, b.width - 2f * (t + pad), b.height - head - t - pad);
+            // a cell in from its sides, and as much room under its title as above its bottom line
+            return new Rect(b.x + _cw, b.y + _ch, b.width - 2f * _cw, b.height - 1.5f * _ch);
         }
 
         // the dark box and the light box of a preview, filled
@@ -97,7 +97,7 @@ namespace Monolith
         private static GameObject _marker; private static float _markerAt = -99f;
 
         // how many rows of the box each hitmarker has: one more hitmarker makes the box this much higher and moves nothing
-        internal const float MarkerRows = 3.5f;
+        internal const float MarkerRows = 3.25f;
 
         // the hitmarker most guns use: the mod knows it once a weapon is in the map; before that, any weapon the game has loaded
         private static GameObject Marker()

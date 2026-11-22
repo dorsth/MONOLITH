@@ -1,5 +1,13 @@
 # MONOLITH changelog
 
+## 1.3.1
+- The key bar keeps its keys in place: "R reset" comes last.
+- Rows that act at once (Undo load, Save as new, Export, Import, the presets) have no ►. A ► opens a page.
+- Keys show bare ("F2"). Brackets are for switches.
+- The page panel is 59 whole cells with a cell between the panels, so rows have the same room on both sides.
+- The previews sit on whole cells and rows: a cell of room inside each box and an even gap under each title.
+- Effects: "No bullet casings" and "No near miss vignette" come first, without a heading.
+
 ## 1.3.0
 - Players preview: "their own" shows once when neither a suit nor a hat is picked, and a note that is too long for its half goes on two lines. The two pictures have a gap between them.
 

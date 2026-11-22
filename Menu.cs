@@ -257,7 +257,7 @@ namespace Monolith
 
         private static readonly MenuRow UpRow = new MenuRow { Kind = RowKind.Up, Label = ".." };
         private MenuRow _dragRow; private Vector2 _lastMouse;
-        private int ColsFor(MenuPage page) { return (int)((_pageR.width - 2 * _cw) / _cw) - 1 - (page.Draw != null ? page.SideCols + 1 : 0); }
+        private int ColsFor(MenuPage page) { return Mathf.RoundToInt((_pageR.width - 2 * _cw) / _cw) - 1 - (page.Draw != null ? page.SideCols + 1 : 0); }
 
         // ---- drawing
 
@@ -339,7 +339,8 @@ namespace Monolith
             float w = Cols * _cw, h = Mathf.Round((RowsHigh + 2.35f) * _ch);
             _win = new Rect(Mathf.Round(Mathf.Min(Screen.width * 0.03f, Mathf.Max(0f, Screen.width - w))), Mathf.Round((Screen.height - h) * 0.5f), w, h);
             _navR = new Rect(_win.x + _cw * 0.5f, _win.y + _ch * 0.75f, NavCols * _cw, (RowsHigh - 4) * _ch);
-            _pageR = new Rect(_navR.xMax + _cw * 0.5f, _navR.y, _win.xMax - _navR.xMax - _cw, _navR.height);
+            // a whole cell between the panels: the page is 59 cells wide, every column of it on the same grid as the rest
+            _pageR = new Rect(_navR.xMax + _cw, _navR.y, _win.xMax - _navR.xMax - _cw * 1.5f, _navR.height);
             _navY0 = _navR.y + _ch; _navStep = _ch; _rowY0 = _pageR.y + _ch; _rowStep = _ch; _visRows = RowsHigh - 6;
 
             if (_bindRow != null) PollBind();
@@ -457,7 +458,9 @@ namespace Monolith
                 : _capture ? K("Key", "press one") + K("Esc", "cancel")
                 : _editRow != null ? K("Enter", "ok") + K("←", "delete") + K("Esc", "cancel")
                 : _searching ? K("type", "to search") + K("Enter", "open") + K("Esc", "leave search")
-                : K("WS", "move") + K("AD", "set") + K("E", "open") + ((over >= 0 && over < _vis.Count ? Changed(_vis[over]) : pageOn && ci >= 0 && ci < _vis.Count && Changed(_vis[ci])) ? K("R", "reset") : "") + K("Q", "back") + K("/", "search") + K("Esc", "close");
+                : K("WS", "move") + K("AD", "set") + K("E", "open") + K("Q", "back") + K("/", "search") + K("Esc", "close")
+                    // last, so the keys before it stay put when it comes and goes
+                    + ((over >= 0 && over < _vis.Count ? Changed(_vis[over]) : pageOn && ci >= 0 && ci < _vis.Count && Changed(_vis[ci])) ? K("R", "reset") : "");
             Line(kb.x + _cw * 2f, kb.y, keys);   // on the same column as the text of the panels and of the box above it
             if (_pop != null) PopDraw(mouse, mouseMoved);
         }
@@ -529,9 +532,10 @@ namespace Monolith
                     if (row.Dyn != null)
                     {
                         string b = ""; try { b = row.Dyn() ?? ""; } catch { }
-                        return "<color=" + Mint + ">" + Esc(Pad(act, cols - b.Length - 2)) + "</color><color=" + Dim + ">" + Esc(b) + "</color><color=" + Hot + "> ►</color>";
+                        return "<color=" + Mint + ">" + Esc(Pad(act, cols - b.Length)) + "</color><color=" + Dim + ">" + Esc(b) + "</color>";
                     }
-                    return "<color=" + Mint + ">" + Esc(Pad(act, cols - 2)) + "</color><color=" + Hot + "> ►</color>";
+                    // done on the spot: no ►, which means a page opens
+                    return "<color=" + Mint + ">" + Esc(act) + "</color>";
                 }
                 case RowKind.Group:
                 {
@@ -718,8 +722,9 @@ namespace Monolith
             object v = e.BoxedValue; Type t = e.SettingType;
             if (t == typeof(bool)) return (bool)v ? "[x]" : "[ ]";
             if (t == typeof(float)) return ((float)v).ToString("0.###", CultureInfo.InvariantCulture);
-            if (t == typeof(KeyCode)) return "[" + v + "]";
-            if (t == typeof(KeyboardShortcut)) return "[" + e.GetSerializedValue() + "]";
+            // keys bare: [x] in brackets is a switch
+            if (t == typeof(KeyCode)) return v.ToString();
+            if (t == typeof(KeyboardShortcut)) return e.GetSerializedValue();
             if (t == typeof(Color)) return "#" + e.GetSerializedValue();
             string s = e.GetSerializedValue();
             return t == typeof(string) && s.Length == 0 ? Lang.T("(empty)") : s;
