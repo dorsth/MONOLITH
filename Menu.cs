@@ -623,7 +623,7 @@ namespace Monolith
                 {
                     int on = 0; foreach (ConfigEntryBase e in row.Parts) if ((bool)e.BoxedValue) on++;
                     string v = on == row.Parts.Length ? "[x]" : on == 0 ? "[ ]" : "[-]";
-                    return "<color=" + name + ">" + Esc(Pad(Lang.T(row.Label), cols - 4)) + "</color> <color=" + Val + ">" + v + "</color>";
+                    return "<color=" + name + ">" + Esc(Pad(Lang.T(row.Label), cols - 4)) + "</color> <color=" + (Changed(row) ? Hot : Val) + ">" + v + "</color>";
                 }
                 default:
                 {
@@ -647,31 +647,32 @@ namespace Monolith
         {
             ConfigEntryBase e = row.Entry; Type t = e.SettingType;
             string v;
+            // a value not at its default is yellow, as Far marks the files picked out in a panel
+            string vc = Changed(row) ? Hot : Val;
             int room = Mathf.Clamp(cols - Lang.T(row.Label).Length - 3, 4, cols / 2);   // cells a list or text value may take
             if (row == _bindRow) { v = Lang.T("press a key…"); used = v.Length; return "<color=" + Hot + ">" + v + "</color>"; }
             if (row == _editRow) { v = Fit(_capture ? Lang.T("press a key…") : _edit + "_", room + 2); used = v.Length; return "<color=" + Hot + ">" + Esc(v) + "</color>"; }
-            if (row.Bind) { v = Lang.T(Monolith.Keys.Name(e.GetSerializedValue(), row.Empty)); used = v.Length; return "<color=" + Val + ">" + Esc(v) + "</color>"; }
+            if (row.Bind) { v = Lang.T(Monolith.Keys.Name(e.GetSerializedValue(), row.Empty)); used = v.Length; return "<color=" + vc + ">" + Esc(v) + "</color>"; }
             if (t == typeof(Color))
             {
                 Color c = (Color)e.BoxedValue;
                 v = "#" + e.GetSerializedValue(); used = v.Length + 4;
-                return "<color=#" + ColorUtility.ToHtmlStringRGB(c) + ">■</color> <color=" + Val + ">" + v + " ▼</color>";
+                return "<color=#" + ColorUtility.ToHtmlStringRGB(c) + ">■</color> <color=" + vc + ">" + v + " ▼</color>";
             }
             if (t != typeof(bool) && IsPick(row))
             {
                 v = Fit(LabelOf(row, e.BoxedValue), room); used = v.Length + 2;
-                // the ▼ in the value's color: yellow is for keys, titles and headings
-                return "<color=" + Val + ">" + Esc(v) + " ▼</color>";
+                return "<color=" + vc + ">" + Esc(v) + " ▼</color>";
             }
             if (Range(e, out _, out _))
             {
                 // the slider itself is drawn over these cells (Knob)
                 v = Show(e); if (v.Length > NumberCells) v = v.Substring(0, NumberCells);
                 used = BarCells + 1 + NumberCells;
-                return BarGap + "<color=" + Val + ">" + v.PadLeft(NumberCells) + "</color>";
+                return BarGap + "<color=" + vc + ">" + v.PadLeft(NumberCells) + "</color>";
             }
             v = Fit(row.Empty != null && e.GetSerializedValue().Length == 0 ? Lang.T(row.Empty) : Show(e), room + 2); used = v.Length;
-            return "<color=" + Val + ">" + Esc(v) + "</color>";
+            return "<color=" + vc + ">" + Esc(v) + "</color>";
         }
 
         // Some mods keep a key as text ("L", "Semicolon"): a text box made you type the name. A text setting called a key,
