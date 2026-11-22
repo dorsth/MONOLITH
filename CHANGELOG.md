@@ -1,5 +1,9 @@
 # MONOLITH changelog
 
+## 1.6.5
+- A setting that is not at its default shows its value in yellow, as Far marks picked files.
+- Beside the hex value in the color picker: the order of its digits, and Default and Previous, each with its color, to go back to with a click.
+
 ## 1.6.4
 - The color picker has 32 colors as separate squares in four rows: grays from white to black, then eight colors light, full and dark, with more room around them.
 

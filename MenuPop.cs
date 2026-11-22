@@ -202,6 +202,8 @@ namespace Monolith
             if (ev.type != EventType.MouseDown) return;
             if (scrolls && ev.button == 0 && PopBar(p).Contains(ev.mousePosition)) { p.Dragging = true; PopScrollTo(p, ev.mousePosition.y); return; }
             Vector2 m = ev.mousePosition;
+            if (p.Palette && ev.button == 0 && PalButton(p, 0).Contains(m)) { p.Typed = ""; PopMove(DefaultSlot); PopClose(true); return; }
+            if (p.Palette && ev.button == 0 && PalButton(p, 1).Contains(m)) { PopClose(false); return; }
             int i = PopAt(m);
             // a click beside it puts back what was there; a click on it between its items does nothing
             if (ev.button != 0 || i < 0) { if (ev.button != 0 || !p.R.Contains(m)) PopClose(false); return; }
@@ -213,10 +215,19 @@ namespace Monolith
         // as wide as a row is high, or less when the room is short; the whole is centered in the frame.
         // room between the frame and the colors, above and below them
         private float PalTop { get { return 1.5f * _ch; } }
+        // the ground around each color
+        private float PalGap { get { return Mathf.Max(Thin * 2f, Mathf.Round(_ch * 0.12f)); } }
+
+        // beside the hex value: Default (0) and Previous (1), each a whole line of the column
+        private Rect PalButton(Pop p, int which)
+        {
+            float gx, sw, hx; PalLayout(p, out gx, out sw, out hx);
+            return new Rect(hx, p.R.y + PalTop + (2 + which) * _ch, 14f * _cw, _ch);
+        }
 
         private void PalLayout(Pop p, out float gx, out float sw, out float hx)
         {
-            float hexW = 11f * _cw, gap = 2f * _cw;
+            float hexW = 14f * _cw, gap = 2f * _cw;
             sw = Mathf.Floor(Mathf.Min(_ch, (p.R.width - 5f * _cw - gap - hexW) / PaletteCols));
             float all = PaletteCols * sw + gap + hexW;
             gx = Mathf.Round(p.R.x + (p.R.width - all) * 0.5f); hx = gx + PaletteCols * sw + gap;
@@ -225,7 +236,7 @@ namespace Monolith
         private void PaletteDraw(Pop p)
         {
             float gx, sw, hx; PalLayout(p, out gx, out sw, out hx);
-            float y0 = p.R.y + PalTop, t = Thin, gap = Mathf.Max(t * 2f, Mathf.Round(_ch * 0.12f));
+            float y0 = p.R.y + PalTop, t = Thin, gap = PalGap;
             for (int i = 0; i < DefaultSlot; i++)
             {
                 // each color a block of its own, with ground around it
@@ -236,11 +247,22 @@ namespace Monolith
                 s = new Rect(s.x - gap, s.y - gap, s.width + 2f * gap, s.height + 2f * gap);
                 if (i == p.Cur) { Fill(new Rect(s.x, s.y, s.width, t), KnobCur); Fill(new Rect(s.x, s.yMax - t, s.width, t), KnobCur); Fill(new Rect(s.x, s.y, t, s.height), KnobCur); Fill(new Rect(s.xMax - t, s.y, t, s.height), KnobCur); }
             }
-            // any other color: its hex value, typed, in a sunken field as Far's, level between the middle rows
-            string hex = p.Typed.Length > 0 ? p.Typed + "_" : p.Row.Entry.GetSerializedValue();
-            float fy = y0 + _ch * (PaletteRows - 1) * 0.5f;
-            Fill(new Rect(hx, fy, 11f * _cw, _ch), Well);
-            GUI.Label(new Rect(hx + _cw, fy, 10f * _cw, _ch), "<color=" + (p.Typed.Length > 0 ? Hot : Val) + ">" + Esc(hex) + "</color>", _st);
+            // any other color: its hex value, typed in a sunken field as Far's, under the order of its digits
+            bool typing = p.Typed.Length > 0;
+            GUI.Label(new Rect(hx + _cw, y0, 13f * _cw, _ch), "<color=" + Hot + ">RRGGBBAA</color>", _st);
+            Fill(new Rect(hx, y0 + _ch, 11f * _cw, _ch), Well);
+            GUI.Label(new Rect(hx + _cw, y0 + _ch, 10f * _cw, _ch), "<color=" + (typing ? Hot : Mint) + ">" + Esc(typing ? p.Typed + "_" : p.Row.Entry.GetSerializedValue()) + "</color>", _st);
+            // the default and the color it was, each with its color, to go back to with a click
+            Vector2 m = Event.current.mousePosition;
+            for (int k = 0; k < 2; k++)
+            {
+                Rect b = PalButton(p, k);
+                Color c = k == 0 ? (Color)p.Values[DefaultSlot] : (Color)p.Was;
+                bool over = b.Contains(m);
+                if (over) Fill(b, Badge);
+                Fill(new Rect(b.x + gap, b.y + gap, _ch - 2f * gap, _ch - 2f * gap), new Color(c.r, c.g, c.b, 1f));
+                GUI.Label(new Rect(b.x + 2f * _cw, b.y, b.width - 2f * _cw, _ch), "<color=" + (over ? Ink : Txt) + ">[ " + Esc(Lang.T(k == 0 ? "Default" : "Previous")) + " ]</color>", _st);
+            }
         }
 
         // the pop-up under its row, centered on it: its frame half a cell in from each end of the row, so its filled room

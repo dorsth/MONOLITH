@@ -112,7 +112,7 @@ T = [
 ('Melee killsound', 'Киллсаунд в ближнем бою', 'L46'), ('volume', 'громкость', 'L36'), ('100 is normal.', '100: обычная громкость.', 'tip'),
 ('Gun sound volume', 'Громкость оружия', 'L38'),
 ('Shots, reloads, clicks, casings.', 'Выстрелы, перезарядка, щелчки, гильзы.', 'tip'),
-('Default', 'Стандарт', 'W15'), ('Same as Hit', 'Как попадание', 'W15'), ('Same as Kill', 'Как убийство', 'W15'),
+('Default', 'Стандарт', 'W15'), ('Previous', 'Прежний', 'W10'), ('Same as Hit', 'Как попадание', 'W15'), ('Same as Kill', 'Как убийство', 'W15'),
 # ---- mouse
 ('Sensitivity in cm/360', 'Чувствительность в см/360', 'L52'), ("Turn it off to use the game's sensitivity.", 'Выключите, чтобы использовать чувствительность игры.', 'tip'),
 ('Mouse DPI', 'DPI мыши', 'L38'), ('The DPI of your mouse.', 'DPI вашей мыши.', 'tip'),
