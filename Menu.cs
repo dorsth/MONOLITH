@@ -268,13 +268,13 @@ namespace Monolith
         private float _navY0, _navStep, _rowY0, _rowStep; private int _visRows = RowsHigh - 6;
         private const int Cols = 80, RowsHigh = 30, NavCols = 19;
 
-        // the STRAFTAT theme for Far (straftat-lobby, STRAFCOLORS): panel glass, gunmetal-sage frames, mint rows and
-        // titles, victory-yellow keys
-        private static readonly Color Back = new Color32(0x09, 0x0A, 0x05, 0xFF), Frame = new Color32(0x8F, 0xA5, 0x9B, 0xFF), Bar = new Color32(0x34, 0x45, 0x32, 0xFF),
+        // the STRAFTAT theme for Far (straftat-lobby, STRAFCOLORS), measured off Far with it: panel glass, gunmetal-sage
+        // frames (lighter on dialogs), the active title on a mint badge, yellow column titles and keys
+        private static readonly Color Back = new Color32(0x09, 0x0A, 0x05, 0xFF), Frame = new Color32(0x8F, 0xA5, 0x9B, 0xFF), Bar = new Color32(0x2B, 0x39, 0x29, 0xFF),
             FrameDim = new Color32(0x6F, 0x85, 0x7B, 0xFF), Panel = new Color32(0x13, 0x18, 0x0F, 0xFF),
             BarDim = new Color32(0x13, 0x18, 0x10, 0xFF), Shadow = new Color(0f, 0f, 0f, 0.5f), Hover = new Color32(0x1A, 0x22, 0x17, 0xFF), KeyBar = new Color32(0x17, 0x1C, 0x13, 0xFF),
-            Well = new Color32(0x07, 0x08, 0x03, 0xFF), Badge = new Color32(0x70, 0x98, 0x70, 0xFF);
-        private const string Txt = "#A9B0AA", Dim = "#8F8F8E", Hot = "#EEFF77", Mint = "#B4F6B7", Val = "#F4FEF4", Head = "#8FA59B", Ink = "#070803";
+            Well = new Color32(0x07, 0x08, 0x03, 0xFF), Badge = new Color32(0xB4, 0xF6, 0xB7, 0xFF);
+        private const string Txt = "#A9B0AA", Dim = "#909790", Hot = "#E8FF8A", Mint = "#B4F6B7", Val = "#F4FEF4", Head = "#909790", Ink = "#070803";
 
         private void Style()
         {
@@ -308,7 +308,9 @@ namespace Monolith
 
         private void Box(Rect r, string title, bool active, Color under, int lines = 2)
         {
-            Color c = active ? Frame : FrameDim;
+            // a panel's frame is the darker sage, a dialog's and its groups' the lighter one
+            bool panel = lines == 2 && under == Back;
+            Color c = panel ? FrameDim : Frame;
             float t = Thin, g = lines == 2 ? t * 2f : 0f;
             for (int k = 0; k < lines; k++)
             {
@@ -319,9 +321,9 @@ namespace Monolith
             if (string.IsNullOrEmpty(title)) return;
             float w = (title.Length + 2) * _cw, x = Mathf.Round(r.x + (r.width - w) * 0.5f);
             // the title of the panel that has the keys sits on a mint badge, as in the theme; a dialog's is bright
-            bool badge = active && lines == 2 && under == Back;
+            bool badge = active && panel;
             Fill(new Rect(x, r.y - _ch * 0.5f + g, w, _ch), badge ? Badge : under);
-            GUI.Label(new Rect(x + _cw, r.y - _ch * 0.5f + g * 0.5f, w, _ch), "<color=" + (badge ? Ink : active ? Val : Head) + ">" + Esc(title) + "</color>", _st);
+            GUI.Label(new Rect(x + _cw, r.y - _ch * 0.5f + g * 0.5f, w, _ch), "<color=" + (badge ? Ink : panel ? Head : lines == 2 ? Val : Txt) + ">" + Esc(title) + "</color>", _st);
         }
 
         private void Line(float x, float y, string rich) { GUI.Label(new Rect(x, y, _win.xMax - x, _ch), rich, _st); }
@@ -372,8 +374,10 @@ namespace Monolith
                 for (int i = 0; i < 9; i++) _dots.SetPixel(i % 3, i / 3, i == 4 ? Color.white : Color.clear);
                 _dots.Apply();
             }
+            // the dots centered across the bar (each 3 pixels holds one, on its middle pixel)
+            float first = Mathf.Floor((w - (Mathf.Floor((w - 1f) / 3f) * 3f + 1f)) / 2f);
             Color was = GUI.color; GUI.color = FrameDim;
-            GUI.DrawTextureWithTexCoords(new Rect(x, ty, w, th), _dots, new Rect(0f, 0f, w / 3f, th / 3f));
+            GUI.DrawTextureWithTexCoords(new Rect(x, ty, w, th), _dots, new Rect((1f - first) / 3f, 0f, w / 3f, th / 3f));
             GUI.color = was;
             float bh = Mathf.Max(_ch * 0.5f, th * shown / count), by = ty + (th - bh) * top / Mathf.Max(1, count - shown);
             Fill(new Rect(x, Mathf.Round(by), w, Mathf.Round(bh)), Frame);
@@ -387,7 +391,7 @@ namespace Monolith
             float x0 = _pageR.x + _cw, x1 = beside ? side.x : _pageR.xMax - _cw;
             title = Fit(title, (int)((x1 - x0) / _cw) - 2);
             float w = title.Length * _cw, x = Mathf.Round((x0 + x1 - w) * 0.5f);
-            GUI.Label(new Rect(x, row.y, w + 2f, _ch), "<color=" + Mint + ">" + Esc(title) + "</color>", _st);
+            GUI.Label(new Rect(x, row.y, w + 2f, _ch), "<color=" + Hot + ">" + Esc(title) + "</color>", _st);
         }
 
         // long enough for a join message with color tags in it
@@ -451,7 +455,8 @@ namespace Monolith
             // a heading just above the first row shown is shown with it
             if (page.Top == 1 && _vis.Count > 0 && _vis[0].Kind == RowKind.Header) page.Top = 0;
 
-            Fill(_win, Back);
+            Fill(_win, Color.black);   // the ground between the panels, black as Far's
+            Fill(_navR, Back); Fill(_pageR, Back);
             // the categories
             Box(_navR, "MONOLITH", !pageOn);
             for (int i = 0; i < _cats.Count; i++)
@@ -492,6 +497,7 @@ namespace Monolith
 
             // what the row under the cursor is
             Rect info = new Rect(_navR.x, _navR.yMax + _ch * 0.5f, _win.width - _cw, _ch * 3.6f);
+            Fill(info, Back);
             Box(info, null, false);
             bool said = _say != null && Time.unscaledTime < _sayUntil;
             MenuRow told = said ? null : over >= 0 && over < _vis.Count ? _vis[over] : overCat >= 0 || !pageOn ? null : ci >= 0 && ci < _vis.Count ? _vis[ci] : null;
@@ -622,7 +628,7 @@ namespace Monolith
 
         private const int BarCells = 10, NumberCells = 6;
         private static readonly string BarGap = new string(' ', BarCells + 1);
-        private static readonly Color LineRest = new Color32(0x6F, 0x85, 0x7B, 0xFF), KnobCur = new Color32(0xEE, 0xFF, 0x77, 0xFF), KnobRest = new Color32(0xA9, 0xB0, 0xAA, 0xFF), Tick = new Color32(0x8F, 0xA5, 0x9B, 0xFF);
+        private static readonly Color LineRest = new Color32(0x6F, 0x85, 0x7B, 0xFF), KnobCur = new Color32(0xE8, 0xFF, 0x8A, 0xFF), KnobRest = new Color32(0xA9, 0xB0, 0xAA, 0xFF), Tick = new Color32(0x8F, 0xA5, 0x9B, 0xFF);
 
         // what a setting is set to, drawn as what it is: a switch, a key, a color, one of a list (▼ opens the list),
         // or a number with a bar that shows where it sits between its lowest and highest

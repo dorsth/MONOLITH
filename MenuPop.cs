@@ -242,7 +242,7 @@ namespace Monolith
             string hex = p.Typed.Length > 0 ? p.Typed + "_" : p.Row.Entry.GetSerializedValue();
             GUI.Label(new Rect(hx, y0, 11f * _cw, _ch), "<color=" + Dim + ">RRGGBBAA</color>", _st);
             Fill(new Rect(hx, y0 + _ch, 11f * _cw, _ch), Well);
-            GUI.Label(new Rect(hx + _cw, y0 + _ch, 10f * _cw, _ch), "<color=" + (p.Typed.Length > 0 ? Hot : Val) + ">" + Esc(hex) + "</color>", _st);
+            GUI.Label(new Rect(hx + _cw, y0 + _ch, 10f * _cw, _ch), "<color=" + (p.Typed.Length > 0 ? Hot : Dim) + ">" + Esc(hex) + "</color>", _st);
             GUI.Label(new Rect(hx, y0 + 2f * _ch, 11f * _cw, _ch), "<color=" + Dim + ">" + Esc(Lang.T("or type one")) + "</color>", _st);
             // a line joined to the frame, then the buttons, Set in the dialog's own green as Far's default button
             float ly = Mathf.Round(y0 + 3.5f * _ch - t * 0.5f);
