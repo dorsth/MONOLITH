@@ -1,5 +1,8 @@
 # MONOLITH changelog
 
+## 1.7.3
+- Other mods in the side menu is #5F605D, the color Far gives hidden files.
+
 ## 1.7.2
 - Colors from the STRAFTAT palette: yellow #EEFF77, the ground between the panels #131411, the cursor row #344532 and inactive titles #8FA59B.
 
