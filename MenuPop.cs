@@ -201,6 +201,8 @@ namespace Monolith
             if (scrolls && ev.button == 0 && PopBar(p).Contains(ev.mousePosition)) { p.Dragging = true; PopScrollTo(p, ev.mousePosition.y); return; }
             Vector2 m = ev.mousePosition;
             if (p.Palette && ev.button == 0 && HexField(p).Contains(m)) { p.Editing = true; p.Typed = ""; return; }
+            // a click anywhere else leaves the field, and a half-typed value with it
+            if (p.Palette) { p.Editing = false; p.Typed = ""; }
             if (p.Palette && ev.button == 0 && DefaultButton(p).Contains(m)) { p.Typed = ""; PopMove(DefaultSlot); PopClose(true); return; }
             int i = PopAt(m);
             // a click beside a list puts back what was there, since the mouse over it moved the cursor; beside the palette it

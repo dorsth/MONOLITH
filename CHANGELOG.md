@@ -1,5 +1,8 @@
 # MONOLITH changelog
 
+## 1.8.4
+- A click outside the hex field of the color picker stops typing in it, and drops a half-typed value.
+
 ## 1.8.3
 - ezCrosshair 1.2.7: the crosshairs are the first pictures again, pixel for pixel with their soft edges, only made even on both sides.
 - The hex field of the color picker is no longer highlighted. Click it to type: it turns yellow with the _ after it, as every text being typed.
