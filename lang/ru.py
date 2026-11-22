@@ -70,8 +70,7 @@ T = [
 ('How far they pop.', 'Насколько сильно они увеличиваются.', 'tip'),
 ('Same headshot animation', 'Обычная анимация хедшота', 'L27'),
 ('Headshots pop like bodyshots.', 'Анимация хедшота такая же, как при попадании в тело.', 'tip'),
-('Bodyshot color', 'Цвет по телу', 'L17'), ('Headshot color', 'Цвет хедшота', 'L17'), ('Shotgun color', 'Цвет дробовика', 'L17'),
-('The black bodyshot hitmarker of the shotgun and a few other guns.', 'Чёрный хитмаркер попадания в тело у дробовика и ещё нескольких пушек.', 'tip'),
+('Bodyshot color', 'Цвет по телу', 'L17'), ('Headshot color', 'Цвет хедшота', 'L17'),
 ('Kill hitmarker', 'Хитмаркер убийства', 'L27'), ('The hit that kills shows in the kill color.', 'Попадание, которое убивает, показывается цветом убийства.', 'tip'), ('Kill color', 'Цвет убийства', 'L17'),
 ('hidden', 'скрыты', 'W16'), ('static', 'статичные', 'W16'),
 # ---- hud: prompts and the rest

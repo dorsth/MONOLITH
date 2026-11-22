@@ -5,7 +5,7 @@ namespace Monolith
 {
     internal static partial class Lang
     {
-        private static readonly Dictionary<string, string> Table = new Dictionary<string, string>(314)
+        private static readonly Dictionary<string, string> Table = new Dictionary<string, string>(312)
         {
             { "Crosshair", "Прицел" },
             { "Viewmodel", "Вьюмодель" },
@@ -108,8 +108,6 @@ namespace Monolith
             { "Headshots pop like bodyshots.", "Анимация хедшота такая же, как при попадании в тело." },
             { "Bodyshot color", "Цвет по телу" },
             { "Headshot color", "Цвет хедшота" },
-            { "Shotgun color", "Цвет дробовика" },
-            { "The black bodyshot hitmarker of the shotgun and a few other guns.", "Чёрный хитмаркер попадания в тело у дробовика и ещё нескольких пушек." },
             { "Kill hitmarker", "Хитмаркер убийства" },
             { "The hit that kills shows in the kill color.", "Попадание, которое убивает, показывается цветом убийства." },
             { "Kill color", "Цвет убийства" },

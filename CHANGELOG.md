@@ -1,5 +1,8 @@
 # MONOLITH changelog
 
+## 1.2.8
+- DorsthTweaks 1.4.1: "Shotgun color" is gone. The shotgun shows the same hitmarker as every other gun, in the bodyshot, headshot and kill colors.
+
 ## 1.2.7
 - The crosshair, hitmarker and players previews are a box beside the rows again. Inside it are two named boxes: dark and light, or enemies and teammates.
 

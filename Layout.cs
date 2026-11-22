@@ -484,10 +484,9 @@ namespace Monolith
                   .Set("Same headshot animation", E(Tweaks, "HUD", "Same Headshot Animation"), () => !On(noHm) && !On(still), "Headshots pop like bodyshots.")
                   .Set("Bodyshot color", E(Tweaks, "HUD", "Hitmarker Bodyshot Color"), shown, "")
                   .Set("Headshot color", E(Tweaks, "HUD", "Hitmarker Headshot Color"), shown, "")
-                  .Set("Shotgun color", E(Tweaks, "HUD", "Hitmarker Shotgun Color"), shown, "The black bodyshot hitmarker of the shotgun and a few other guns.")
                   .Set("Kill hitmarker", kill, shown, "The hit that kills shows in the kill color.")
                   .Set("Kill color", E(Tweaks, "HUD", "Hitmarker Kill Color"), () => !On(noHm) && On(kill), "");
-                if (noHm != null) { hm.Draw = r => BundleMenu.I.HitmarkerPreview(r); hm.SideCols = 24; hm.SideRows = () => On(kill) ? 16 : 13; }
+                if (noHm != null) { hm.Draw = r => BundleMenu.I.HitmarkerPreview(r); hm.SideCols = 24; hm.SideRows = () => On(kill) ? 13 : 10; }
 
                 var pr = new MenuPage(p, "Prompts", "The texts on weapons, doors and buttons.");
                 ConfigEntryBase noPick = E(Tweaks, "Interaction", "Hide Pickup Prompts"), noUse = E(Tweaks, "Interaction", "Hide Interaction Prompts");
