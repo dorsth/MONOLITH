@@ -191,10 +191,15 @@ namespace Monolith
             p.R = new Rect(Mathf.Round(x), Mathf.Round(y), w, h);
             if (mouseMoved) { int at = PopAt(mouse); if (at >= 0) PopMove(at); }
 
-            // filled up to its frame and no further: the half cell around it stays free, so it never covers a frame of the page
+            // drawn as a panel is: the page's own background, a frame, its title on the frame. The half cell around the frame
+            // hides the rows under it, but stops inside the frame of the page.
             var frame = new Rect(p.R.x + _cw * 0.5f, p.R.y + _ch * 0.5f, p.R.width - _cw, p.R.height - _ch);
-            Fill(frame, Panel);
-            Box(frame, Lang.T(p.Row.Label.Trim()), true, Panel);
+            float pt = Thin * 3f;
+            var room = new Rect(_pageR.x + pt, _pageR.y + pt, _pageR.width - 2f * pt, _pageR.height - 2f * pt);
+            float x0 = Mathf.Max(p.R.x, room.x), y0 = Mathf.Max(p.R.y, room.y), x1 = Mathf.Min(p.R.xMax, room.xMax), y1 = Mathf.Min(p.R.yMax, room.yMax);
+            if (x1 > x0 && y1 > y0) Fill(new Rect(x0, y0, x1 - x0, y1 - y0), Back);
+            Fill(frame, Back);
+            Box(frame, Lang.T(p.Row.Label.Trim()), true, Back);
             if (p.Palette)
             {
                 for (int i = 0; i < n; i++)
