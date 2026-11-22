@@ -5,6 +5,7 @@
 
 ## 1.2.7
 - The crosshair, hitmarker and players previews are a box beside the rows again. Inside it are two named boxes: dark and light, or enemies and teammates.
+- HUD > Hitmarkers: "Animation size" is named "Animation".
 
 ## 1.2.6
 - DorsthTweaks 1.4.0: HUD > Hitmarkers has "Kill hitmarker". With it on, the hit that kills shows in the kill color. Off by default.
