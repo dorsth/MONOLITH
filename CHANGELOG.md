@@ -1,5 +1,8 @@
 # MONOLITH changelog
 
+## 1.4.0
+- Section headings are drawn as Far draws them: a line across the page, joined to its frame, with the name in the middle.
+
 ## 1.3.9
 - Color picker and lists have their lighter panel back, with half a cell of it around the frame. It stops just inside the double line of the page and never covers it.
 

@@ -321,6 +321,18 @@ namespace Monolith
 
         private void Line(float x, float y, string rich) { GUI.Label(new Rect(x, y, _win.xMax - x, _ch), rich, _st); }
 
+        // A section heading as Far draws one: a single line joined to the inner line of the page frame, its name in the
+        // middle. Beside a preview it ends where the rows end.
+        private void Separator(Rect row, string title, bool full, bool active)
+        {
+            float t = Thin, x0 = _pageR.x + 2f * t, x1 = full ? _pageR.xMax - 2f * t : row.xMax, y = Mathf.Round(row.y + _ch * 0.5f - t * 0.5f);
+            Fill(new Rect(x0, y, x1 - x0, t), active ? Frame : FrameDim);
+            title = Fit(title, (int)((x1 - x0) / _cw) - 4);
+            float w = (title.Length + 2) * _cw, x = Mathf.Round((x0 + x1 - w) * 0.5f);
+            Fill(new Rect(x, row.y, w, _ch), Back);
+            GUI.Label(new Rect(x + _cw, row.y, w, _ch), "<color=" + Head + ">" + Esc(title) + "</color>", _st);
+        }
+
 
         // long enough for a join message with color tags in it
         private const int EditMax = 200;
@@ -402,7 +414,8 @@ namespace Monolith
                 Rect r = new Rect(_pageR.x + _cw, _pageR.y + (i + 1) * _ch, _pageR.width - 2 * _cw - side * _cw, _ch);
                 bool cur = idx == ci && pageOn;
                 if (cur) Fill(r, Bar); else if (idx == over && row.Kind != RowKind.Header) Fill(r, Hover);
-                Line(r.x + _cw * 0.5f, r.y, RowText(row, cols, cur));
+                if (row.Kind == RowKind.Header) Separator(r, Lang.T(row.Label), side == 0, pageOn);
+                else Line(r.x + _cw * 0.5f, r.y, RowText(row, cols, cur));
                 Knob(row, r.y, cols, cur);
             }
             if (_vis.Count > vis)
@@ -507,11 +520,6 @@ namespace Monolith
                     string to = _page != null && _page.Parent != null ? Lang.T(_page.Parent.Path[_page.Parent.Path.Length - 1]) : "";
                     string back = Fit(Lang.T("back to ") + to, cols - 3);
                     return "<color=" + name + ">" + Pad("..", cols - back.Length) + "</color><color=" + Dim + ">" + Esc(back) + "</color>";
-                }
-                case RowKind.Header:
-                {
-                    string label = Esc(Fit(Lang.T(row.Label), cols - 6));
-                    return "<color=" + Head + ">── " + label + " " + new string('─', Mathf.Max(0, cols - label.Length - 4)) + "</color>";
                 }
                 case RowKind.Link:
                 {
