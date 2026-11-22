@@ -1,5 +1,8 @@
 # MONOLITH changelog
 
+## 1.2.5
+- New icon.
+
 ## 1.2.4
 - The crosshair, hitmarker and players previews are under the rows of their page, as wide as a row. The rows of those pages use the full width.
 
