@@ -285,7 +285,7 @@ namespace Monolith
             { "search: ", "поиск: " },
             { "press a key…", "нажмите клавишу…" },
             { "Did not work: ", "Не получилось: " },
-            { "   or type one: RRGGBB", "   или введите: RRGGBB" },
+            { "  or type RRGGBB", "  или введите RRGGBB" },
             { "reset", "сброс" },
             { "Reset", "Сброс" },
             { "move", "выбор" },

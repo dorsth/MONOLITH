@@ -20,12 +20,13 @@ namespace Monolith
             public bool Palette; public int Cols = 1, Cur, Top;
             public string Typed = ""; public float TypedAt;
             public float AnchorRight, AnchorY;
-            public Rect Side;                  // the preview box of the page, which it keeps clear of when it can
             public Rect R; public int Shown;
         }
 
         private Pop _pop;
         private const int PaletteCols = 12, ListRows = 14;
+        // the palette: a color every 2.5 cells, each 2 wide, so it fits beside a preview and the preview shows the pick
+        private const float Pitch = 2.5f, Swatch = 2f, PalLeft = 1.5f;
 
         private static string LabelOf(MenuRow row, object v)
         {
@@ -41,7 +42,6 @@ namespace Monolith
         {
             p.AnchorRight = _pageR.xMax - _cw - (page.Draw != null ? (page.SideCols + 1) * _cw : 0f);
             p.AnchorY = _rowY0 + (ci - page.Top + 1) * _rowStep;
-            p.Side = page.Draw != null ? SideRect(page) : new Rect();
         }
 
         private void OpenList(MenuRow row, MenuPage page, int ci)
@@ -150,7 +150,7 @@ namespace Monolith
             if (!p.R.Contains(m)) return -1;
             if (p.Palette)
             {
-                int col = Mathf.FloorToInt((m.x - p.R.x - _cw * 2f) / (_cw * 4f)), row = Mathf.FloorToInt((m.y - p.R.y - _ch) / _ch);
+                int col = Mathf.FloorToInt((m.x - p.R.x - _cw * (PalLeft - (Pitch - Swatch) / 2f)) / (_cw * Pitch)), row = Mathf.FloorToInt((m.y - p.R.y - _ch) / _ch);
                 if (col < 0 || col >= p.Cols || row < 0) return -1;
                 int i = row * p.Cols + col;
                 return i < p.Values.Length ? i : -1;
@@ -174,7 +174,7 @@ namespace Monolith
             Pop p = _pop;
             int n = p.Values.Length;
             float w, h;
-            if (p.Palette) { w = (p.Cols * 4 + 4) * _cw; h = (n / p.Cols + 4) * _ch; }
+            if (p.Palette) { w = (p.Cols * Pitch - (Pitch - Swatch) + 2f * PalLeft) * _cw; h = (n / p.Cols + 4) * _ch; }
             else
             {
                 string title = Lang.T(p.Row.Label.Trim());
@@ -188,8 +188,6 @@ namespace Monolith
             float x = Mathf.Clamp(p.AnchorRight - w, _pageR.x + _cw * 0.5f, _pageR.xMax - w - _cw * 0.5f), y = p.AnchorY;
             x = Mathf.Clamp(x, _win.x + _cw, _win.xMax - w - _cw);
             if (y + h > _win.yMax - _ch * 1.5f) y = Mathf.Max(_win.y + _ch * 0.5f, p.AnchorY - _rowStep - h);
-            // too wide to sit beside the preview: under it, so what you pick shows while you pick it
-            if (p.Side.width > 0f && new Rect(x, y, w, h).Overlaps(p.Side) && p.Side.yMax + _ch * 0.5f + h <= _pageR.yMax) y = p.Side.yMax + _ch * 0.5f;
             p.R = new Rect(Mathf.Round(x), Mathf.Round(y), w, h);
             if (mouseMoved) { int at = PopAt(mouse); if (at >= 0) PopMove(at); }
 
@@ -200,13 +198,19 @@ namespace Monolith
                 for (int i = 0; i < n; i++)
                 {
                     int col = i % p.Cols, row = i / p.Cols;
-                    float cx = p.R.x + _cw * 2f + col * _cw * 4f, cy = p.R.y + _ch + row * _ch;
+                    float cx = Mathf.Round(p.R.x + _cw * (PalLeft + col * Pitch)), cy = p.R.y + _ch + row * _ch, sw = Mathf.Round(_cw * Swatch);
                     Color c = (Color)p.Values[i];
-                    Fill(new Rect(cx + _cw, cy + 3f, _cw * 2f, _ch - 6f), new Color(c.r, c.g, c.b, 1f));
-                    if (i == p.Cur) { GUI.Label(new Rect(cx, cy, _cw, _ch), "<color=" + Hot + ">[</color>", _st); GUI.Label(new Rect(cx + _cw * 3f, cy, _cw, _ch), "<color=" + Hot + ">]</color>", _st); }
+                    if (i == p.Cur)
+                    {
+                        // the one picked: a line around it
+                        float t = Thin, o = t + 1f;
+                        Fill(new Rect(cx - o, cy + 1f, sw + 2f * o, _ch - 2f), KnobCur);
+                        Fill(new Rect(cx - o + t, cy + 1f + t, sw + 2f * (o - t), _ch - 2f - 2f * t), Panel);
+                    }
+                    Fill(new Rect(cx, cy + 3f, sw, _ch - 6f), new Color(c.r, c.g, c.b, 1f));
                 }
                 string hex = p.Typed.Length > 0 ? "<color=" + Hot + ">#" + p.Typed + "_</color>" : "<color=" + Val + ">#" + p.Row.Entry.GetSerializedValue() + "</color>";
-                GUI.Label(new Rect(p.R.x + _cw * 3f, p.R.yMax - _ch * 2f, p.R.width, _ch), hex + "<color=" + Dim + ">" + Lang.T("   or type one: RRGGBB") + "</color>", _st);
+                GUI.Label(new Rect(p.R.x + _cw * PalLeft, p.R.yMax - _ch * 2f, p.R.width, _ch), hex + "<color=" + Dim + ">" + Lang.T("  or type RRGGBB") + "</color>", _st);
                 return;
             }
             if (p.Cur < p.Top) p.Top = p.Cur;

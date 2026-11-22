@@ -1,5 +1,9 @@
 # MONOLITH changelog
 
+## 1.3.3
+- The color picker is narrower and opens right under its row, beside the preview, so the preview shows the color while you pick it. The picked color has a line around it.
+- The previews have the room they had in 1.3.0 again.
+
 ## 1.3.2
 - Color pickers and lists stay inside the page. One that would cover the preview opens under it, so you see the color while you pick it.
 - Per weapon: the weapon rows say what they are.
