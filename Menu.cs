@@ -450,7 +450,7 @@ namespace Monolith
                 Fill(new Rect(sr.x + _cw * 0.5f, sr.y + _ch * 0.5f, sr.width, sr.height), Shadow);
                 Fill(sr, Panel);
                 var frame = new Rect(sr.x + _cw * 0.5f, sr.y + _ch * 0.5f, sr.width - _cw, sr.height - _ch);
-                Box(frame, Lang.T("preview"), false, Panel);
+                Box(frame, Lang.T("Preview"), false, Panel);
                 page.Draw(frame);
             }
 
@@ -516,7 +516,8 @@ namespace Monolith
         private Rect SideRect(MenuPage page)
         {
             // the dialog with its half cell of ground around the frame: the title on the frame comes level with the first row
-            return new Rect(_pageR.xMax - (page.SideCols + 1.5f) * _cw, _pageR.y + _ch - Thin, page.SideCols * _cw, page.SideRows() * _ch);
+            // a cell of room on its left, and the same between its shadow and the page frame on its right
+            return new Rect(_pageR.xMax - (page.SideCols + 1.5f) * _cw, _pageR.y + _ch - Thin, (page.SideCols - 0.5f) * _cw, page.SideRows() * _ch);
         }
 
         private static string K(string key, string what) { return "<color=" + Hot + ">" + Lang.T(key) + "</color><color=" + Txt + "> " + Lang.T(what) + "</color>  "; }
@@ -601,12 +602,13 @@ namespace Monolith
             {
                 Color c = (Color)e.BoxedValue;
                 v = "#" + e.GetSerializedValue(); used = v.Length + 4;
-                return "<color=#" + ColorUtility.ToHtmlStringRGB(c) + ">■</color> <color=" + Val + ">" + v + "</color><color=" + Hot + "> ▼</color>";
+                return "<color=#" + ColorUtility.ToHtmlStringRGB(c) + ">■</color> <color=" + Val + ">" + v + " ▼</color>";
             }
             if (t != typeof(bool) && IsPick(row))
             {
                 v = Fit(LabelOf(row, e.BoxedValue), room); used = v.Length + 2;
-                return "<color=" + Val + ">" + Esc(v) + "</color><color=" + Hot + "> ▼</color>";
+                // the ▼ in the value's color: yellow is for keys, titles and headings
+                return "<color=" + Val + ">" + Esc(v) + " ▼</color>";
             }
             if (Range(e, out _, out _))
             {

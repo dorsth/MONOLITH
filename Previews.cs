@@ -64,7 +64,7 @@ namespace Monolith
         // the dark group and the light group of a preview, filled
         private Rect Tone(Rect box, int i)
         {
-            Rect s = Part(box, i, i == 0 ? "dark" : "light");
+            Rect s = Part(box, i, i == 0 ? "Dark" : "Light");
             Fill(s, i == 0 ? Color.black : Light);
             return s;
         }
@@ -165,7 +165,7 @@ namespace Monolith
                 // enemies in the upper group and teammates in the lower, each a suit and a hat
                 for (int side = 0; side < 2; side++)
                 {
-                    Rect s = Part(r, side, side == 0 ? "enemies" : "teammates", true);
+                    Rect s = Part(r, side, side == 0 ? "Enemies" : "Teammates", true);
                     string suit = (side == 0 ? Players.EnemyOutfit : Players.TeamOutfit).Value, top = (side == 0 ? Players.EnemyHat : Players.TeamHat).Value;
                     // nothing picked for either: said once, not once for the suit and once for the hat
                     if (string.IsNullOrEmpty(suit) && string.IsNullOrEmpty(top)) { NoteIn(s, "their own", Dim); continue; }

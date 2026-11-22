@@ -1,5 +1,10 @@
 # MONOLITH changelog
 
+## 1.5.1
+- The ▼ of a list or color is in the value's color. Yellow is for keys, titles and headings.
+- The preview dialog and its groups are capitalized: Preview, Dark, Light, Enemies, Teammates.
+- The preview dialog has a cell of room on both sides.
+
 ## 1.5.0
 - Color pickers and lists have the shadow the preview dialog has.
 

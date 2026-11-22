@@ -5,7 +5,7 @@ namespace Monolith
 {
     internal static partial class Lang
     {
-        private static readonly Dictionary<string, string> Table = new Dictionary<string, string>(309)
+        private static readonly Dictionary<string, string> Table = new Dictionary<string, string>(307)
         {
             { "Crosshair", "Прицел" },
             { "Viewmodel", "Вьюмодель" },
@@ -58,9 +58,9 @@ namespace Monolith
             { "Hit color", "Цвет при попадании" },
             { "The crosshair changes color for a moment on a hit.", "При попадании прицел на мгновение меняет цвет." },
             { "color", "цвет" },
-            { "preview", "превью" },
-            { "dark", "темно" },
-            { "light", "светло" },
+            { "Preview", "Превью" },
+            { "Dark", "Темно" },
+            { "Light", "Светло" },
             { "FOV", "FOV" },
             { "Left / right", "Влево / вправо" },
             { "Down / up", "Вниз / вверх" },
@@ -161,8 +161,6 @@ namespace Monolith
             { "The game's lobby option, kept between launches. In other lobbies the host decides.", "Настройка лобби из игры, сохраняется между запусками. В чужих лобби решает хост." },
             { "The same setting as in the game. Only in lobbies with enemy outlines on.", "Та же настройка, что в игре. Только в лобби с обводкой врагов." },
             { "The same setting as in the game.", "Та же настройка, что в игре." },
-            { "enemies", "враги" },
-            { "teammates", "союзники" },
             { "no picture", "нет превью" },
             { "no hat", "без шапки" },
             { "shown once a", "появится после" },

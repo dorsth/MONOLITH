@@ -41,7 +41,7 @@ T = [
 ("1 is the picture's own size at 1080p.", '1: размер самой картинки при 1080p.', 'tip'),
 ('Show when scoped', 'Показывать в оптике', 'L27'), ('Hit color', 'Цвет при попадании', 'L27'),
 ('The crosshair changes color for a moment on a hit.', 'При попадании прицел на мгновение меняет цвет.', 'tip'),
-('color', 'цвет', 'L15'), ('preview', 'превью', 'W16'), ('dark', 'темно', 'W7'), ('light', 'светло', 'W7'),
+('color', 'цвет', 'L15'), ('Preview', 'Превью', 'W16'), ('Dark', 'Темно', 'W7'), ('Light', 'Светло', 'W7'),
 # ---- viewmodel
 ('FOV', 'FOV', 'L38'), ('Left / right', 'Влево / вправо', 'L38'), ('Down / up', 'Вниз / вверх', 'L38'), ('Back / forward', 'Назад / вперёд', 'L38'),
 ('Sway', 'Покачивание', 'L38'),
@@ -105,7 +105,7 @@ T = [
 ("The game's lobby option, kept between launches. In other lobbies the host decides.", 'Настройка лобби из игры, сохраняется между запусками. В чужих лобби решает хост.', 'tip'),
 ('The same setting as in the game. Only in lobbies with enemy outlines on.', 'Та же настройка, что в игре. Только в лобби с обводкой врагов.', 'tip'),
 ('The same setting as in the game.', 'Та же настройка, что в игре.', 'tip'),
-('enemies', 'враги', 'W20'), ('teammates', 'союзники', 'W20'), ('no picture', 'нет превью', 'W10'), ('no hat', 'без шапки', 'W15'),
+('no picture', 'нет превью', 'W10'), ('no hat', 'без шапки', 'W15'),
 ('shown once a', 'появится после', 'W18'), ('map has loaded', 'загрузки карты', 'W18'),
 # ---- sound
 ('Hitsound', 'Хитсаунд', 'L46'), ('Headshot hitsound', 'Хитсаунд в голову', 'L46'), ('Killsound', 'Киллсаунд', 'L46'),
