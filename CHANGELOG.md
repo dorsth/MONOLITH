@@ -8,13 +8,13 @@ What is new since 1.1.9, the last version on Thunderstore. Every step is listed 
 - A new color picker: 24 colors, a hex field you click to type in, and Default.
 - New settings: Kill hitmarker and its color, Sprint FOV increase in degrees, Anisotropic filtering (on), and Include controls in configs (sensitivity and keybinds).
 - Configs carry your sensitivity, the game's and TrueSens.
-- Match stats: total damage, only the columns that can happen in a 1v1, 2v2 or free-for-all, ordered by kills when there are no teams, and the victory board further back in the room.
+- Match stats: total damage, only the columns that can happen in a 1v1, 2v2 or free-for-all, ordered by kills when there are no teams, and the victory board clear of the rematch pillar.
 - Crosshairs: the brackets curve smoothly and the star's tips fade out.
 - The SpawnViewer speed-up works with SpawnViewer 2.1.
 - Holds: CameraTweaks 1.2.3, CombatSounds 1.1.8, DorsthTweaks 1.4.5, MatchStats 1.0.4, NoGore 1.3.5, TrueSens 1.2.5, ViewmodelTweaks 2.0.7, ezCrosshair 1.3.5.
 
 ## 1.10.2
-- MatchStats 1.0.4: takes won and survived show the count. The victory board stands a little further back than in 1.10.0.
+- MatchStats 1.0.4: takes won is gone from the 1v1 and free-for-all boards (it is the game's own score); survived shows the count; the victory board stands further left, clear of the rematch pillar.
 
 ## 1.10.1
 - MatchStats 1.0.3: the victory board stands twice as far back in the room.

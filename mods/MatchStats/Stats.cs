@@ -500,10 +500,10 @@ namespace MatchStats
                 var rows = Sorted();
                 bool solo = Solo(rows), duel = solo && rows.Count == 2;
                 // a column that can only be 0 in this kind of match is left out: trades and clutches need a teammate, a 2k a
-                // second enemy, and in a 1v1 the first kill of a take is its only one. Without teams, surviving a take is winning it
+                // second enemy, and in a 1v1 the first kill of a take is its only one. Without teams, surviving a take is winning it, which the game's own score already shows
                 string[] head = !full ? RoundHead
-                    : duel ? new[] { "player", "kills", "deaths", "damage", "takes won" }
-                    : solo ? new[] { "player", "kills", "deaths", "damage", "first k-d", "2k", "takes won" }
+                    : duel ? new[] { "player", "kills", "deaths", "damage" }
+                    : solo ? new[] { "player", "kills", "deaths", "damage", "first k-d", "2k" }
                     : new[] { "player", "kills", "deaths", "damage", "first k-d", "trade", "2k", "clutch", "survived" };
                 if (full && !_teamsSaid && MatchStatsPlugin.Log != null)
                 {
@@ -520,8 +520,8 @@ namespace MatchStats
                     P p = kv.Value;
                     string kills = p.Kills.ToString(), deaths = p.Deaths.ToString(), dmg = Num(p.Dmg), won = p.Survived.ToString(), first = p.OpenK + "-" + p.OpenD;
                     lines.Add(!full ? new[] { Drawable(p.Name), p.RK.ToString(), p.RD.ToString(), Num(p.RDmg) }
-                        : duel ? new[] { Drawable(p.Name), kills, deaths, dmg, won }
-                        : solo ? new[] { Drawable(p.Name), kills, deaths, dmg, first, p.Multi.ToString(), won }
+                        : duel ? new[] { Drawable(p.Name), kills, deaths, dmg }
+                        : solo ? new[] { Drawable(p.Name), kills, deaths, dmg, first, p.Multi.ToString() }
                         : new[] { Drawable(p.Name), kills, deaths, dmg, first, p.Trades.ToString(), p.Multi.ToString(), p.Clutch.ToString(), won });
                     names.Add(me >= 0 && Team(kv.Key) == Team(me) ? self : enemy);
                 }
@@ -578,7 +578,7 @@ namespace MatchStats
             private string _whyFlat;
             private const float Turn = 85f;      // degrees toward the middle of the room
             private const float Wide = 6.5f;      // the board is this many times as wide as the word REMATCH
-            private const float Clear = 2.6f, Out = -1.75f;   // Out below 0: further back, away from you
+            private const float Clear = 4.6f, Out = 0f;
             private void Flat()
             {
                 _world = false;
