@@ -1,5 +1,12 @@
 # MONOLITH changelog
 
+## 1.8.3
+- ezCrosshair 1.2.7: the crosshairs are the first pictures again, pixel for pixel with their soft edges, only made even on both sides.
+- The hex field of the color picker is no longer highlighted. Click it to type: it turns yellow with the _ after it, as every text being typed.
+- A page shows no cursor row while you use the mouse, only the row under the mouse. A key brings the cursor back.
+- Enter and Backspace no longer work as E and Q. Tips that said Enter say E.
+- The yellow is #F0FC9D, a step toward #EEFF77.
+
 ## 1.8.2
 - ezCrosshair 1.2.6: every crosshair drawn again pixel by pixel, with no soft edges, and its size rounded to whole pixels so it stays sharp.
 

@@ -578,14 +578,14 @@ namespace Monolith
                  .Set("cm/360", E(Sens, "Sensitivity", "cm/360"), own, "How far you move the mouse for one full turn.")
                  .Set("ADS multiplier", E(Sens, "Sensitivity", "ADS Multiplier"), own, "1 feels the same as hip fire.")
                  .Set("Scoped multiplier", E(Sens, "Sensitivity", "Scoped Multiplier"), own, "1 feels the same as hip fire.");
-                const string how = " Press Enter, then a key, mouse button or scroll.";
+                const string how = " Press E, then a key, mouse button or scroll.";
                 p.Head("Keybinds")
                  .Key("Second jump key", Keys.Jump1, "not set", "Works next to your own jump key." + how)
                  .Key("Third jump key", Keys.Jump2, "not set", "Put scroll up on one and scroll down on the other to jump with the whole wheel." + how)
-                 .Key("Swap weapons", Keys.Swap, "scroll wheel", "Same as Swap in the game's settings. Press Enter, then a key or mouse button, or scroll to use the wheel.");
+                 .Key("Swap weapons", Keys.Swap, "scroll wheel", "Same as Swap in the game's settings. Press E, then a key or mouse button, or scroll to use the wheel.");
                 if (p.Rows.Count > 0 && p.Rows[p.Rows.Count - 1].Entry == Keys.Swap) p.Rows[p.Rows.Count - 1].If = Keys.SyncSwap;   // shows what the game's settings have now
                 var t = new MenuPage(p, "Taunts", "Move a taunt to another key, or switch it off.");
-                for (int i = 0; i < Keys.Taunt.Length; i++) t.Key("Taunt " + (i + 1), Keys.Taunt[i], "key " + ((i + 1) % 10), "Press Enter, then its new key. Press Enter twice for no key.");
+                for (int i = 0; i < Keys.Taunt.Length; i++) t.Key("Taunt " + (i + 1), Keys.Taunt[i], "key " + ((i + 1) % 10), "Press E, then its new key. Enter sets no key.");
                 p.Go(t, () => { int n = 0; foreach (var e in Keys.Taunt) if (e != null && e.Value.Length > 0) n++; return n == 0 ? "number keys" : Lang.Count(n, " changed", " changed", "changed: "); });
                 if (p.Rows.Count > 2) cats.Add(p);
             }
@@ -609,7 +609,7 @@ namespace Monolith
             {
                 var p = new MenuPage(null, "General", "Language, the menu key, menu animations, playlists.");
                 p.Set("Language / Язык", Lang.Pick, null, "")
-                 .Set("Open this menu", BundleMenu.Key, null, "Press Enter, then the key.")
+                 .Set("Open this menu", BundleMenu.Key, null, "Press E, then the key.")
                  .Set("Fewer UI animations", E(Tweaks, "Menus", "Reduce UI Animations"), null, "No animations in menus and on the HUD.")
                  .Set("Hide default playlists", E(Tweaks, "Menus", "Hide Default Playlists"), null, "Only your own playlists show when you host.");
                 // who MONOLITH builds on: a line each, the name on the right; nothing to press

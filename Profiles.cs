@@ -394,7 +394,7 @@ namespace Monolith
                 : new MenuRow { Kind = RowKind.Action, Label = "Undo load", Info = "Back to what you had before the last load or import, sensitivity and keybinds included.", Take = s => { string r = Undo(); Fill(); return r; } });
             pg.Rows.Add(new MenuRow { Kind = RowKind.Action, Label = "Save as new", Ask = "name", Info = "Saves your current config under a name. A config with the same name is replaced.", Take = s => { string r = SaveAs(s); Fill(); return r; } });
             pg.Rows.Add(new MenuRow { Kind = RowKind.Action, Label = "Export to clipboard", Info = "Your config as one line of text. Paste it to a friend.", Take = s => ExportNow() });
-            pg.Rows.Add(new MenuRow { Kind = RowKind.Action, Label = "Import from clipboard", Info = "Copy a line from a friend (it starts with MONOLITH:), then press Enter here. It is saved under its name.", Take = s => { string r = Import(); Fill(); return r; } });
+            pg.Rows.Add(new MenuRow { Kind = RowKind.Action, Label = "Import from clipboard", Info = "Copy a line from a friend (it starts with MONOLITH:), then press E here. It is saved under its name.", Take = s => { string r = Import(); Fill(); return r; } });
             pg.Rows.Add(new MenuRow { Kind = RowKind.Entry, Label = "Include controls", Entry = GameConfig.TakeKeys, Tip = "Loading a config also sets its sensitivity and keybinds." });
             bool saved = false;
             foreach (Profile each in All)

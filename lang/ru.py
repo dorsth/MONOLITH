@@ -5,8 +5,8 @@
 # Row names: a full page has 56 cells, a page with a preview box 31.
 # Of those a switch takes 4, a slider 18, a color 14; a list or text value gives way to the name (it keeps 7).
 B  = 'previous config'          # the name the last setup is kept under (a profile name: not translated)
-HOW_EN = ' Press Enter, then a key, mouse button or scroll.'
-HOW_RU = ' Нажмите Enter, затем клавишу, кнопку мыши или прокрутку.'
+HOW_EN = ' Press E, then a key, mouse button or scroll.'
+HOW_RU = ' Нажмите E, затем клавишу, кнопку мыши или прокрутку.'
 T = [
 # ---- categories and pages
 ('Crosshair', 'Прицел', 'nav'), ('Viewmodel', 'Вьюмодель', 'nav'), ('Camera', 'Камера', 'nav'), ('HUD', 'HUD', 'nav'),
@@ -139,14 +139,14 @@ T = [
 ('Second jump key', 'Вторая клавиша прыжка', 'L40'), ('Third jump key', 'Третья клавиша прыжка', 'L40'), ('Swap weapons', 'Смена оружия', 'L40'),
 ('Next to your own jump key.' + HOW_EN, 'В дополнение к вашей клавише прыжка.' + HOW_RU, 'tipb'),
 ('Scroll up on one and scroll down on the other: jump on the whole wheel.' + HOW_EN, 'На одну прокрутку вверх, на другую вниз: прыжок на всём колесе.' + HOW_RU, 'tipb'),
-("Same as Swap in the game's settings. Press Enter, then a key or mouse button, or scroll to use the wheel.", 'То же, что смена оружия в настройках игры. Нажмите Enter, затем клавишу, кнопку мыши или прокрутку для колеса.', 'tipb'),
+("Same as Swap in the game's settings. Press E, then a key or mouse button, or scroll to use the wheel.", 'То же, что смена оружия в настройках игры. Нажмите E, затем клавишу, кнопку мыши или прокрутку для колеса.', 'tipb'),
 ('not set', 'не задано', 'W15'), ('scroll wheel', 'колесо мыши', 'W15'), ('number keys', 'цифры', 'W24'), ('changed: ', 'изменено: ', 'W12'),
-('Press Enter, then its new key. Press Enter twice for no key.', 'Нажмите Enter, затем новую клавишу. Enter дважды: без клавиши.', 'tipb'),
+('Press E, then its new key. Enter sets no key.', 'Нажмите E, затем новую клавишу. Enter: без клавиши.', 'tipb'),
 ('off', 'выкл', 'W15'), ('scroll up', 'колесо вверх', 'W15'), ('scroll down', 'колесо вниз', 'W15'),
 ('mouse 3', 'мышь 3', 'W15'), ('mouse 4', 'мышь 4', 'W15'), ('mouse 5', 'мышь 5', 'W15'),
 # ---- menu page
 ('Language / Язык', 'Язык / Language', 'L40'), ('Open this menu', 'Открыть это меню', 'L40'),
-('Press Enter, then the key.', 'Нажмите Enter, затем клавишу.', 'tip'),
+('Press E, then the key.', 'Нажмите E, затем клавишу.', 'tip'),
 # ---- profiles
 ('Presets', 'Пресеты', 'L50'), ('Saved', 'Сохранённые', 'L50'),
 ('Credits', 'Благодарности', 'L50'), ('Menu', 'Меню', 'L52'),
@@ -157,21 +157,21 @@ T = [
 ('Works with mods made for Mod Menu by kestrel.', 'Работает с модами для Mod Menu от kestrel.', 'info'),
 ('Undo load', 'Отменить загрузку', 'L41'), ('Redo load', 'Вернуть загрузку', 'L41'), ('Save as new', 'Сохранить как новый', 'L41'), ('Export to clipboard', 'Экспорт в буфер', 'L41'), ('Include controls', 'Вместе с управлением', 'L41'), ('Loading a config also sets its sensitivity and keybinds.', 'Загрузка конфига задаёт и его чувствительность, и клавиши.', 'tip'), ('Overwrite', 'Перезаписать', 'L41'),
 ('Back to the config you loaded last.', 'Возврат к последнему загруженному конфигу.', 'info'),
-('Copy a line from a friend (it starts with MONOLITH:), then press Enter here. It is saved under its name.', 'Скопируйте строку от друга (она начинается с MONOLITH:) и нажмите здесь Enter. Она сохранится под своим именем.', 'info'),
+('Copy a line from a friend (it starts with MONOLITH:), then press E here. It is saved under its name.', 'Скопируйте строку от друга (она начинается с MONOLITH:) и нажмите здесь E. Она сохранится под своим именем.', 'info'),
 ('Loads everything. Sensitivity and keybinds only when Include controls is on.', 'Загружает всё. Чувствительность и клавиши только при включённом пункте Вместе с управлением.', 'info'),
 ('Saves your current config under a name. A config with the same name is replaced.', 'Сохраняет текущий конфиг под именем. Конфиг с тем же именем заменяется.', 'info'),
 ('Back to what you had before the last load or import, sensitivity and keybinds included.', 'Возврат к тому, что было до последней загрузки или импорта, включая чувствительность и клавиши.', 'info'),
 ('Nothing to undo.', 'Нечего отменять.', ''), ('Back to what you had before the last load.', 'Возвращено то, что было до последней загрузки.', ''), ('The load is back.', 'Загрузка возвращена.', ''),
 ('Your config as one line of text. Paste it to a friend.', 'Ваш конфиг одной строкой текста. Отправьте её другу.', 'info'),
 ('Import from clipboard', 'Импорт из буфера', 'L41'),
-('Copy a line from a friend (it starts with MONOLITH:), then press Enter here. Yours is kept as "' + B + '".', 'Скопируйте строку от друга (она начинается с MONOLITH:) и нажмите здесь Enter. Ваш конфиг сохранится как «' + B + '».', 'info'),
+('Copy a line from a friend (it starts with MONOLITH:), then press E here. Yours is kept as "' + B + '".', 'Скопируйте строку от друга (она начинается с MONOLITH:) и нажмите здесь E. Ваш конфиг сохранится как «' + B + '».', 'info'),
 ('Load', 'Загрузить', 'L41'), ('This config as one line of text. Paste it to a friend.', 'Этот конфиг одной строкой текста. Вставьте его другу.', 'info'),
 ('Saves your current config under this name.', 'Сохраняет текущий конфиг под этим именем.', 'info'),
 ('Delete', 'Удалить', 'L41'),
 ('The config Dorsth plays with, except sensitivity and keybinds.', 'Конфиг, с которым играет Dorsth, кроме чувствительности и клавиш.', 'info'),
 ('Defaults', 'По умолчанию', 'L41'),
 ('Every mod setting back to its default, except keybinds and outline colors. The game\'s own settings stay as they are.', 'Все настройки модов к значениям по умолчанию, кроме клавиш и цветов обводки. Настройки самой игры не меняются.', 'info'),
-(': Enter again', ': ещё раз Enter', 'W15'),
+(': E again', ': ещё раз E', 'W15'),
 ('No name given, nothing saved.', 'Имя не задано, ничего не сохранено.', 'info'),
 ('Overwrote ', 'Перезаписан профиль ', ''), ('Saved ', 'Сохранён профиль ', ''), ('Deleted ', 'Удалён профиль ', ''), ('Loaded ', 'Загружен профиль ', ''),
 ('Settings changed: ', 'Изменено настроек: ', ''), (' Undo load brings back what you had.', ' Отмена загрузки вернёт прежнее.', ''),

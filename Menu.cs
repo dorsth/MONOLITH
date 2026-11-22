@@ -262,6 +262,7 @@ namespace Monolith
 
         // ---- drawing
 
+        private bool _byMouse;
         private static Font _font; private static GUIStyle _st; private static Texture2D _white, _dots; private static int _fontFor; private static bool _fontSaid;
         private float _cw, _ch; private Rect _win, _navR, _pageR;
         // where the first category and the first row are and how far apart they sit: set when it is drawn, used by the mouse
@@ -273,8 +274,8 @@ namespace Monolith
         private static readonly Color Back = new Color32(0x13, 0x14, 0x11, 0xFF), Frame = new Color32(0x8F, 0xA5, 0x9B, 0xFF), Bar = new Color32(0x34, 0x45, 0x32, 0xFF), MenuBar = new Color32(0x2B, 0x39, 0x29, 0xFF), Window = new Color32(0x13, 0x14, 0x11, 0xFF),
             FrameDim = new Color32(0x6F, 0x85, 0x7B, 0xFF), Panel = new Color32(0x13, 0x18, 0x0F, 0xFF),
             BarDim = new Color32(0x13, 0x18, 0x10, 0xFF), Shadow = new Color(0f, 0f, 0f, 0.5f), Hover = new Color32(0x1A, 0x22, 0x17, 0xFF), KeyBar = new Color32(0x17, 0x1C, 0x13, 0xFF),
-            Well = new Color32(0x07, 0x08, 0x03, 0xFF), Selected = new Color32(0x2A, 0x38, 0x27, 0xFF), Badge = new Color32(0xB4, 0xF6, 0xB7, 0xFF);
-        private const string Txt = "#ADB3AC", Dim = "#909790", Hot = "#F1FAC3", Mint = "#B4F6B7", Val = "#FCFEF9", Head = "#8FA59B", Faint = "#5F605D", Ink = "#070803";
+            Well = new Color32(0x07, 0x08, 0x03, 0xFF), Badge = new Color32(0xB4, 0xF6, 0xB7, 0xFF);
+        private const string Txt = "#ADB3AC", Dim = "#909790", Hot = "#F0FC9D", Mint = "#B4F6B7", Val = "#FCFEF9", Head = "#8FA59B", Faint = "#5F605D", Ink = "#070803";
 
         private void Style()
         {
@@ -417,6 +418,9 @@ namespace Monolith
             _pageR = new Rect(_navR.xMax + _cw, _navR.y, _win.xMax - _navR.xMax - _cw * 1.5f, _navR.height);
             _navY0 = _navR.y + _ch; _navStep = _ch; _rowY0 = _pageR.y + _ch; _rowStep = _ch; _visRows = RowsHigh - 6;
 
+            // the mouse in use: the page shows no cursor, only the row under the mouse; a key brings the cursor back
+            if (ev.type == EventType.MouseDown) _byMouse = true;
+            else if (ev.type == EventType.KeyDown && ev.keyCode != KeyCode.None) _byMouse = false;
             if (_bindRow != null) PollBind();
             bool binding = _bindRow != null || Time.frameCount - _bindEnd <= 1;
             // Reset under the page works in every state: it ends whatever is being edited, then resets
@@ -483,7 +487,7 @@ namespace Monolith
             {
                 int idx = page.Top + i; MenuRow row = _vis[idx];
                 Rect r = new Rect(_pageR.x + _cw, _pageR.y + (i + 1) * _ch, Scrolls ? BarX(_pageR.xMax) - Gap - _pageR.x - _cw : _pageR.width - 2 * _cw - side * _cw, _ch);
-                bool cur = idx == ci && pageOn;
+                bool cur = idx == ci && pageOn && !_byMouse;
                 if (cur) Fill(r, Bar); else if (idx == over && row.Kind != RowKind.Header) Fill(r, Hover);
                 if (row.Kind == RowKind.Header) Heading(r, Lang.T(row.Label), page.Draw != null ? SideRect(page) : new Rect());
                 else Line(r.x + _cw * 0.5f, r.y, RowText(row, cols, cur));
@@ -601,7 +605,7 @@ namespace Monolith
                 {
                     string act = Lang.T(row.Label);
                     if (row == _editRow) return "<color=" + Mint + ">" + Esc(act) + ": </color><color=" + Hot + ">" + Esc(Fit(_edit, cols - act.Length - 4)) + "_</color>";
-                    if (row == _armed) return "<color=" + Hot + ">" + Esc(Pad(act + Lang.T(": Enter again"), cols)) + "</color>";
+                    if (row == _armed) return "<color=" + Hot + ">" + Esc(Pad(act + Lang.T(": E again"), cols)) + "</color>";
                     if (row.Take == null && row.Dyn != null)   // a line to read (credits): the text, its value on the right, nothing to press
                     {
                         string v = ""; try { v = row.Dyn() ?? ""; } catch { }
@@ -636,7 +640,7 @@ namespace Monolith
 
         private const int BarCells = 10, NumberCells = 6;
         private static readonly string BarGap = new string(' ', BarCells + 1);
-        private static readonly Color LineRest = new Color32(0x6F, 0x85, 0x7B, 0xFF), KnobCur = new Color32(0xF1, 0xFA, 0xC3, 0xFF), KnobRest = new Color32(0xAD, 0xB3, 0xAC, 0xFF), Tick = new Color32(0x8F, 0xA5, 0x9B, 0xFF);
+        private static readonly Color LineRest = new Color32(0x6F, 0x85, 0x7B, 0xFF), KnobCur = new Color32(0xF0, 0xFC, 0x9D, 0xFF), KnobRest = new Color32(0xAD, 0xB3, 0xAC, 0xFF), Tick = new Color32(0x8F, 0xA5, 0x9B, 0xFF);
 
         // what a setting is set to, drawn as what it is: a switch, a key, a color, one of a list (▼ opens the list),
         // or a number with a bar that shows where it sits between its lowest and highest
@@ -1068,8 +1072,8 @@ namespace Monolith
             if (k == KeyCode.Tab) { _inNav = !_inNav; ev.Use(); return; }
             if (k == KeyCode.W) k = KeyCode.UpArrow; else if (k == KeyCode.S) k = KeyCode.DownArrow; else if (k == KeyCode.A) k = KeyCode.LeftArrow; else if (k == KeyCode.D) k = KeyCode.RightArrow;
             else if (k == KeyCode.R) k = KeyCode.Delete;
-            else if (k == KeyCode.Q) k = KeyCode.Backspace;   // back, for keyboards without that key
-            else if (k == KeyCode.E) k = KeyCode.Return;      // open or take: Q and E sit either side of W, so one hand does it all
+            // Q back and E open or take: they sit either side of W, so one hand does it all (Backspace and Enter are not them)
+            else if (k == KeyCode.Backspace || k == KeyCode.Return || k == KeyCode.KeypadEnter) { ev.Use(); return; }
             // the search starts on the character, so it is the same key on every keyboard layout
             if (ch == '/' || k == KeyCode.Slash) { _searching = true; _query = ""; _searchPage = null; _modeFrame = Time.frameCount; ev.Use(); return; }
             // reset: the row under the mouse, wherever the keys are; without one, the cursor's row on the page
@@ -1084,7 +1088,7 @@ namespace Monolith
             {
                 if (k == KeyCode.UpArrow) SetCat(_cat - 1);
                 else if (k == KeyCode.DownArrow) SetCat(_cat + 1);
-                else if (k == KeyCode.RightArrow || k == KeyCode.Return || k == KeyCode.KeypadEnter) _inNav = false;
+                else if (k == KeyCode.RightArrow || k == KeyCode.E) _inNav = false;
                 else return;
                 ev.Use(); return;
             }
@@ -1092,10 +1096,10 @@ namespace Monolith
             else if (k == KeyCode.DownArrow) Move(page, ci, 1);
             else if (k == KeyCode.PageUp) Move(page, ci, -Mathf.Max(1, _visRows - 1));
             else if (k == KeyCode.PageDown) Move(page, ci, Mathf.Max(1, _visRows - 1));
-            else if (k == KeyCode.Backspace) GoBack();
+            else if (k == KeyCode.Q) GoBack();
             else if (k == KeyCode.LeftArrow) { if (row == null || !Change(row, -1, ev.shift)) GoBack(); }
             else if (k == KeyCode.RightArrow) { if (row != null) { if (row.Kind == RowKind.Link) Activate(row); else Change(row, 1, ev.shift); } }
-            else if (k == KeyCode.Return || k == KeyCode.KeypadEnter || k == KeyCode.Space) { if (row != null) Activate(row); }
+            else if (k == KeyCode.E || k == KeyCode.Space) { if (row != null) Activate(row); }
             else return;
             ev.Use();
         }
