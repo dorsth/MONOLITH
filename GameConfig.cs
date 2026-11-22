@@ -37,7 +37,7 @@ namespace Monolith
 
         internal static void Bind(ConfigFile c)
         {
-            TakeKeys = c.Bind("Configs", "Include Keybinds", false, "Loading a config also sets its keybinds. Off: your keybinds stay as they are.");
+            TakeKeys = c.Bind("Configs", "Include Controls", false, "Loading a config also sets its sensitivity and keybinds. Off: yours stay as they are.");
         }
 
         private static readonly CultureInfo Inv = CultureInfo.InvariantCulture;
@@ -75,7 +75,7 @@ namespace Monolith
             catch (Exception e) { BundlePlugin.Log.LogWarning("Configs: the game's settings could not be read: " + e.Message); }
         }
 
-        /// <summary>Sets what a config holds of the game's settings, and its keybinds when asked. Returns how many changed.</summary>
+        /// <summary>Sets what a config holds of the game's settings, and its sensitivity and keybinds when asked. Returns how many changed.</summary>
         internal static int Apply(Dictionary<uint, string> from, bool keys)
         {
             int n = 0;
@@ -85,6 +85,8 @@ namespace Monolith
                 for (int r = 0; r < Prefs.GetLength(0); r++)
                 {
                     string k = Prefs[r, 0], kind = Prefs[r, 1], field = Prefs[r, 2], v;
+                    // the game's sensitivity is part of the controls, like the keybinds
+                    if (!keys && k.IndexOf("Sensitivity", StringComparison.Ordinal) >= 0) continue;
                     if (!from.TryGetValue(Profiles.IdOf(Mod, Settings, k), out v)) continue;
                     float f; int i;
                     if (kind == "f") { if (!float.TryParse(v, NumberStyles.Float, Inv, out f) || (PlayerPrefs.HasKey(k) && PlayerPrefs.GetFloat(k) == f)) continue; PlayerPrefs.SetFloat(k, f); if (s != null && field != null) Traverse.Create(s).Field(field).SetValue(f); }

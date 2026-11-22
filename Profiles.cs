@@ -5,7 +5,7 @@
 //  * what belongs to one PC (resolution, window mode, V-Sync), the menu's own key, a mod's internal notes, the join message.
 // Loading one puts every mod setting it does not name back to its default, so a loaded profile is the whole setup.
 // Sensitivity is only set from a config that holds it: one saved before it was included leaves yours as it is.
-// Keybinds are only loaded when "Include keybinds" is on; undoing a load always brings yours back.
+// Sensitivity and keybinds (the controls) are only loaded when "Include controls" is on; undoing a load always brings yours back.
 //
 // To pass one on it becomes one line of text on the clipboard: MONOLITH:<name>:<code>. The code is letters and digits
 // only, so a chat program cannot mangle it. Importing reads the clipboard, keeps what you had as "previous setup",
@@ -33,7 +33,7 @@ namespace Monolith
 
         // Game: a setting a profile sets only when it holds a value for it (the two outline colors the game also has, and
         // TrueSens): Defaults, and a profile from before these were in it, leave yours as it is.
-        private struct Item { public uint Id; public ConfigEntryBase Entry; public bool Game, Key; }
+        private struct Item { public uint Id; public ConfigEntryBase Entry; public bool Game, Key, Control; }
 
         // FNV-1a over mod, section and name: a setting keeps its number as long as it keeps its name
         internal static uint IdOf(string mod, string section, string key) { return Id(mod, new ConfigDefinition(section, key)); }
@@ -68,7 +68,7 @@ namespace Monolith
                     uint id = Id(kv.Key, d);
                     if (!seen.Add(id)) continue;
                     bool key = d.Section == "Keys" || e.SettingType == typeof(KeyCode) || e.SettingType == typeof(KeyboardShortcut);
-                    list.Add(new Item { Id = id, Entry = e, Key = key, Game = kv.Key == Sens || ReferenceEquals(e, Players.EnemyOutline) || ReferenceEquals(e, Players.TeamOutline) });
+                    list.Add(new Item { Id = id, Entry = e, Key = key, Control = kv.Key == Sens, Game = kv.Key == Sens || ReferenceEquals(e, Players.EnemyOutline) || ReferenceEquals(e, Players.TeamOutline) });
                 }
             }
             return list;
@@ -128,7 +128,7 @@ namespace Monolith
                 foreach (Item it in items)
                 {
                     string want;
-                    if (it.Key && !keys) continue;
+                    if ((it.Key || it.Control) && !keys) continue;
                     // keys and the game's settings are only set from a config that holds them
                     if (!p.Values.TryGetValue(it.Id, out want)) { if (it.Game || it.Key) continue; want = DefaultText(it.Entry); }
                     if (it.Entry.GetSerializedValue() == want) continue;
@@ -391,11 +391,11 @@ namespace Monolith
             pg.Rows.Clear(); pg.Cur = null;
             if (Find(Before) != null) pg.Rows.Add(_undone
                 ? new MenuRow { Kind = RowKind.Action, Label = "Redo load", Info = "Back to the config you loaded last.", Take = s => { string r = Undo(); Fill(); return r; } }
-                : new MenuRow { Kind = RowKind.Action, Label = "Undo load", Info = "Back to what you had before the last load or import, keybinds included.", Take = s => { string r = Undo(); Fill(); return r; } });
+                : new MenuRow { Kind = RowKind.Action, Label = "Undo load", Info = "Back to what you had before the last load or import, sensitivity and keybinds included.", Take = s => { string r = Undo(); Fill(); return r; } });
             pg.Rows.Add(new MenuRow { Kind = RowKind.Action, Label = "Save as new", Ask = "name", Info = "Saves your current config under a name. A config with the same name is replaced.", Take = s => { string r = SaveAs(s); Fill(); return r; } });
             pg.Rows.Add(new MenuRow { Kind = RowKind.Action, Label = "Export to clipboard", Info = "Your config as one line of text. Paste it to a friend.", Take = s => ExportNow() });
             pg.Rows.Add(new MenuRow { Kind = RowKind.Action, Label = "Import from clipboard", Info = "Copy a line from a friend (it starts with MONOLITH:), then press Enter here. It is saved under its name.", Take = s => { string r = Import(); Fill(); return r; } });
-            pg.Rows.Add(new MenuRow { Kind = RowKind.Entry, Label = "Include keybinds", Entry = GameConfig.TakeKeys });
+            pg.Rows.Add(new MenuRow { Kind = RowKind.Entry, Label = "Include controls", Entry = GameConfig.TakeKeys, Tip = "Loading a config also sets its sensitivity and keybinds." });
             bool saved = false;
             foreach (Profile each in All)
             {
@@ -403,7 +403,7 @@ namespace Monolith
                 if (string.Equals(p.Name, Before, StringComparison.OrdinalIgnoreCase)) continue;   // the Undo row stands for it
                 if (!saved) { pg.Head("Saved"); saved = true; }
                 var sub = new MenuPage(pg, p.Name, Lang.Count(Differs(p), " setting differs from the defaults.", " settings differ from the defaults.", "Differences from the defaults: ") + (Lang.Ru ? "." : ""));
-                sub.Rows.Add(new MenuRow { Kind = RowKind.Action, Label = "Load", Info = "Loads everything, sensitivity included. Keybinds only when Include keybinds is on.", Take = s => { string r = Load(p); Fill(); return r; } });
+                sub.Rows.Add(new MenuRow { Kind = RowKind.Action, Label = "Load", Info = "Loads everything. Sensitivity and keybinds only when Include controls is on.", Take = s => { string r = Load(p); Fill(); return r; } });
                 sub.Rows.Add(new MenuRow { Kind = RowKind.Action, Label = "Export to clipboard", Info = "This config as one line of text. Paste it to a friend.", Take = s => Export(p) });
                 sub.Rows.Add(new MenuRow { Kind = RowKind.Action, Label = "Overwrite", Confirm = true, Info = "Saves your current config under this name.", Take = s => { string r = SaveAs(p.Name); Fill(); return r; } });
                 sub.Rows.Add(new MenuRow { Kind = RowKind.Action, Label = "Delete", Confirm = true, Info = "", Take = s => { string r = Delete(p); Fill(); return r; } });

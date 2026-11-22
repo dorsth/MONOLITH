@@ -5,7 +5,7 @@ namespace Monolith
 {
     internal static partial class Lang
     {
-        private static readonly Dictionary<string, string> Table = new Dictionary<string, string>(312)
+        private static readonly Dictionary<string, string> Table = new Dictionary<string, string>(313)
         {
             { "Crosshair", "Прицел" },
             { "Viewmodel", "Вьюмодель" },
@@ -242,13 +242,14 @@ namespace Monolith
             { "Redo load", "Вернуть загрузку" },
             { "Save as new", "Сохранить как новый" },
             { "Export to clipboard", "Экспорт в буфер" },
-            { "Include keybinds", "Вместе с клавишами" },
+            { "Include controls", "Вместе с управлением" },
+            { "Loading a config also sets its sensitivity and keybinds.", "Загрузка конфига задаёт и его чувствительность, и клавиши." },
             { "Overwrite", "Перезаписать" },
             { "Back to the config you loaded last.", "Возврат к последнему загруженному конфигу." },
             { "Copy a line from a friend (it starts with MONOLITH:), then press Enter here. It is saved under its name.", "Скопируйте строку от друга (она начинается с MONOLITH:) и нажмите здесь Enter. Она сохранится под своим именем." },
-            { "Loads everything, sensitivity included. Keybinds only when Include keybinds is on.", "Загружает всё, включая чувствительность. Клавиши только при включённом пункте Вместе с клавишами." },
+            { "Loads everything. Sensitivity and keybinds only when Include controls is on.", "Загружает всё. Чувствительность и клавиши только при включённом пункте Вместе с управлением." },
             { "Saves your current config under a name. A config with the same name is replaced.", "Сохраняет текущий конфиг под именем. Конфиг с тем же именем заменяется." },
-            { "Back to what you had before the last load or import, keybinds included.", "Возврат к тому, что было до последней загрузки или импорта, включая клавиши." },
+            { "Back to what you had before the last load or import, sensitivity and keybinds included.", "Возврат к тому, что было до последней загрузки или импорта, включая чувствительность и клавиши." },
             { "Nothing to undo.", "Нечего отменять." },
             { "Back to what you had before the last load.", "Возвращено то, что было до последней загрузки." },
             { "The load is back.", "Загрузка возвращена." },

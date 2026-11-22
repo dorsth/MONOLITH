@@ -1,5 +1,8 @@
 # MONOLITH changelog
 
+## 1.3.4
+- Configs: "Include keybinds" is "Include controls". It covers sensitivity too (the game's and TrueSens), so a config from a friend leaves your sensitivity alone unless it is on. Off by default.
+
 ## 1.3.3
 - The color picker is narrower and opens right under its row, beside the preview, so the preview shows the color while you pick it. The picked color has a line around it.
 - The previews have the room they had in 1.3.0 again.
