@@ -20,6 +20,7 @@ namespace Monolith
             public bool Palette; public int Cols = 1, Cur, Top;
             public string Typed = ""; public float TypedAt;
             public float AnchorRight, AnchorY;
+            public Rect Side;                  // the preview box of the page, which it keeps clear of when it can
             public Rect R; public int Shown;
         }
 
@@ -40,6 +41,7 @@ namespace Monolith
         {
             p.AnchorRight = _pageR.xMax - _cw - (page.Draw != null ? (page.SideCols + 1) * _cw : 0f);
             p.AnchorY = _rowY0 + (ci - page.Top + 1) * _rowStep;
+            p.Side = page.Draw != null ? SideRect(page) : new Rect();
         }
 
         private void OpenList(MenuRow row, MenuPage page, int ci)
@@ -182,8 +184,12 @@ namespace Monolith
                 w = (Mathf.Min(longest, 40) + 6) * _cw; h = (p.Shown + 2) * _ch;
             }
             // under the row; above it when there is no room under it; never outside the window
-            float x = Mathf.Clamp(p.AnchorRight - w, _win.x + _cw, _win.xMax - w - _cw), y = p.AnchorY;
+            // inside the page; under the row, or above it when there is no room under it
+            float x = Mathf.Clamp(p.AnchorRight - w, _pageR.x + _cw * 0.5f, _pageR.xMax - w - _cw * 0.5f), y = p.AnchorY;
+            x = Mathf.Clamp(x, _win.x + _cw, _win.xMax - w - _cw);
             if (y + h > _win.yMax - _ch * 1.5f) y = Mathf.Max(_win.y + _ch * 0.5f, p.AnchorY - _rowStep - h);
+            // too wide to sit beside the preview: under it, so what you pick shows while you pick it
+            if (p.Side.width > 0f && new Rect(x, y, w, h).Overlaps(p.Side) && p.Side.yMax + _ch * 0.5f + h <= _pageR.yMax) y = p.Side.yMax + _ch * 0.5f;
             p.R = new Rect(Mathf.Round(x), Mathf.Round(y), w, h);
             if (mouseMoved) { int at = PopAt(mouse); if (at >= 0) PopMove(at); }
 

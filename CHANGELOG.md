@@ -1,5 +1,9 @@
 # MONOLITH changelog
 
+## 1.3.2
+- Color pickers and lists stay inside the page. One that would cover the preview opens under it, so you see the color while you pick it.
+- Per weapon: the weapon rows say what they are.
+
 ## 1.3.1
 - The key bar keeps its keys in place: "R reset" comes last.
 - Rows that act at once (Undo load, Save as new, Export, Import, the presets) have no ►. A ► opens a page.

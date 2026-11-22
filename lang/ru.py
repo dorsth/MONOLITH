@@ -31,6 +31,7 @@ T = [
 ('Save, load and share configs: every setting, the game\'s and your sensitivity included.', 'Сохранение, загрузка и обмен конфигами: все настройки, включая настройки игры и чувствительность.', 'info'),
 ('Language, the menu key, menu animations, playlists.', 'Язык, клавиша меню, анимации меню, плейлисты.', 'info'),
 ('A weapon listed here uses its own FOV and position.', 'У оружия из этого списка свои FOV и положение.', 'info'),
+('Pick a weapon, then its own FOV and position.', 'Выберите оружие, затем его FOV и положение.', 'info'),
 # ---- crosshair
 ('Custom crosshair', 'Свой прицел', 'L27'), ('Off: the game crosshair.', 'Выкл: прицел игры.', 'tip'),
 ('Style', 'Стиль', 'L15'),

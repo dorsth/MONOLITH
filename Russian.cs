@@ -5,7 +5,7 @@ namespace Monolith
 {
     internal static partial class Lang
     {
-        private static readonly Dictionary<string, string> Table = new Dictionary<string, string>(311)
+        private static readonly Dictionary<string, string> Table = new Dictionary<string, string>(312)
         {
             { "Crosshair", "Прицел" },
             { "Viewmodel", "Вьюмодель" },
@@ -45,6 +45,7 @@ namespace Monolith
             { "Save, load and share configs: every setting, the game's and your sensitivity included.", "Сохранение, загрузка и обмен конфигами: все настройки, включая настройки игры и чувствительность." },
             { "Language, the menu key, menu animations, playlists.", "Язык, клавиша меню, анимации меню, плейлисты." },
             { "A weapon listed here uses its own FOV and position.", "У оружия из этого списка свои FOV и положение." },
+            { "Pick a weapon, then its own FOV and position.", "Выберите оружие, затем его FOV и положение." },
             { "Custom crosshair", "Свой прицел" },
             { "Off: the game crosshair.", "Выкл: прицел игры." },
             { "Style", "Стиль" },

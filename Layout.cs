@@ -435,7 +435,7 @@ namespace Monolith
                 {
                     int me = i; string s = "Weapon " + (i + 1); ConfigEntryBase pick = picks[i];
                     Func<bool> used = () => !Is(pick, "None");
-                    var slot = new MenuPage(per, s, null);
+                    var slot = new MenuPage(per, s, "Pick a weapon, then its own FOV and position.");
                     slot.Set("Weapon", pick, null, "None leaves this slot empty.")
                         .Set("FOV", E(View, s, "Viewmodel FOV"), used, "")
                         .Set("Left / right", E(View, s, "Viewmodel X Offset"), used, "")
