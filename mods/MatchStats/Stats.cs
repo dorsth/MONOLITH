@@ -37,7 +37,7 @@ namespace MatchStats
 
         internal sealed class P
         {
-            public string Name = "";
+            public string Name = ""; public ulong Steam;
             public int Kills, Deaths, Takes, Survived, OpenK, OpenD, Trades, Multi, Clutch;
             public float Dmg;
             public int RoundKills; public bool Alive = true, LastAlive;
@@ -168,7 +168,7 @@ namespace MatchStats
             int vt = Team(h.Victim), mates = 0, foes = 0; P last = null;
             foreach (var kv in All)
             {
-                if (!kv.Value.Alive) continue;
+                if (!kv.Value.Alive || !Playing(kv.Key)) continue;
                 if (Team(kv.Key) == vt) { mates++; last = kv.Value; } else foes++;
             }
             if (mates == 1 && foes >= 2 && last != null) last.LastAlive = true;
@@ -200,7 +200,7 @@ namespace MatchStats
 
         private static bool TeamAlive(int team)
         {
-            foreach (var kv in All) if (kv.Value.Alive && Team(kv.Key) == team && ClientInstance.playerInstances.ContainsKey(kv.Key)) return true;
+            foreach (var kv in All) if (kv.Value.Alive && Team(kv.Key) == team && ClientInstance.playerInstances.ContainsKey(kv.Key) && Playing(kv.Key)) return true;
             return false;
         }
 
@@ -343,7 +343,7 @@ namespace MatchStats
             {
                 p = new P(); All[id] = p;
                 ClientInstance ci;
-                if (ClientInstance.playerInstances.TryGetValue(id, out ci) && ci != null) p.Name = Untag(ci.PlayerName);
+                if (ClientInstance.playerInstances.TryGetValue(id, out ci) && ci != null) { p.Name = Untag(ci.PlayerName); p.Steam = ci.PlayerSteamID; }
             }
             return p;
         }
@@ -407,9 +407,42 @@ namespace MatchStats
 
         internal static string Num(float f) { return Mathf.RoundToInt(f).ToString(CultureInfo.InvariantCulture); }
 
-        // The game has 4 player places (ids 0 to 3). A higher id is a spectator seat (Straftat Tournaments): not on the
-        // boards and not counted in takes.
-        private static bool Playing(int id) { return id >= 0 && id < 4; }
+        // A spectator of Straftat Tournaments is not on the boards and not counted in takes. Any id can be one: the ids go
+        // by when someone joined, so with a spectator in early a player can have id 4 or 5. Up to 1.0.0 every id from 4 up
+        // was taken for a spectator, which left players out and kept spectators in.
+        private static bool Playing(int id)
+        {
+            if (id < 0) return false;
+            ClientInstance ci; P p;
+            if (ClientInstance.playerInstances.TryGetValue(id, out ci) && ci != null) return !Watching(ci.PlayerSteamID);
+            return All.TryGetValue(id, out p) && !Watching(p.Steam);   // someone who left: as they were
+        }
+
+        // the spectators, as Straftat Tournaments keeps them in the lobby (Steam IDs, comma separated); read once a frame
+        private static readonly HashSet<ulong> Spectators = new HashSet<ulong>();
+        private static int _specFrame = -1;
+        private static string _specRaw = "";
+        private static bool Watching(ulong steam)
+        {
+            if (steam == 0) return false;
+            if (_specFrame != Time.frameCount)
+            {
+                _specFrame = Time.frameCount;
+                string raw = "";
+                try
+                {
+                    ulong lobby = SteamLobby.Instance != null ? SteamLobby.Instance.CurrentLobbyID : 0;
+                    if (lobby != 0) raw = Steamworks.SteamMatchmaking.GetLobbyData(new Steamworks.CSteamID(lobby), "dorsth_t_spec") ?? "";
+                }
+                catch { }
+                if (raw != _specRaw)
+                {
+                    _specRaw = raw; Spectators.Clear();
+                    foreach (string part in raw.Split(',')) { ulong v; if (ulong.TryParse(part, out v)) Spectators.Add(v); }
+                }
+            }
+            return Spectators.Contains(steam);
+        }
 
         internal static List<KeyValuePair<int, P>> Sorted()
         {
