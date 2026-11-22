@@ -18,7 +18,7 @@ namespace Monolith
             public MenuRow Row; public object Was;
             public object[] Values; public string[] Labels;
             public bool Palette; public int Cols = 1, Cur, Top;
-            public float Left;                 // where the palette starts in it, in cells: wider for a long title, the colors in the middle
+            public float Pitch;                // the palette: cells from one color to the next
             public string Typed = ""; public float TypedAt;
             public float AnchorRight, AnchorY;
             public Rect R; public int Shown;
@@ -26,8 +26,8 @@ namespace Monolith
 
         private Pop _pop;
         private const int PaletteCols = 12, ListRows = 14;
-        // the palette: a column per shade, a row per hue, under the value it sets and no wider than it needs
-        private const float Pitch = 2.4f, Swatch = 2f, PalLeft = 1.5f, PalRow = 0.75f;
+        // the palette is as wide as the row it sets: its frame on the row's edges, the colors spread over it
+        private const float PalLeft = 1.5f, SwatchShare = 0.83f;
 
         private static string LabelOf(MenuRow row, object v)
         {
@@ -60,7 +60,7 @@ namespace Monolith
         {
             Color was = (Color)row.Entry.BoxedValue;
             var values = new List<object>();
-            // first column: white to black; then every hue, light, full, dim and dark, a column each (a row is one hue)
+            // top row: white to black; under it every hue, light, full, dim and dark
             for (int i = 0; i < PaletteCols; i++) { float g = 1f - i / (PaletteCols - 1f); values.Add(new Color(g, g, g, was.a)); }
             float[] sat = { 0.4f, 1f, 1f, 1f }, val = { 1f, 1f, 0.7f, 0.42f };
             for (int r = 0; r < sat.Length; r++)
@@ -107,12 +107,10 @@ namespace Monolith
                 if (p.Palette && p.Typed.Length > 0 && !TryHex(p)) { p.Typed = ""; ev.Use(); return; }
                 PopClose(true); ev.Use(); return;
             }
-            // in the palette a column holds Cols colors: up and down go one, left and right a column
-            int across = p.Palette ? p.Cols : 1, down = p.Palette ? 1 : p.Cols;
-            if (k == KeyCode.UpArrow) { p.Typed = ""; PopMove(p.Cur - down); }
-            else if (k == KeyCode.DownArrow) { p.Typed = ""; PopMove(p.Cur + down); }
-            else if (k == KeyCode.LeftArrow) { p.Typed = ""; PopMove(p.Cur - across); }
-            else if (k == KeyCode.RightArrow) { p.Typed = ""; PopMove(p.Cur + across); }
+            if (k == KeyCode.UpArrow) { p.Typed = ""; PopMove(p.Cur - p.Cols); }
+            else if (k == KeyCode.DownArrow) { p.Typed = ""; PopMove(p.Cur + p.Cols); }
+            else if (k == KeyCode.LeftArrow) { p.Typed = ""; PopMove(p.Cur - 1); }
+            else if (k == KeyCode.RightArrow) { p.Typed = ""; PopMove(p.Cur + 1); }
             else if (k == KeyCode.PageUp) PopMove(p.Cur - (p.Palette ? p.Cols : ListRows - 1));
             else if (k == KeyCode.PageDown) PopMove(p.Cur + (p.Palette ? p.Cols : ListRows - 1));
             else if (k == KeyCode.Home) PopMove(0);
@@ -153,9 +151,9 @@ namespace Monolith
             if (!p.R.Contains(m)) return -1;
             if (p.Palette)
             {
-                int col = Mathf.FloorToInt((m.x - p.R.x - _cw * (p.Left - (Pitch - Swatch) / 2f)) / (_cw * Pitch)), row = Mathf.FloorToInt((m.y - p.R.y - _ch) / (_ch * PalRow));
-                if (col < 0 || row < 0 || row >= p.Cols) return -1;
-                int i = col * p.Cols + row;
+                int col = Mathf.FloorToInt((m.x - p.R.x - _cw * (PalLeft - p.Pitch * (1f - SwatchShare) / 2f)) / (_cw * p.Pitch)), row = Mathf.FloorToInt((m.y - p.R.y - _ch) / _ch);
+                if (col < 0 || col >= p.Cols || row < 0) return -1;
+                int i = row * p.Cols + col;
                 return i < p.Values.Length ? i : -1;
             }
             int line = Mathf.FloorToInt((m.y - p.R.y - _ch) / _ch);
@@ -179,9 +177,9 @@ namespace Monolith
             float w, h;
             if (p.Palette)
             {
-                float colors = n / p.Cols * Pitch - (Pitch - Swatch), cells = Mathf.Max(colors + 2f * PalLeft, Lang.T(p.Row.Label.Trim()).Length + 4f);
-                p.Left = (cells - colors) / 2f;
-                w = cells * _cw; h = (p.Cols * PalRow + 3.5f) * _ch;
+                w = p.AnchorRight - _pageR.x;
+                p.Pitch = (w / _cw - 2f * PalLeft) / (p.Cols - 1f + SwatchShare);
+                h = (n / p.Cols + 4) * _ch;
             }
             else
             {
@@ -194,7 +192,7 @@ namespace Monolith
             // under the row; above it when there is no room under it; never outside the window
             // inside the page; under the row, or above it when there is no room under it
             // its half cell of filled room stops just inside the double line of the page
-            float edge = Thin * 3f + 2f;
+            float edge = _cw * 0.5f;
             float x = Mathf.Clamp(p.AnchorRight - w, _pageR.x + edge, _pageR.xMax - w - edge), y = p.AnchorY;
             x = Mathf.Clamp(x, _win.x + _cw, _win.xMax - w - _cw);
             if (y + h > _win.yMax - _ch * 1.5f) y = Mathf.Max(_win.y + _ch * 0.5f, p.AnchorY - _rowStep - h);
@@ -212,15 +210,15 @@ namespace Monolith
             {
                 for (int i = 0; i < n; i++)
                 {
-                    int col = i / p.Cols, row = i % p.Cols;
-                    float rh = Mathf.Round(_ch * PalRow), cx = Mathf.Round(p.R.x + _cw * (p.Left + col * Pitch)), cy = p.R.y + _ch + row * rh, sw = Mathf.Round(_cw * Swatch), sh = rh - 4f;
+                    int col = i % p.Cols, row = i / p.Cols;
+                    float cx = Mathf.Round(p.R.x + _cw * (PalLeft + col * p.Pitch)), cy = p.R.y + _ch + row * _ch, sw = Mathf.Round(_cw * p.Pitch * SwatchShare), sh = _ch - 6f;
                     Color c = (Color)p.Values[i];
                     // the one picked: a line right around it
-                    if (i == p.Cur) { float t = Thin; Fill(new Rect(cx - t, cy + 2f - t, sw + 2f * t, sh + 2f * t), KnobCur); }
-                    Fill(new Rect(cx, cy + 2f, sw, sh), new Color(c.r, c.g, c.b, 1f));
+                    if (i == p.Cur) { float t = Thin; Fill(new Rect(cx - t, cy + 3f - t, sw + 2f * t, sh + 2f * t), KnobCur); }
+                    Fill(new Rect(cx, cy + 3f, sw, sh), new Color(c.r, c.g, c.b, 1f));
                 }
                 string hex = p.Typed.Length > 0 ? "<color=" + Hot + ">#" + p.Typed + "_</color>" : "<color=" + Val + ">#" + p.Row.Entry.GetSerializedValue() + "</color>";
-                GUI.Label(new Rect(p.R.x + _cw * p.Left, p.R.yMax - _ch * 2f, p.R.width, _ch), hex, _st);
+                GUI.Label(new Rect(p.R.x + _cw * PalLeft, p.R.yMax - _ch * 2f, p.R.width, _ch), hex, _st);
                 return;
             }
             if (p.Cur < p.Top) p.Top = p.Cur;

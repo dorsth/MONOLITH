@@ -1,5 +1,8 @@
 # MONOLITH changelog
 
+## 1.4.6
+- The color picker is exactly as wide as its row: its frame on the row's edges, the colors spread across it in rows again.
+
 ## 1.4.5
 - The color picker is a narrow column under the value: a column per shade, a row per hue. It no longer reaches under the name of the setting. Up and down go one color, left and right a shade.
 
