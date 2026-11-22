@@ -1,5 +1,8 @@
 # MONOLITH changelog
 
+## 1.9.9
+- The icon has the menu's colors.
+
 ## 1.9.8
 - ezCrosshair 1.3.5: the star's tips fade out, so its points no longer look square.
 
