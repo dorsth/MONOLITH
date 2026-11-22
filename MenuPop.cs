@@ -25,8 +25,8 @@ namespace Monolith
 
         private Pop _pop;
         private const int PaletteCols = 12, ListRows = 14;
-        // the palette: a color every 2.5 cells, each 2 wide, so it fits beside a preview and the preview shows the pick
-        private const float Pitch = 2.5f, Swatch = 2f, PalLeft = 1.5f;
+        // the palette: a color every 2.4 cells, each 2 wide, so it fits beside a preview and the preview shows the pick
+        private const float Pitch = 2.4f, Swatch = 2f, PalLeft = 1.5f;
 
         private static string LabelOf(MenuRow row, object v)
         {
@@ -185,21 +185,21 @@ namespace Monolith
             }
             // under the row; above it when there is no room under it; never outside the window
             // inside the page; under the row, or above it when there is no room under it
-            float x = Mathf.Clamp(p.AnchorRight - w, _pageR.x + _cw * 0.5f, _pageR.xMax - w - _cw * 0.5f), y = p.AnchorY;
+            // its half cell of filled room stops just inside the double line of the page
+            float edge = Thin * 3f + 2f;
+            float x = Mathf.Clamp(p.AnchorRight - w, _pageR.x + edge, _pageR.xMax - w - edge), y = p.AnchorY;
             x = Mathf.Clamp(x, _win.x + _cw, _win.xMax - w - _cw);
             if (y + h > _win.yMax - _ch * 1.5f) y = Mathf.Max(_win.y + _ch * 0.5f, p.AnchorY - _rowStep - h);
             p.R = new Rect(Mathf.Round(x), Mathf.Round(y), w, h);
             if (mouseMoved) { int at = PopAt(mouse); if (at >= 0) PopMove(at); }
 
-            // drawn as a panel is: the page's own background, a frame, its title on the frame. The half cell around the frame
-            // hides the rows under it, but stops inside the frame of the page.
+            // a filled panel with half a cell of room around its frame, as Far draws a dialog; never over the page's own lines
             var frame = new Rect(p.R.x + _cw * 0.5f, p.R.y + _ch * 0.5f, p.R.width - _cw, p.R.height - _ch);
             float pt = Thin * 3f;
             var room = new Rect(_pageR.x + pt, _pageR.y + pt, _pageR.width - 2f * pt, _pageR.height - 2f * pt);
             float x0 = Mathf.Max(p.R.x, room.x), y0 = Mathf.Max(p.R.y, room.y), x1 = Mathf.Min(p.R.xMax, room.xMax), y1 = Mathf.Min(p.R.yMax, room.yMax);
-            if (x1 > x0 && y1 > y0) Fill(new Rect(x0, y0, x1 - x0, y1 - y0), Back);
-            Fill(frame, Back);
-            Box(frame, Lang.T(p.Row.Label.Trim()), true, Back);
+            if (x1 > x0 && y1 > y0) Fill(new Rect(x0, y0, x1 - x0, y1 - y0), Panel);
+            Box(frame, Lang.T(p.Row.Label.Trim()), true, Panel);
             if (p.Palette)
             {
                 for (int i = 0; i < n; i++)
@@ -232,7 +232,7 @@ namespace Monolith
                 string count = " " + (p.Cur + 1) + "/" + n + " ";
                 // on the frame's bottom line, from the end of the last row down (2 pixels higher it cuts a notch into the bar on the last row)
                 Rect cr = new Rect(p.R.xMax - (count.Length + 3) * _cw, p.R.yMax - _ch, count.Length * _cw, _ch);
-                Fill(cr, Back);
+                Fill(cr, Panel);
                 GUI.Label(cr, "<color=" + Head + ">" + count + "</color>", _st);
             }
         }

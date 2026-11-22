@@ -1,5 +1,8 @@
 # MONOLITH changelog
 
+## 1.3.9
+- Color picker and lists have their lighter panel back, with half a cell of it around the frame. It stops just inside the double line of the page and never covers it.
+
 ## 1.3.8
 - Color picker and lists look like the panels: the same dark background, their title on the frame, and nothing of the rows under them showing around the title.
 
