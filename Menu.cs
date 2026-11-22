@@ -470,10 +470,10 @@ namespace Monolith
             Footer(_navR, BundlePlugin.Version);
             string title = _searching ? Lang.T("search: ") + _query + "_" : PathText(page);
             Box(_pageR, Fit(title, (int)(_pageR.width / _cw) - 24), pageOn);   // room on the right for the clock
-            // the clock on the top frame at the right, in yellow, as Far shows it
+            // the clock on the top frame, as Far shows it: over the corner, its last letter on the frame's outer edge
             string clock = DateTime.Now.ToShortTimeString();
-            float cx = _pageR.xMax - (clock.Length + 3) * _cw;
-            Fill(new Rect(cx, _pageR.y - _ch * 0.5f + Thin * 2f, (clock.Length + 2) * _cw, _ch), Back);
+            float cx = _pageR.xMax - (clock.Length + 1) * _cw;
+            Fill(new Rect(cx, _pageR.y - _ch * 0.5f + Thin * 2f, (clock.Length + 1) * _cw, _ch), Back);
             GUI.Label(new Rect(cx + _cw, _pageR.y - _ch * 0.5f + Thin, (clock.Length + 1) * _cw, _ch), "<b><color=" + Hot + ">" + Esc(clock) + "</color></b>", _st);
             int side = page.Draw != null ? page.SideCols + 1 : 0;
             int cols = ColsFor(page), vis = _visRows;

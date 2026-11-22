@@ -1,5 +1,8 @@
 # MONOLITH changelog
 
+## 1.7.1
+- The clock sits over the top right corner, as in Far.
+
 ## 1.7.0
 - The yellow is back to how it was.
 
