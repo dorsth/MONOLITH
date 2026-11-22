@@ -1,5 +1,8 @@
 # MONOLITH changelog
 
+## 1.7.4
+- Bright titles and values are #FCFEF9, as in Far.
+
 ## 1.7.3
 - Other mods in the side menu is #5F605D, the color Far gives hidden files.
 

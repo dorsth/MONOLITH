@@ -274,7 +274,7 @@ namespace Monolith
             FrameDim = new Color32(0x6F, 0x85, 0x7B, 0xFF), Panel = new Color32(0x13, 0x18, 0x0F, 0xFF),
             BarDim = new Color32(0x13, 0x18, 0x10, 0xFF), Shadow = new Color(0f, 0f, 0f, 0.5f), Hover = new Color32(0x1A, 0x22, 0x17, 0xFF), KeyBar = new Color32(0x17, 0x1C, 0x13, 0xFF),
             Well = new Color32(0x07, 0x08, 0x03, 0xFF), Badge = new Color32(0xB4, 0xF6, 0xB7, 0xFF);
-        private const string Txt = "#A9B0AA", Dim = "#909790", Hot = "#EEFF77", Mint = "#B4F6B7", Val = "#F4FEF4", Head = "#8FA59B", Faint = "#5F605D", Ink = "#070803";
+        private const string Txt = "#A9B0AA", Dim = "#909790", Hot = "#EEFF77", Mint = "#B4F6B7", Val = "#FCFEF9", Head = "#8FA59B", Faint = "#5F605D", Ink = "#070803";
 
         private void Style()
         {
