@@ -1,5 +1,8 @@
 # MONOLITH changelog
 
+## 1.4.4
+- Beside a preview, a section line runs into the preview's frame, so it is joined at both ends.
+
 ## 1.4.3
 - A sub-page opens on its first setting, also when you left it by "..".
 
