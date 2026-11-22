@@ -10,7 +10,7 @@
 //  * a kill: a hit that takes the health from above 0 to 0 or less.
 //  * per take (one fight; a round is one map of takes): the first kill (opening kill and opening
 //    death), a trade (killing the enemy who killed your teammate in the 3 seconds before), two or more kills in one take,
-//    a clutch (your team wins the round after you were the last one alive on it while two enemies were alive), and who
+//    a clutch (your team wins the take after you were the last one alive on it while two enemies were alive), and who
 //    was still alive at the end.
 // What is shown, only between rounds and after the match, never while anyone can play (no live health or damage of
 // others): a small board on the round-end screen (kills, deaths, damage in that round, that map, only), each name on
@@ -319,7 +319,7 @@ namespace MatchStats
 
         private static void MatchReset()
         {
-            All.Clear(); Tagged.Clear(); Known.Clear(); KillerOf.Clear(); IdOfKiller.Clear(); Waiting.Clear(); IdOf.Clear(); RoundDeaths.Clear();
+            Board._teamsSaid = false; All.Clear(); Tagged.Clear(); Known.Clear(); KillerOf.Clear(); IdOfKiller.Clear(); Waiting.Clear(); IdOf.Clear(); RoundDeaths.Clear();
             _firstDone = false; _takeOn = false;
         }
 
@@ -448,8 +448,18 @@ namespace MatchStats
         {
             var l = new List<KeyValuePair<int, P>>();
             foreach (var kv in All) if (Playing(kv.Key)) l.Add(kv);
-            l.Sort((a, b) => Team(a.Key) != Team(b.Key) ? Team(a.Key).CompareTo(Team(b.Key)) : b.Value.Kills != a.Value.Kills ? b.Value.Kills.CompareTo(a.Value.Kills) : b.Value.Dmg.CompareTo(a.Value.Dmg));
+            // teams together; with no teams (1v1, free-for-all) only by kills, else everyone came out in the order they joined
+            bool solo = Solo(l);
+            l.Sort((a, b) => !solo && Team(a.Key) != Team(b.Key) ? Team(a.Key).CompareTo(Team(b.Key)) : b.Value.Kills != a.Value.Kills ? b.Value.Kills.CompareTo(a.Value.Kills) : b.Value.Dmg.CompareTo(a.Value.Dmg));
             return l;
+        }
+
+        // every player on a team of their own: 1v1 or free-for-all
+        internal static bool Solo(List<KeyValuePair<int, P>> l)
+        {
+            var seen = new HashSet<int>();
+            foreach (var kv in l) if (!seen.Add(Team(kv.Key))) return false;
+            return true;
         }
 
         // The boards in the game's own look: the font of its round-end screen, text with a light shadow on one dark
@@ -461,14 +471,12 @@ namespace MatchStats
         internal sealed class Board : MonoBehaviour
         {
             internal static Board Me;
-            private bool _full, _waitOnly; private float _hideAt = -1f;
+            private bool _full, _waitOnly; internal static bool _teamsSaid; private float _hideAt = -1f;
             private GameObject _canvas; private RectTransform _root, _back;
             private const float Pad = 14f, Edge = 24f;   // panel padding around the text; the round board's distance from the screen's left and top
             private TMP_FontAsset _font; private Material _mat;
             private readonly List<TextMeshProUGUI> _cells = new List<TextMeshProUGUI>();
 
-            // adr and 2k are the short names players already know; the rest is written out
-            private static readonly string[] FullHead = { "player", "kills", "deaths", "adr", "first k-d", "trade", "2k", "clutch", "survived" };
             private static readonly string[] RoundHead = { "player", "kills", "deaths", "damage" };
             private const float Gap = 28f;   // the same gap between all columns
             private static readonly Color Mint = new Color32(0xB4, 0xF2, 0xB4, 0xFF), White = new Color32(0xF8, 0xF8, 0xF8, 0xFF);
@@ -489,17 +497,32 @@ namespace MatchStats
                     if (pm != null && ColorUtility.TryParseHtmlString("#" + (pm.enemyNameLogColor ?? "").TrimStart('#'), out c)) enemy = c;
                 }
                 catch { }
-                string[] head = full ? FullHead : RoundHead;
-                float size = full ? 22f : 20f, rowH = full ? 32f : 22f, pad = 0f;
                 var rows = Sorted();
-                if (!full) rows.Sort((a, b) => Team(a.Key) != Team(b.Key) ? Team(a.Key).CompareTo(Team(b.Key)) : b.Value.RK != a.Value.RK ? b.Value.RK.CompareTo(a.Value.RK) : b.Value.RDmg.CompareTo(a.Value.RDmg));
+                bool solo = Solo(rows), duel = solo && rows.Count == 2;
+                // a column that can only be 0 in this kind of match is left out: trades and clutches need a teammate, a 2k a
+                // second enemy, and in a 1v1 the first kill of a take is its only one. Without teams, surviving a take is winning it
+                string[] head = !full ? RoundHead
+                    : duel ? new[] { "player", "kills", "deaths", "damage", "takes won" }
+                    : solo ? new[] { "player", "kills", "deaths", "damage", "first k-d", "2k", "takes won" }
+                    : new[] { "player", "kills", "deaths", "damage", "first k-d", "trade", "2k", "clutch", "survived" };
+                if (full && !_teamsSaid && MatchStatsPlugin.Log != null)
+                {
+                    _teamsSaid = true;
+                    var sb = new StringBuilder("Match stats: teams");
+                    foreach (var kv in rows) sb.Append(", ").Append(Drawable(kv.Value.Name)).Append(" ").Append(Team(kv.Key));
+                    MatchStatsPlugin.Log.LogInfo(sb.ToString() + (solo ? " (no teams)" : ""));
+                }
+                float size = full ? 22f : 20f, rowH = full ? 32f : 22f, pad = 0f;
+                if (!full) rows.Sort((a, b) => !solo && Team(a.Key) != Team(b.Key) ? Team(a.Key).CompareTo(Team(b.Key)) : b.Value.RK != a.Value.RK ? b.Value.RK.CompareTo(a.Value.RK) : b.Value.RDmg.CompareTo(a.Value.RDmg));
                 var lines = new List<string[]> { head }; var names = new List<Color> { Mint };
                 foreach (var kv in rows)
                 {
-                    P p = kv.Value; int t = Math.Max(1, p.Takes);
-                    lines.Add(full
-                        ? new[] { Drawable(p.Name), p.Kills.ToString(), p.Deaths.ToString(), Num(p.Dmg / t), p.OpenK + "-" + p.OpenD, p.Trades.ToString(), p.Multi.ToString(), p.Clutch.ToString(), p.Survived + "/" + p.Takes }
-                        : new[] { Drawable(p.Name), p.RK.ToString(), p.RD.ToString(), Num(p.RDmg) });
+                    P p = kv.Value;
+                    string kills = p.Kills.ToString(), deaths = p.Deaths.ToString(), dmg = Num(p.Dmg), won = p.Survived + "/" + p.Takes, first = p.OpenK + "-" + p.OpenD;
+                    lines.Add(!full ? new[] { Drawable(p.Name), p.RK.ToString(), p.RD.ToString(), Num(p.RDmg) }
+                        : duel ? new[] { Drawable(p.Name), kills, deaths, dmg, won }
+                        : solo ? new[] { Drawable(p.Name), kills, deaths, dmg, first, p.Multi.ToString(), won }
+                        : new[] { Drawable(p.Name), kills, deaths, dmg, first, p.Trades.ToString(), p.Multi.ToString(), p.Clutch.ToString(), won });
                     names.Add(me >= 0 && Team(kv.Key) == Team(me) ? self : enemy);
                 }
                 // every column is as wide as its longest entry in the board's font, with the same gap before each number
@@ -555,7 +578,7 @@ namespace MatchStats
             private string _whyFlat;
             private const float Turn = 85f;      // degrees toward the middle of the room
             private const float Wide = 6.5f;      // the board is this many times as wide as the word REMATCH
-            private const float Clear = 2.6f, Out = 0f;
+            private const float Clear = 2.6f, Out = -1f;   // Out below 0: further back, away from you
             private void Flat()
             {
                 _world = false;
