@@ -981,9 +981,13 @@ namespace UltimateTweaks
                 BepInEx.PluginInfo pi;
                 if (!BepInEx.Bootstrap.Chainloader.PluginInfos.TryGetValue("suvilba.straftat.spawnviewer", out pi) || pi.Instance == null) return;   // not installed
                 var t = pi.Instance.GetType();
-                var m = AccessTools.Method(t, "RefreshPostfix", Type.EmptyTypes); var f = AccessTools.Field(t, "_refreshRequested");
-                if (m == null || f == null || f.FieldType != typeof(bool)) throw new Exception("SpawnViewer is not the version this was written for (1.6.0)");
-                svPlugin = pi.Instance; svFlag = f;
+                // 1.6: one flag, _refreshRequested. 2.x: _rescan, with _spawnsLocked cleared
+                var m = AccessTools.Method(t, "RefreshPostfix", Type.EmptyTypes);
+                var f = AccessTools.Field(t, "_refreshRequested") ?? AccessTools.Field(t, "_rescan");
+                var unlock = f != null && f.Name == "_rescan" ? AccessTools.Field(t, "_spawnsLocked") : null;
+                if (m == null || f == null || f.FieldType != typeof(bool) || (f.Name == "_rescan" && (unlock == null || unlock.FieldType != typeof(bool))))
+                    throw new Exception("SpawnViewer " + pi.Metadata.Version + " is not a version this was written for (1.6, 2.1)");
+                svPlugin = pi.Instance; svFlag = f; svUnlock = unlock;
                 h.Patch(m, prefix: new HarmonyMethod(self.GetMethod("SvRefreshPre", bf)));
                 DorsthTweaks.DorsthTweaksPlugin.Note("SpawnViewerNoSearch: SpawnViewer found, its refresh no longer searches every loaded object");
             });
@@ -992,6 +996,7 @@ namespace UltimateTweaks
                 BepInEx.PluginInfo pi;
                 if (!BepInEx.Bootstrap.Chainloader.PluginInfos.TryGetValue("suvilba.straftat.spawnviewer", out pi) || pi.Instance == null) return;   // not installed
                 var t = pi.Instance.GetType();
+                if (AccessTools.Method(t, "OnGUI", Type.EmptyTypes) == null) return;   // 2.x draws no panel: nothing to save
                 var m = AccessTools.Method(t, "Update", Type.EmptyTypes); var f = AccessTools.Field(t, "_uiVisible");
                 if (m == null || f == null || f.FieldType != typeof(bool) || f.IsStatic) throw new Exception("SpawnViewer is not the version this was written for (1.6.0)");
                 svGui = pi.Instance; svVisible = AccessTools.FieldRefAccess<object, bool>(f);
@@ -1000,15 +1005,17 @@ namespace UltimateTweaks
             });
         }
         // ---- SpawnViewerNoSearch. SpawnViewer.RefreshPostfix (run after the game's spawn methods):
-        //        var all = Resources.FindObjectsOfTypeAll<SpawnViewer>(); if (all.Length != 0) all[0]._refreshRequested = true;
+        //        var all = Resources.FindObjectsOfTypeAll<SpawnViewer>(); if (all.Length != 0) all[0]._refreshRequested = true;     (1.6)
+        //        ... all[0]._spawnsLocked = false; all[0]._rescan = true;                                                             (2.1)
         // SpawnViewer is the plugin class itself, so there is exactly one and BepInEx already holds it.
-        static object svPlugin; static FieldInfo svFlag;
+        static object svPlugin; static FieldInfo svFlag, svUnlock;
         static bool SvRefreshPre()
         {
             if (!TweaksPlugin.SvNoSearch || svFlag == null) return true;
             try
             {
                 var u = svPlugin as UnityEngine.Object; if (u == null) return true;     // gone: let it search as before
+                if (svUnlock != null) svUnlock.SetValue(svPlugin, false);
                 svFlag.SetValue(svPlugin, true);
                 return false;
             }

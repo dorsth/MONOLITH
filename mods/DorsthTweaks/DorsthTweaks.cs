@@ -35,7 +35,7 @@ using PlanarReflection = UnityStandardAssets.Water.PlanarReflection;
 
 [assembly: AssemblyTitle("DorsthTweaks")]
 [assembly: AssemblyDescription("Small client-side tweaks for STRAFTAT: bullet trails, HUD, prompts, menus and performance.")]
-[assembly: AssemblyVersion("1.4.4.0")]
+[assembly: AssemblyVersion("1.4.5.0")]
 [assembly: AssemblyFileVersion("1.3.7.0")]
 
 // Only changes what you see on your own screen, so matchmaking with unmodded players still works.
@@ -49,7 +49,7 @@ namespace DorsthTweaks
     {
         public const string Guid = "dorsth.straftat.dorsthtweaks";
         public const string Name = "DorsthTweaks";
-        public const string Version = "1.4.4";
+        public const string Version = "1.4.5";
 
         internal static ManualLogSource Log;
         internal static ConfigEntry<bool> Detail;

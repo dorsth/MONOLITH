@@ -1,5 +1,8 @@
 # MONOLITH changelog
 
+## 1.9.6
+- DorsthTweaks 1.4.5: the SpawnViewer speed-up works with SpawnViewer 2.1 too: its refresh no longer searches every loaded object. 2.1 has no panel, so there is no panel layout to skip.
+
 ## 1.9.5
 - The tips of the second and third jump keys are in Russian again.
 - The Crosshairs folder in the download has the smooth brackets too; its old copy took their place.
