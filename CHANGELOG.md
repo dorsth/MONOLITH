@@ -1,5 +1,8 @@
 # MONOLITH changelog
 
+## 1.7.9
+- The panels are #131411, the same as the ground around them, with no darker fill.
+
 ## 1.7.8
 - The color picker is laid out as Far's: its 16 colors touching in two rows, Default under them, and Previous under the hex value.
 
