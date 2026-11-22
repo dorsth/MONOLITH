@@ -456,14 +456,12 @@ namespace Monolith
             // ---------------------------------------------------------------- camera
             {
                 var p = new MenuPage(null, "Camera", "Tilt, shake, sprint FOV, recoil.");
-                ConfigEntryBase noFov = E(Cam, "Camera", "NoSpeedFov");
                 p.Set("No tilt", E(Cam, "Camera", "NoTilt"), null, "No roll when you strafe, slide or turn.")
                  .Set("Better recoil", E(Cam, "Camera", "BetterRecoil"), null, "With the AR, AK and Warden, recoil moves your aim instead of shaking the camera.")
                  .Set("No landing shake", E(Cam, "Camera", "NoFallShake"), null, "")
                  .Set("No jump shake", E(Cam, "Camera", "NoJumpShake"), null, "Slide jumps, wall jumps and ceiling hits.")
                  .Set("No vault shake", E(Cam, "Camera", "NoVaultShake"), null, "")
-                 .Set("No sprint FOV", noFov, null, "Your FOV stays the same when you sprint and slide. Off: it widens by the amount below.")
-                 .Set("Sprint FOV amount", E(Cam, "Camera", "SpeedFovAmount"), () => Off(noFov), "How much your FOV widens when you sprint and slide. 1 is the game's.");
+                 .Set("Sprint FOV increase", E(Cam, "Camera", "SprintFovIncrease"), null, "Degrees your FOV widens when you sprint. Sliding widens it by the same share. 0: no change.");
                 if (p.Rows.Count > 0) cats.Add(p);
             }
 

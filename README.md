@@ -20,7 +20,7 @@ Your old settings come along.
 |---|---|
 | Crosshair | style, color, size; add your own PNGs in `plugins/MONOLITH/Crosshairs` |
 | Viewmodel | weapon FOV and position, per weapon if you want; sway, bob, left-handed, hide arms |
-| Camera | no tilt, no landing or jump shake, sprint FOV amount, better recoil |
+| Camera | no tilt, no landing or jump shake, sprint FOV increase, better recoil |
 | HUD | hitmarkers, prompts, hide FPS or ping, slide cooldown timer |
 | Effects | tracers, casings, bodies, blood, vignette |
 | Players | one outfit and hat for enemies, one for teammates, outline colors |

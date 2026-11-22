@@ -1,5 +1,8 @@
 # MONOLITH changelog
 
+## 1.3.5
+- CameraTweaks 1.2.2: Camera has one row, "Sprint FOV increase": how many degrees your FOV widens when you sprint, 0 for none (the default). It replaces "No sprint FOV" and "Sprint FOV amount".
+
 ## 1.3.4
 - Configs: "Include keybinds" is "Include controls". It covers sensitivity too (the game's and TrueSens), so a config from a friend leaves your sensitivity alone unless it is on. Off by default.
 
