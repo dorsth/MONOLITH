@@ -33,15 +33,13 @@ namespace Monolith
             GUI.color = was;
         }
 
-        // where a preview shows its samples: a cell clear of the frame and its title, black on the left and light on the right
-        private Rect Swatch(Rect r, out float half)
+        // what a preview shows its samples on: black on the left half, light on the right
+        private float Swatch(Rect r)
         {
-            float px = _cw, py = Mathf.Round(_ch * 0.5f);
-            r = new Rect(r.x + px, r.y + py, r.width - 2f * px, r.height - 2f * py);
-            half = Mathf.Floor(r.width / 2f);
+            float half = Mathf.Floor(r.width / 2f);
             Fill(new Rect(r.x, r.y, half, r.height), Color.black);
             Fill(new Rect(r.x + half, r.y, r.width - half, r.height), Light);
-            return r;
+            return half;
         }
 
         // ---- the crosshair: its own picture, size and color, on dark and on light
@@ -52,7 +50,7 @@ namespace Monolith
             {
                 if (EzCrosshair.EzCrosshairPlugin.Pick == null) return;
                 Texture2D tex = EzCrosshair.Pictures.Get(EzCrosshair.EzCrosshairPlugin.Pick.Value);
-                float half; r = Swatch(r, out half);
+                float half = Swatch(r);
                 GUI.BeginGroup(r);
                 if (tex != null)
                 {
@@ -101,8 +99,7 @@ namespace Monolith
                 RectTransform rt = marker != null ? marker.transform as RectTransform : null;
                 if (img == null || img.sprite == null || rt == null || rt.sizeDelta.x <= 0f)
                 {
-                    Note(r.x + r.width / 2f, r.y + r.height / 2f - _ch, "shown once a", Dim);
-                    Note(r.x + r.width / 2f, r.y + r.height / 2f, "map has loaded", Dim);
+                    Note(r.x + r.width / 2f, r.y + r.height / 2f - _ch / 2f, "shown once a map has loaded", Dim);
                     return;
                 }
                 PauseManager pm = PauseManager.Instance;
@@ -114,14 +111,13 @@ namespace Monolith
                     DorsthTweaks.GapKept.Made made = DorsthTweaks.GapKept.Get(sp, DorsthTweaks.Hitmarkers.Width, DorsthTweaks.Hitmarkers.Gap, DorsthTweaks.Hitmarkers.Length, px);
                     if (made != null && made.Sprite != null) { sp = made.Sprite; px *= made.GrowX; py *= made.GrowY; }
                 }
-                float half; r = Swatch(r, out half);
-                float row = r.height / 3f;
+                float half = Swatch(r), cell = half / 3f;
                 GUI.BeginGroup(r);
                 for (int i = 0; i < 3; i++)
                 {
                     Color c = (i == 0 ? DorsthTweaks.DorsthTweaksPlugin.BodyshotColor : i == 1 ? DorsthTweaks.DorsthTweaksPlugin.HeadshotColor : DorsthTweaks.DorsthTweaksPlugin.ShotgunHitmarkerColor).Color;
-                    Pic(new Rect(0f, i * row, half, row), sp, c, px, py);
-                    Pic(new Rect(half, i * row, r.width - half, row), sp, c, px, py);
+                    Pic(new Rect(i * cell, 0f, cell, r.height), sp, c, px, py);
+                    Pic(new Rect(half + i * cell, 0f, cell, r.height), sp, c, px, py);
                 }
                 GUI.EndGroup();
             }
@@ -134,16 +130,15 @@ namespace Monolith
         {
             try
             {
-                // room under the box's own title, the same space left and right of a picture, and a gap between the two groups
-                float top = Mathf.Round(_ch * 0.5f), pad = Mathf.Round(_cw * 0.8f), half = (r.height - top) / 2f, w = r.width / 2f;
+                // enemies on the left half and teammates on the right, each a suit and a hat under its name
+                float pad = Mathf.Round(_cw * 0.8f), w = r.width / 4f;
                 for (int side = 0; side < 2; side++)
                 {
-                    float y = r.y + top + side * half;
-                    Note(r.x + r.width / 2f, y, side == 0 ? "enemies" : "teammates", Head);
+                    Note(r.x + (side * 2 + 1) * w, r.y, side == 0 ? "enemies" : "teammates", Head);
                     for (int hat = 0; hat < 2; hat++)
                     {
                         string name = (side == 0 ? (hat == 0 ? Players.EnemyOutfit : Players.EnemyHat) : (hat == 0 ? Players.TeamOutfit : Players.TeamHat)).Value;
-                        var cell = new Rect(r.x + hat * w + pad, y + _ch + pad * 0.5f, w - 2f * pad, half - _ch - pad * 1.5f);
+                        var cell = new Rect(r.x + (side * 2 + hat) * w + pad, r.y + _ch + pad * 0.5f, w - 2f * pad, r.height - _ch - pad * 0.5f);
                         Sprite pic = Players.Picture(hat == 1, name);
                         if (pic != null) Pic(cell, pic, Color.white);
                         else Note(cell.x + cell.width / 2f, cell.y + cell.height / 2f - _ch / 2f, string.IsNullOrEmpty(name) ? "their own" : "no picture", Dim);

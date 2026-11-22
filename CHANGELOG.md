@@ -1,5 +1,8 @@
 # MONOLITH changelog
 
+## 1.2.4
+- The crosshair, hitmarker and players previews are under the rows of their page, as wide as a row. The rows of those pages use the full width.
+
 ## 1.2.3
 - Box titles in the menu are centered.
 - The crosshair and hitmarker previews sit clear of their frame and title, with a black half and a light half.

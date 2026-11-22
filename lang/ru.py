@@ -2,7 +2,7 @@
 # check: 'nav' category name (16 cells) | 'L<n>' a row name that has n cells | 'tip' a row's line under the page
 # (with "По умолчанию: x." after it) | 'tipb' the same with nothing after it | 'info' a line under the page |
 # 'W<n>' at most n cells | '' not checked (a part that is put together with others).
-# Row names: a full page has 56 cells, the crosshair and players pages 31, the hitmarker page 35 (their preview box).
+# Row names: a page has 56 cells.
 # Of those a switch takes 4, a slider 18, a color 14; a list or text value gives way to the name (it keeps 7).
 B  = 'previous config'          # the name the last setup is kept under (a profile name: not translated)
 HOW_EN = ' Press Enter, then a key, mouse button or scroll.'
@@ -31,7 +31,7 @@ T = [
 ('Save, load and share configs: every setting, the game\'s and your sensitivity included.', 'Сохранение, загрузка и обмен конфигами: все настройки, включая настройки игры и чувствительность.', 'info'),
 ('Language, the menu key, menu animations, playlists.', 'Язык, клавиша меню, анимации меню, плейлисты.', 'info'),
 ('A weapon listed here uses its own FOV and position.', 'У оружия из этого списка свои FOV и положение.', 'info'),
-# ---- crosshair (31 cells)
+# ---- crosshair
 ('Custom crosshair', 'Свой прицел', 'L27'), ('Off: the game crosshair.', 'Выкл: прицел игры.', 'tip'),
 ('Style', 'Стиль', 'L15'),
 ('Every PNG in plugins/MONOLITH/Crosshairs. Add your own there and restart the game.', 'Каждый PNG в plugins/MONOLITH/Crosshairs. Добавьте свои туда и перезапустите игру.', 'tip'),
@@ -40,7 +40,7 @@ T = [
 ("1 is the picture's own size at 1080p.", '1: размер самой картинки при 1080p.', 'tip'),
 ('Show when scoped', 'Показывать в оптике', 'L27'), ('Hit color', 'Цвет при попадании', 'L27'),
 ('The crosshair changes color for a moment on a hit.', 'При попадании прицел на мгновение меняет цвет.', 'tip'),
-('color', 'цвет', 'L15'), ('preview', 'превью', 'W16'),
+('color', 'цвет', 'L15'), ('Preview', 'Превью', 'L50'),
 # ---- viewmodel
 ('FOV', 'FOV', 'L38'), ('Left / right', 'Влево / вправо', 'L38'), ('Down / up', 'Вниз / вверх', 'L38'), ('Back / forward', 'Назад / вперёд', 'L38'),
 ('Sway', 'Покачивание', 'L38'),
@@ -98,14 +98,14 @@ T = [
 ('Hide ragdolls', 'Скрыть рэгдоллы', 'L50'), ('Hide dropped hats', 'Скрыть сбитые шапки', 'L50'), ('Hats that were shot off.', 'Шапки, сбитые выстрелом.', 'tip'),
 ('No blood', 'Без крови', 'L52'), ('Turn it off to pick which.', 'Выключите, чтобы выбрать отдельно.', 'tip'),
 ('No hit blood', 'Без крови при попадании', 'L50'), ('No death blood', 'Без крови при смерти', 'L50'), ('No blood decals', 'Без декалей крови', 'L50'),
-# ---- players (31 cells)
+# ---- players
 ('Enemies', 'Враги', 'L25'), ('Teammates', 'Союзники', 'L25'), ('Suit', 'Костюм', 'L15'), ('Hat', 'Шапка', 'L15'),
 ('their own', 'как у них', 'W9'), ('From the next round.', 'Со следующего раунда.', 'tip'), ('Outline color', 'Цвет обводки', 'L17'), ('Lobby', 'Лобби', 'L25'), ('Enemy outlines when I host', 'Обводка врагов в моих лобби', 'L27'), ('Friendly fire when I host', 'Огонь по своим в моих лобби', 'L27'),
 ("The game's lobby option, kept between launches. In other lobbies the host decides.", 'Настройка лобби из игры, сохраняется между запусками. В чужих лобби решает хост.', 'tip'),
 ('The same setting as in the game. Only in lobbies with enemy outlines on.', 'Та же настройка, что в игре. Только в лобби с обводкой врагов.', 'tip'),
 ('The same setting as in the game.', 'Та же настройка, что в игре.', 'tip'),
 ('enemies', 'враги', 'W20'), ('teammates', 'союзники', 'W20'), ('no picture', 'нет превью', 'W10'), ('no hat', 'без шапки', 'W15'),
-('shown once a', 'появится после', 'W18'), ('map has loaded', 'загрузки карты', 'W18'),
+('shown once a map has loaded', 'появится после загрузки карты', 'W50'),
 # ---- sound
 ('Hitsound', 'Хитсаунд', 'L46'), ('Headshot hitsound', 'Хитсаунд в голову', 'L46'), ('Killsound', 'Киллсаунд', 'L46'),
 ('Melee killsound', 'Киллсаунд в ближнем бою', 'L46'), ('volume', 'громкость', 'L36'), ('100 is normal.', '100: обычная громкость.', 'tip'),

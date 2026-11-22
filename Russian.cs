@@ -5,7 +5,7 @@ namespace Monolith
 {
     internal static partial class Lang
     {
-        private static readonly Dictionary<string, string> Table = new Dictionary<string, string>(309)
+        private static readonly Dictionary<string, string> Table = new Dictionary<string, string>(308)
         {
             { "Crosshair", "Прицел" },
             { "Viewmodel", "Вьюмодель" },
@@ -58,7 +58,7 @@ namespace Monolith
             { "Hit color", "Цвет при попадании" },
             { "The crosshair changes color for a moment on a hit.", "При попадании прицел на мгновение меняет цвет." },
             { "color", "цвет" },
-            { "preview", "превью" },
+            { "Preview", "Превью" },
             { "FOV", "FOV" },
             { "Left / right", "Влево / вправо" },
             { "Down / up", "Вниз / вверх" },
@@ -163,8 +163,7 @@ namespace Monolith
             { "teammates", "союзники" },
             { "no picture", "нет превью" },
             { "no hat", "без шапки" },
-            { "shown once a", "появится после" },
-            { "map has loaded", "загрузки карты" },
+            { "shown once a map has loaded", "появится после загрузки карты" },
             { "Hitsound", "Хитсаунд" },
             { "Headshot hitsound", "Хитсаунд в голову" },
             { "Killsound", "Киллсаунд" },
