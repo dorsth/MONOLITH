@@ -15,10 +15,25 @@ namespace Monolith
         private static readonly Color Light = new Color32(0xB9, 0xC2, 0xBC, 0xFF);
 
         // a line of text, centred on x
-        private void Note(float x, float y, string text, string color)
+        private void Note(float x, float y, string text, string color) { Put(x, y, Lang.T(text), color); }
+
+        private void Put(float x, float y, string text, string color)
+        {
+            GUI.Label(new Rect(Mathf.Round(x - text.Length * _cw * 0.5f), y, text.Length * _cw + 2f, _ch), "<color=" + color + ">" + text + "</color>", _st);
+        }
+
+        // a note in the middle of a box: on two lines when one line would touch its sides
+        private void NoteIn(Rect box, string text, string color)
         {
             text = Lang.T(text);
-            GUI.Label(new Rect(Mathf.Round(x - text.Length * _cw * 0.5f), y, text.Length * _cw + 2f, _ch), "<color=" + color + ">" + text + "</color>", _st);
+            float x = box.x + box.width / 2f, y = box.y + box.height / 2f;
+            int cut = -1;
+            if (text.Length * _cw > box.width - _cw)
+                for (int i = text.IndexOf(' '); i >= 0; i = text.IndexOf(' ', i + 1))
+                    if (cut < 0 || Mathf.Max(i, text.Length - i - 1) < Mathf.Max(cut, text.Length - cut - 1)) cut = i;
+            if (cut < 0) { Put(x, y - _ch / 2f, text, color); return; }
+            Put(x, y - _ch, text.Substring(0, cut), color);
+            Put(x, y, text.Substring(cut + 1), color);
         }
 
         // a sprite, as large as it fits in the box without changing its shape (or at the size given)
@@ -151,13 +166,17 @@ namespace Monolith
                 for (int side = 0; side < 2; side++)
                 {
                     Rect s = Part(r, side, side == 0 ? "enemies" : "teammates", true);
+                    string suit = (side == 0 ? Players.EnemyOutfit : Players.TeamOutfit).Value, top = (side == 0 ? Players.EnemyHat : Players.TeamHat).Value;
+                    // nothing picked for either: said once, not once for the suit and once for the hat
+                    if (string.IsNullOrEmpty(suit) && string.IsNullOrEmpty(top)) { NoteIn(s, "their own", Dim); continue; }
+                    float w = Mathf.Floor((s.width - _cw) / 2f);
                     for (int hat = 0; hat < 2; hat++)
                     {
-                        string name = (side == 0 ? (hat == 0 ? Players.EnemyOutfit : Players.EnemyHat) : (hat == 0 ? Players.TeamOutfit : Players.TeamHat)).Value;
-                        var cell = new Rect(s.x + hat * s.width / 2f, s.y, s.width / 2f, s.height);
+                        string name = hat == 0 ? suit : top;
+                        var cell = new Rect(hat == 0 ? s.x : s.xMax - w, s.y, w, s.height);
                         Sprite pic = Players.Picture(hat == 1, name);
                         if (pic != null) Pic(cell, pic, Color.white);
-                        else Note(cell.x + cell.width / 2f, cell.y + cell.height / 2f - _ch / 2f, string.IsNullOrEmpty(name) ? "their own" : "no picture", Dim);
+                        else NoteIn(cell, string.IsNullOrEmpty(name) ? "their own" : "no picture", Dim);
                     }
                 }
             }

@@ -1,5 +1,8 @@
 # MONOLITH changelog
 
+## 1.3.0
+- Players preview: "their own" shows once when neither a suit nor a hat is picked, and a note that is too long for its half goes on two lines. The two pictures have a gap between them.
+
 ## 1.2.9
 - Hitmarker preview: turning on Kill hitmarker adds its hitmarker under the other two, which stay where they are.
 
