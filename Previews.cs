@@ -33,6 +33,17 @@ namespace Monolith
             GUI.color = was;
         }
 
+        // where a preview shows its samples: a cell clear of the frame and its title, black on the left and light on the right
+        private Rect Swatch(Rect r, out float half)
+        {
+            float px = _cw, py = Mathf.Round(_ch * 0.5f);
+            r = new Rect(r.x + px, r.y + py, r.width - 2f * px, r.height - 2f * py);
+            half = Mathf.Floor(r.width / 2f);
+            Fill(new Rect(r.x, r.y, half, r.height), Color.black);
+            Fill(new Rect(r.x + half, r.y, r.width - half, r.height), Light);
+            return r;
+        }
+
         // ---- the crosshair: its own picture, size and color, on dark and on light
 
         internal void CrosshairPreview(Rect r)
@@ -41,9 +52,8 @@ namespace Monolith
             {
                 if (EzCrosshair.EzCrosshairPlugin.Pick == null) return;
                 Texture2D tex = EzCrosshair.Pictures.Get(EzCrosshair.EzCrosshairPlugin.Pick.Value);
-                float half = Mathf.Floor(r.width / 2f);
+                float half; r = Swatch(r, out half);
                 GUI.BeginGroup(r);
-                Fill(new Rect(half, 0f, r.width - half, r.height), Light);
                 if (tex != null)
                 {
                     Vector2Int size = EzCrosshair.Overlay.ScreenSize(tex, Mathf.Clamp(EzCrosshair.EzCrosshairPlugin.Scale.Value, 0f, 2f));
@@ -104,9 +114,9 @@ namespace Monolith
                     DorsthTweaks.GapKept.Made made = DorsthTweaks.GapKept.Get(sp, DorsthTweaks.Hitmarkers.Width, DorsthTweaks.Hitmarkers.Gap, DorsthTweaks.Hitmarkers.Length, px);
                     if (made != null && made.Sprite != null) { sp = made.Sprite; px *= made.GrowX; py *= made.GrowY; }
                 }
-                float half = Mathf.Floor(r.width / 2f), row = r.height / 3f;
+                float half; r = Swatch(r, out half);
+                float row = r.height / 3f;
                 GUI.BeginGroup(r);
-                Fill(new Rect(half, 0f, r.width - half, r.height), Light);
                 for (int i = 0; i < 3; i++)
                 {
                     Color c = (i == 0 ? DorsthTweaks.DorsthTweaksPlugin.BodyshotColor : i == 1 ? DorsthTweaks.DorsthTweaksPlugin.HeadshotColor : DorsthTweaks.DorsthTweaksPlugin.ShotgunHitmarkerColor).Color;

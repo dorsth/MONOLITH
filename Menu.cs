@@ -310,7 +310,7 @@ namespace Monolith
                 Fill(new Rect(q.x, q.y, t, q.height), c); Fill(new Rect(q.xMax - t, q.y, t, q.height), c);
             }
             if (string.IsNullOrEmpty(title)) return;
-            float w = (title.Length + 2) * _cw, x = r.x + _cw * 2f;
+            float w = (title.Length + 2) * _cw, x = Mathf.Round(r.x + (r.width - w) * 0.5f);
             Fill(new Rect(x, r.y - _ch * 0.5f + g, w, _ch), under);
             GUI.Label(new Rect(x + _cw, r.y - _ch * 0.5f + g * 0.5f, w, _ch), "<color=" + (active ? Hot : Head) + ">" + Esc(title) + "</color>", _st);
         }

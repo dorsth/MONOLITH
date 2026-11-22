@@ -1,5 +1,9 @@
 # MONOLITH changelog
 
+## 1.2.3
+- Box titles in the menu are centered.
+- The crosshair and hitmarker previews sit clear of their frame and title, with a black half and a light half.
+
 ## 1.2.2
 - Camera has "Sprint FOV amount": how much your FOV widens when you sprint and slide. 1 is the game's. It shows when No sprint FOV is off.
 - The menu and README say "keybinds" where they said "keys".
