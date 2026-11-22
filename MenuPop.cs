@@ -2,7 +2,8 @@
 //
 // Both open on Enter (or a click) on a row and lie over the page, in the manner of a Far dialog. What the cursor is on
 // is applied at once, so you see or hear it; Enter keeps it, Escape (or a click beside it) puts back what was there.
-// A list: up and down, page up and down, or type the first letters of a name. A palette: the arrows, or type a hex value.
+// A list: up and down, page up and down, or type the first letters of a name. A palette, as Far's Color dialog: the 16
+// console colors and the default, the arrows to pick, a hex value typed for any other color, Set, Reset and Cancel.
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -18,7 +19,7 @@ namespace Monolith
             public MenuRow Row; public object Was;
             public object[] Values; public string[] Labels;
             public bool Palette; public int Cols = 1, Cur, Top;
-            public float Pitch;                // the palette: cells from one color to the next
+            public Rect SetR, ResetR, CancelR; // the palette's buttons
             public string Typed = ""; public float TypedAt;
             public float AnchorRight, AnchorY;
             public bool Free, Dragging;        // the view was scrolled away from the cursor (wheel, scroll bar); the scroll bar is held
@@ -26,9 +27,15 @@ namespace Monolith
         }
 
         private Pop _pop;
-        private const int PaletteCols = 12, ListRows = 14;
-        // the palette is as wide as the row it sets: its frame on the row's edges, the colors spread over it
-        private const float PalLeft = 2f, SwatchShare = 0.83f;
+        private const int PaletteCols = 8, ListRows = 14, DefaultSlot = 16;
+        // the 16 colors of Far's Color dialog, in its order: the dark eight, then the bright eight
+        private static readonly Color32[] Console16 =
+        {
+            new Color32(0x00, 0x00, 0x00, 0xFF), new Color32(0x00, 0x00, 0x80, 0xFF), new Color32(0x00, 0x80, 0x00, 0xFF), new Color32(0x00, 0x80, 0x80, 0xFF),
+            new Color32(0x80, 0x00, 0x00, 0xFF), new Color32(0x80, 0x00, 0x80, 0xFF), new Color32(0x80, 0x80, 0x00, 0xFF), new Color32(0xC0, 0xC0, 0xC0, 0xFF),
+            new Color32(0x80, 0x80, 0x80, 0xFF), new Color32(0x00, 0x00, 0xFF, 0xFF), new Color32(0x00, 0xFF, 0x00, 0xFF), new Color32(0x00, 0xFF, 0xFF, 0xFF),
+            new Color32(0xFF, 0x00, 0x00, 0xFF), new Color32(0xFF, 0x00, 0xFF, 0xFF), new Color32(0xFF, 0xFF, 0x00, 0xFF), new Color32(0xFF, 0xFF, 0xFF, 0xFF),
+        };
 
         private static string LabelOf(MenuRow row, object v)
         {
@@ -61,25 +68,18 @@ namespace Monolith
         {
             Color was = (Color)row.Entry.BoxedValue;
             var values = new List<object>();
-            // top row: white to black; under it every hue, light, full, dim and dark
-            for (int i = 0; i < PaletteCols; i++) { float g = 1f - i / (PaletteCols - 1f); values.Add(new Color(g, g, g, was.a)); }
-            float[] sat = { 0.4f, 1f, 1f, 1f }, val = { 1f, 1f, 0.7f, 0.42f };
-            for (int r = 0; r < sat.Length; r++)
-                for (int i = 0; i < PaletteCols; i++) { Color c = Color.HSVToRGB(i / (float)PaletteCols, sat[r], val[r]); c.a = was.a; values.Add(c); }
-            var p = new Pop { Row = row, Was = was, Values = values.ToArray(), Palette = true, Cols = PaletteCols };
-            // the cursor starts on the color nearest to the one in use
-            float best = float.MaxValue;
-            for (int i = 0; i < p.Values.Length; i++)
-            {
-                Color c = (Color)p.Values[i];
-                float d = (c.r - was.r) * (c.r - was.r) + (c.g - was.g) * (c.g - was.g) + (c.b - was.b) * (c.b - was.b);
-                if (d < best) { best = d; p.Cur = i; }
-            }
+            foreach (Color32 c32 in Console16) { Color c = c32; c.a = was.a; values.Add(c); }
+            values.Add((Color)row.Entry.DefaultValue);
+            var p = new Pop { Row = row, Was = was, Values = values.ToArray(), Palette = true, Cols = PaletteCols, Cur = -1 };
+            // the cursor starts on the color in use, if it is one of them; a color of your own has none
+            for (int i = values.Count - 1; i >= 0; i--) if (Same((Color)values[i], was)) { p.Cur = i; break; }
             Anchor(p, page, ci);
             _pop = p;
         }
 
-        private void PopApply() { try { _pop.Row.Entry.BoxedValue = _pop.Values[_pop.Cur]; } catch { } }
+        private static bool Same(Color a, Color b) { return Mathf.Abs(a.r - b.r) + Mathf.Abs(a.g - b.g) + Mathf.Abs(a.b - b.b) < 0.004f; }
+
+        private void PopApply() { if (_pop.Cur >= 0) try { _pop.Row.Entry.BoxedValue = _pop.Values[_pop.Cur]; } catch { } }
 
         private void PopClose(bool keep)
         {
@@ -109,14 +109,24 @@ namespace Monolith
                 if (p.Palette && p.Typed.Length > 0 && !TryHex(p)) { p.Typed = ""; ev.Use(); return; }
                 PopClose(true); ev.Use(); return;
             }
-            if (k == KeyCode.UpArrow) { p.Typed = ""; PopMove(p.Cur - p.Cols); }
+            if (p.Palette && k == KeyCode.Delete) { p.Typed = ""; PopMove(DefaultSlot); PopClose(true); ev.Use(); return; }
+            if (p.Palette)
+            {
+                // two rows of eight, then Default under them
+                int c = p.Cur;
+                if (k == KeyCode.UpArrow) { p.Typed = ""; PopMove(c == DefaultSlot ? PaletteCols : c >= PaletteCols ? c - PaletteCols : Mathf.Max(c, 0)); }
+                else if (k == KeyCode.DownArrow) { p.Typed = ""; PopMove(c < 0 ? 0 : c < PaletteCols ? c + PaletteCols : DefaultSlot); }
+                else if (k == KeyCode.LeftArrow) { p.Typed = ""; PopMove(c < 0 ? 0 : c < DefaultSlot && c % PaletteCols > 0 ? c - 1 : c); }
+                else if (k == KeyCode.RightArrow) { p.Typed = ""; PopMove(c < 0 ? 0 : c < DefaultSlot && c % PaletteCols < PaletteCols - 1 ? c + 1 : c); }
+            }
+            else if (k == KeyCode.UpArrow) { p.Typed = ""; PopMove(p.Cur - p.Cols); }
             else if (k == KeyCode.DownArrow) { p.Typed = ""; PopMove(p.Cur + p.Cols); }
             else if (k == KeyCode.LeftArrow) { p.Typed = ""; PopMove(p.Cur - 1); }
             else if (k == KeyCode.RightArrow) { p.Typed = ""; PopMove(p.Cur + 1); }
-            else if (k == KeyCode.PageUp) PopMove(p.Cur - (p.Palette ? p.Cols : ListRows - 1));
-            else if (k == KeyCode.PageDown) PopMove(p.Cur + (p.Palette ? p.Cols : ListRows - 1));
-            else if (k == KeyCode.Home) PopMove(0);
-            else if (k == KeyCode.End) PopMove(p.Values.Length - 1);
+            else if (k == KeyCode.PageUp && !p.Palette) PopMove(p.Cur - (ListRows - 1));
+            else if (k == KeyCode.PageDown && !p.Palette) PopMove(p.Cur + (ListRows - 1));
+            else if (k == KeyCode.Home && !p.Palette) PopMove(0);
+            else if (k == KeyCode.End && !p.Palette) PopMove(p.Values.Length - 1);
             else if (k == KeyCode.Backspace) { if (p.Typed.Length > 0) p.Typed = p.Typed.Substring(0, p.Typed.Length - 1); }
             else if (ch > ' ' || (ch == ' ' && p.Typed.Length > 0))
             {
@@ -143,6 +153,9 @@ namespace Monolith
             if (!ColorUtility.TryParseHtmlString("#" + p.Typed, out c)) return false;
             if (p.Typed.Length == 6) c.a = ((Color)p.Was).a;
             try { p.Row.Entry.BoxedValue = c; } catch { return false; }
+            // the cursor goes to the color typed, if it is one of them
+            p.Cur = -1;
+            for (int i = p.Values.Length - 1; i >= 0; i--) if (Same((Color)p.Values[i], c)) { p.Cur = i; break; }
             return true;
         }
 
@@ -153,10 +166,11 @@ namespace Monolith
             if (!p.R.Contains(m)) return -1;
             if (p.Palette)
             {
-                int col = Mathf.FloorToInt((m.x - p.R.x - _cw * (PalLeft - p.Pitch * (1f - SwatchShare) / 2f)) / (_cw * p.Pitch)), row = Mathf.FloorToInt((m.y - p.R.y - _ch) / _ch);
-                if (col < 0 || col >= p.Cols || row < 0) return -1;
-                int i = row * p.Cols + col;
-                return i < p.Values.Length ? i : -1;
+                float gx, sw, hx; PalLayout(p, out gx, out sw, out hx);
+                int col = Mathf.FloorToInt((m.x - gx) / sw), row = Mathf.FloorToInt((m.y - p.R.y - _ch) / _ch);
+                if (row == 2 && m.x >= gx && m.x < hx) return DefaultSlot;
+                if (col < 0 || col >= PaletteCols || row < 0 || row > 1) return -1;
+                return row * PaletteCols + col;
             }
             int line = Mathf.FloorToInt((m.y - p.R.y - _ch) / _ch);
             if (line < 0 || line >= p.Shown) return -1;
@@ -184,9 +198,63 @@ namespace Monolith
             if (ev.type == EventType.MouseDrag) { if (p.Dragging) PopScrollTo(p, ev.mousePosition.y); return; }
             if (ev.type != EventType.MouseDown) return;
             if (scrolls && ev.button == 0 && PopBar(p).Contains(ev.mousePosition)) { p.Dragging = true; PopScrollTo(p, ev.mousePosition.y); return; }
-            int i = PopAt(ev.mousePosition);
-            if (ev.button != 0 || i < 0) { PopClose(false); return; }
-            PopMove(i); PopApply(); PopClose(true);
+            Vector2 m = ev.mousePosition;
+            if (p.Palette && ev.button == 0)
+            {
+                if (p.SetR.Contains(m)) { if (p.Typed.Length > 0) TryHex(p); PopClose(true); return; }
+                if (p.ResetR.Contains(m)) { p.Typed = ""; PopMove(DefaultSlot); PopClose(true); return; }
+                if (p.CancelR.Contains(m)) { PopClose(false); return; }
+            }
+            int i = PopAt(m);
+            // a click beside it puts back what was there; a click on it between its items does nothing
+            if (ev.button != 0 || i < 0) { if (ev.button != 0 || !p.R.Contains(m)) PopClose(false); return; }
+            PopMove(i); PopApply();
+            if (!p.Palette) PopClose(true);
+        }
+
+        // The palette, laid out as Far's Color dialog: the colors at gx, sw wide each and touching, the hex value at hx.
+        // The colors take what room there is, up to three cells each; the whole is centered in the frame.
+        private void PalLayout(Pop p, out float gx, out float sw, out float hx)
+        {
+            float hexW = 11f * _cw, gap = _cw;
+            sw = Mathf.Floor(Mathf.Min(3f * _cw, (p.R.width - 3f * _cw - gap - hexW) / PaletteCols));
+            float all = PaletteCols * sw + gap + hexW;
+            gx = Mathf.Round(p.R.x + (p.R.width - all) * 0.5f); hx = gx + PaletteCols * sw + gap;
+        }
+
+        private void PaletteDraw(Pop p, Rect frame)
+        {
+            float gx, sw, hx; PalLayout(p, out gx, out sw, out hx);
+            float y0 = p.R.y + _ch, t = Thin;
+            Color now = (Color)p.Row.Entry.BoxedValue;
+            for (int i = 0; i <= DefaultSlot; i++)
+            {
+                Rect s = i == DefaultSlot ? new Rect(gx, y0 + 2f * _ch, sw, _ch) : new Rect(gx + (i % PaletteCols) * sw, y0 + (i / PaletteCols) * _ch, sw, _ch);
+                Color c = (Color)p.Values[i];
+                Fill(s, new Color(c.r, c.g, c.b, 1f));
+                // the color in use: a dot in it, in black or white, whichever shows on it
+                if (Same(c, now)) { float d = Mathf.Round(_cw * 0.4f), l = c.r * 0.3f + c.g * 0.59f + c.b * 0.11f; Fill(new Rect(Mathf.Round(s.center.x - d / 2f), Mathf.Round(s.center.y - d / 2f), d, d), l > 0.5f ? Color.black : Color.white); }
+                // the cursor: a line around it
+                if (i == p.Cur) { Fill(new Rect(s.x, s.y, s.width, t), KnobCur); Fill(new Rect(s.x, s.yMax - t, s.width, t), KnobCur); Fill(new Rect(s.x, s.y, t, s.height), KnobCur); Fill(new Rect(s.xMax - t, s.y, t, s.height), KnobCur); }
+            }
+            GUI.Label(new Rect(gx + sw + _cw * 0.5f, y0 + 2f * _ch, hx - gx, _ch), "<color=" + (p.Cur == DefaultSlot ? Val : Txt) + ">" + Esc(Lang.T("Default")) + "</color>", _st);
+            // the hex value: any color, typed; in a sunken field as Far's
+            string hex = p.Typed.Length > 0 ? p.Typed + "_" : p.Row.Entry.GetSerializedValue();
+            GUI.Label(new Rect(hx, y0, 11f * _cw, _ch), "<color=" + Dim + ">RRGGBBAA</color>", _st);
+            Fill(new Rect(hx, y0 + _ch, 11f * _cw, _ch), Well);
+            GUI.Label(new Rect(hx + _cw, y0 + _ch, 10f * _cw, _ch), "<color=" + (p.Typed.Length > 0 ? Hot : Val) + ">" + Esc(hex) + "</color>", _st);
+            GUI.Label(new Rect(hx, y0 + 2f * _ch, 11f * _cw, _ch), "<color=" + Dim + ">" + Esc(Lang.T("or type one")) + "</color>", _st);
+            // a line joined to the frame, then the buttons, Set in the dialog's own green as Far's default button
+            float ly = Mathf.Round(y0 + 3.5f * _ch - t * 0.5f);
+            Fill(new Rect(frame.x + 2f * t, ly, frame.width - 4f * t, t), Frame);
+            string set = "{ " + Lang.T("Set") + " }", reset = "[ " + Lang.T("Reset") + " ]", cancel = "[ " + Lang.T("Cancel") + " ]";
+            float bw = (set.Length + reset.Length + cancel.Length + 2) * _cw, bx = Mathf.Round(p.R.x + (p.R.width - bw) * 0.5f), by = y0 + 4f * _ch;
+            p.SetR = new Rect(bx, by, set.Length * _cw, _ch);
+            p.ResetR = new Rect(p.SetR.xMax + _cw, by, reset.Length * _cw, _ch);
+            p.CancelR = new Rect(p.ResetR.xMax + _cw, by, cancel.Length * _cw, _ch);
+            GUI.Label(p.SetR, "<color=" + Mint + ">" + Esc(set) + "</color>", _st);
+            GUI.Label(p.ResetR, "<color=" + Txt + ">" + Esc(reset) + "</color>", _st);
+            GUI.Label(p.CancelR, "<color=" + Txt + ">" + Esc(cancel) + "</color>", _st);
         }
 
         // the pop-up under its row, centered on it: its frame half a cell in from each end of the row, so its filled room
@@ -204,12 +272,8 @@ namespace Monolith
             Pop p = _pop;
             int n = p.Values.Length;
             float w, h;
-            if (p.Palette)
-            {
-                w = Span(p);
-                p.Pitch = (w / _cw - 2f * PalLeft) / (p.Cols - 1f + SwatchShare);
-                h = (n / p.Cols + 2) * _ch;   // the hex value is on the bottom line of the frame
-            }
+            // the palette: two rows of colors and Default, a line, the buttons
+            if (p.Palette) { w = Span(p); h = 7f * _ch; }
             else
             {
                 string title = Lang.T(p.Row.Label.Trim());
@@ -226,7 +290,7 @@ namespace Monolith
             x = Mathf.Clamp(x, _win.x + _cw, _win.xMax - w - _cw);
             if (y + h > _win.yMax - _ch * 1.5f) y = Mathf.Max(_win.y + _ch * 0.5f, p.AnchorY - _rowStep - h);
             p.R = new Rect(Mathf.Round(x), Mathf.Round(y), w, h);
-            if (mouseMoved && !p.Dragging && !(p.Values.Length > p.Shown && !p.Palette && PopBar(p).Contains(mouse))) { int at = PopAt(mouse); if (at >= 0) PopMove(at); }
+            if (mouseMoved && !p.Palette && !p.Dragging && !(p.Values.Length > p.Shown && PopBar(p).Contains(mouse))) { int at = PopAt(mouse); if (at >= 0) PopMove(at); }
 
             // a filled panel with half a cell of room around its frame, as Far draws a dialog; never over the page's own lines
             var frame = new Rect(p.R.x + _cw * 0.5f, p.R.y + _ch * 0.5f, p.R.width - _cw, p.R.height - _ch);
@@ -236,25 +300,7 @@ namespace Monolith
             Clipped(new Rect(p.R.x + _cw * 0.5f, p.R.y + _ch * 0.5f, p.R.width, p.R.height), room, Shadow);
             Clipped(p.R, room, Panel);
             Box(frame, Lang.T(p.Row.Label.Trim()), true, Panel);
-            if (p.Palette)
-            {
-                for (int i = 0; i < n; i++)
-                {
-                    int col = i % p.Cols, row = i / p.Cols;
-                    float cx = Mathf.Round(p.R.x + _cw * (PalLeft + col * p.Pitch)), cy = p.R.y + _ch + row * _ch, sw = Mathf.Round(_cw * p.Pitch * SwatchShare), sh = _ch - 6f;
-                    Color c = (Color)p.Values[i];
-                    // the one picked: a line right around it
-                    if (i == p.Cur) { float t = Thin; Fill(new Rect(cx - t, cy + 3f - t, sw + 2f * t, sh + 2f * t), KnobCur); }
-                    Fill(new Rect(cx, cy + 3f, sw, sh), new Color(c.r, c.g, c.b, 1f));
-                }
-                string hex = p.Typed.Length > 0 ? "<color=" + Hot + ">#" + p.Typed + "_</color>" : "<color=" + Val + ">#" + p.Row.Entry.GetSerializedValue() + "</color>";
-                // on the bottom line of the frame, in the middle, as Far puts its totals there
-                int len = (p.Typed.Length > 0 ? p.Typed.Length + 2 : p.Row.Entry.GetSerializedValue().Length + 1) + 2;
-                float hw = len * _cw, hx = Mathf.Round(p.R.x + (p.R.width - hw) * 0.5f), hy = p.R.yMax - _ch;
-                Fill(new Rect(hx, hy, hw, _ch), Panel);
-                GUI.Label(new Rect(hx + _cw, hy, hw, _ch), hex, _st);
-                return;
-            }
+            if (p.Palette) { PaletteDraw(p, frame); return; }
             // the cursor is kept in view, unless the list was scrolled away from it
             if (!p.Free && p.Cur < p.Top) p.Top = p.Cur;
             if (!p.Free && p.Cur >= p.Top + p.Shown) p.Top = p.Cur - p.Shown + 1;

@@ -268,11 +268,13 @@ namespace Monolith
         private float _navY0, _navStep, _rowY0, _rowStep; private int _visRows = RowsHigh - 6;
         private const int Cols = 80, RowsHigh = 30, NavCols = 19;
 
-        // the palette of the screenshot it was modelled on
-        private static readonly Color Back = new Color32(0x0B, 0x11, 0x0D, 0xFF), Frame = new Color32(0x9F, 0xB8, 0xA8, 0xFF), Bar = new Color32(0x26, 0x38, 0x2D, 0xFF),
-            FrameDim = new Color32(0x5C, 0x6D, 0x62, 0xFF), Panel = new Color32(0x12, 0x1C, 0x16, 0xFF),
-            BarDim = new Color32(0x18, 0x22, 0x1B, 0xFF), Shadow = new Color(0f, 0f, 0f, 0.5f), Hover = new Color32(0x14, 0x1D, 0x17, 0xFF), KeyBar = new Color32(0x16, 0x1F, 0x19, 0xFF);
-        private const string Txt = "#D5E3D9", Dim = "#7F9186", Hot = "#E8E05A", Mint = "#B6F0C2", Val = "#FFFFFF", Head = "#9FB8A8";
+        // the STRAFTAT theme for Far (straftat-lobby, STRAFCOLORS): panel glass, gunmetal-sage frames, mint rows and
+        // titles, victory-yellow keys
+        private static readonly Color Back = new Color32(0x09, 0x0A, 0x05, 0xFF), Frame = new Color32(0x8F, 0xA5, 0x9B, 0xFF), Bar = new Color32(0x34, 0x45, 0x32, 0xFF),
+            FrameDim = new Color32(0x6F, 0x85, 0x7B, 0xFF), Panel = new Color32(0x13, 0x18, 0x0F, 0xFF),
+            BarDim = new Color32(0x13, 0x18, 0x10, 0xFF), Shadow = new Color(0f, 0f, 0f, 0.5f), Hover = new Color32(0x1A, 0x22, 0x17, 0xFF), KeyBar = new Color32(0x17, 0x1C, 0x13, 0xFF),
+            Well = new Color32(0x07, 0x08, 0x03, 0xFF), Badge = new Color32(0x70, 0x98, 0x70, 0xFF);
+        private const string Txt = "#A9B0AA", Dim = "#8F8F8E", Hot = "#EEFF77", Mint = "#B4F6B7", Val = "#F4FEF4", Head = "#8FA59B", Ink = "#070803";
 
         private void Style()
         {
@@ -316,8 +318,10 @@ namespace Monolith
             }
             if (string.IsNullOrEmpty(title)) return;
             float w = (title.Length + 2) * _cw, x = Mathf.Round(r.x + (r.width - w) * 0.5f);
-            Fill(new Rect(x, r.y - _ch * 0.5f + g, w, _ch), under);
-            GUI.Label(new Rect(x + _cw, r.y - _ch * 0.5f + g * 0.5f, w, _ch), "<color=" + (active ? Hot : Head) + ">" + Esc(title) + "</color>", _st);
+            // the title of the panel that has the keys sits on a mint badge, as in the theme; a dialog's is bright
+            bool badge = active && lines == 2 && under == Back;
+            Fill(new Rect(x, r.y - _ch * 0.5f + g, w, _ch), badge ? Badge : under);
+            GUI.Label(new Rect(x + _cw, r.y - _ch * 0.5f + g * 0.5f, w, _ch), "<color=" + (badge ? Ink : active ? Val : Head) + ">" + Esc(title) + "</color>", _st);
         }
 
         private void Line(float x, float y, string rich) { GUI.Label(new Rect(x, y, _win.xMax - x, _ch), rich, _st); }
@@ -383,7 +387,7 @@ namespace Monolith
             float x0 = _pageR.x + _cw, x1 = beside ? side.x : _pageR.xMax - _cw;
             title = Fit(title, (int)((x1 - x0) / _cw) - 2);
             float w = title.Length * _cw, x = Mathf.Round((x0 + x1 - w) * 0.5f);
-            GUI.Label(new Rect(x, row.y, w + 2f, _ch), "<color=" + Hot + ">" + Esc(title) + "</color>", _st);
+            GUI.Label(new Rect(x, row.y, w + 2f, _ch), "<color=" + Mint + ">" + Esc(title) + "</color>", _st);
         }
 
         // long enough for a join message with color tags in it
@@ -618,7 +622,7 @@ namespace Monolith
 
         private const int BarCells = 10, NumberCells = 6;
         private static readonly string BarGap = new string(' ', BarCells + 1);
-        private static readonly Color LineRest = new Color32(0x7F, 0x91, 0x86, 0xFF), KnobCur = new Color32(0xE8, 0xE0, 0x5A, 0xFF), KnobRest = new Color32(0xD5, 0xE3, 0xD9, 0xFF), Tick = new Color32(0x9F, 0xB8, 0xA8, 0xFF);
+        private static readonly Color LineRest = new Color32(0x6F, 0x85, 0x7B, 0xFF), KnobCur = new Color32(0xEE, 0xFF, 0x77, 0xFF), KnobRest = new Color32(0xA9, 0xB0, 0xAA, 0xFF), Tick = new Color32(0x8F, 0xA5, 0x9B, 0xFF);
 
         // what a setting is set to, drawn as what it is: a switch, a key, a color, one of a list (▼ opens the list),
         // or a number with a bar that shows where it sits between its lowest and highest

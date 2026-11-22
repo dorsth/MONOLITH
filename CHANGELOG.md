@@ -1,5 +1,9 @@
 # MONOLITH changelog
 
+## 1.5.9
+- The menu uses the colors of the STRAFTAT theme for Far: panel glass, gunmetal-sage frames, mint headings, victory-yellow keys, and the title of the panel that has the keys on a mint badge.
+- The color picker is laid out as Far's Color dialog: the 16 console colors and Default, the color in use marked with a dot, a field for any other color (type its hex value), and Set, Reset and Cancel. Picking a color shows it at once; Set (or Enter) keeps it, Cancel (or Esc) puts back what was there, Reset (or Delete) sets the default.
+
 ## 1.5.8
 - Lists: the rows have the same room on all four sides inside the frame, and the scroll bar has that room on both sides too.
 
