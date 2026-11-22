@@ -19,7 +19,7 @@ namespace Monolith
             public MenuRow Row; public object Was;
             public object[] Values; public string[] Labels;
             public bool Palette; public int Cols = 1, Cur, Top;
-            public string Typed = ""; public float TypedAt;
+            public string Typed = ""; public float TypedAt; public bool Editing;   // Editing: the hex field was clicked
             public float AnchorRight, AnchorY;
             public bool Free, Dragging;        // the view was scrolled away from the cursor (wheel, scroll bar); the scroll bar is held
             public Rect R; public int Shown;
@@ -96,7 +96,7 @@ namespace Monolith
             to = Mathf.Clamp(to, 0, p.Values.Length - 1);
             p.Free = false;
             if (to == p.Cur) return;
-            p.Cur = to; p.Typed = p.Palette ? p.Typed : p.Typed;
+            p.Cur = to; p.Editing = false;
             PopApply();
         }
 
@@ -200,6 +200,7 @@ namespace Monolith
             if (ev.type != EventType.MouseDown) return;
             if (scrolls && ev.button == 0 && PopBar(p).Contains(ev.mousePosition)) { p.Dragging = true; PopScrollTo(p, ev.mousePosition.y); return; }
             Vector2 m = ev.mousePosition;
+            if (p.Palette && ev.button == 0 && HexField(p).Contains(m)) { p.Editing = true; p.Typed = ""; return; }
             if (p.Palette && ev.button == 0 && DefaultButton(p).Contains(m)) { p.Typed = ""; PopMove(DefaultSlot); PopClose(true); return; }
             int i = PopAt(m);
             // a click beside a list puts back what was there, since the mouse over it moved the cursor; beside the palette it
@@ -212,6 +213,13 @@ namespace Monolith
         // The palette, laid out as Far's Color dialog: the colors at gx, sw wide each and touching, the hex value at hx. The colors take up to three cells each; the whole is centered in the frame.
         // room between the frame and the colors, above and below them
         private float PalTop { get { return 1.5f * _ch; } }
+
+        // the hex value's sunken field
+        private Rect HexField(Pop p)
+        {
+            float gx, sw, hx; PalLayout(p, out gx, out sw, out hx);
+            return new Rect(hx, p.R.y + PalTop + _ch, 11f * _cw, _ch);
+        }
 
         // under the hex value: Default. The button is exactly its text, so its fill under the mouse fits the brackets.
         private Rect DefaultButton(Pop p)
@@ -239,14 +247,13 @@ namespace Monolith
                 Fill(s, new Color(c.r, c.g, c.b, 1f));
                 if (i == p.Cur) Outline(s, KnobCur);
             }
-            // any other color: its hex value in a sunken field as Far's, under the order of its digits. As in Far, the value
-            // waits selected with the caret blinking after it, so it is plain that typing writes over it
-            bool typing = p.Typed.Length > 0, blink = Time.unscaledTime % 1f < 0.5f;
-            string value = typing ? p.Typed : p.Row.Entry.GetSerializedValue();
+            // any other color: its hex value in a sunken field as Far's, under the order of its digits. Clicked or typed in,
+            // it is written in yellow with the _ after it, as every text being typed in the menu
+            bool typing = p.Editing || p.Typed.Length > 0;
+            Rect f = HexField(p);
             GUI.Label(new Rect(hx + _cw, y0, 13f * _cw, _ch), "<color=" + Txt + ">RRGGBBAA</color>", _st);
-            Fill(new Rect(hx, y0 + _ch, 11f * _cw, _ch), Well);
-            if (!typing) Fill(new Rect(hx + _cw, y0 + _ch, value.Length * _cw, _ch), Selected);
-            GUI.Label(new Rect(hx + _cw, y0 + _ch, 10f * _cw, _ch), "<color=" + (typing ? Hot : Val) + ">" + Esc(value) + "</color><color=" + Hot + ">" + (blink ? "_" : " ") + "</color>", _st);
+            Fill(f, Well);
+            GUI.Label(new Rect(f.x + _cw, f.y, 10f * _cw, _ch), typing ? "<color=" + Hot + ">" + Esc(p.Typed) + "_</color>" : "<color=" + Val + ">" + Esc(p.Row.Entry.GetSerializedValue()) + "</color>", _st);
             Rect b = DefaultButton(p);
             bool over = b.Contains(Event.current.mousePosition);
             if (over) Fill(b, Badge);
