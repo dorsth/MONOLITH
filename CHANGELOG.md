@@ -1,5 +1,8 @@
 # MONOLITH changelog
 
+## 1.4.3
+- A sub-page opens on its first setting, also when you left it by "..".
+
 ## 1.4.2
 - The line between names and values is gone again.
 

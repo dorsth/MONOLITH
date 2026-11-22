@@ -1077,7 +1077,11 @@ namespace Monolith
             switch (row.Kind)
             {
                 case RowKind.Up: GoBack(); return;
-                case RowKind.Link: _searching = false; _searchPage = null; _page = row.To; return;
+                case RowKind.Link:
+                    _searching = false; _searchPage = null; _page = row.To;
+                    // a page opens on its first setting, never on the ".." it was left by
+                    if (_page.Cur == UpRow) { _page.Cur = null; _page.Last = 0; }
+                    return;
                 case RowKind.Action:
                 {
                     if (row.Take != null)
