@@ -5,7 +5,7 @@ namespace Monolith
 {
     internal static partial class Lang
     {
-        private static readonly Dictionary<string, string> Table = new Dictionary<string, string>(311)
+        private static readonly Dictionary<string, string> Table = new Dictionary<string, string>(314)
         {
             { "Crosshair", "Прицел" },
             { "Viewmodel", "Вьюмодель" },
@@ -58,7 +58,9 @@ namespace Monolith
             { "Hit color", "Цвет при попадании" },
             { "The crosshair changes color for a moment on a hit.", "При попадании прицел на мгновение меняет цвет." },
             { "color", "цвет" },
-            { "Preview", "Превью" },
+            { "preview", "превью" },
+            { "dark", "темно" },
+            { "light", "светло" },
             { "FOV", "FOV" },
             { "Left / right", "Влево / вправо" },
             { "Down / up", "Вниз / вверх" },
@@ -100,13 +102,13 @@ namespace Monolith
             { "Gap", "Зазор" },
             { "Static hitmarkers", "Статичные хитмаркеры" },
             { "They fade out without popping.", "Они исчезают без увеличения." },
-            { "Animation size", "Сила анимации" },
+            { "Animation", "Анимация" },
             { "How far they pop.", "Насколько сильно они увеличиваются." },
-            { "Same headshot animation", "Хедшот как обычное попадание" },
+            { "Same headshot animation", "Обычная анимация хедшота" },
             { "Headshots pop like bodyshots.", "Анимация хедшота такая же, как при попадании в тело." },
-            { "Bodyshot color", "Цвет попадания в тело" },
+            { "Bodyshot color", "Цвет по телу" },
             { "Headshot color", "Цвет хедшота" },
-            { "Shotgun color", "Цвет для дробовика" },
+            { "Shotgun color", "Цвет дробовика" },
             { "The black bodyshot hitmarker of the shotgun and a few other guns.", "Чёрный хитмаркер попадания в тело у дробовика и ещё нескольких пушек." },
             { "Kill hitmarker", "Хитмаркер убийства" },
             { "The hit that kills shows in the kill color.", "Попадание, которое убивает, показывается цветом убийства." },
@@ -166,7 +168,8 @@ namespace Monolith
             { "teammates", "союзники" },
             { "no picture", "нет превью" },
             { "no hat", "без шапки" },
-            { "shown once a map has loaded", "появится после загрузки карты" },
+            { "shown once a", "появится после" },
+            { "map has loaded", "загрузки карты" },
             { "Hitsound", "Хитсаунд" },
             { "Headshot hitsound", "Хитсаунд в голову" },
             { "Killsound", "Киллсаунд" },

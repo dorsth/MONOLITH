@@ -2,7 +2,7 @@
 # check: 'nav' category name (16 cells) | 'L<n>' a row name that has n cells | 'tip' a row's line under the page
 # (with "По умолчанию: x." after it) | 'tipb' the same with nothing after it | 'info' a line under the page |
 # 'W<n>' at most n cells | '' not checked (a part that is put together with others).
-# Row names: a page has 56 cells.
+# Row names: a full page has 56 cells, a page with a preview box 31.
 # Of those a switch takes 4, a slider 18, a color 14; a list or text value gives way to the name (it keeps 7).
 B  = 'previous config'          # the name the last setup is kept under (a profile name: not translated)
 HOW_EN = ' Press Enter, then a key, mouse button or scroll.'
@@ -40,7 +40,7 @@ T = [
 ("1 is the picture's own size at 1080p.", '1: размер самой картинки при 1080p.', 'tip'),
 ('Show when scoped', 'Показывать в оптике', 'L27'), ('Hit color', 'Цвет при попадании', 'L27'),
 ('The crosshair changes color for a moment on a hit.', 'При попадании прицел на мгновение меняет цвет.', 'tip'),
-('color', 'цвет', 'L15'), ('Preview', 'Превью', 'L50'),
+('color', 'цвет', 'L15'), ('preview', 'превью', 'W16'), ('dark', 'темно', 'W7'), ('light', 'светло', 'W7'),
 # ---- viewmodel
 ('FOV', 'FOV', 'L38'), ('Left / right', 'Влево / вправо', 'L38'), ('Down / up', 'Вниз / вверх', 'L38'), ('Back / forward', 'Назад / вперёд', 'L38'),
 ('Sway', 'Покачивание', 'L38'),
@@ -64,15 +64,15 @@ T = [
 ('With the AR, AK and Warden, recoil moves your aim instead of shaking the camera.', 'У AR, AK и Warden отдача двигает прицел, а не трясёт камеру.', 'tip'),
 ('No near miss vignette', 'Без виньетки при пролёте пуль', 'L52'),
 # ---- hud: hitmarkers
-('Hide hitmarkers', 'Скрыть хитмаркеры', 'L31'), ('Line ends', 'Концы линий', 'L15'), 
-('Length', 'Длина', 'L17'), ('Width', 'Толщина', 'L38'), ('Thickness', 'Толщина', 'L17'), ('Gap', 'Зазор', 'L17'), ('Static hitmarkers', 'Статичные хитмаркеры', 'L31'), ('They fade out without popping.', 'Они исчезают без увеличения.', 'tip'),
-('Animation size', 'Сила анимации', 'L17'),
+('Hide hitmarkers', 'Скрыть хитмаркеры', 'L27'), ('Line ends', 'Концы линий', 'L11'), 
+('Length', 'Длина', 'L13'), ('Width', 'Толщина', 'L38'), ('Thickness', 'Толщина', 'L13'), ('Gap', 'Зазор', 'L13'), ('Static hitmarkers', 'Статичные хитмаркеры', 'L27'), ('They fade out without popping.', 'Они исчезают без увеличения.', 'tip'),
+('Animation', 'Анимация', 'L13'),
 ('How far they pop.', 'Насколько сильно они увеличиваются.', 'tip'),
-('Same headshot animation', 'Хедшот как обычное попадание', 'L31'),
+('Same headshot animation', 'Обычная анимация хедшота', 'L27'),
 ('Headshots pop like bodyshots.', 'Анимация хедшота такая же, как при попадании в тело.', 'tip'),
-('Bodyshot color', 'Цвет попадания в тело', 'L21'), ('Headshot color', 'Цвет хедшота', 'L21'), ('Shotgun color', 'Цвет для дробовика', 'L21'),
+('Bodyshot color', 'Цвет по телу', 'L17'), ('Headshot color', 'Цвет хедшота', 'L17'), ('Shotgun color', 'Цвет дробовика', 'L17'),
 ('The black bodyshot hitmarker of the shotgun and a few other guns.', 'Чёрный хитмаркер попадания в тело у дробовика и ещё нескольких пушек.', 'tip'),
-('Kill hitmarker', 'Хитмаркер убийства', 'L31'), ('The hit that kills shows in the kill color.', 'Попадание, которое убивает, показывается цветом убийства.', 'tip'), ('Kill color', 'Цвет убийства', 'L21'),
+('Kill hitmarker', 'Хитмаркер убийства', 'L27'), ('The hit that kills shows in the kill color.', 'Попадание, которое убивает, показывается цветом убийства.', 'tip'), ('Kill color', 'Цвет убийства', 'L17'),
 ('hidden', 'скрыты', 'W16'), ('static', 'статичные', 'W16'),
 # ---- hud: prompts and the rest
 ('Hide prompts', 'Скрыть подсказки', 'L52'), ('On weapons, doors and buttons.', 'На оружии, дверях и кнопках.', 'info'),
@@ -106,7 +106,7 @@ T = [
 ('The same setting as in the game. Only in lobbies with enemy outlines on.', 'Та же настройка, что в игре. Только в лобби с обводкой врагов.', 'tip'),
 ('The same setting as in the game.', 'Та же настройка, что в игре.', 'tip'),
 ('enemies', 'враги', 'W20'), ('teammates', 'союзники', 'W20'), ('no picture', 'нет превью', 'W10'), ('no hat', 'без шапки', 'W15'),
-('shown once a map has loaded', 'появится после загрузки карты', 'W50'),
+('shown once a', 'появится после', 'W18'), ('map has loaded', 'загрузки карты', 'W18'),
 # ---- sound
 ('Hitsound', 'Хитсаунд', 'L46'), ('Headshot hitsound', 'Хитсаунд в голову', 'L46'), ('Killsound', 'Киллсаунд', 'L46'),
 ('Melee killsound', 'Киллсаунд в ближнем бою', 'L46'), ('volume', 'громкость', 'L36'), ('100 is normal.', '100: обычная громкость.', 'tip'),

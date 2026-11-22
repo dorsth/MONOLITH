@@ -38,7 +38,7 @@ namespace Monolith
         // where a pop-up for this row hangs: under the row, its right edge on the row's
         private void Anchor(Pop p, MenuPage page, int ci)
         {
-            p.AnchorRight = _pageR.xMax - _cw;
+            p.AnchorRight = _pageR.xMax - _cw - (page.Draw != null ? (page.SideCols + 1) * _cw : 0f);
             p.AnchorY = _rowY0 + (ci - page.Top + 1) * _rowStep;
         }
 

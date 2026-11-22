@@ -52,7 +52,7 @@ namespace Monolith
         public MenuRow Cur; public int Last, Top;
         public bool Outside;                // not part of MONOLITH (the other mods you have): dimmer in the list
         // a box on the right of the page that the page draws itself (the crosshair): its size in cells, its title
-        public Action<UnityEngine.Rect> Draw; public int UnderRows;
+        public Action<UnityEngine.Rect> Draw; public int SideCols; public Func<int> SideRows;
 
         public MenuPage(MenuPage parent, string name, string info = null)
         {
@@ -401,7 +401,7 @@ namespace Monolith
                  .Set("Show when scoped", E(Cross, "Crosshair", "Show While Scoped"), own, "")
                  .Set("Hit color", hit, own, "The crosshair changes color for a moment on a hit.")
                  .Set("  color", E(Cross, "Crosshair", "Hit Color Value"), () => On(on) && On(hit), "");
-                if (on != null) { p.Draw = r => BundleMenu.I.CrosshairPreview(r); p.UnderRows = 5; }
+                if (on != null) { p.Draw = r => BundleMenu.I.CrosshairPreview(r); p.SideCols = 24; p.SideRows = () => 10; }
                 if (p.Rows.Count > 0) cats.Add(p);
             }
 
@@ -480,14 +480,14 @@ namespace Monolith
                   .Set("Thickness", E(Tweaks, "HUD", "Hitmarker Width"), shown, "")
                   .Set("Gap", E(Tweaks, "HUD", "Hitmarker Gap"), shown, "")
                   .Set("Static hitmarkers", still, shown, "They fade out without popping.")
-                  .Set("Animation size", E(Tweaks, "HUD", "Hitmarker Animation"), () => !On(noHm) && !On(still), "How far they pop.")
+                  .Set("Animation", E(Tweaks, "HUD", "Hitmarker Animation"), () => !On(noHm) && !On(still), "How far they pop.")
                   .Set("Same headshot animation", E(Tweaks, "HUD", "Same Headshot Animation"), () => !On(noHm) && !On(still), "Headshots pop like bodyshots.")
                   .Set("Bodyshot color", E(Tweaks, "HUD", "Hitmarker Bodyshot Color"), shown, "")
                   .Set("Headshot color", E(Tweaks, "HUD", "Hitmarker Headshot Color"), shown, "")
                   .Set("Shotgun color", E(Tweaks, "HUD", "Hitmarker Shotgun Color"), shown, "The black bodyshot hitmarker of the shotgun and a few other guns.")
                   .Set("Kill hitmarker", kill, shown, "The hit that kills shows in the kill color.")
                   .Set("Kill color", E(Tweaks, "HUD", "Hitmarker Kill Color"), () => !On(noHm) && On(kill), "");
-                if (noHm != null) { hm.Draw = r => BundleMenu.I.HitmarkerPreview(r); hm.UnderRows = 5; }
+                if (noHm != null) { hm.Draw = r => BundleMenu.I.HitmarkerPreview(r); hm.SideCols = 24; hm.SideRows = () => On(kill) ? 16 : 13; }
 
                 var pr = new MenuPage(p, "Prompts", "The texts on weapons, doors and buttons.");
                 ConfigEntryBase noPick = E(Tweaks, "Interaction", "Hide Pickup Prompts"), noUse = E(Tweaks, "Interaction", "Hide Interaction Prompts");
@@ -552,7 +552,7 @@ namespace Monolith
                  .Set("Enemy outlines when I host", Players.HostOutlines, null, "The game's lobby option, kept between launches. In other lobbies the host decides.")
                  .Set("Friendly fire when I host", Players.HostFriendlyFire, null, "The game's lobby option, kept between launches. In other lobbies the host decides.")
                  .Set("Join message", E(Tweaks, "Menus", "Join Message"), null, "The line everyone sees when you join a lobby. {name} is your name. Color, bold, italic, underline and strikethrough tags work. Up to 120 letters, tags not counted. Leave it empty for the game's line.");
-                if (p.Rows.Count > 2) { p.Draw = r => BundleMenu.I.PlayersPreview(r); p.UnderRows = 6; cats.Add(p); }
+                if (p.Rows.Count > 2) { p.Draw = r => BundleMenu.I.PlayersPreview(r); p.SideCols = 24; p.SideRows = () => 15; cats.Add(p); }
             }
 
             // ---------------------------------------------------------------- sound

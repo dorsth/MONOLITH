@@ -257,7 +257,7 @@ namespace Monolith
 
         private static readonly MenuRow UpRow = new MenuRow { Kind = RowKind.Up, Label = ".." };
         private MenuRow _dragRow; private Vector2 _lastMouse;
-        private int ColsFor(MenuPage page) { return (int)((_pageR.width - 2 * _cw) / _cw) - 1; }
+        private int ColsFor(MenuPage page) { return (int)((_pageR.width - 2 * _cw) / _cw) - 1 - (page.Draw != null ? page.SideCols + 1 : 0); }
 
         // ---- drawing
 
@@ -296,14 +296,18 @@ namespace Monolith
 
         private void Fill(Rect r, Color c) { Color o = GUI.color; GUI.color = c; GUI.DrawTexture(r, _white); GUI.color = o; }
 
-        // a double frame, as the panels of a text-mode file manager have, drawn as lines (no gaps between rows)
+        // how thick a frame line is
+        private float Thin { get { return Mathf.Max(1f, Mathf.Round(_ch / 14f)); } }
+
+        // a double frame, as the panels of a text-mode file manager have, drawn as lines (no gaps between rows);
+        // a box inside a panel has one line
         private void Box(Rect r, string title, bool active) { Box(r, title, active, Back); }
 
-        private void Box(Rect r, string title, bool active, Color under)
+        private void Box(Rect r, string title, bool active, Color under, int lines = 2)
         {
             Color c = active ? Frame : FrameDim;
-            float t = Mathf.Max(1f, Mathf.Round(_ch / 14f)), g = t * 2f;
-            for (int k = 0; k < 2; k++)
+            float t = Thin, g = lines == 2 ? t * 2f : 0f;
+            for (int k = 0; k < lines; k++)
             {
                 float o = k * g; Rect q = new Rect(r.x + o, r.y + o, r.width - 2 * o, r.height - 2 * o);
                 Fill(new Rect(q.x, q.y, q.width, t), c); Fill(new Rect(q.x, q.yMax - t, q.width, t), c);
@@ -336,9 +340,7 @@ namespace Monolith
             _win = new Rect(Mathf.Round(Mathf.Min(Screen.width * 0.03f, Mathf.Max(0f, Screen.width - w))), Mathf.Round((Screen.height - h) * 0.5f), w, h);
             _navR = new Rect(_win.x + _cw * 0.5f, _win.y + _ch * 0.75f, NavCols * _cw, (RowsHigh - 4) * _ch);
             _pageR = new Rect(_navR.xMax + _cw * 0.5f, _navR.y, _win.xMax - _navR.xMax - _cw, _navR.height);
-            _navY0 = _navR.y + _ch; _navStep = _ch; _rowY0 = _pageR.y + _ch; _rowStep = _ch;
-            // a page with a preview keeps room for it under its rows: its heading, the preview, and air above the frame
-            _visRows = RowsHigh - 6 - (page.Draw != null ? page.UnderRows + 2 : 0);
+            _navY0 = _navR.y + _ch; _navStep = _ch; _rowY0 = _pageR.y + _ch; _rowStep = _ch; _visRows = RowsHigh - 6;
 
             if (_bindRow != null) PollBind();
             bool binding = _bindRow != null || Time.frameCount - _bindEnd <= 1;
@@ -391,11 +393,12 @@ namespace Monolith
             }
             string title = _searching ? Lang.T("search: ") + _query + "_" : PathText(page);
             Box(_pageR, Fit(title, (int)(_pageR.width / _cw) - 8), pageOn);
+            int side = page.Draw != null ? page.SideCols + 1 : 0;
             int cols = ColsFor(page), vis = _visRows;
             for (int i = 0; i < vis && page.Top + i < _vis.Count; i++)
             {
                 int idx = page.Top + i; MenuRow row = _vis[idx];
-                Rect r = new Rect(_pageR.x + _cw, _pageR.y + (i + 1) * _ch, _pageR.width - 2 * _cw, _ch);
+                Rect r = new Rect(_pageR.x + _cw, _pageR.y + (i + 1) * _ch, _pageR.width - 2 * _cw - side * _cw, _ch);
                 bool cur = idx == ci && pageOn;
                 if (cur) Fill(r, Bar); else if (idx == over && row.Kind != RowKind.Header) Fill(r, Hover);
                 Line(r.x + _cw * 0.5f, r.y, RowText(row, cols, cur));
@@ -409,12 +412,12 @@ namespace Monolith
                 GUI.Label(cr, "<color=" + Head + ">" + count + "</color>", _st);
             }
 
-            // the preview: under the rows, headed as a section of the page is, as wide as a row
+            // the preview: a box beside the rows, which fills it with smaller boxes of its own
             if (page.Draw != null)
             {
-                float y = _pageR.y + (Mathf.Min(vis, _vis.Count - page.Top) + 1) * _ch;
-                Line(_pageR.x + _cw * 1.5f, y, RowText(PreviewHead, cols, false));
-                page.Draw(new Rect(_pageR.x + _cw, y + _ch + Mathf.Round(_ch * 0.25f), _pageR.width - 2f * _cw, page.UnderRows * _ch));
+                Rect sr = SideRect(page);
+                Box(sr, Lang.T("preview"), false);
+                page.Draw(sr);
             }
 
             // what the row under the cursor is
@@ -474,7 +477,11 @@ namespace Monolith
             try { row.Entry.BoxedValue = none ? Monolith.Keys.NoKey(row.Entry) : Monolith.Keys.Taken(row.Entry, got); } catch { }
         }
 
-        private static readonly MenuRow PreviewHead = new MenuRow { Kind = RowKind.Header, Label = "Preview" };
+        private Rect SideRect(MenuPage page)
+        {
+            // its title sits on its top line: that line is put where the title comes level with the text of the first row
+            return new Rect(_pageR.xMax - (page.SideCols + 1.5f) * _cw, _pageR.y + _ch * 1.5f - Thin, page.SideCols * _cw, page.SideRows() * _ch);
+        }
 
         private static string K(string key, string what) { return "<color=" + Hot + ">" + Lang.T(key) + "</color><color=" + Txt + "> " + Lang.T(what) + "</color>  "; }
 
@@ -694,6 +701,7 @@ namespace Monolith
         private int RowAt(Vector2 m, MenuPage page)
         {
             if (!_pageR.Contains(m) || m.y < _rowY0) return -1;
+            if (page.Draw != null && m.x >= SideRect(page).x - 10f) return -1;
             int i = page.Top + Mathf.FloorToInt((m.y - _rowY0) / _rowStep);
             if (i < 0 || i >= _vis.Count || i >= page.Top + _visRows || _vis[i].Kind == RowKind.Header) return -1;
             return i;
