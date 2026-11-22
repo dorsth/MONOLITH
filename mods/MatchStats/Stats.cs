@@ -578,7 +578,7 @@ namespace MatchStats
             private string _whyFlat;
             private const float Turn = 85f;      // degrees toward the middle of the room
             private const float Wide = 6.5f;      // the board is this many times as wide as the word REMATCH
-            private const float Clear = 4.6f, Out = 0f;
+            private const float Clear = 4.6f, Out = 0.25f;
             private void Flat()
             {
                 _world = false;
