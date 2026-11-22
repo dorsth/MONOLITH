@@ -20,7 +20,7 @@ using UnityEngine.UI;
 
 [assembly: AssemblyTitle("ezCrosshair")]
 [assembly: AssemblyDescription("Pick your own crosshair, its color and size.")]
-[assembly: AssemblyVersion("1.2.8.0")]
+[assembly: AssemblyVersion("1.2.9.0")]
 [assembly: AssemblyFileVersion("1.2.1.0")]
 
 // Only changes what you see on your own screen, so matchmaking with unmodded players still works.
@@ -34,7 +34,7 @@ namespace EzCrosshair
     {
         public const string Guid = "dorsth.straftat.ezcrosshair";
         public const string Name = "ezCrosshair";
-        public const string Version = "1.2.8";
+        public const string Version = "1.2.9";
         internal const string ModMenuGuid = "kestrel.straftat.modmenu";
 
         // in the order they're shown (Images.cs has each one's picture)
@@ -172,17 +172,9 @@ namespace EzCrosshair
             try
             {
                 System.IO.Directory.CreateDirectory(Folder);
-                // once: the crosshairs that come with it become files like any other. One you delete afterwards stays gone.
-                ConfigEntry<bool> written = config.Bind("Internal", "Crosshair Files Written", false, "Set once the crosshairs that come with MONOLITH have been written to its Crosshairs folder.");
-                if (!written.Value)
-                {
-                    foreach (string n in EzCrosshairPlugin.Names)
-                    {
-                        string path = System.IO.Path.Combine(Folder, n + ".png");
-                        if (!System.IO.File.Exists(path)) System.IO.File.WriteAllBytes(path, Convert.FromBase64String(Images.Get(n)));
-                    }
-                    written.Value = true;
-                }
+                // The crosshairs that come with it stay in the dll, so a new version of them reaches everyone; the folder is for
+                // your own. A file there with the same name as one of them takes its place. (Up to 1.2.8 they were written here
+                // once, and those copies then hid every later change to them.)
                 string[] found = System.IO.Directory.GetFiles(Folder, "*.png");
                 Array.Sort(found, StringComparer.OrdinalIgnoreCase);
                 foreach (string f in found)
