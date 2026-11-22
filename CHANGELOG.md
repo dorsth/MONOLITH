@@ -1,5 +1,9 @@
 # MONOLITH changelog
 
+## 1.7.6
+- The clock and the titles no longer have a dark block above the frame.
+- The yellow is #F1FAC3, measured from Far.
+
 ## 1.7.5
 - Regular text is #ADB3AC, as in Far.
 

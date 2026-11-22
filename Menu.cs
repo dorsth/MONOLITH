@@ -274,7 +274,7 @@ namespace Monolith
             FrameDim = new Color32(0x6F, 0x85, 0x7B, 0xFF), Panel = new Color32(0x13, 0x18, 0x0F, 0xFF),
             BarDim = new Color32(0x13, 0x18, 0x10, 0xFF), Shadow = new Color(0f, 0f, 0f, 0.5f), Hover = new Color32(0x1A, 0x22, 0x17, 0xFF), KeyBar = new Color32(0x17, 0x1C, 0x13, 0xFF),
             Well = new Color32(0x07, 0x08, 0x03, 0xFF), Badge = new Color32(0xB4, 0xF6, 0xB7, 0xFF);
-        private const string Txt = "#ADB3AC", Dim = "#909790", Hot = "#EEFF77", Mint = "#B4F6B7", Val = "#FCFEF9", Head = "#8FA59B", Faint = "#5F605D", Ink = "#070803";
+        private const string Txt = "#ADB3AC", Dim = "#909790", Hot = "#F1FAC3", Mint = "#B4F6B7", Val = "#FCFEF9", Head = "#8FA59B", Faint = "#5F605D", Ink = "#070803";
 
         private void Style()
         {
@@ -323,7 +323,8 @@ namespace Monolith
             float w = (title.Length + 2) * _cw, x = Mathf.Round(r.x + (r.width - w) * 0.5f);
             // the title of the panel that has the keys sits on a mint badge, as in the theme; a dialog's is bright. Titles are bold, as Far's
             bool badge = active && panel;
-            Fill(new Rect(x, r.y - _ch * 0.5f + g, w, _ch), badge ? Badge : under);
+            // a badge is a whole cell; a plain title only hides the frame under it, so the ground above stays
+            if (badge) Fill(new Rect(x, r.y - _ch * 0.5f + g, w, _ch), Badge); else Fill(new Rect(x, r.y, w, _ch * 0.5f + g), under);
             GUI.Label(new Rect(x + _cw, r.y - _ch * 0.5f + g * 0.5f, w, _ch), "<b><color=" + (badge ? Ink : panel ? Head : lines == 2 ? Val : Txt) + ">" + Esc(title) + "</color></b>", _st);
         }
 
@@ -474,7 +475,7 @@ namespace Monolith
             // the clock on the top frame, as Far shows it: over the corner, its last letter on the frame's outer edge
             string clock = DateTime.Now.ToShortTimeString();
             float cx = _pageR.xMax - (clock.Length + 1) * _cw;
-            Fill(new Rect(cx, _pageR.y - _ch * 0.5f + Thin * 2f, (clock.Length + 1) * _cw, _ch), Back);
+            Fill(new Rect(cx, _pageR.y, (clock.Length + 1) * _cw, _ch * 0.5f + Thin * 2f), Back);   // over the frame only: above it is the ground
             GUI.Label(new Rect(cx + _cw, _pageR.y - _ch * 0.5f + Thin, (clock.Length + 1) * _cw, _ch), "<b><color=" + Hot + ">" + Esc(clock) + "</color></b>", _st);
             int side = page.Draw != null ? page.SideCols + 1 : 0;
             int cols = ColsFor(page), vis = _visRows;
@@ -635,7 +636,7 @@ namespace Monolith
 
         private const int BarCells = 10, NumberCells = 6;
         private static readonly string BarGap = new string(' ', BarCells + 1);
-        private static readonly Color LineRest = new Color32(0x6F, 0x85, 0x7B, 0xFF), KnobCur = new Color32(0xEE, 0xFF, 0x77, 0xFF), KnobRest = new Color32(0xAD, 0xB3, 0xAC, 0xFF), Tick = new Color32(0x8F, 0xA5, 0x9B, 0xFF);
+        private static readonly Color LineRest = new Color32(0x6F, 0x85, 0x7B, 0xFF), KnobCur = new Color32(0xF1, 0xFA, 0xC3, 0xFF), KnobRest = new Color32(0xAD, 0xB3, 0xAC, 0xFF), Tick = new Color32(0x8F, 0xA5, 0x9B, 0xFF);
 
         // what a setting is set to, drawn as what it is: a switch, a key, a color, one of a list (▼ opens the list),
         // or a number with a bar that shows where it sits between its lowest and highest
