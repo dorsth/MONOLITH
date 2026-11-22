@@ -5,7 +5,7 @@ namespace Monolith
 {
     internal static partial class Lang
     {
-        private static readonly Dictionary<string, string> Table = new Dictionary<string, string>(307)
+        private static readonly Dictionary<string, string> Table = new Dictionary<string, string>(309)
         {
             { "Crosshair", "Прицел" },
             { "Viewmodel", "Вьюмодель" },
@@ -86,7 +86,9 @@ namespace Monolith
             { "Slide jumps, wall jumps and ceiling hits.", "Прыжки из подката, прыжки от стен и удары о потолок." },
             { "No vault shake", "Без тряски при перелезании" },
             { "No sprint FOV", "Без FOV при беге" },
-            { "Your FOV stays the same when you sprint and slide. Off: it widens like in the game.", "FOV не меняется при беге и подкате. Выкл.: расширяется как в игре." },
+            { "Your FOV stays the same when you sprint and slide. Off: it widens by the amount below.", "FOV не меняется при беге и подкате. Выкл.: расширяется на величину ниже." },
+            { "Sprint FOV amount", "Сила FOV при беге" },
+            { "How much your FOV widens when you sprint and slide. 1 is the game's.", "Насколько расширяется FOV при беге и подкате. 1 как в игре." },
             { "Better recoil", "Улучшенная отдача" },
             { "With the AR, AK and Warden, recoil moves your aim instead of shaking the camera.", "У AR, AK и Warden отдача двигает прицел, а не трясёт камеру." },
             { "No near miss vignette", "Без виньетки при пролёте пуль" },

@@ -59,7 +59,8 @@ T = [
 ('No landing shake', 'Без тряски при приземлении', 'L52'), ('No jump shake', 'Без тряски при прыжке', 'L52'),
 ('Slide jumps, wall jumps and ceiling hits.', 'Прыжки из подката, прыжки от стен и удары о потолок.', 'tip'),
 ('No vault shake', 'Без тряски при перелезании', 'L52'), ('No sprint FOV', 'Без FOV при беге', 'L52'),
-('Your FOV stays the same when you sprint and slide. Off: it widens like in the game.', 'FOV не меняется при беге и подкате. Выкл.: расширяется как в игре.', 'tip'), ('Better recoil', 'Улучшенная отдача', 'L52'),
+('Your FOV stays the same when you sprint and slide. Off: it widens by the amount below.', 'FOV не меняется при беге и подкате. Выкл.: расширяется на величину ниже.', 'tip'),
+('Sprint FOV amount', 'Сила FOV при беге', 'L38'), ('How much your FOV widens when you sprint and slide. 1 is the game\'s.', 'Насколько расширяется FOV при беге и подкате. 1 как в игре.', 'tip'), ('Better recoil', 'Улучшенная отдача', 'L52'),
 ('With the AR, AK and Warden, recoil moves your aim instead of shaking the camera.', 'У AR, AK и Warden отдача двигает прицел, а не трясёт камеру.', 'tip'),
 ('No near miss vignette', 'Без виньетки при пролёте пуль', 'L52'),
 # ---- hud: hitmarkers (35 cells)
