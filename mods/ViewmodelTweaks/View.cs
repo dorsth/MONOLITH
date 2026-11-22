@@ -234,8 +234,12 @@ namespace ViewmodelTweaks
         // ---- small things
 
         // placing a weapon by hand shows a see-through copy of it: that copy is the main camera's, not the weapon camera's
+        // the placement preview of a mine or claymore you hold: One Camera keeps it where the game put it (Plugin.Pose)
+        internal static Transform Preview;
+
         private static void PreviewShown(Transform ___previewObject)
         {
+            Preview = ___previewObject;
             try { if (___previewObject != null && ___previewObject.childCount > 0) ___previewObject.GetChild(0).gameObject.layer = 0; } catch { }
         }
 

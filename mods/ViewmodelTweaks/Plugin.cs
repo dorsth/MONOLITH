@@ -15,7 +15,7 @@ using UnityEngine.LowLevel;
 
 [assembly: AssemblyTitle("ViewmodelTweaks")]
 [assembly: AssemblyDescription("Viewmodel FOV, position, sway, bob and arms, with its own values for any weapon you add.")]
-[assembly: AssemblyVersion("2.0.6.0")]
+[assembly: AssemblyVersion("2.0.7.0")]
 [assembly: StraftatMod(isVanillaCompatible: true)]
 
 namespace ViewmodelTweaks
@@ -55,7 +55,7 @@ namespace ViewmodelTweaks
     {
         public const string Guid = "dorsth.straftat.viewmodeltweaks";
         public const string Name = "ViewmodelTweaks";
-        public const string Version = "2.0.6";
+        public const string Version = "2.0.7";
         internal const int MaxSlots = 10;
 
         internal static ManualLogSource Log;
@@ -259,6 +259,7 @@ namespace ViewmodelTweaks
             {
                 float sx, sy, sz; Vector3 off;
                 if (!Move(cam, out sx, out sy, out sz, out off)) return;
+                Loosen(b);
                 _bobPos = b.localPosition; _bobScale = b.localScale;
                 Vector3 p = _bobPos + off;
                 b.localPosition = new Vector3(p.x * sx, p.y * sy, p.z * sz);
@@ -277,6 +278,43 @@ namespace ViewmodelTweaks
         {
             _posed = false;
             try { if (_bob != null) { _bob.localPosition = _bobPos; _bob.localScale = _bobScale; } } catch { }
+            Fasten();
+        }
+
+        // The placement preview of a mine or claymore hangs under the weapon but stands in the world, where your crosshair
+        // points. Moved with the weapon it showed closer and lower than where the mine goes, so it is taken out from under
+        // the weapon while the frame is drawn and put back after.
+        private static Transform _prev, _prevParent;
+        private static int _prevIndex;
+        private static Vector3 _prevPos, _prevScale;
+        private static Quaternion _prevRot;
+
+        private static void Loosen(Transform b)
+        {
+            _prev = null;
+            try
+            {
+                Transform t = View.Preview;
+                if (t == null || !t.gameObject.activeInHierarchy || t.parent == null || !t.IsChildOf(b)) return;
+                _prevParent = t.parent; _prevIndex = t.GetSiblingIndex();
+                _prevPos = t.localPosition; _prevRot = t.localRotation; _prevScale = t.localScale;
+                t.SetParent(null, true);
+                _prev = t;
+            }
+            catch { _prev = null; }
+        }
+
+        private static void Fasten()
+        {
+            Transform t = _prev;
+            _prev = null;
+            if (t == null) return;
+            try
+            {
+                t.SetParent(_prevParent, false); t.SetSiblingIndex(_prevIndex);
+                t.localPosition = _prevPos; t.localRotation = _prevRot; t.localScale = _prevScale;
+            }
+            catch { }
         }
 
         // ---- Loose effects of a weapon under One Camera: the second camera on demand
