@@ -1,5 +1,8 @@
 # MONOLITH changelog
 
+## 1.5.5
+- Scroll bars sit exactly where the double line of the frame was, as in Far, instead of half over it.
+
 ## 1.5.4
 - In a list, the mouse wheel scrolls the list and leaves the setting alone.
 - Scroll bars can be dragged: in a list it scrolls the list, on a page it moves the cursor.

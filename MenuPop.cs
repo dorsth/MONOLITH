@@ -166,7 +166,7 @@ namespace Monolith
         }
 
         // the scroll bar of a long list: one cell wide on its right frame, over its rows
-        private Rect PopBar(Pop p) { return new Rect(p.R.xMax - _cw * 1.25f, p.R.y + _ch, _cw, p.Shown * _ch); }
+        private Rect PopBar(Pop p) { return new Rect(BarX(p.R.xMax - _cw * 0.5f), p.R.y + _ch, _cw, p.Shown * _ch); }
 
         // the list shows from where the mouse is on its scroll bar
         private void PopScrollTo(Pop p, float y)

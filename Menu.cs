@@ -331,11 +331,14 @@ namespace Monolith
 
         // A long page has a scroll bar on its right frame, as a Far panel has: ▲ on the first row, ▼ on the last, the
         // part shown as a bar on the line between them.
-        private void ScrollBar(int top, int shown, int count) { ScrollBar(_pageR.xMax - _cw, _rowY0, top, shown, count, Back); }
+        private void ScrollBar(int top, int shown, int count) { ScrollBar(BarX(_pageR.xMax), _rowY0, top, shown, count, Back); }
+
+        // where a scroll bar goes: in place of the double line of a frame whose outer edge is at right, as Far draws it
+        private float BarX(float right) { return Mathf.Round(right - Thin * 1.5f - _cw * 0.5f); }
 
         // a page's scroll bar, held with the mouse: the cursor goes to the row at that height of the bar
         private bool _barHeld;
-        private Rect PageBar(MenuPage page) { return _vis.Count > _visRows ? new Rect(_pageR.xMax - _cw, _rowY0, _cw, _visRows * _ch) : new Rect(); }
+        private Rect PageBar(MenuPage page) { return _vis.Count > _visRows ? new Rect(BarX(_pageR.xMax), _rowY0, _cw, _visRows * _ch) : new Rect(); }
         private void BarTo(MenuPage page, int ci, float y)
         {
             Rect b = PageBar(page);
