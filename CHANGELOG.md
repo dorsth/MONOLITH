@@ -1,5 +1,8 @@
 # MONOLITH changelog
 
+## 1.10.2
+- MatchStats 1.0.4: takes won and survived show the count, with the match's takes once in the heading; a player who missed takes shows x/y.
+
 ## 1.10.1
 - MatchStats 1.0.3: the victory board stands twice as far back in the room.
 
