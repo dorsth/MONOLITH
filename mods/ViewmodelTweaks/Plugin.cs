@@ -2,7 +2,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using BepInEx;
 using BepInEx.Bootstrap;
@@ -15,7 +14,7 @@ using UnityEngine.LowLevel;
 
 [assembly: AssemblyTitle("ViewmodelTweaks")]
 [assembly: AssemblyDescription("Viewmodel FOV, position, sway, bob and arms, with its own values for any weapon you add.")]
-[assembly: AssemblyVersion("2.0.7.0")]
+[assembly: AssemblyVersion("2.0.8.0")]
 [assembly: StraftatMod(isVanillaCompatible: true)]
 
 namespace ViewmodelTweaks
@@ -55,13 +54,16 @@ namespace ViewmodelTweaks
     {
         public const string Guid = "dorsth.straftat.viewmodeltweaks";
         public const string Name = "ViewmodelTweaks";
-        public const string Version = "2.0.7";
+        public const string Version = "2.0.8";
         internal const int MaxSlots = 10;
 
         internal static ManualLogSource Log;
         internal static ConfigEntry<bool> Detail;
         // what One Camera does, for measuring: only with Detailed Log on
         internal static void Note(string s) { if (Detail != null && Detail.Value) Log.LogInfo(s); }
+        // This mod's code runs every frame and inside the game's own methods: a problem is written once, not every frame.
+        private static readonly HashSet<string> Said = new HashSet<string>();
+        internal static void WarnOnce(string s) { if (Said.Count < 32 && Said.Add(s)) Log.LogWarning(s); }
         internal static readonly List<Slot> Slots = new List<Slot>();
         private static bool _dirty = true;
         private static Slot _shown;
@@ -93,7 +95,7 @@ namespace ViewmodelTweaks
         // has given the main camera a larger near distance, the weapon is pulled in less, so nothing more is cut off.
         private static float Near(Camera cam) { return Mathf.Clamp(cam.nearClipPlane * 10f, 0.1f, 1f); }
         private static Camera _main; private static Transform _bob; private static Camera _second;
-        private static bool _oneOn, _posed, _hooked, _warned;
+        private static bool _oneOn, _posed, _hooked;
         private static Vector3 _bobPos, _bobScale;
         private static int _heldLayerBit;
 
@@ -101,15 +103,11 @@ namespace ViewmodelTweaks
         private static float ViewFov() { Slot s = _shown; return s != null ? s.Fov.Value : View.Fov.Value; }
         private static Vector3 ViewOffset() { Slot s = _shown; return s != null ? new Vector3(s.X.Value, s.Y.Value, s.Z.Value) : View.Offset; }
 
-        // Your arms hang under that object too: the arms' model with its bones is a child of BobPosition/FPArms (read from
-        // the game's player prefab). A mesh with bones takes its bones' places once a frame, before any camera starts drawing. So with the move
-        // made only while the main camera draws (1.2.0's first tries), the gun was right and the arms were not:
-        //   - nothing else done: the arms kept their real size and only followed the shift;
-        //   - the arms drawn in a step of their own with the move as a changed view: the move twice, arms too far forward;
-        //   - stand-in bones outside that object: never looked at in the game, replaced by this.
-        // What is done now: the move is made one step earlier, after every script of the frame has run and just before the
-        // engine takes the bones' places (Unity's own frame loop gets two steps of this mod: one there, one right after the
-        // frame is drawn). Gun and arms get the same move from the same object, so they stay together as the game built them.
+        // Your arms hang under that object too (BobPosition/FPArms), and a mesh with bones takes its bones' places once a
+        // frame, before any camera starts drawing. A move made only while the main camera draws leaves the arms at their
+        // real size. So the move is made one step earlier: after every script of the frame has run and just before the
+        // engine takes the bones' places. Unity's own frame loop gets two steps of this mod: one there, one right after
+        // the frame is drawn.
         private sealed class PoseStep { }
         private sealed class UnposeStep { }
         private sealed class TrailStep { }
@@ -201,7 +199,7 @@ namespace ViewmodelTweaks
                 _bob = parent != null ? parent.Find("BobPosition") : null;
                 if (_main == null || _bob == null)
                 {
-                    if (!_warned) { _warned = true; Log.LogWarning("One Camera: the player's camera is not built as expected (a game update?), left off."); }
+                    WarnOnce("One Camera: the player's camera is not built as expected (a game update?), left off.");
                     want = false;
                 }
             }
@@ -210,9 +208,8 @@ namespace ViewmodelTweaks
                 if (_heldLayerBit == 0) { int l = LayerMask.NameToLayer("HeldWeapon"); _heldLayerBit = 1 << (l < 0 ? 8 : l); }
                 if (!_hooked) { Camera.onPreCull += PreCull; Camera.onPostRender += PostRender; _hooked = true; }
                 // which camera draws the weapon is decided every frame (ModeNow): the main one, unless a loose effect is showing
-                // Every weapon there is gets its effect prefabs marked when One Camera comes on. Up to the first 2.0.0 build a
-                // weapon was only marked the first time it was held or made with One Camera already on: one held earlier
-                // (every weapon, after a smoke test) was never marked and its effect showed, big, at the real muzzle.
+                // every weapon there is gets its effect prefabs marked now: one held before One Camera came on would
+                // show its effect, big, at the real muzzle
                 if (!_oneOn)
                     foreach (global::Weapon w in UnityEngine.Object.FindObjectsOfType<global::Weapon>()) if (w != null) MarkEffects(w.gameObject);
                 if (!_loopIn && !_loopBroken && !LoopSet(true))
@@ -234,7 +231,7 @@ namespace ViewmodelTweaks
                     LooseClear();
                     if (_main != null) _main.cullingMask &= ~_heldLayerBit;
                     // the second camera, its place and its FOV back as the general settings say (and a weapon's own on top, next frame)
-                    try { View.Apply(); } catch { }
+                    try { View.Apply(); } catch (Exception e) { WarnOnce("One Camera, switching off: " + e.Message); }
                     Note("One Camera off: the second camera draws your weapon again.");
                 }
             }
@@ -265,7 +262,7 @@ namespace ViewmodelTweaks
                 b.localScale = new Vector3(_bobScale.x * sx, _bobScale.y * sy, _bobScale.z * sz);
                 _posed = true;
             }
-            catch (Exception e) { if (!_warned) { _warned = true; Log.LogWarning("One Camera: " + e.Message); } }
+            catch (Exception e) { WarnOnce("One Camera: " + e.Message); }
         }
 
         private static void PostRender(Camera cam)
@@ -276,7 +273,8 @@ namespace ViewmodelTweaks
         private static void Unpose()
         {
             _posed = false;
-            try { if (_bob != null) { _bob.localPosition = _bobPos; _bob.localScale = _bobScale; } } catch { }
+            try { if (_bob != null) { _bob.localPosition = _bobPos; _bob.localScale = _bobScale; } }
+            catch (Exception e) { WarnOnce("One Camera, putting the weapon back: " + e.Message); }
             Fasten();
         }
 
@@ -300,7 +298,7 @@ namespace ViewmodelTweaks
                 t.SetParent(null, true);
                 _prev = t;
             }
-            catch { _prev = null; }
+            catch (Exception e) { _prev = null; WarnOnce("One Camera, placement preview: " + e.Message); }
         }
 
         private static void Fasten()
@@ -313,15 +311,14 @@ namespace ViewmodelTweaks
                 t.SetParent(_prevParent, false); t.SetSiblingIndex(_prevIndex);
                 t.localPosition = _prevPos; t.localRotation = _prevRot; t.localScale = _prevScale;
             }
-            catch { }
+            catch (Exception e) { WarnOnce("One Camera, placement preview: " + e.Message); }
         }
 
         // ---- Loose effects of a weapon under One Camera: the second camera on demand
         // A muzzle effect, an ejected case or pin and a launcher's smoke are particle systems made in the world (not under
         // the object that is moved), on the weapon layer: only the second camera draws them, from its place. Drawn by the
-        // main camera they stand at the real muzzle, a few times too big and too close.
-        // Their particles live in the world, so they cannot be
-        // given the weapon's move the way the gun, the arms and a trail's two points can.
+        // main camera they stand at the real muzzle, a few times too big and too close, and particles that live in the
+        // world cannot be given the weapon's move.
         // So for as long as such an effect has live particles the frame is drawn exactly as without One Camera: second
         // camera on, the weapon not moved, trails back at their real points. The frames without one are One Camera's.
         //   - every prefab a weapon makes such effects from (the fields below) gets a marker; an instance reports itself;
@@ -338,7 +335,8 @@ namespace ViewmodelTweaks
 
         private static void WeaponAwakePostfix(global::Weapon __instance)
         {
-            try { if (__instance != null) MarkEffects(__instance.gameObject); } catch { }
+            try { if (__instance != null) MarkEffects(__instance.gameObject); }
+            catch (Exception e) { WarnOnce("One Camera, a weapon's effects: " + e.Message); }
         }
 
         private static void MarkEffects(GameObject weapon)
@@ -360,14 +358,12 @@ namespace ViewmodelTweaks
                     }
                 _effectFields[t] = fs = found.ToArray();
             }
-            if (_markedFx.Count > 1024) _markedFx.Clear();
             for (int i = 0; i < fs.Length; i++)
             {
                 object v = fs[i].GetValue(w);
                 GameObject go = v as GameObject;
                 if (go == null) { Component c = v as Component; if (c != null) go = c.gameObject; }
-                if (go == null || !_markedFx.Add(go.GetInstanceID())) continue;
-                if (go.GetComponent<OwnLoose>() == null) go.AddComponent<OwnLoose>();
+                MarkPrefab(go);
             }
         }
 
@@ -375,8 +371,7 @@ namespace ViewmodelTweaks
         {
             if (!_oneOn) return;
             // made right now by one of your own weapon's effect methods (View.OwnFx): with "hide" on it is never drawn.
-            // Up to the second 2.0.0 build this was decided at the end of the frame from the effect's layer and its distance
-            // to your eye; a long gun's muzzle is further than that distance, and the Prophet's effect still showed.
+            // Its distance to your eye is no test for "yours": a long gun's muzzle is further away than a short one's.
             m.Own = View.OwnFx > 0;
             if (m.Own && HidesEffects) { HideNow(m.gameObject); return; }
             if (_bornCount < _born.Length) _born[_bornCount++] = m;
@@ -401,16 +396,15 @@ namespace ViewmodelTweaks
 
         // ---- Particle effects that are part of the weapon you hold (the Prophet has one at its muzzle, always on)
         // They are not made when you fire, so nothing above sees them. Their particles are worked out at the weapon's real
-        // place and size, and under One Camera the main camera drew them there: big, around the gun.
-        // With "hide" on they are not drawn while you hold the
-        // weapon and come back when you let go of it; with "hide" off, holding such a weapon means two-camera frames.
+        // place and size, and the main camera draws them there: big, around the gun. With "hide" on they are not drawn
+        // while you hold the weapon and come back when you let go of it; with "hide" off, holding such a weapon means
+        // two-camera frames.
         private static GameObject _heldR, _heldL;
         private static bool _heldHide, _heldFx, _heldOne;
         // A melee weapon hits with a collider that hangs under the object One Camera moves (MeleeChildCollision, a child of
         // the weapon, swung by its animation), and its swing trail is made from that collider's place. While one is in your
         // hands nothing is moved: every frame is a two-camera frame, drawn and hit-tested exactly as without One Camera.
-        // Moved like a gun, the trail was drawn as a wide white bar, and whether the moved collider changes a hit was
-        // never tested, so it is not left to chance.
+        // Moved like a gun, the trail is drawn as a wide white bar, and a moved collider could change a hit.
         private static bool _heldMelee;
         private static bool Melee(GameObject weapon) { return weapon != null && weapon.GetComponent<MeleeWeapon>() != null; }
         private static readonly List<ParticleSystemRenderer> _heldParts = new List<ParticleSystemRenderer>(), _partBuf = new List<ParticleSystemRenderer>();
@@ -468,7 +462,7 @@ namespace ViewmodelTweaks
         private static void FrameNow()
         {
             if (!_oneOn) return;
-            try { ModeNow(); } catch (Exception e) { _two = false; if (!_warned) { _warned = true; Log.LogWarning("One Camera, effects: " + e.Message); } }
+            try { ModeNow(); } catch (Exception e) { _two = false; WarnOnce("One Camera, effects: " + e.Message); }
             TrailsNow();
         }
 
@@ -531,17 +525,13 @@ namespace ViewmodelTweaks
         }
 
         // ---- Your own bullet trails under One Camera
-        // With two cameras a trail of yours is a line in the world from the real muzzle to the hit (shifted by
-        // where the second camera stands), drawn by the second camera only: seen from that camera's place, with the
-        // viewmodel FOV, on top of the world. 1.2.0 first moved the trail's start to where the muzzle shows, at its real
-        // distance, and let the main camera draw it as a line in the world: about two metres ahead and, with a wide FOV,
-        // at or under the floor. Its start was then hidden by the ground or a wall whenever one was in the way, and it
-        // slid differently when you moved.
-        // Now the trail is made exactly as with two cameras (nothing is moved while it is made, the hit is shifted
-        // as always), and every frame its two points get the weapon's move for that frame: where the second
-        // camera would have shown them. Same place on screen, same sliding when you move, in front of the world, and
-        // behind or before the gun as with two cameras. Only your own trails; nothing but the line's two points and its
-        // width is written.
+        // With two cameras a trail of yours is a line in the world from the real muzzle to the hit (shifted by where
+        // the second camera stands), drawn by the second camera only: from that camera's place, with the viewmodel FOV,
+        // on top of the world. Drawn by the main camera as it is, its start sits about two metres ahead and, with a wide
+        // FOV, at or under the floor.
+        // So the trail is made exactly as with two cameras, and every frame its two points get the weapon's move for
+        // that frame: where the second camera would have shown them. Only your own trails; nothing but the line's two
+        // points and its width is written.
         private struct Trail { public LineRenderer Line; public Vector3 W0, W1; public float Width; public bool Seen, Shrinks, Mapped; }
         private static readonly Trail[] _trails = new Trail[128];
         private static int _trailCount;
@@ -568,7 +558,7 @@ namespace ViewmodelTweaks
                 if (_marked.Add(pre.GetInstanceID()) && pre.GetComponent<OwnTrail>() == null) pre.gameObject.AddComponent<OwnTrail>();
                 _ownSpawn = true;
             }
-            catch { }
+            catch (Exception e) { WarnOnce("One Camera, a bullet trail: " + e.Message); }
         }
         private static void TrailFinalizer() { _ownSpawn = false; View.End(); }
 
@@ -585,7 +575,7 @@ namespace ViewmodelTweaks
                 if (HidesEffects) HideNow(___douilleGrenade);
                 else if (___douilleGrenade.GetComponent<OwnLoose>() == null) ___douilleGrenade.AddComponent<OwnLoose>();
             }
-            catch { }
+            catch (Exception e) { WarnOnce("One Camera, a grenade pin: " + e.Message); }
         }
 
         internal static void TrailBorn(OwnTrail t)
@@ -659,7 +649,7 @@ namespace ViewmodelTweaks
                 if (_two) return;
                 _mPos = cp; _mRot = cr; _mOff = off; _mScale = new Vector3(sx, sy, sz); _mapOk = true;
             }
-            catch (Exception e) { _trailCount = 0; if (!_warned) { _warned = true; Log.LogWarning("One Camera, trails: " + e.Message); } }
+            catch (Exception e) { _trailCount = 0; WarnOnce("One Camera, trails: " + e.Message); }
         }
 
         private static Vector3 Back(Vector3 shown, Quaternion pinv)
@@ -681,7 +671,7 @@ namespace ViewmodelTweaks
                     foreach (MethodInfo m in t.GetMethods(all))
                     {
                         if (m.IsAbstract || m.ContainsGenericParameters || m.GetMethodBody() == null) continue;
-                        try { m.MethodHandle.GetFunctionPointer(); } catch { }
+                        try { m.MethodHandle.GetFunctionPointer(); } catch (Exception) { }   // then it is made when first used
                     }
             }
             catch (Exception e) { Log.LogWarning("Getting ready early failed, it happens at the first weapon instead: " + e.Message); }
@@ -707,8 +697,6 @@ namespace ViewmodelTweaks
             Log = Logger;
             Log.LogInfo(Name + " " + Version + " loaded. Dorsth was here.");
             Detail = Config.Bind("Internal", "Detailed Log", false, "Writes what One Camera does to the log (for measuring). Off: only problems are written.");
-            FromSwordStance();
-            NoSword();
             for (int i = 1; i <= MaxSlots; i++)
             {
                 string s = "Weapon " + i;
@@ -722,7 +710,6 @@ namespace ViewmodelTweaks
                     Z = Config.Bind(s, "Viewmodel Z Offset", 0f, new ConfigDescription("Back (negative) or forward (positive).", new AcceptableValueRange<float>(-5f, 5f))),
                 });
             }
-            FromOneVersion();
             View.Bind(Config);
             Hide(View.TakeOver(Config, Paths.ConfigPath));
             OneCamera = Config.Bind("Viewmodel", "One Camera", false, "Your weapon and arms are drawn by the main camera and the game's second camera is switched off; they look the same (viewmodel FOV, offset, never inside a wall). Having the second camera on costs about 4% of the frame rate. The loose effects of your own weapon (muzzle effect, ejected case or pin, a launcher's smoke) can only be drawn by the second camera: see the next setting. Your shots, hits and what other players see are not changed.");
@@ -775,76 +762,6 @@ namespace ViewmodelTweaks
             gameObject.hideFlags = HideFlags.HideAndDontSave;
         }
 
-        /// <summary>
-        /// This mod was called SwordStance: its settings file is taken over once (the first start under the new name),
-        /// so nothing has to be set again. The old file stays where it is.
-        /// </summary>
-        private void FromSwordStance()
-        {
-            try
-            {
-                string dir = System.IO.Path.GetDirectoryName(Config.ConfigFilePath);
-                string old = System.IO.Path.Combine(dir, "dorsth.straftat.swordstance.cfg");
-                if (System.IO.File.Exists(Config.ConfigFilePath) || !System.IO.File.Exists(old)) return;
-                System.IO.File.Copy(old, Config.ConfigFilePath);
-                Config.Reload();
-                Log.LogInfo("Settings taken over from SwordStance.");
-            }
-            catch (Exception e) { Log.LogWarning("Couldn't take over SwordStance's settings: " + e.Message); }
-        }
-
-        /// <summary>
-        /// Up to 1.1.1 the list had a Sword, which is no weapon of its own: the sword is the flamberge. A weapon set to
-        /// Sword becomes the flamberge (or nothing, when the flamberge already has its own).
-        /// </summary>
-        private void NoSword()
-        {
-            try
-            {
-                string path = Config.ConfigFilePath;
-                if (!System.IO.File.Exists(path)) return;
-                string[] lines = System.IO.File.ReadAllLines(path);
-                bool flam = lines.Any(l => l.Trim() == "Weapon = Flamberge"), changed = false;
-                for (int i = 0; i < lines.Length; i++)
-                {
-                    if (lines[i].Trim() != "Weapon = Sword") continue;
-                    lines[i] = flam ? "Weapon = None" : "Weapon = Flamberge";
-                    flam = true; changed = true;
-                }
-                if (!changed) return;
-                System.IO.File.WriteAllLines(path, lines);
-                Config.Reload();
-                Log.LogInfo("Sword is the flamberge now.");
-            }
-            catch (Exception e) { Log.LogWarning("Couldn't move Sword over to the flamberge: " + e.Message); }
-        }
-
-        /// <summary>
-        /// 1.0.0 had one set of settings for a list of names (katana, sword). They become a weapon each, once; the old
-        /// list is emptied so it isn't read again.
-        /// </summary>
-        private void FromOneVersion()
-        {
-            const string S = "Sword Stance";
-            ConfigEntry<string> names = Config.Bind(S, "Weapons", "", "Not used since 1.1.0: weapons are added one by one now.");
-            if (string.IsNullOrWhiteSpace(names.Value) || Slots.Any(x => x.Used)) { Hide(names); return; }
-            ConfigEntry<float> fov = Config.Bind(S, "Viewmodel FOV", 75f, "Not used since 1.1.0.");
-            ConfigEntry<float> x = Config.Bind(S, "Viewmodel X Offset", 0f, "Not used since 1.1.0.");
-            ConfigEntry<float> y = Config.Bind(S, "Viewmodel Y Offset", -0.1f, "Not used since 1.1.0.");
-            ConfigEntry<float> z = Config.Bind(S, "Viewmodel Z Offset", 0f, "Not used since 1.1.0.");
-            ConfigEntry<bool> arms = Config.Bind(S, "Invisible Arms", false, "Not used since 1.1.0.");
-            int i = 0;
-            foreach (string n in names.Value.Split(','))
-            {
-                Weapon w = Weapons.FromName(n.Trim());
-                if (w == Weapon.None || i >= Slots.Count || Slots.Any(s => s.Weapon.Value == w)) continue;
-                Slot s0 = Slots[i++];
-                s0.Weapon.Value = w; s0.Fov.Value = fov.Value; s0.X.Value = x.Value; s0.Y.Value = y.Value; s0.Z.Value = z.Value; s0.NoArms.Value = arms.Value;
-            }
-            names.Value = "";
-            Hide(names, fov, x, y, z, arms);
-        }
-
         // a moved setting keeps its value: BepInEx keeps the line under the old name until something takes it
         private void FromOldName(ConfigDefinition old, ConfigEntry<bool> now)
         {
@@ -856,7 +773,7 @@ namespace ViewmodelTweaks
                 if (bool.TryParse(v, out b)) now.Value = b;
                 orphans.Remove(old); Config.Save();
             }
-            catch { }
+            catch (Exception e) { WarnOnce("Moving a setting to its new name: " + e.Message); }
         }
 
         private static void Hide(params ConfigEntryBase[] entries)

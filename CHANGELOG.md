@@ -1,5 +1,9 @@
 # MONOLITH changelog
 
+## 2.0.3
+- ViewmodelTweaks 2.0.8: a problem with Performance viewmodel is written to the log, once each. Its code is shorter and nothing else works differently.
+- Holds: CameraTweaks 1.2.3, CombatSounds 1.1.8, DorsthTweaks 1.4.5, MatchStats 1.0.4, NoGore 1.3.5, TrueSens 1.2.5, ViewmodelTweaks 2.0.8, ezCrosshair 1.3.5.
+
 ## 2.0.2
 - A problem in the menu is written to the log, once each. Before, it was skipped without a word.
 - Nothing looks or works differently. The menu code is easier to read: sizes have names, the long lines are split, and one helper sets a typed value.

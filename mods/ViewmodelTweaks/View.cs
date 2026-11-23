@@ -1,10 +1,7 @@
 // ViewmodelTweaks - the viewmodel itself. Dorsth was here.
 //
-// Up to 1.2.0 this mod was an add-on for Minimal Viewmodels Reborn by kestrel (MIT; its camera approach is still used
-// here, see "the second camera"): that mod placed the weapon, this one gave
-// single weapons their own values on top of it, by reading its settings, its camera and its private list of arm meshes
-// and putting things back whenever it had changed them. From 2.0.0 the mod does the whole job itself and needs nothing
-// else. What it has to do is small and all of it is the game's own machinery:
+// Up to 1.2.0 this mod was an add-on for Minimal Viewmodels Reborn by kestrel (MIT). Its camera approach is still
+// used here, see "the second camera". What the mod has to do is small and all of it is the game's own machinery:
 //
 //   - the game draws the weapon you hold with a second camera (it sits on the main camera, FOV 75, and only draws the
 //     weapon layer), but only at the higher quality settings. Here that camera is always used for your own weapon, is
@@ -211,7 +208,7 @@ namespace ViewmodelTweaks
                 BobOf(a) = _bobScale * bob; CrouchOf(a) = _crouch * bob; SprintOf(a) = _sprint * bob;
                 AimOf(a) = _aim * bob; IdleOf(a) = _idle * bob;
             }
-            catch { }
+            catch (Exception e) { ViewmodelTweaksPlugin.WarnOnce("Sway and bob: " + e.Message); }
         }
 
         private static float BobNumber(float n) { return n * Bob.Value; }
@@ -240,7 +237,8 @@ namespace ViewmodelTweaks
         private static void PreviewShown(Transform ___previewObject)
         {
             Preview = ___previewObject;
-            try { if (___previewObject != null && ___previewObject.childCount > 0) ___previewObject.GetChild(0).gameObject.layer = 0; } catch { }
+            try { if (___previewObject != null && ___previewObject.childCount > 0) ___previewObject.GetChild(0).gameObject.layer = 0; }
+            catch (Exception e) { ViewmodelTweaksPlugin.WarnOnce("The placement preview: " + e.Message); }
         }
 
         // ---- what the weapon makes in the world: on the weapon layer while it is made (yours only), back right after
@@ -302,20 +300,28 @@ namespace ViewmodelTweaks
             for (int i = _saved.Count - 1; i >= from; i--)
             {
                 Saved s = _saved[i];
-                try { if (s.Go != null) s.Go.layer = s.Layer; } catch { }
+                try { if (s.Go != null) s.Go.layer = s.Layer; }
+                catch (Exception e) { ViewmodelTweaksPlugin.WarnOnce("A weapon effect's layer: " + e.Message); }
             }
             _saved.RemoveRange(from, _saved.Count - from);
         }
 
         private static bool Mine(global::Weapon w) { return w != null && w.IsOwner && (object)WeaponCam != null; }
 
-        private static void FxCase(global::Weapon __instance, GameObject ___ejectCaseVfx) { Begin(); try { if (Mine(__instance)) Own(___ejectCaseVfx); } catch { } }
-        private static void FxFlash(global::Weapon __instance, GameObject ___muzzleFlash) { Begin(); try { if (Mine(__instance)) Own(___muzzleFlash); } catch { } }
-        private static void FxFlash2(global::Weapon __instance, GameObject ___muzzleFlash2) { Begin(); try { if (Mine(__instance)) Own(___muzzleFlash2); } catch { } }
-        private static void FxSmoke(DualLauncher __instance, bool ___grenadeOpen, ParticleSystem ___grenadeSmoke)
+        // Runs before one of the game's effect methods: Begin always (FxDone ends it), the prefab lifted when the weapon is yours.
+        private static void Fx(global::Weapon w, GameObject prefab)
         {
             Begin();
-            try { if (___grenadeOpen && ___grenadeSmoke != null && Mine(__instance)) Own(___grenadeSmoke.gameObject); } catch { }
+            try { if (Mine(w)) Own(prefab); }
+            catch (Exception e) { ViewmodelTweaksPlugin.WarnOnce("A weapon effect: " + e.Message); }
+        }
+
+        private static void FxCase(global::Weapon __instance, GameObject ___ejectCaseVfx) { Fx(__instance, ___ejectCaseVfx); }
+        private static void FxFlash(global::Weapon __instance, GameObject ___muzzleFlash) { Fx(__instance, ___muzzleFlash); }
+        private static void FxFlash2(global::Weapon __instance, GameObject ___muzzleFlash2) { Fx(__instance, ___muzzleFlash2); }
+        private static void FxSmoke(DualLauncher __instance, bool ___grenadeOpen, ParticleSystem ___grenadeSmoke)
+        {
+            Fx(__instance, ___grenadeOpen && ___grenadeSmoke != null ? ___grenadeSmoke.gameObject : null);
         }
         private static void FxDone() { End(); }
 
