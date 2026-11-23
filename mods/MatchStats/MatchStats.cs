@@ -12,7 +12,7 @@ using ComputerysModdingUtilities;
 
 [assembly: AssemblyTitle("MatchStats")]
 [assembly: AssemblyDescription("Kills, deaths and damage of every player, between rounds and after the match.")]
-[assembly: AssemblyVersion("1.0.5.0")]
+[assembly: AssemblyVersion("1.0.6.0")]
 
 // Only changes what you see, so matchmaking with unmodded players still works.
 [assembly: StraftatMod(isVanillaCompatible: true)]
@@ -24,14 +24,17 @@ namespace MatchStats
     {
         public const string Guid = "dorsth.straftat.matchstats";
         public const string Name = "MatchStats";
-        public const string Version = "1.0.5";
+        public const string Version = "1.0.6";
 
         internal static ManualLogSource Log;
 
         private void Awake()
         {
             Log = Logger;
+#if !DORSTH_BUNDLE
+            // in MONOLITH only MONOLITH says it loaded, so the line shows once
             Log.LogInfo(Name + " " + Version + " loaded. Dorsth was here.");
+#endif
             bool fresh = !File.Exists(Config.ConfigFilePath);
             try { Stats.Bind(Config, new HarmonyLib.Harmony(Guid)); }
             catch (Exception e) { Log.LogWarning("Match stats are off: " + e.Message); return; }

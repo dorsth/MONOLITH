@@ -290,8 +290,11 @@ namespace MatchStats
 
             private void LateUpdate()
             {
-                bool show = _id >= 0 && _name != null && On.Value && ClientInstance.playerInstances.ContainsKey(_id);
-                if (!show) { if (_t.text.Length > 0) _t.text = ""; _k = _d = _dmg = -1; return; }
+                if (_t == null) return;
+                // a new label's text is null until set, and the player list is missing outside a match: both threw every frame
+                var players = ClientInstance.playerInstances;
+                bool show = _id >= 0 && _name != null && On.Value && players != null && players.ContainsKey(_id);
+                if (!show) { if (!string.IsNullOrEmpty(_t.text)) _t.text = ""; _k = _d = _dmg = -1; return; }
                 P p; All.TryGetValue(_id, out p);
                 int k = p != null ? p.Kills : 0, d = p != null ? p.Deaths : 0, dmg = p != null ? Mathf.RoundToInt(p.Dmg) : 0;
                 if (k != _k || d != _d || dmg != _dmg)
@@ -305,7 +308,7 @@ namespace MatchStats
                 // screen: then the label takes the name's place, lined up the way the name would be.
                 Bounds b = _name.textBounds;
                 Vector3 at;
-                if (_name.text.Length > 0 && b.size.x > 0f) at = new Vector3(b.min.x, b.max.y + _t.fontSize * 0.2f, 0f);
+                if (!string.IsNullOrEmpty(_name.text) && b.size.x > 0f) at = new Vector3(b.min.x, b.max.y + _t.fontSize * 0.2f, 0f);
                 else
                 {
                     Rect r = _name.rectTransform.rect; float tw = _t.preferredWidth;
