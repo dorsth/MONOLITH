@@ -16,7 +16,7 @@ using UnityEngine;
 
 [assembly: AssemblyTitle("CameraTweaks")]
 [assembly: AssemblyDescription("Takes out the camera movement STRAFTAT adds on its own, one switch each.")]
-[assembly: AssemblyVersion("1.2.3.0")]
+[assembly: AssemblyVersion("1.2.4.0")]
 // only changes your own camera on your own screen: fine to play with people who don't have it
 [assembly: StraftatMod(isVanillaCompatible: true)]
 
@@ -30,7 +30,7 @@ namespace CameraTweaks
     [BepInPlugin(Guid, Name, Version)]
     public sealed class Plugin : BaseUnityPlugin
     {
-        public const string Guid = "dorsth.straftat.cameratweaks", Name = "CameraTweaks", Version = "1.2.3";
+        public const string Guid = "dorsth.straftat.cameratweaks", Name = "CameraTweaks", Version = "1.2.4";
         internal static ManualLogSource Log;
 
         // NoTilt: all of SideTilt's roll (tiltAmount, slideTiltAmount, wallSlideLean, rotationAmount)
@@ -56,14 +56,14 @@ namespace CameraTweaks
             // The recoil keeps the last player (and everything it points to) until the next shot; a heap walk found
             // ~300 destroyed objects of an earlier take held that way. Let go of it when a scene loads.
             UnityEngine.SceneManagement.SceneManager.sceneLoaded += (s, m) => Recoil.Forget();
-            const string roll = "Camera", shake = roll, recoil = roll;
-            NoTilt = Config.Bind(roll, "NoTilt", true, "On: the camera stops rolling to the side when you strafe, slide, slide along a wall or move your mouse sideways.");
-            NoFallShake = Config.Bind(shake, "NoFallShake", true, "On: no camera shake or dip when you land.");
-            NoJumpShake = Config.Bind(shake, "NoJumpShake", true, "On: no camera shake when you jump out of a slide, wall jump or hit a ceiling.");
-            NoVaultShake = Config.Bind(shake, "NoVaultShake", false, "On: no camera shake when you vault over something.");
-            SprintFov = Config.Bind(roll, "SprintFovIncrease", 0, new ConfigDescription("How many degrees the FOV widens when you sprint. Sliding widens it by the same share as in the game. 0: it stays what you set in the game.", new AcceptableValueRange<int>(0, 30)));
+            const string section = "Camera";
+            NoTilt = Config.Bind(section, "NoTilt", true, "On: the camera stops rolling to the side when you strafe, slide, slide along a wall or move your mouse sideways.");
+            NoFallShake = Config.Bind(section, "NoFallShake", true, "On: no camera shake or dip when you land.");
+            NoJumpShake = Config.Bind(section, "NoJumpShake", true, "On: no camera shake when you jump out of a slide, wall jump or hit a ceiling.");
+            NoVaultShake = Config.Bind(section, "NoVaultShake", false, "On: no camera shake when you vault over something.");
+            SprintFov = Config.Bind(section, "SprintFovIncrease", 0, new ConfigDescription("How many degrees the FOV widens when you sprint. Sliding widens it by the same share as in the game. 0: it stays what you set in the game.", new AcceptableValueRange<int>(0, 30)));
             SprintFov.SettingChanged += (o, e) => SpeedFov.ApplyAll();
-            BetterRecoil = Config.Bind(recoil, "BetterRecoil", true, "On: the AR, AK and warden kick your aim instead of the camera. When you let go it comes back down by the kick you didn't pull down yourself, so taps and bursts come back to where you aimed and a pulled down spray doesn't swing below it.");
+            BetterRecoil = Config.Bind(section, "BetterRecoil", true, "On: the AR, AK and warden kick your aim instead of the camera. When you let go it comes back down by the kick you didn't pull down yourself, so taps and bursts come back to where you aimed and a pulled down spray doesn't swing below it.");
 
             var h = new Harmony(Guid);
             Shakes.Patch(h);
@@ -156,10 +156,10 @@ namespace CameraTweaks
         // which shake each call is, in order, per method of the game's FirstPersonController
         private static readonly Dictionary<string, string[]> Punches = new Dictionary<string, string[]>
         {
-            { "OnControllerColliderHit", new[] { "CeilingHit", "CeilingHit" } },
-            { "Jump", new[] { "WallJump", "JumpSlope", "JumpSlope", "JumpSlope" } },
-            { "ApplyFinalMovements", new[] { "JumpSlope", "FallShake" } },
-            { "CheckForVault", new[] { "Vault" } },
+            { "OnControllerColliderHit", new[] { "JumpShake", "JumpShake" } },   // ceiling hits
+            { "Jump", new[] { "JumpShake", "JumpShake", "JumpShake", "JumpShake" } },   // a wall jump, then jumps out of a slide
+            { "ApplyFinalMovements", new[] { "JumpShake", "FallShake" } },
+            { "CheckForVault", new[] { "VaultShake" } },
         };
 
         public static void Patch(Harmony h)
@@ -201,11 +201,9 @@ namespace CameraTweaks
 
         private static Tweener Gate(bool on, Transform t, Vector3 p, float d, int v, float e) { return on ? t.DOPunchRotation(p, d, v, e) : null; }
 
-        public static Tweener CeilingHit(Transform t, Vector3 p, float d, int v, float e) { return Gate(!Plugin.NoJumpShake.Value, t, p, d, v, e); }
-        public static Tweener WallJump(Transform t, Vector3 p, float d, int v, float e) { return Gate(!Plugin.NoJumpShake.Value, t, p, d, v, e); }
-        public static Tweener JumpSlope(Transform t, Vector3 p, float d, int v, float e) { return Gate(!Plugin.NoJumpShake.Value, t, p, d, v, e); }
+        public static Tweener JumpShake(Transform t, Vector3 p, float d, int v, float e) { return Gate(!Plugin.NoJumpShake.Value, t, p, d, v, e); }
         public static Tweener FallShake(Transform t, Vector3 p, float d, int v, float e) { return Gate(!Plugin.NoFallShake.Value, t, p, d, v, e); }
-        public static Tweener Vault(Transform t, Vector3 p, float d, int v, float e) { return Gate(!Plugin.NoVaultShake.Value, t, p, d, v, e); }
+        public static Tweener VaultShake(Transform t, Vector3 p, float d, int v, float e) { return Gate(!Plugin.NoVaultShake.Value, t, p, d, v, e); }
 
         public static TweenerCore<Quaternion, Vector3, QuaternionOptions> HighFall(Transform t, Vector3 end, float d, RotateMode mode)
         {
