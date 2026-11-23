@@ -12,8 +12,7 @@ using ComputerysModdingUtilities;
 
 [assembly: AssemblyTitle("MatchStats")]
 [assembly: AssemblyDescription("Kills, deaths and damage of every player, between rounds and after the match.")]
-[assembly: AssemblyVersion("1.0.4.0")]
-[assembly: AssemblyFileVersion("1.0.4.0")]
+[assembly: AssemblyVersion("1.0.5.0")]
 
 // Only changes what you see, so matchmaking with unmodded players still works.
 [assembly: StraftatMod(isVanillaCompatible: true)]
@@ -25,7 +24,7 @@ namespace MatchStats
     {
         public const string Guid = "dorsth.straftat.matchstats";
         public const string Name = "MatchStats";
-        public const string Version = "1.0.4";
+        public const string Version = "1.0.5";
 
         internal static ManualLogSource Log;
 
@@ -37,7 +36,7 @@ namespace MatchStats
             try { Stats.Bind(Config, new HarmonyLib.Harmony(Guid)); }
             catch (Exception e) { Log.LogWarning("Match stats are off: " + e.Message); return; }
             // match stats used to be part of MONOLITH (up to 1.1.8): its on/off setting comes along once
-            if (fresh) try { Carry(); } catch { }
+            if (fresh) try { Carry(); } catch (Exception e) { Log.LogWarning("The old on/off setting could not be read: " + e.Message); }
         }
 
         private void Carry()

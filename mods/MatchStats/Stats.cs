@@ -273,7 +273,8 @@ namespace MatchStats
             {
                 if (name == null) return;
                 // the color of the Tab screen's "current map" line, for both screens
-                try { TabScreen ts = name.GetComponentInParent<TabScreen>(true); if (ts != null && MapText(ts) != null) _mint = MapText(ts).color; } catch { }
+                TabScreen ts = name.GetComponentInParent<TabScreen>(true);
+                if (ts != null && MapText(ts) != null) _mint = MapText(ts).color;
                 KillTag tag = name.GetComponentInChildren<KillTag>(true);
                 if (tag == null)
                 {
@@ -434,7 +435,7 @@ namespace MatchStats
                     ulong lobby = SteamLobby.Instance != null ? SteamLobby.Instance.CurrentLobbyID : 0;
                     if (lobby != 0) raw = Steamworks.SteamMatchmaking.GetLobbyData(new Steamworks.CSteamID(lobby), "dorsth_t_spec") ?? "";
                 }
-                catch { }
+                catch (Exception e) { Quiet(e); }
                 if (raw != _specRaw)
                 {
                     _specRaw = raw; Spectators.Clear();
@@ -487,16 +488,12 @@ namespace MatchStats
                 if (_canvas == null) Make();
                 if (_root == null) return;
                 Flat(); _worldUntil = full ? Time.unscaledTime + 10f : -1f; _whyFlat = null;
-                int me = -1;
-                try { if (LobbyController.Instance != null && LobbyController.Instance.LocalPlayerController != null) me = LobbyController.Instance.LocalPlayerController.PlayerId; } catch { }
+                var lobby = LobbyController.Instance;
+                int me = lobby != null && lobby.LocalPlayerController != null ? lobby.LocalPlayerController.PlayerId : -1;
                 Color self = new Color32(0xAC, 0xBC, 0xFC, 0xFF), enemy = new Color32(0xE8, 0x80, 0x68, 0xFF), c;
-                try
-                {
-                    PauseManager pm = PauseManager.Instance;
-                    if (pm != null && ColorUtility.TryParseHtmlString("#" + (pm.selfNameLogColor ?? "").TrimStart('#'), out c)) self = c;
-                    if (pm != null && ColorUtility.TryParseHtmlString("#" + (pm.enemyNameLogColor ?? "").TrimStart('#'), out c)) enemy = c;
-                }
-                catch { }
+                PauseManager pm = PauseManager.Instance;
+                if (pm != null && ColorUtility.TryParseHtmlString("#" + (pm.selfNameLogColor ?? "").TrimStart('#'), out c)) self = c;
+                if (pm != null && ColorUtility.TryParseHtmlString("#" + (pm.enemyNameLogColor ?? "").TrimStart('#'), out c)) enemy = c;
                 var rows = Sorted();
                 bool solo = Solo(rows), duel = solo && rows.Count == 2;
                 // a column that can only be 0 in this kind of match is left out: trades and clutches need a teammate, a 2k a
@@ -730,7 +727,7 @@ namespace MatchStats
                         _mat.SetFloat(ShaderUtilities.ID_UnderlaySoftness, 0.2f);
                     }
                 }
-                catch { }
+                catch (Exception e) { Quiet(e); }
                 _canvas.SetActive(false);
             }
 
