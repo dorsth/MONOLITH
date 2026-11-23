@@ -1,5 +1,9 @@
 # MONOLITH changelog
 
+## 2.0.6
+- DorsthTweaks 1.4.7: a weapon lying loose when you join mid-match no longer writes an error to the log, and the two SpawnViewer warnings at start are gone.
+- Holds: CameraTweaks 1.2.4, CombatSounds 1.1.9, DorsthTweaks 1.4.7, MatchStats 1.0.6, NoGore 1.3.6, TrueSens 1.2.6, ViewmodelTweaks 2.0.8, ezCrosshair 1.3.6.
+
 ## 2.0.5
 - The log says "loaded. Dorsth was here." once, for MONOLITH, instead of once for every mod inside.
 - MatchStats 1.0.6: the kills label on the Tab and round-end screens no longer writes an error to the log every frame.
