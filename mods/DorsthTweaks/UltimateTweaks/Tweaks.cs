@@ -986,8 +986,9 @@ namespace UltimateTweaks
                 var t = pi.Instance.GetType();
                 // 1.6: one flag, _refreshRequested. 2.x: _rescan, with _spawnsLocked cleared
                 var m = AccessTools.Method(t, "RefreshPostfix", Type.EmptyTypes);
-                var f = AccessTools.Field(t, "_refreshRequested") ?? AccessTools.Field(t, "_rescan");
-                var unlock = f != null && f.Name == "_rescan" ? AccessTools.Field(t, "_spawnsLocked") : null;
+                // plain lookups: AccessTools warns in the log for each name a version doesn't have
+                var f = t.GetField("_refreshRequested", AnyMember) ?? t.GetField("_rescan", AnyMember);
+                var unlock = f != null && f.Name == "_rescan" ? t.GetField("_spawnsLocked", AnyMember) : null;
                 if (m == null || f == null || f.FieldType != typeof(bool) || (f.Name == "_rescan" && (unlock == null || unlock.FieldType != typeof(bool))))
                     throw new Exception("SpawnViewer " + pi.Metadata.Version + " is not a version this was written for (1.6, 2.1)");
                 svPlugin = pi.Instance; svFlag = f; svUnlock = unlock;
@@ -999,7 +1000,7 @@ namespace UltimateTweaks
                 BepInEx.PluginInfo pi;
                 if (!BepInEx.Bootstrap.Chainloader.PluginInfos.TryGetValue("suvilba.straftat.spawnviewer", out pi) || pi.Instance == null) return;   // not installed
                 var t = pi.Instance.GetType();
-                if (AccessTools.Method(t, "OnGUI", Type.EmptyTypes) == null) return;   // 2.x draws no panel: nothing to save
+                if (t.GetMethod("OnGUI", AnyMember, null, Type.EmptyTypes, null) == null) return;   // 2.x draws no panel: nothing to save
                 var m = AccessTools.Method(t, "Update", Type.EmptyTypes); var f = AccessTools.Field(t, "_uiVisible");
                 if (m == null || f == null || f.FieldType != typeof(bool) || f.IsStatic) throw new Exception("SpawnViewer is not the version this was written for (1.6.0)");
                 svGui = pi.Instance; svVisible = AccessTools.FieldRefAccess<object, bool>(f);
@@ -1007,6 +1008,8 @@ namespace UltimateTweaks
                 DorsthTweaks.DorsthTweaksPlugin.Note("OnGuiNoLayout: SpawnViewer found, no GUI layout pass for it while its panel is hidden");
             });
         }
+        private const BindingFlags AnyMember = BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic;
+
         // ---- SpawnViewerNoSearch. SpawnViewer.RefreshPostfix (run after the game's spawn methods):
         //        var all = Resources.FindObjectsOfTypeAll<SpawnViewer>(); if (all.Length != 0) all[0]._refreshRequested = true;     (1.6)
         //        ... all[0]._spawnsLocked = false; all[0]._rescan = true;                                                             (2.1)

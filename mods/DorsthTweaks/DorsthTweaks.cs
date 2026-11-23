@@ -35,7 +35,7 @@ using PlanarReflection = UnityStandardAssets.Water.PlanarReflection;
 
 [assembly: AssemblyTitle("DorsthTweaks")]
 [assembly: AssemblyDescription("Small client-side tweaks for STRAFTAT: bullet trails, HUD, prompts, menus and performance.")]
-[assembly: AssemblyVersion("1.4.6.0")]
+[assembly: AssemblyVersion("1.4.7.0")]
 [assembly: AssemblyFileVersion("1.3.7.0")]
 
 // Only changes what you see on your own screen, so matchmaking with unmodded players still works.
@@ -49,7 +49,7 @@ namespace DorsthTweaks
     {
         public const string Guid = "dorsth.straftat.dorsthtweaks";
         public const string Name = "DorsthTweaks";
-        public const string Version = "1.4.6";
+        public const string Version = "1.4.7";
 
         internal static ManualLogSource Log;
         internal static ConfigEntry<bool> Detail;
@@ -150,6 +150,7 @@ namespace DorsthTweaks
             Install("key prompt", KeyPrompt.Install);
             Install("slide cooldown timer", SlideClock.Install);
             Install("weapon highlight", WeaponHighlight.Install);
+            Install("loose items", LooseItems.Install);
             Install("near miss vignette", NearMiss.Install);
             Install("idle camera effect", IdleCameraEffect.Install);
             Install("reduce UI animations", StaticUI.Install);
@@ -493,10 +494,37 @@ namespace DorsthTweaks
     }
 
     /// <summary>
-    /// Where DorsthTweaks' clocks and coroutines live: its own hidden object, kept across scenes. Not the plugin's own
-    /// object: without Mod Menu the game destroys BepInEx's manager object on the way into a lobby, and everything on
-    /// it stopped (a coroutine started then even threw inside the game's scene loading).
+    /// A weapon that starts with no parent, like one lying loose when you join mid-match, made the game's
+    /// ItemBehaviour.Start throw on transform.parent.up and skip the rest of its setup. Its floating bob is skipped
+    /// for the moment Start runs and started here instead, with the world's up.
     /// </summary>
+    internal static class LooseItems
+    {
+        internal static void Install()
+        {
+            // last, so it sees a parent another mod's prefix gave the item
+            GameHook.Add(typeof(ItemBehaviour), "Start", null, typeof(LooseItems), "StartPrefix", "StartPostfix", () => true, Priority.Last, Priority.Last);
+            GameHook.RefreshAll();
+        }
+
+        private static void StartPrefix(ItemBehaviour __instance, out bool __state)
+        {
+            __state = __instance.transform.parent == null && !__instance.dispenserStart && __instance.gameObject.name != "Pig Held Item";
+            if (__state) __instance.dispenserStart = true;
+        }
+
+        private static void StartPostfix(ItemBehaviour __instance, bool __state)
+        {
+            if (!__state) return;
+            __instance.dispenserStart = false;
+            Transform t = __instance.transform;
+            // kept in the game's own field, which picking the item up kills
+            GroundMove(__instance) = t.DOLocalMove(t.localPosition + Vector3.up / 2f, 1.4f).SetEase(Ease.InOutSine).SetLoops(-1, LoopType.Yoyo);
+        }
+
+        private static readonly AccessTools.FieldRef<ItemBehaviour, Tween> GroundMove = AccessTools.FieldRefAccess<ItemBehaviour, Tween>("groundMov");
+    }
+
     /// <summary>
     /// Every script the game has in memory (in the map and the prefabs behind it), looked up once per frame and sorted by
     /// kind. After a map loads, six parts of this mod each asked the engine for "every Weapon" (or player, or item) on
