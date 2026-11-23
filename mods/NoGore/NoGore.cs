@@ -25,8 +25,7 @@ using UnityEngine;
 
 [assembly: AssemblyTitle("NoGore")]
 [assembly: AssemblyDescription("Hides ragdolls, body pieces and hats that fall off players, and removes blood.")]
-[assembly: AssemblyVersion("1.3.5.0")]
-[assembly: AssemblyFileVersion("1.3.0.0")]
+[assembly: AssemblyVersion("1.3.6.0")]
 
 // Only changes what you see on your own screen, so matchmaking with unmodded players still works.
 [assembly: StraftatMod(isVanillaCompatible: true)]
@@ -39,27 +38,13 @@ namespace NoGore
     {
         public const string Guid = "dorsth.straftat.nogore";
         public const string Name = "NoGore";
-        public const string Version = "1.3.5";
+        public const string Version = "1.3.6";
 
         internal static ManualLogSource Log;
         internal static ConfigEntry<bool> HideBodies, HideRagdolls, HideHats, NoBlood, NoHitBlood, NoDeathBlood, NoBloodStains;
 
         // a group switch that's on covers everything under it; off, each of its own switches decides
         internal static bool Ragdolls { get { return HideBodies.Value || HideRagdolls.Value; } }
-        // a setting that was renamed keeps its value: BepInEx keeps the line under the old name until something takes it
-        private static void FromOldName(ConfigFile c, ConfigDefinition old, ConfigEntry<bool> now)
-        {
-            try
-            {
-                var orphans = HarmonyLib.AccessTools.Property(typeof(ConfigFile), "OrphanedEntries")?.GetValue(c, null) as System.Collections.Generic.Dictionary<ConfigDefinition, string>;
-                string v; bool b;
-                if (orphans == null || !orphans.TryGetValue(old, out v)) return;
-                if (bool.TryParse(v, out b)) now.Value = b;
-                orphans.Remove(old); c.Save();
-            }
-            catch { }
-        }
-
         internal static bool Hats { get { return HideBodies.Value || HideHats.Value; } }
         internal static bool HitBlood { get { return NoBlood.Value || NoHitBlood.Value; } }
         internal static bool DeathBlood { get { return NoBlood.Value || NoDeathBlood.Value; } }
@@ -85,7 +70,6 @@ namespace NoGore
             HideBodies = Config.Bind(Bodies, "Hide Bodies", true, "No ragdolls, body pieces or dropped hats. Turn off to pick which.");
             HideRagdolls = Config.Bind(Bodies, "Hide Ragdolls", false, "Dead bodies (yours too) and the pieces from an explosive death.");
             HideHats = Config.Bind(Bodies, "Hide Dropped Hats", false, "Hats that come off players.");
-            FromOldName(Config, new ConfigDefinition(Bodies, "Hide Hats"), HideHats);   // its name until 1.3.2
             NoBlood = Config.Bind(Blood, "No Blood", true, "No blood at all. Turn off to pick which.");
             NoHitBlood = Config.Bind(Blood, "No Hit Blood", false, "Blood from hits.");
             NoDeathBlood = Config.Bind(Blood, "No Death Blood", false, "The blood that comes out of a body when it dies. It shows without the body too.");
@@ -103,7 +87,7 @@ namespace NoGore
         /// Settings of earlier versions: up to 1.1.1 there were two switches (NoRagdoll, NoBlood), 1.2.0 had blood in two
         /// (NoBloodParticles, NoBloodTextures), and a first 1.3.0 had one switch for hit and death blood together and one
         /// for the pieces of a body (now part of Hide Ragdolls). What they were set to carries over, and their lines leave
-        /// the settings file.
+        /// the settings file. Hide Dropped Hats was Hide Hats until 1.3.2.
         /// </summary>
         private void CarryOld()
         {
@@ -124,7 +108,8 @@ namespace NoGore
                 if (!NoBlood.Value) { NoHitBlood.Value = sp; NoDeathBlood.Value = sp; NoBloodStains.Value = st; }
             }
             else if (blood == false) NoBlood.Value = false;
-            string was;
+            string was; bool hats;
+            if (left.TryGetValue(new ConfigDefinition("Bodies", "Hide Hats"), out was) && bool.TryParse(was, out hats)) HideHats.Value = hats;
             if (left.TryGetValue(new ConfigDefinition("Blood", "No Blood Spray"), out was) && was != null && string.Equals(was.Trim(), "true", StringComparison.OrdinalIgnoreCase))
             {
                 NoHitBlood.Value = true;
