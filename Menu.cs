@@ -317,8 +317,9 @@ namespace Monolith
         private const float ScreenLeft = 0.03f;
 
         // the STRAFTAT theme for Far (straftat-lobby, STRAFCOLORS), measured off Far with it: panel glass, gunmetal-sage
-        // frames (lighter on dialogs), the active title on a mint badge, yellow column titles and keys
-        private static readonly Color Back = new Color32(0x13, 0x14, 0x11, 0xFF), Frame = new Color32(0x8F, 0xA5, 0x9B, 0xFF), Bar = new Color32(0x34, 0x45, 0x32, 0xFF), MenuBar = new Color32(0x2B, 0x39, 0x29, 0xFF), Window = new Color32(0x13, 0x14, 0x11, 0xFF),
+        // frames (lighter on dialogs), the active title on a mint badge, yellow column titles and keys. The panels are the
+        // theme's dark glass and dialogs (the preview and pop-ups) its lighter dialog ground, so they stand out
+        private static readonly Color Back = new Color32(0x09, 0x0A, 0x05, 0xFF), Frame = new Color32(0x8F, 0xA5, 0x9B, 0xFF), Bar = new Color32(0x34, 0x45, 0x32, 0xFF), MenuBar = new Color32(0x2B, 0x39, 0x29, 0xFF), Window = new Color32(0x13, 0x14, 0x11, 0xFF),
             FrameDim = new Color32(0x6F, 0x85, 0x7B, 0xFF), Panel = new Color32(0x13, 0x18, 0x0F, 0xFF),
             BarDim = new Color32(0x13, 0x18, 0x10, 0xFF), Hover = new Color32(0x1A, 0x22, 0x17, 0xFF), KeyBar = new Color32(0x17, 0x1C, 0x13, 0xFF),
             Well = new Color32(0x07, 0x08, 0x03, 0xFF), Badge = new Color32(0xB4, 0xF6, 0xB7, 0xFF);
