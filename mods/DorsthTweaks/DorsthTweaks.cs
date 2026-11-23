@@ -115,7 +115,10 @@ namespace DorsthTweaks
         private void Awake()
         {
             Log = Logger;
+#if !DORSTH_BUNDLE
+            // in MONOLITH only MONOLITH says it loaded, so the line shows once
             Log.LogInfo(Name + " " + Version + " loaded. Dorsth was here.");
+#endif
             Detail = Config.Bind("Internal", "Detailed Log", false, "Writes what each tweak did to the log (for measuring). Off: only problems are written.");
             // BepInEx's manager object (every plugin's home) is a plain object the game destroys on the way into a lobby,
             // unless something hides it (Mod Menu does, so does BepInEx's HideManagerGameObject). Hidden here too.

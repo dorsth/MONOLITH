@@ -59,7 +59,10 @@ namespace EzCrosshair
         private void Awake()
         {
             Log = Logger;
+#if !DORSTH_BUNDLE
+            // in MONOLITH only MONOLITH says it loaded, so the line shows once
             Log.LogInfo(Name + " " + Version + " loaded. Dorsth was here.");
+#endif
             // BepInEx's manager object (every plugin's home) is a plain object the game destroys on the way into a lobby, unless something hides it (Mod Menu does): hidden here too, so this works without Mod Menu.
             gameObject.hideFlags = HideFlags.HideAndDontSave;
 

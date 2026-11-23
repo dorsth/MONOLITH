@@ -42,7 +42,10 @@ namespace CombatSounds
         private void Awake()
         {
             Log = Logger;
+#if !DORSTH_BUNDLE
+            // in MONOLITH only MONOLITH says it loaded, so the line shows once
             Log.LogInfo(Name + " " + Version + " loaded. Dorsth was here.");
+#endif
             // the volume table also drops removed guns and casings when a scene loads, not only every 256 new ones
             // (a heap walk found ~135 destroyed sound sources of earlier takes still in it)
             UnityEngine.SceneManagement.SceneManager.sceneLoaded += (s, m) => GunSounds.Prune();

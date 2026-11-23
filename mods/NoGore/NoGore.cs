@@ -60,7 +60,10 @@ namespace NoGore
         private void Awake()
         {
             Log = Logger;
+#if !DORSTH_BUNDLE
+            // in MONOLITH only MONOLITH says it loaded, so the line shows once
             Log.LogInfo(Name + " " + Version + " loaded. Dorsth was here.");
+#endif
 #if !DORSTH_BUNDLE
             if (BepInEx.Bootstrap.Chainloader.PluginInfos.ContainsKey("kestrel.straftat.modmenu"))
             { try { ModMenuDescription(); } catch (Exception e) { Logger.LogInfo("Mod Menu description: " + e.Message); } }

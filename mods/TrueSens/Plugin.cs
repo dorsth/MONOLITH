@@ -61,7 +61,10 @@ namespace TrueSens
             if (killCam != null) harmony.Patch(killCam, prefix: new HarmonyMethod(typeof(Plugin), nameof(KillCamPrefix)), finalizer: new HarmonyMethod(typeof(Plugin), nameof(KillCamPostfix)));
             try { SettingsMenu.Install(harmony); }
             catch (Exception e) { Log.LogWarning("The game's sensitivity sliders stay as they are: " + e.Message); }
+#if !DORSTH_BUNDLE
+            // in MONOLITH only MONOLITH says it loaded, so the line shows once
             Logger.LogInfo(Name + " " + Version + " loaded. Dorsth was here.");
+#endif
             Report();
         }
 

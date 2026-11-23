@@ -695,7 +695,10 @@ namespace ViewmodelTweaks
         private void Awake()
         {
             Log = Logger;
+#if !DORSTH_BUNDLE
+            // in MONOLITH only MONOLITH says it loaded, so the line shows once
             Log.LogInfo(Name + " " + Version + " loaded. Dorsth was here.");
+#endif
             Detail = Config.Bind("Internal", "Detailed Log", false, "Writes what One Camera does to the log (for measuring). Off: only problems are written.");
             for (int i = 1; i <= MaxSlots; i++)
             {

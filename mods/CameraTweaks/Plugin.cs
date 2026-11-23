@@ -76,7 +76,10 @@ namespace CameraTweaks
                 // after other mods' prefixes: if one already took care of this shot, leave it
                 if (m != null) h.Patch(m, new HarmonyMethod(typeof(Recoil), nameof(Recoil.Prefix)) { priority = Priority.Last });
             }
+#if !DORSTH_BUNDLE
+            // in MONOLITH only MONOLITH says it loaded, so the line shows once
             Logger.LogInfo(Name + " " + Version + " loaded. Dorsth was here.");
+#endif
             // BepInEx's manager object (every plugin's home) is a plain object the game destroys on the way into a lobby, unless something hides it (Mod Menu does): hidden here too, so this works without Mod Menu.
             gameObject.hideFlags = HideFlags.HideAndDontSave;
         }
