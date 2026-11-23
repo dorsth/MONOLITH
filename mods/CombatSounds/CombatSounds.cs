@@ -17,8 +17,7 @@ using UnityEngine.Networking;
 
 [assembly: AssemblyTitle("CombatSounds")]
 [assembly: AssemblyDescription("Your own hit, head hit, kill and melee kill sounds, and gun volume.")]
-[assembly: AssemblyVersion("1.1.8.0")]
-[assembly: AssemblyFileVersion("1.1.6.0")]
+[assembly: AssemblyVersion("1.1.9.0")]
 
 // Only changes what you hear, so matchmaking with unmodded players still works.
 [assembly: StraftatMod(isVanillaCompatible: true)]
@@ -34,7 +33,7 @@ namespace CombatSounds
 #endif
         public const string Guid = "dorsth.straftat.combatsounds";
         public const string Name = "CombatSounds";
-        public const string Version = "1.1.8";
+        public const string Version = "1.1.9";
 
         internal static ManualLogSource Log;
         internal static SoundSlot Hit, HeadHit, Kill, MeleeKill;
@@ -387,12 +386,14 @@ namespace CombatSounds
                 _hit = slot;
                 if (slot.HasSound && !slot.SameSound(_kill)) slot.Play();
             }
-            catch (Exception e)
-            {
-                if (_errorLogged) return;
-                _errorLogged = true;
-                CombatSoundsPlugin.Log.LogError("Error (further errors are not logged): " + e);
-            }
+            catch (Exception e) { LogOnce(e); }
+        }
+
+        private static void LogOnce(Exception e)
+        {
+            if (_errorLogged) return;
+            _errorLogged = true;
+            CombatSoundsPlugin.Log.LogError("Error (further errors are not logged): " + e);
         }
 
         /// <summary>
@@ -430,7 +431,7 @@ namespace CombatSounds
                 if (slot.ReplacesGameSound) return false;
                 return !slot.PlayGame(__instance != null ? __instance.audio : null, clip);
             }
-            catch { return true; }
+            catch (Exception e) { LogOnce(e); return true; }
         }
     }
 
