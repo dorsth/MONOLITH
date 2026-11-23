@@ -1,5 +1,8 @@
 # MONOLITH changelog
 
+## 2.0.1
+- Configs: a preset, Overwrite or Delete you clicked asks you to click again, not to press E again.
+
 ## 2.0.0
 What is new since 1.1.9, the last version on Thunderstore. Every step is listed under its own version below.
 

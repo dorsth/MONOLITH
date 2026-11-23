@@ -5,7 +5,7 @@ namespace Monolith
 {
     internal static partial class Lang
     {
-        private static readonly Dictionary<string, string> Table = new Dictionary<string, string>(308)
+        private static readonly Dictionary<string, string> Table = new Dictionary<string, string>(309)
         {
             { "Crosshair", "Прицел" },
             { "Viewmodel", "Вьюмодель" },
@@ -260,6 +260,7 @@ namespace Monolith
             { "Defaults", "По умолчанию" },
             { "Every mod setting back to its default, except keybinds and outline colors. The game's own settings stay as they are.", "Все настройки модов к значениям по умолчанию, кроме клавиш и цветов обводки. Настройки самой игры не меняются." },
             { ": E again", ": ещё раз E" },
+            { ": click again", ": ещё клик" },
             { "No name given, nothing saved.", "Имя не задано, ничего не сохранено." },
             { "Overwrote ", "Перезаписан профиль " },
             { "Saved ", "Сохранён профиль " },

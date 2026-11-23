@@ -170,6 +170,7 @@ T = [
 ('Defaults', 'По умолчанию', 'L41'),
 ('Every mod setting back to its default, except keybinds and outline colors. The game\'s own settings stay as they are.', 'Все настройки модов к значениям по умолчанию, кроме клавиш и цветов обводки. Настройки самой игры не меняются.', 'info'),
 (': E again', ': ещё раз E', 'W15'),
+(': click again', ': ещё клик', 'W15'),
 ('No name given, nothing saved.', 'Имя не задано, ничего не сохранено.', 'info'),
 ('Overwrote ', 'Перезаписан профиль ', ''), ('Saved ', 'Сохранён профиль ', ''), ('Deleted ', 'Удалён профиль ', ''), ('Loaded ', 'Загружен профиль ', ''),
 ('Settings changed: ', 'Изменено настроек: ', ''), (' Undo load brings back what you had.', ' Отмена загрузки вернёт прежнее.', ''),

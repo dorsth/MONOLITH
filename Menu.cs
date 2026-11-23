@@ -76,7 +76,7 @@ namespace Monolith
         // a key being set by pressing it (read from the input system: it knows mouse buttons and the wheel too)
         private MenuRow _bindRow; private int _bindEnd = -10;
         // a row that wants E twice, and the line a row's action gave back
-        private MenuRow _armed; private string _say; private float _sayUntil;
+        private MenuRow _armed; private bool _armedByClick, _clicking; private string _say; private float _sayUntil;
         private void Say(string s) { _say = s; _sayUntil = Time.unscaledTime + 8f; }
         // the search
         private bool _searching; private string _query = ""; private MenuPage _searchPage;
@@ -618,7 +618,7 @@ namespace Monolith
                 {
                     string act = Lang.T(row.Label);
                     if (row == _editRow) return "<color=" + Mint + ">" + Esc(act) + ": </color><color=" + Hot + ">" + Esc(Fit(_edit, cols - act.Length - 4)) + "_</color>";
-                    if (row == _armed) return "<color=" + Hot + ">" + Esc(Pad(act + Lang.T(": E again"), cols)) + "</color>";
+                    if (row == _armed) return "<color=" + Hot + ">" + Esc(Pad(act + Lang.T(_armedByClick ? ": click again" : ": E again"), cols)) + "</color>";
                     if (row.Take == null && row.Dyn != null)   // a line to read (credits): the text, its value on the right, nothing to press
                     {
                         string v = ""; try { v = row.Dyn() ?? ""; } catch { }
@@ -1157,7 +1157,8 @@ namespace Monolith
             // On a number's bar: the value goes to the mouse, and follows it while held.
             if (button != 0) return;
             if (OnBar(row, m.x, page)) { _dragRow = row; Slide(row, m.x, page); return; }
-            Activate(row);
+            _clicking = true;
+            try { Activate(row); } finally { _clicking = false; }
         }
 
         private void Activate(MenuRow row)
@@ -1175,7 +1176,7 @@ namespace Monolith
                     if (row.Take != null)
                     {
                         if (row.Ask != null) { _editRow = row; _capture = false; _edit = ""; _modeFrame = Time.frameCount; return; }
-                        if (row.Confirm && _armed != row) { _armed = row; return; }
+                        if (row.Confirm && _armed != row) { _armed = row; _armedByClick = _clicking; return; }
                         Took(row, null);
                         return;
                     }
