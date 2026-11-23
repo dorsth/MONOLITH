@@ -20,7 +20,7 @@ using UnityEngine.UI;
 
 [assembly: AssemblyTitle("ezCrosshair")]
 [assembly: AssemblyDescription("Pick your own crosshair, its color and size.")]
-[assembly: AssemblyVersion("1.3.5.0")]
+[assembly: AssemblyVersion("1.3.6.0")]
 [assembly: AssemblyFileVersion("1.2.1.0")]
 
 // Only changes what you see on your own screen, so matchmaking with unmodded players still works.
@@ -34,7 +34,7 @@ namespace EzCrosshair
     {
         public const string Guid = "dorsth.straftat.ezcrosshair";
         public const string Name = "ezCrosshair";
-        public const string Version = "1.3.5";
+        public const string Version = "1.3.6";
         internal const string ModMenuGuid = "kestrel.straftat.modmenu";
 
         // in the order they're shown (Images.cs has each one's picture)
@@ -44,6 +44,8 @@ namespace EzCrosshair
         };
 
         internal static ManualLogSource Log;
+        private static readonly HashSet<string> Said = new HashSet<string>();
+        internal static void WarnOnce(string s) { if (Said.Count < 32 && Said.Add(s)) Log.LogWarning(s); }
         internal static ConfigEntry<bool> On;
         internal static ConfigEntry<string> Pick;
         internal static ConfigEntry<Color> Tint;
@@ -434,8 +436,7 @@ namespace EzCrosshair
                 if (!name.EndsWith("(Clone)", StringComparison.Ordinal)) return;
                 if (!_hooked) { _hooked = true; UnityEngine.SceneManagement.SceneManager.sceneLoaded += (sc, m) => NotMarkers.Clear(); }
                 // the hit markers' names, from everything loaded that has one (guns, grenades, mines, rockets). Read again
-                // when something new shows up that isn't one yet: a gun loaded after the last read (the list read in the
-                // main menu had none, so the colour only came once something else read it again)
+                // when something new shows up that isn't one yet: a gun loaded after the last read.
                 // Every new thing under the pause manager that is not a hit marker (a chat line, a kill line) would start that
                 // read again, and the read looks through everything loaded, four times: a few milliseconds each time. So a
                 // name that turned out not to be a marker is remembered until the next map.
@@ -448,7 +449,7 @@ namespace EzCrosshair
                 }
                 _until = Time.unscaledTime + Flash;
             }
-            catch { }
+            catch (Exception e) { EzCrosshairPlugin.WarnOnce("Hit color: " + e.Message); }
         }
     }
 }

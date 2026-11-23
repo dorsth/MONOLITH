@@ -357,22 +357,27 @@ namespace EzCrosshair
                 b.onClick.AddListener(() => { EzCrosshairPlugin.Tint.Value = (Color)col; Rebuild(); });
                 x += 48f;
             }
-            // the color as a hex code: type or paste one, it's used once it has 6 digits
-            string good = ColorUtility.ToHtmlStringRGB(EzCrosshairPlugin.Tint.Value).ToLowerInvariant();
+            HexBox(w, x + 8f, y, W - Pad - (x + 8f), "crosshair color", EzCrosshairPlugin.Tint);
+        }
+
+        // a color as a hex code: type or paste one, it's used once it has 6 digits
+        private void HexBox(Transform parent, float x, float y, float width, string key, BepInEx.Configuration.ConfigEntry<Color> color)
+        {
+            string good = ColorUtility.ToHtmlStringRGB(color.Value).ToLowerInvariant();
             TextBox hex = null;
-            hex = TextBox.Make(w, x + 8f, y, W - Pad - (x + 8f), 40f, new TextBox.Options
+            hex = TextBox.Make(parent, x, y, width, 40f, new TextBox.Options
             {
                 Text = good,
                 Prefix = "#",
                 Limit = 6,
-                Key = "crosshair color",
+                Key = key,
                 Filter = c => Uri.IsHexDigit(c) ? char.ToLowerInvariant(c) : '\0',
                 Changed = v =>
                 {
                     Color c;
                     if (v.Length != 6 || v == good || !ColorUtility.TryParseHtmlString("#" + v, out c)) return;
                     good = v;
-                    EzCrosshairPlugin.Tint.Value = c;
+                    color.Value = c;
                     // built again with the new color; the field keeps its cursor (Key)
                     Rebuild();
                 },
@@ -387,25 +392,7 @@ namespace EzCrosshair
             float right = W - Pad * 2f;
             var sw = Ui.Panel(r, EzCrosshairPlugin.HitTint.Value, Ui.RoundSmall);
             Ui.At(sw.rectTransform, right - 180f - 8f - 150f - 8f - 40f, 4f, 40f, 40f);
-            string good = ColorUtility.ToHtmlStringRGB(EzCrosshairPlugin.HitTint.Value).ToLowerInvariant();
-            TextBox hex = null;
-            hex = TextBox.Make(r, right - 180f - 8f - 150f, 4f, 150f, 40f, new TextBox.Options
-            {
-                Text = good,
-                Prefix = "#",
-                Limit = 6,
-                Key = "hit color",
-                Filter = c => Uri.IsHexDigit(c) ? char.ToLowerInvariant(c) : '\0',
-                Changed = v =>
-                {
-                    Color c;
-                    if (v.Length != 6 || v == good || !ColorUtility.TryParseHtmlString("#" + v, out c)) return;
-                    good = v;
-                    EzCrosshairPlugin.HitTint.Value = c;
-                    Rebuild();
-                },
-                Left = v => { if (v.Length != 6 && hex != null) hex.SetTextWithoutNotify(good); },
-            });
+            HexBox(r, right - 180f - 8f - 150f, 4f, 150f, "hit color", EzCrosshairPlugin.HitTint);
         }
 
         // one setting on its own darker bar, its control on the right
@@ -605,7 +592,7 @@ namespace EzCrosshair
                     }
                 }
             }
-            catch { }
+            catch (Exception e) { EzCrosshairPlugin.WarnOnce("STRAFTH's menu colors were not read: " + e.Message); }
             Color t, b;
             if (!ColorUtility.TryParseHtmlString("#" + text, out t)) t = MintTxt;
             if (!ColorUtility.TryParseHtmlString("#" + back, out b)) b = MintBg;
