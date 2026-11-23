@@ -1,5 +1,9 @@
 # MONOLITH changelog
 
+## 2.0.7
+- The menu's preview box and pop-ups have no drop shadow.
+- Holds: CameraTweaks 1.2.4, CombatSounds 1.1.9, DorsthTweaks 1.4.7, MatchStats 1.0.6, NoGore 1.3.6, TrueSens 1.2.6, ViewmodelTweaks 2.0.8, ezCrosshair 1.3.6.
+
 ## 2.0.6
 - DorsthTweaks 1.4.7: a weapon lying loose when you join mid-match no longer writes an error to the log, and the two SpawnViewer warnings at start are gone.
 - Holds: CameraTweaks 1.2.4, CombatSounds 1.1.9, DorsthTweaks 1.4.7, MatchStats 1.0.6, NoGore 1.3.6, TrueSens 1.2.6, ViewmodelTweaks 2.0.8, ezCrosshair 1.3.6.

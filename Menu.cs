@@ -320,7 +320,7 @@ namespace Monolith
         // frames (lighter on dialogs), the active title on a mint badge, yellow column titles and keys
         private static readonly Color Back = new Color32(0x13, 0x14, 0x11, 0xFF), Frame = new Color32(0x8F, 0xA5, 0x9B, 0xFF), Bar = new Color32(0x34, 0x45, 0x32, 0xFF), MenuBar = new Color32(0x2B, 0x39, 0x29, 0xFF), Window = new Color32(0x13, 0x14, 0x11, 0xFF),
             FrameDim = new Color32(0x6F, 0x85, 0x7B, 0xFF), Panel = new Color32(0x13, 0x18, 0x0F, 0xFF),
-            BarDim = new Color32(0x13, 0x18, 0x10, 0xFF), Shadow = new Color(0f, 0f, 0f, 0.5f), Hover = new Color32(0x1A, 0x22, 0x17, 0xFF), KeyBar = new Color32(0x17, 0x1C, 0x13, 0xFF),
+            BarDim = new Color32(0x13, 0x18, 0x10, 0xFF), Hover = new Color32(0x1A, 0x22, 0x17, 0xFF), KeyBar = new Color32(0x17, 0x1C, 0x13, 0xFF),
             Well = new Color32(0x07, 0x08, 0x03, 0xFF), Badge = new Color32(0xB4, 0xF6, 0xB7, 0xFF);
         private const string Txt = "#ADB3AC", Dim = "#909790", Hot = "#F0FC9D", Mint = "#B4F6B7", Val = "#FCFEF9", Head = "#8FA59B", Faint = "#5F605D", Ink = "#070803";
 
@@ -560,12 +560,11 @@ namespace Monolith
             }
             if (_vis.Count > vis) ScrollBar(page.Top, vis, _vis.Count);
 
-            // the preview: a Far dialog over the page beside the rows, with its shadow, its own lighter ground and
-            // a double frame, the samples in named groups inside it
+            // the preview: a Far dialog over the page beside the rows, with its own lighter ground and a double frame,
+            // the samples in named groups inside it
             if (page.Draw != null)
             {
                 Rect sr = SideRect(page);
-                Fill(new Rect(sr.x + _cw * 0.5f, sr.y + _ch * 0.5f, sr.width, sr.height), Shadow);
                 Fill(sr, Panel);
                 var frame = new Rect(sr.x + _cw * 0.5f, sr.y + _ch * 0.5f, sr.width - _cw, sr.height - _ch);
                 Box(frame, Lang.T("Preview"), false, Panel);
@@ -636,7 +635,7 @@ namespace Monolith
         private Rect SideRect(MenuPage page)
         {
             // the dialog with its half cell of ground around the frame: the title on the frame comes level with the first row
-            // a cell of room on its left, and the same between its shadow and the page frame on its right
+            // a cell of room on its left, and a cell and a half between it and the page frame on its right
             return new Rect(_pageR.xMax - (page.SideCols + 1.5f) * _cw, _pageR.y + _ch - Thin, (page.SideCols - 0.5f) * _cw, page.SideRows() * _ch);
         }
 
