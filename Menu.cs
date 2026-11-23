@@ -554,7 +554,8 @@ namespace Monolith
                 int idx = page.Top + i; MenuRow row = _vis[idx];
                 Rect r = new Rect(_pageR.x + _cw, _pageR.y + (i + 1) * _ch, Scrolls ? BarX(_pageR.xMax) - Gap - _pageR.x - _cw : _pageR.width - 2 * _cw - side * _cw, _ch);
                 bool cur = idx == ci && pageOn && !_byMouse;
-                if (cur) Fill(r, Bar); else if (idx == over && row.Kind != RowKind.Header) Fill(r, Hover);
+                // dim under an open pop-up: it shows which row the pop-up belongs to, and the keys go to the pop-up
+                if (cur) Fill(r, _pop != null ? BarDim : Bar); else if (idx == over && row.Kind != RowKind.Header) Fill(r, Hover);
                 if (row.Kind == RowKind.Header) Heading(r, Lang.T(row.Label), page.Draw != null ? SideRect(page) : new Rect());
                 else Line(r.x + _cw * 0.5f, r.y, RowText(row, cols, cur));
                 Knob(row, r.y, cols, cur);
