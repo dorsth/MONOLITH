@@ -35,7 +35,7 @@ using PlanarReflection = UnityStandardAssets.Water.PlanarReflection;
 
 [assembly: AssemblyTitle("DorsthTweaks")]
 [assembly: AssemblyDescription("Small client-side tweaks for STRAFTAT: bullet trails, HUD, prompts, menus and performance.")]
-[assembly: AssemblyVersion("1.4.5.0")]
+[assembly: AssemblyVersion("1.4.6.0")]
 [assembly: AssemblyFileVersion("1.3.7.0")]
 
 // Only changes what you see on your own screen, so matchmaking with unmodded players still works.
@@ -49,7 +49,7 @@ namespace DorsthTweaks
     {
         public const string Guid = "dorsth.straftat.dorsthtweaks";
         public const string Name = "DorsthTweaks";
-        public const string Version = "1.4.5";
+        public const string Version = "1.4.6";
 
         internal static ManualLogSource Log;
         internal static ConfigEntry<bool> Detail;
@@ -305,7 +305,7 @@ namespace DorsthTweaks
             string was = Old(section, key);
             if (was == null) return;
             try { now.SetSerializedValue(was); }
-            catch { }
+            catch (Exception ex) { DorsthTweaksPlugin.LogErrorOnce(ex); }
         }
 
         private static void Install(string feature, Action install)
@@ -322,6 +322,13 @@ namespace DorsthTweaks
         {
             if (ErrorsLogged.Count > 64 || !ErrorsLogged.Add(where + ":" + line)) return;
             Log.LogError("Error in " + where + " (logged once): " + e);
+        }
+
+        /// <summary>Runs one step so that its error does not stop the steps after it. Logged once per step.</summary>
+        internal static void Safe(Action a)
+        {
+            try { a(); }
+            catch (Exception e) { LogErrorOnce(e, a.Method.DeclaringType?.Name + "." + a.Method.Name, 0); }
         }
 
         /// <summary>When a setting changes: update the hooks first, then apply the change.</summary>
@@ -661,6 +668,18 @@ namespace DorsthTweaks
             foreach (TKey key in saved.Keys)
                 if (key == null) gone.Add(key);
             foreach (TKey key in gone) saved.Remove(key);
+        }
+
+        /// <summary>The same for what is saved by material id.</summary>
+        internal static void PruneGoneMaterials<TValue>(Dictionary<int, TValue> saved)
+        {
+            var alive = new HashSet<int>();
+            foreach (Material m in Resources.FindObjectsOfTypeAll<Material>())
+                if (m != null) alive.Add(m.GetInstanceID());
+            var gone = new List<int>();
+            foreach (int id in saved.Keys)
+                if (!alive.Contains(id)) gone.Add(id);
+            foreach (int id in gone) saved.Remove(id);
         }
     }
 
@@ -1041,7 +1060,7 @@ namespace DorsthTweaks
                 {
                     GameObject marker = null;
                     try { marker = kind.Value.GetValue(thrown) as GameObject; }
-                    catch { }
+                    catch (Exception ex) { DorsthTweaksPlugin.LogErrorOnce(ex); }
                     if (marker != null) markers.Add(marker);
                 }
             }
@@ -1385,7 +1404,7 @@ namespace DorsthTweaks
         {
             // no smaller versions (they blur it), left out of the game's texture quality limit
             var tex = new Texture2D(W, H, TextureFormat.RGBA32, false) { filterMode = FilterMode.Bilinear, wrapMode = TextureWrapMode.Clamp, name = src.name + " (DorsthTweaks)" };
-            try { tex.ignoreMipmapLimit = true; } catch { }
+            tex.ignoreMipmapLimit = true;
             tex.SetPixels32(outPx);
             tex.Apply(false, true);
             Sprite sprite = Sprite.Create(tex, new Rect(0f, 0f, W, H), new Vector2(0.5f, 0.5f), src.pixelsPerUnit * scale);
@@ -2100,7 +2119,7 @@ namespace DorsthTweaks
         private static Exception AnimationFinalizer(Weapon __instance, bool __state, Exception __exception)
         {
             try { if (__state && __instance != null) _comeback(__instance) = false; }
-            catch { }
+            catch (Exception ex) { DorsthTweaksPlugin.LogErrorOnce(ex); }
             return __exception;
         }
 
@@ -2411,13 +2430,7 @@ namespace DorsthTweaks
             Scenes.Loaded += (scene, mode) =>
             {
                 if (DorsthTweaksPlugin.WeaponHighlightColor.IsDefault || Originals.Count == 0) { Originals.Clear(); return; }
-                var alive = new HashSet<int>();
-                foreach (Material m in Resources.FindObjectsOfTypeAll<Material>())
-                    if (m != null) alive.Add(m.GetInstanceID());
-                var gone = new List<int>();
-                foreach (int id in Originals.Keys)
-                    if (!alive.Contains(id)) gone.Add(id);
-                foreach (int id in gone) Originals.Remove(id);
+                Scenes.PruneGoneMaterials(Originals);
             };
         }
 
@@ -2697,14 +2710,7 @@ namespace DorsthTweaks
             // What's remembered of buttons, toggles and lists that are gone is dropped at every scene load, not only in the
             // main menu: the HUD makes new ones all through a match, and remembering the destroyed ones kept them (and
             // everything they point to) in memory for the whole session.
-            if (Fades.Count > 0 || ToggleFades.Count > 0 || ListFades.Count > 0 || Carets.Count > 0 || Particles.Count > 0)
-            {
-                Scenes.PruneGone(Fades);
-                Scenes.PruneGone(ToggleFades);
-                Scenes.PruneGone(ListFades);
-                Scenes.PruneGone(Carets);
-                Scenes.PruneGone(Particles);
-            }
+            PruneGone();
             if (!On() || scene.name != Scenes.MainMenu) return;
             try { Still(); }
             catch (Exception e) { DorsthTweaksPlugin.LogErrorOnce(e); }
@@ -2714,14 +2720,19 @@ namespace DorsthTweaks
 
         private static bool InMainMenuScene(Component c) { return c != null && c.gameObject.scene.name == Scenes.MainMenu; }
 
-        /// <summary>One pass over the menus (when turned on, and when the main menu loads).</summary>
-        private static void Still()
+        private static void PruneGone()
         {
             Scenes.PruneGone(Fades);
             Scenes.PruneGone(ToggleFades);
             Scenes.PruneGone(ListFades);
             Scenes.PruneGone(Carets);
             Scenes.PruneGone(Particles);
+        }
+
+        /// <summary>One pass over the menus (when turned on, and when the main menu loads).</summary>
+        private static void Still()
+        {
+            PruneGone();
             StoppedLoops.RemoveWhere(loop => loop == null);
             foreach (UnityEngine.Object o in Scenes.FindAll(typeof(Selectable)))
             {
@@ -3280,7 +3291,7 @@ namespace DorsthTweaks
             foreach (string name in WarmOwnerNames)
             {
                 Type t = null;
-                try { t = game.GetType(name, false); } catch { }
+                try { t = game.GetType(name, false); } catch (Exception ex) { DorsthTweaksPlugin.LogErrorOnce(ex); }
                 if (t != null && typeof(MonoBehaviour).IsAssignableFrom(t)) list.Add(t);
             }
             return _warmOwners = list.ToArray();
@@ -3320,7 +3331,7 @@ namespace DorsthTweaks
                     foreach (FieldInfo f in fields)
                     {
                         Component part = null;
-                        try { part = f.GetValue(b) as Component; } catch { }
+                        try { part = f.GetValue(b) as Component; } catch (Exception ex) { DorsthTweaksPlugin.LogErrorOnce(ex); }
                         if (part == null) continue;
                         GameObject go = part.gameObject;
                         if (go.scene.IsValid()) continue;                    // something in the map, not a prefab
@@ -3369,7 +3380,7 @@ namespace DorsthTweaks
                         {
                             c.GetComponentsInChildren(true, behaviours);
                             foreach (MonoBehaviour b in behaviours)
-                                if (b != null && !IsUnity(b)) { try { UnityEngine.Object.DestroyImmediate(b); } catch { } }
+                                if (b != null && !IsUnity(b)) { try { UnityEngine.Object.DestroyImmediate(b); } catch (Exception ex) { DorsthTweaksPlugin.LogErrorOnce(ex); } }
                         }
                         c.GetComponentsInChildren(true, behaviours);
                         bool left = false;
@@ -3400,7 +3411,7 @@ namespace DorsthTweaks
                 holder.SetActive(true);
                 foreach (ParticleSystem ps in holder.GetComponentsInChildren<ParticleSystem>(true))
                 {
-                    try { ps.Simulate(0.1f, true, true); } catch { }
+                    try { ps.Simulate(0.1f, true, true); } catch (Exception ex) { DorsthTweaksPlugin.LogErrorOnce(ex); }
                 }
                 var camGo = new GameObject("DorsthTweaks warm up camera");
                 camGo.hideFlags = HideFlags.HideAndDontSave;
@@ -3464,7 +3475,7 @@ namespace DorsthTweaks
                     foreach (FieldInfo f in fields)
                     {
                         object value = null;
-                        try { value = f.GetValue(script); } catch { }
+                        try { value = f.GetValue(script); } catch (Exception ex) { DorsthTweaksPlugin.LogErrorOnce(ex); }
                         if (value is AudioClip one) n += Load(one);
                         else if (value is AudioClip[] many)
                             foreach (AudioClip c in many) n += Load(c);
@@ -3547,8 +3558,15 @@ namespace DorsthTweaks
                     Material m = parts[i].Value;
                     for (int pass = 0; pass < m.passCount; pass++) cb.DrawMesh(parts[i].Key, place, m, subs[i], pass);
                 }
-                catch { }
+                catch (Exception ex) { DorsthTweaksPlugin.LogErrorOnce(ex); }
             }
+            RenderOnce(cam, cb, rt, holder);
+            return parts.Count;
+        }
+
+        /// <summary>One render of a hidden camera with what is in cb, then everything made for it is let go.</summary>
+        private static void RenderOnce(Camera cam, CommandBuffer cb, RenderTexture rt, params UnityEngine.Object[] made)
+        {
             try
             {
                 cam.AddCommandBuffer(CameraEvent.AfterForwardAlpha, cb);
@@ -3560,9 +3578,8 @@ namespace DorsthTweaks
                 cb.Release();
                 cam.targetTexture = null;
                 RenderTexture.ReleaseTemporary(rt);
-                UnityEngine.Object.Destroy(holder);
+                foreach (UnityEngine.Object o in made) UnityEngine.Object.Destroy(o);
             }
-            return parts.Count;
         }
 
         /// <summary>Draws each material once on a hidden 32x32 camera far below the map, so its shader is compiled now.</summary>
@@ -3601,22 +3618,9 @@ namespace DorsthTweaks
                     Warmed.Add(m.GetInstanceID());
                     n++;
                 }
-                catch { }
+                catch (Exception ex) { DorsthTweaksPlugin.LogErrorOnce(ex); }
             }
-            try
-            {
-                cam.AddCommandBuffer(CameraEvent.AfterForwardAlpha, cb);
-                cam.Render();
-            }
-            finally
-            {
-                cam.RemoveAllCommandBuffers();
-                cb.Release();
-                cam.targetTexture = null;
-                RenderTexture.ReleaseTemporary(rt);
-                UnityEngine.Object.Destroy(quad);
-                UnityEngine.Object.Destroy(holder);
-            }
+            RenderOnce(cam, cb, rt, quad, holder);
             return n;
         }
     }
@@ -3959,7 +3963,7 @@ namespace DorsthTweaks
                 foreach (FieldInfo f in Fields(t))
                 {
                     object v = null;
-                    try { v = f.GetValue(b); } catch { }
+                    try { v = f.GetValue(b); } catch (Exception ex) { DorsthTweaksPlugin.LogErrorOnce(ex); }
                     var one = v as GameObject;
                     if (one != null) Add(t, f, one, seen);
                     var many = v as GameObject[];
@@ -4094,8 +4098,8 @@ namespace DorsthTweaks
                 // only what's in the scene is dealt with; the effect prefabs are left as they are (their lights stay
                 // off). Looking them up here as well was a second search through every script in memory per map, and
                 // its result was dropped again before the last map was freed.
-                if (WarmUp.RunsFor(scene.name)) Safe(ApplyScene);
-                else Safe(Apply);
+                if (WarmUp.RunsFor(scene.name)) DorsthTweaksPlugin.Safe(ApplyScene);
+                else DorsthTweaksPlugin.Safe(Apply);
             };
         }
 
@@ -4182,14 +4186,7 @@ namespace DorsthTweaks
             BladeTrails.Clear();
             Scenes.PruneGone(OwnWidth);
             Scenes.PruneGone(Swinging);
-            if (On()) Safe(Apply);
-        }
-
-        private static void Safe(Action a)
-        {
-            try { a(); }
-            // logged once per method called, not once for all of them
-            catch (Exception e) { DorsthTweaksPlugin.LogErrorOnce(e, a.Method.DeclaringType?.Name + "." + a.Method.Name, 0); }
+            if (On()) DorsthTweaksPlugin.Safe(Apply);
         }
 
         /// <summary>Everything put back, then off again if the setting is on (when it changes, and when a map loads).</summary>
@@ -4206,13 +4203,7 @@ namespace DorsthTweaks
             AaModes.Clear();
             foreach (Behaviour b in Off) if (b != null) b.enabled = true;
             Off.Clear();
-            if (prefabLights)
-            {
-                foreach (Light l in Darkened) if (l != null) l.enabled = true;
-                Darkened.Clear();
-                foreach (GameObject g in Parked) if (g != null) g.SetActive(true);
-                Parked.Clear();
-            }
+            if (prefabLights) ReleasePrefabLights();
             FadeLights.Clear();
             // lights whose flicker was never started: started now that the setting is off
             if (!On())
@@ -4221,7 +4212,7 @@ namespace DorsthTweaks
                 {
                     if (f != null && f.isActiveAndEnabled)
                     {
-                        try { AccessTools.Method(typeof(WFX_LightFlicker), "Start")?.Invoke(f, null); } catch { }
+                        try { AccessTools.Method(typeof(WFX_LightFlicker), "Start")?.Invoke(f, null); } catch (Exception ex) { DorsthTweaksPlugin.LogErrorOnce(ex); }
                     }
                 }
             }
@@ -4231,9 +4222,9 @@ namespace DorsthTweaks
             RestoreBlades();
             if (!On()) ShotEffects.Release();
             if (!On()) return;
-            Safe(NoCigSmoke);
-            Safe(NoGunSmoke);
-            Safe(NoBladeTrail);
+            DorsthTweaksPlugin.Safe(NoCigSmoke);
+            DorsthTweaksPlugin.Safe(NoGunSmoke);
+            DorsthTweaksPlugin.Safe(NoBladeTrail);
             foreach (UnityEngine.Object o in Scenes.FindAll(typeof(PP.PostProcessVolume))) Volume((PP.PostProcessVolume)o);
             foreach (UnityEngine.Object o in Scenes.FindAll(typeof(PP.PostProcessLayer))) Layer((PP.PostProcessLayer)o);
             // light shafts and flares on the map
@@ -4618,7 +4609,7 @@ namespace DorsthTweaks
             if (_lod >= 0f)
             {
                 _lod = QualitySettings.lodBias;
-                Safe(SmallNow);
+                DorsthTweaksPlugin.Safe(SmallNow);
             }
         }
 
@@ -4628,9 +4619,9 @@ namespace DorsthTweaks
             yield return null;
             float until = Time.realtimeSinceStartup + 5f;
             while (!WarmUp.Settled && Time.realtimeSinceStartup < until) yield return null;
-            Safe(Scan);
+            DorsthTweaksPlugin.Safe(Scan);
             yield return new WaitForSecondsRealtime(3f);
-            Safe(Scan);
+            DorsthTweaksPlugin.Safe(Scan);
         }
 
         private static void Scan()
@@ -4661,7 +4652,7 @@ namespace DorsthTweaks
             var wait = new WaitForSecondsRealtime(1f);
             while (true)
             {
-                Safe(SmallNow);
+                DorsthTweaksPlugin.Safe(SmallNow);
                 yield return wait;
             }
         }
@@ -4703,13 +4694,6 @@ namespace DorsthTweaks
             RaysOff.Clear();
             Small();
         }
-
-        private static void Safe(Action a)
-        {
-            try { a(); }
-            // logged once per method called, not once for all of them
-            catch (Exception e) { DorsthTweaksPlugin.LogErrorOnce(e, a.Method.DeclaringType?.Name + "." + a.Method.Name, 0); }
-        }
     }
 
     internal static class Quality
@@ -4723,10 +4707,10 @@ namespace DorsthTweaks
         internal static void Install()
         {
             GameHook.Add(typeof(Settings), "SetQualityLevelDropdown", null, typeof(Quality), null, "QualityPostfix", () => true);
-            DorsthTweaksPlugin.LowerTextures.SettingChanged += (sender, args) => Safe(ApplyLower);
-            DorsthTweaksPlugin.Anisotropic.SettingChanged += (sender, args) => Safe(Apply);
+            DorsthTweaksPlugin.LowerTextures.SettingChanged += (sender, args) => DorsthTweaksPlugin.Safe(ApplyLower);
+            DorsthTweaksPlugin.Anisotropic.SettingChanged += (sender, args) => DorsthTweaksPlugin.Safe(Apply);
             // maps: WarmUp calls BeforeUnload and AfterLoad once a map has settled
-            Safe(Apply);
+            DorsthTweaksPlugin.Safe(Apply);
         }
 
         /// <summary>
@@ -4752,22 +4736,15 @@ namespace DorsthTweaks
         {
             if (Swapped.Count == 0 && DorsthTweaksPlugin.LowerTextures.Value <= 0) return;
             Swapped.RemoveAll(sw => sw.Mat == null);
-            Safe(ApplyLower);
-        }
-
-        private static void Safe(Action a)
-        {
-            try { a(); }
-            // logged once per method called, not once for all of them
-            catch (Exception e) { DorsthTweaksPlugin.LogErrorOnce(e, a.Method.DeclaringType?.Name + "." + a.Method.Name, 0); }
+            DorsthTweaksPlugin.Safe(ApplyLower);
         }
 
         // the game just set its own values: those are the ones to keep now
         private static void QualityPostfix()
         {
             _saved = false;
-            Safe(Apply);
-            Safe(Perf.QualityChanged);
+            DorsthTweaksPlugin.Safe(Apply);
+            DorsthTweaksPlugin.Safe(Perf.QualityChanged);
         }
 
         internal static void Apply()
@@ -4871,7 +4848,7 @@ namespace DorsthTweaks
                     if (go.layer != 5 && go.GetComponent<TMP_Text>() == null && !UnderCanvas(go.transform)) continue;
                     foreach (Material m in r.sharedMaterials) if (m != null) { materials.Add(m); AddTextures(m, textures); }
                 }
-                catch { }
+                catch (Exception ex) { DorsthTweaksPlugin.LogErrorOnce(ex); }
             }
             foreach (Graphic g in Found.Of<Graphic>())
             {
@@ -4881,12 +4858,12 @@ namespace DorsthTweaks
                     if (g.mainTexture != null) textures.Add(g.mainTexture);
                     if (g.material != null) { materials.Add(g.material); AddTextures(g.material, textures); }
                 }
-                catch { }
+                catch (Exception ex) { DorsthTweaksPlugin.LogErrorOnce(ex); }
             }
             foreach (Sprite sp in Resources.FindObjectsOfTypeAll<Sprite>())
             {
                 try { if (sp != null && sp.texture != null) textures.Add(sp.texture); }
-                catch { }
+                catch (Exception ex) { DorsthTweaksPlugin.LogErrorOnce(ex); }
             }
             foreach (TMP_FontAsset f in Resources.FindObjectsOfTypeAll<TMP_FontAsset>())
             {
@@ -4896,7 +4873,7 @@ namespace DorsthTweaks
                     if (f.material != null) materials.Add(f.material);
                     if (f.atlasTextures != null) foreach (Texture2D t in f.atlasTextures) if (t != null) textures.Add(t);
                 }
-                catch { }
+                catch (Exception ex) { DorsthTweaksPlugin.LogErrorOnce(ex); }
             }
         }
 
@@ -4956,7 +4933,7 @@ namespace DorsthTweaks
                         swapped++;
                     }
                 }
-                catch { }
+                catch (Exception ex) { DorsthTweaksPlugin.LogErrorOnce(ex); }
             }
             // copies of textures no material has anymore (a map that's gone): destroyed and forgotten, so neither the
             // copies nor these lists grow from map to map
@@ -5039,7 +5016,7 @@ namespace DorsthTweaks
                         Originals[copy.GetInstanceID()] = q.Own;
                         Swapped.Add(q);
                     }
-                    catch { }
+                    catch (Exception ex) { DorsthTweaksPlugin.LogErrorOnce(ex); }
                 }
                 yield return null;
             }
@@ -5116,7 +5093,7 @@ namespace DorsthTweaks
             foreach (Swap sw in Swapped)
             {
                 try { if (sw.Mat != null && sw.Own != null && sw.Mat.GetTexture(sw.Prop) is Texture2D now && CopyIds.Contains(now.GetInstanceID())) sw.Mat.SetTexture(sw.Prop, sw.Own); }
-                catch { }
+                catch (Exception ex) { DorsthTweaksPlugin.LogErrorOnce(ex); }
             }
             Swapped.Clear();
             // a gun or player that came in after the swap made its own copy of the material, with the smaller texture
@@ -5134,7 +5111,7 @@ namespace DorsthTweaks
                             if (m.GetTexture(prop) is Texture2D now && now != null && Originals.TryGetValue(now.GetInstanceID(), out Texture2D own) && own != null)
                                 m.SetTexture(prop, own);
                     }
-                    catch { }
+                    catch (Exception ex) { DorsthTweaksPlugin.LogErrorOnce(ex); }
                 }
             Originals.Clear();
         }
@@ -5414,14 +5391,7 @@ namespace DorsthTweaks
         /// <summary>Forgets the materials of a map that's gone (the list grew with every map).</summary>
         internal static void ForgetGone()
         {
-            if (FrozenMaterials.Count == 0) return;
-            var alive = new HashSet<int>();
-            foreach (Material m in Resources.FindObjectsOfTypeAll<Material>())
-                if (m != null) alive.Add(m.GetInstanceID());
-            var gone = new List<int>();
-            foreach (int id in FrozenMaterials.Keys)
-                if (!alive.Contains(id)) gone.Add(id);
-            foreach (int id in gone) FrozenMaterials.Remove(id);
+            if (FrozenMaterials.Count > 0) Scenes.PruneGoneMaterials(FrozenMaterials);
         }
 
         internal static void Freeze(Material m, int owner)

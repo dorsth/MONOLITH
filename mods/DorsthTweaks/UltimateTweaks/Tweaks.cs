@@ -81,7 +81,7 @@ namespace UltimateTweaks
             }) tierOf[n] = "Safe";
             foreach (string n in new[] { "PreCompile", "VoiceKeyOffThread", "JobWorkerLimit" }) tierOf[n] = "Experimental";
             Master.SettingChanged += (s, e) => Refresh();
-            try { DorsthTweaks.DorsthTweaksPlugin.NoPostProcessing.SettingChanged += (s, e) => Refresh(); } catch { }
+            DorsthTweaks.DorsthTweaksPlugin.NoPostProcessing.SettingChanged += (s, e) => Refresh();
             SceneManager.sceneLoaded += (sc, m) => { Keeper.SceneLoaded(sc); Keeper.Dirty = true; }; SceneManager.sceneUnloaded += sc => { Keeper.SceneUnloaded(sc); };
 
             try { Patches.Apply(new Harmony(Guid)); } catch (Exception e) { L.LogError("Patching failed: " + e); }
@@ -110,7 +110,7 @@ namespace UltimateTweaks
         internal void Refresh()
         {
             // DorsthTweaks' No Post-Processing brings forward rendering and the soft fill light (0.1, matte)
-            bool plain = false; try { plain = DorsthTweaks.DorsthTweaksPlugin.NoPostProcessing.Value; } catch { }
+            bool plain = DorsthTweaks.DorsthTweaksPlugin.NoPostProcessing.Value;
             Plain = plain; Forward = plain;
             MouseEventsOff = Active("NoMouseEvents"); CrosshairFix = Active("CrosshairFix"); LobbyThrottle = Active("LobbyListThrottle"); SteamCheckThrottle = Active("SteamRunningCheckThrottle");
             PreviewDollIdle = Active("PreviewDollIdle"); OwnTagCanvasOff = Active("OwnNameTagCanvasOff"); JobLimit = Active("JobWorkerLimit");
@@ -321,10 +321,10 @@ namespace UltimateTweaks
         static bool HasHandlers(Scene sc)
         {
             var types = MouseTypes(); if (types.Length == 0 || !sc.IsValid() || !sc.isLoaded) return false;
-            foreach (var root in sc.GetRootGameObjects()) foreach (var t in types) { try { if (root.GetComponentInChildren(t, true) != null) return true; } catch { } }
+            foreach (var root in sc.GetRootGameObjects()) foreach (var t in types) { try { if (root.GetComponentInChildren(t, true) != null) return true; } catch (Exception ex) { DorsthTweaks.DorsthTweaksPlugin.LogErrorOnce(ex); } }
             return false;
         }
-        public static void SceneLoaded(Scene sc) { searchDoll = true; try { sceneHasHandlers[sc.handle] = HasHandlers(sc); } catch { } DeadInput(); DeadNet(); deadAgainAt = Time.unscaledTime + 4f; }
+        public static void SceneLoaded(Scene sc) { searchDoll = true; try { sceneHasHandlers[sc.handle] = HasHandlers(sc); } catch (Exception ex) { DorsthTweaks.DorsthTweaksPlugin.LogErrorOnce(ex); } DeadInput(); DeadNet(); deadAgainAt = Time.unscaledTime + 4f; }
         static float deadAgainAt;
         static int deadNetLogged, deadNetRemoved; static MethodInfo setFirst; static readonly Predicate<FishNet.Object.NetworkObject> isGone = o => o == null;
         static void PruneOwned(FishNet.Connection.NetworkConnection c)
@@ -442,7 +442,7 @@ namespace UltimateTweaks
         bool LiveMouseHandlers()
         {
             // the scene this object lives in (objects that survive scene changes) is not announced as "loaded": look through it once
-            if (!ownSceneChecked) { ownSceneChecked = true; try { sceneHasHandlers[gameObject.scene.handle] = HasHandlers(gameObject.scene); for (int i = 0; i < SceneManager.sceneCount; i++) { var sc = SceneManager.GetSceneAt(i); if (!sceneHasHandlers.ContainsKey(sc.handle)) sceneHasHandlers[sc.handle] = HasHandlers(sc); } } catch { } }
+            if (!ownSceneChecked) { ownSceneChecked = true; try { sceneHasHandlers[gameObject.scene.handle] = HasHandlers(gameObject.scene); for (int i = 0; i < SceneManager.sceneCount; i++) { var sc = SceneManager.GetSceneAt(i); if (!sceneHasHandlers.ContainsKey(sc.handle)) sceneHasHandlers[sc.handle] = HasHandlers(sc); } } catch (Exception ex) { DorsthTweaks.DorsthTweaksPlugin.LogErrorOnce(ex); } }
             foreach (var kv in sceneHasHandlers) if (kv.Value) return true;
             return false;
         }
@@ -459,8 +459,8 @@ namespace UltimateTweaks
             Func<string, HarmonyMethod> M = n => new HarmonyMethod(self.GetMethod(n, bf));
             // ezCrosshair up to 1.2.0 hides the game's crosshair by switching its image off after Crosshair.Update. Applying
             // "the game's last write" would then switch it back on, so this fix stays out of the way until ezCrosshair is 1.2.1+.
-            BepInEx.PluginInfo ez; bool oldEz = false;
-            try { oldEz = BepInEx.Bootstrap.Chainloader.PluginInfos.TryGetValue("dorsth.straftat.ezcrosshair", out ez) && ez.Metadata.Version < new Version(1, 2, 1); } catch { }
+            BepInEx.PluginInfo ez;
+            bool oldEz = BepInEx.Bootstrap.Chainloader.PluginInfos.TryGetValue("dorsth.straftat.ezcrosshair", out ez) && ez.Metadata.Version < new Version(1, 2, 1);
             if (oldEz) TweaksPlugin.L.LogWarning("CrosshairFix is off: ezCrosshair older than 1.2.1 is installed. Update ezCrosshair to 1.2.1 (it no longer flips the game's crosshair every frame).");
             else
             {
@@ -525,7 +525,7 @@ namespace UltimateTweaks
                 h.Patch(m, postfix: M("FovTweenPost"));
             });
             {
-                int hz = 0; try { hz = Screen.currentResolution.refreshRate; } catch { }
+                int hz = Screen.currentResolution.refreshRate;
                 if (hz < 120) hz = 120;
                 arcStep = 1f / hz;
                 DorsthTweaks.DorsthTweaksPlugin.Note("OtherArcsAtScreenRate: other players' launcher arcs are worked out " + hz + " times a second");
@@ -742,7 +742,10 @@ namespace UltimateTweaks
         internal static readonly Dictionary<int, string> itemNames = new Dictionary<int, string>();
         public static string ItemNameOf(UnityEngine.Object o)
         {
-            if (!TweaksPlugin.ItemNameOn) return o.name;
+            return TweaksPlugin.ItemNameOn ? CachedName(o) : o.name;
+        }
+        static string CachedName(UnityEngine.Object o)
+        {
             int id = o.GetInstanceID(); string n;
             if (itemNames.TryGetValue(id, out n)) return n;
             n = o.name; if (itemNames.Count > 4096) itemNames.Clear();
@@ -918,7 +921,7 @@ namespace UltimateTweaks
                 var lc = LobbyController.Instance;
                 if (lc == null || lc.LocalPlayerController == null || lc.LocalPlayerController == __instance) ClientInstance.playerInstances.Clear();
             }
-            catch { }
+            catch (Exception ex) { DorsthTweaks.DorsthTweaksPlugin.LogErrorOnce(ex); }
             return null;
         }
 
@@ -1049,7 +1052,7 @@ namespace UltimateTweaks
         static void FpcGuiPost(FirstPersonController __instance)
         {
             if (!TweaksPlugin.GuiNoLayout) return;
-            try { __instance.useGUILayout = false; } catch { }
+            __instance.useGUILayout = false;
         }
         /// At a scene load and when the setting changes: the FPS counter(s) and the player scripts that exist now.
         internal static void GuiLayoutRefresh()
@@ -1062,7 +1065,7 @@ namespace UltimateTweaks
                 foreach (var c in UnityEngine.Object.FindObjectsOfType<FishNet.Component.Utility.PingDisplay>(true)) if (c.useGUILayout == off) c.useGUILayout = !off;
                 if (!off && svLayoutOff) { var b = svGui as MonoBehaviour; if (b != null) b.useGUILayout = true; svLayoutOff = false; }
             }
-            catch { }
+            catch (Exception ex) { DorsthTweaks.DorsthTweaksPlugin.LogErrorOnce(ex); }
         }
         static void SvGuiPost(MonoBehaviour __instance)
         {
@@ -1073,7 +1076,7 @@ namespace UltimateTweaks
                 if (wantOff == svLayoutOff) return;
                 __instance.useGUILayout = !wantOff; svLayoutOff = wantOff;
             }
-            catch { }
+            catch (Exception ex) { DorsthTweaks.DorsthTweaksPlugin.LogErrorOnce(ex); }
         }
 
         static bool MycPre()
@@ -1134,7 +1137,7 @@ namespace UltimateTweaks
                 }
                 list.Add(new FovT { T = __result, End = end });
             }
-            catch { }
+            catch (Exception ex) { DorsthTweaks.DorsthTweaksPlugin.LogErrorOnce(ex); }
         }
 
         static bool GunScanPre()
@@ -1151,21 +1154,21 @@ namespace UltimateTweaks
         static void CountdownPost(PlayerManager __instance)
         {
             if (!TweaksPlugin.GunScan || gsScan == null) return;
-            try { if (__instance != null && __instance.IsOwner && TweaksPlugin.I != null) { gsDoneThisTake = false; TweaksPlugin.I.StartCoroutine(GunScanInCountdown()); } } catch { }
+            try { if (__instance != null && __instance.IsOwner && TweaksPlugin.I != null) { gsDoneThisTake = false; TweaksPlugin.I.StartCoroutine(GunScanInCountdown()); } } catch (Exception ex) { DorsthTweaks.DorsthTweaksPlugin.LogErrorOnce(ex); }
         }
         static System.Collections.IEnumerator GunScanInCountdown()
         {
             yield return new WaitForSecondsRealtime(0.6f);
             if (!TweaksPlugin.GunScan || gsScan == null || gsDoneThisTake || LocalCanMove()) yield break;
             gsOwn = true;
-            try { gsScan(); gsDoneThisTake = true; } catch { } finally { gsOwn = false; }
+            try { gsScan(); gsDoneThisTake = true; } catch (Exception ex) { DorsthTweaks.DorsthTweaksPlugin.LogErrorOnce(ex); } finally { gsOwn = false; }
         }
         static void GunScanAtCountdown()
         {
             if (!TweaksPlugin.GunScan || gsScan == null) return;
             if (gsDoneThisTake) { gsDoneThisTake = false; return; }
             gsOwn = true;
-            try { gsScan(); } catch { } finally { gsOwn = false; }
+            try { gsScan(); } catch (Exception ex) { DorsthTweaks.DorsthTweaksPlugin.LogErrorOnce(ex); } finally { gsOwn = false; }
         }
         static bool LocalCanMove()
         {
@@ -1288,11 +1291,7 @@ namespace UltimateTweaks
         }
         static string KcName(UnityEngine.Object o)
         {
-            if (!TweaksPlugin.KillCamText) return o.name;
-            int id = o.GetInstanceID(); string n;
-            if (itemNames.TryGetValue(id, out n)) return n;
-            n = o.name; if (itemNames.Count > 4096) itemNames.Clear();
-            itemNames[id] = n; return n;
+            return TweaksPlugin.KillCamText ? CachedName(o) : o.name;
         }
         static void KcRecycle(DG.Tweening.Tween t)
         {
