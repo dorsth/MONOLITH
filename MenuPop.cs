@@ -80,13 +80,13 @@ namespace Monolith
 
         private static bool Same(Color a, Color b) { return Mathf.Abs(a.r - b.r) + Mathf.Abs(a.g - b.g) + Mathf.Abs(a.b - b.b) < 0.004f; }
 
-        private void PopApply() { if (_pop.Cur >= 0) try { _pop.Row.Entry.BoxedValue = _pop.Values[_pop.Cur]; } catch { } }
+        private void PopApply() { if (_pop.Cur >= 0) try { _pop.Row.Entry.BoxedValue = _pop.Values[_pop.Cur]; } catch (Exception e) { Warn("picking from a list", e); } }
 
         private void PopClose(bool keep)
         {
             Pop p = _pop; _pop = null;
             if (p == null) return;
-            if (!keep) { try { if (!Equals(p.Row.Entry.BoxedValue, p.Was)) p.Row.Entry.BoxedValue = p.Was; } catch { } }
+            if (!keep) { try { if (!Equals(p.Row.Entry.BoxedValue, p.Was)) p.Row.Entry.BoxedValue = p.Was; } catch (Exception e) { Warn("closing a list", e); } }
             _modeFrame = Time.frameCount;
         }
 

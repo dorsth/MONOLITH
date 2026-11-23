@@ -65,6 +65,21 @@ namespace Monolith
             try { return UnityInput.Current.GetKeyDown(k); } catch { return Input.GetKeyDown(k); }
         }
 
+        // One row failing (often a setting of another mod) must not take the menu down. It is written to the log,
+        // once for each different failure: the menu is drawn every frame.
+        private static readonly HashSet<string> Warned = new HashSet<string>();
+        internal static void Warn(string what, Exception e)
+        {
+            if (Warned.Add(what + ": " + e.Message)) BundlePlugin.Log.LogWarning("Menu, " + what + ": " + e.Message);
+        }
+
+        // A value typed in the menu goes into the setting. Text the setting does not take is dropped, as when typing letters into a number.
+        private static void SetTyped(ConfigEntryBase entry, string typed)
+        {
+            try { entry.SetSerializedValue(entry.SettingType == typeof(Color) ? typed.TrimStart('#') : typed); }
+            catch (Exception) { }
+        }
+
         private List<MenuPage> _cats;
         private int _cat;
         private MenuPage _page;
@@ -72,14 +87,22 @@ namespace Monolith
         private readonly List<MenuRow> _vis = new List<MenuRow>();
 
         // an edit in progress
-        private MenuRow _editRow; private string _edit; private bool _capture;
+        private MenuRow _editRow;
+        private string _edit;
+        private bool _capture;
         // a key being set by pressing it (read from the input system: it knows mouse buttons and the wheel too)
-        private MenuRow _bindRow; private int _bindEnd = -10;
+        private MenuRow _bindRow;
+        private int _bindEnd = -10;
         // a row that wants E twice, and the line a row's action gave back
-        private MenuRow _armed; private bool _armedByClick, _clicking; private string _say; private float _sayUntil;
+        private MenuRow _armed;
+        private bool _armedByClick, _clicking;
+        private string _say;
+        private float _sayUntil;
         private void Say(string s) { _say = s; _sayUntil = Time.unscaledTime + 8f; }
         // the search
-        private bool _searching; private string _query = ""; private MenuPage _searchPage;
+        private bool _searching;
+        private string _query = "";
+        private MenuPage _searchPage;
 
         private bool _pauseBefore;
         private int _openFrame = -10, _modeFrame = -10;
@@ -101,6 +124,17 @@ namespace Monolith
             I = this; enabled = false; useGUILayout = false;
             // a map or the main menu loading while it is open: shut, and the new scene's pause state is left alone
             SceneManager.activeSceneChanged += (from, to) => { if (Opened) Shut(false); };
+        }
+
+        /// <summary>What the info box says: the row under the mouse first, then the category under it, then the cursor's.</summary>
+        private string InfoText(int over, int overCat, bool pageOn, int ci)
+        {
+            if (over >= 0 && over < _vis.Count) return Describe(_vis[over]);
+            if (overCat >= 0) return Lang.T(_cats[overCat].Info);
+            if (!pageOn) return Lang.T(_cats[_cat].Info);
+            if (ci >= 0) return Describe(_vis[ci]);
+            if (_searching && _query.Length > 0) return Lang.T("Nothing found.");
+            return "";
         }
 
         // ---- open and close
@@ -163,7 +197,7 @@ namespace Monolith
                 }
                 if (_block.activeSelf != on) _block.SetActive(on);
             }
-            catch { }
+            catch (Exception e) { Warn("the click shield", e); }
             Keyboard(on);
         }
 
@@ -263,11 +297,24 @@ namespace Monolith
         // ---- drawing
 
         private bool _byMouse;
-        private static Font _font; private static GUIStyle _st; private static Texture2D _white, _dots; private static int _fontFor; private static bool _fontSaid;
-        private float _cw, _ch; private Rect _win, _navR, _pageR;
+        private static Font _font;
+        private static GUIStyle _st;
+        private static Texture2D _white, _dots;
+        private static int _fontFor;
+        private static bool _fontSaid;
+        // one cell of the text grid in pixels, and the window and its two panels
+        private float _cw, _ch;
+        private Rect _win, _navR, _pageR;
         // where the first category and the first row are and how far apart they sit: set when it is drawn, used by the mouse
-        private float _navY0, _navStep, _rowY0, _rowStep; private int _visRows = RowsHigh - 6;
+        private float _navY0, _navStep, _rowY0, _rowStep;
+        private int _visRows = PanelRows - 2;
+        // The menu in cells. Across: 80. Down: a margin, the two panels, a gap, the info box, a gap, the key bar.
         private const int Cols = 80, RowsHigh = 30, NavCols = 19;
+        private const int PanelRows = RowsHigh - 4, KeyBarRows = 1;
+        private const float TopMargin = 0.75f, SideMargin = 0.5f, BoxGap = 0.5f, InfoRows = 3.6f;
+        private const float WindowRows = TopMargin + PanelRows + BoxGap + InfoRows + BoxGap + KeyBarRows;
+        // on the left, so the crosshair and your weapon stay in view while you change them: this share of the screen is left of it
+        private const float ScreenLeft = 0.03f;
 
         // the STRAFTAT theme for Far (straftat-lobby, STRAFCOLORS), measured off Far with it: panel glass, gunmetal-sage
         // frames (lighter on dialogs), the active title on a mint badge, yellow column titles and keys
@@ -409,14 +456,20 @@ namespace Monolith
             Style();
             Event ev = Event.current;
             MenuPage page = Current(); int ci = Lay(page);
-            // on the left, so the crosshair and your weapon stay in view while you change them
-            // top margin 0.75, panels 26, gap 0.5, the box under them 3.6, gap 0.5, key bar 1: the same gap above and below the box
-            float w = Cols * _cw, h = Mathf.Round((RowsHigh + 2.35f) * _ch);
-            _win = new Rect(Mathf.Round(Mathf.Min(Screen.width * 0.03f, Mathf.Max(0f, Screen.width - w))), Mathf.Round((Screen.height - h) * 0.5f), w, h);
-            _navR = new Rect(_win.x + _cw * 0.5f, _win.y + _ch * 0.75f, NavCols * _cw, (RowsHigh - 4) * _ch);
+            float w = Cols * _cw;
+            float h = Mathf.Round(WindowRows * _ch);
+            float left = Mathf.Min(Screen.width * ScreenLeft, Mathf.Max(0f, Screen.width - w));
+            _win = new Rect(Mathf.Round(left), Mathf.Round((Screen.height - h) * 0.5f), w, h);
+            _navR = new Rect(_win.x + _cw * SideMargin, _win.y + _ch * TopMargin, NavCols * _cw, PanelRows * _ch);
             // a whole cell between the panels: the page is 59 cells wide, every column of it on the same grid as the rest
-            _pageR = new Rect(_navR.xMax + _cw, _navR.y, _win.xMax - _navR.xMax - _cw * 1.5f, _navR.height);
-            _navY0 = _navR.y + _ch; _navStep = _ch; _rowY0 = _pageR.y + _ch; _rowStep = _ch; _visRows = RowsHigh - 6;
+            float pageX = _navR.xMax + _cw;
+            _pageR = new Rect(pageX, _navR.y, _win.xMax - _cw * SideMargin - pageX, _navR.height);
+            // the first row of a panel is one cell under its frame
+            _navY0 = _navR.y + _ch;
+            _navStep = _ch;
+            _rowY0 = _pageR.y + _ch;
+            _rowStep = _ch;
+            _visRows = PanelRows - 2;
 
             // the mouse in use: the page shows no cursor, only the row under the mouse; a key brings the cursor back
             bool wasMouse = _byMouse;
@@ -520,12 +573,12 @@ namespace Monolith
             }
 
             // what the row under the cursor is
-            Rect info = new Rect(_navR.x, _navR.yMax + _ch * 0.5f, _win.width - _cw, _ch * 3.6f);
+            Rect info = new Rect(_navR.x, _navR.yMax + _ch * BoxGap, _win.width - 2 * _cw * SideMargin, _ch * InfoRows);
             Fill(info, Back);
             Box(info, null, false);
             bool said = _say != null && Time.unscaledTime < _sayUntil;
             MenuRow told = said ? null : over >= 0 && over < _vis.Count ? _vis[over] : overCat >= 0 || !pageOn ? null : ci >= 0 && ci < _vis.Count ? _vis[ci] : null;
-            string text = said ? _say : over >= 0 && over < _vis.Count ? Describe(_vis[over]) : overCat >= 0 ? Lang.T(_cats[overCat].Info) : !pageOn ? Lang.T(_cats[_cat].Info) : ci >= 0 ? Describe(_vis[ci]) : _searching && _query.Length > 0 ? Lang.T("Nothing found.") : "";
+            string text = said ? _say : InfoText(over, overCat, pageOn, ci);
             // the mouse went from a row down to this box (to click Reset): the box keeps telling about that row
             if (!said && info.Contains(mouse) && _told != null && _vis.Contains(_told)) { told = _told; text = Describe(told); }
             else _told = told;
@@ -577,7 +630,7 @@ namespace Monolith
             MenuRow row = _bindRow;
             _bindRow = null; _bindEnd = Time.frameCount;
             if (got == "<Keyboard>/escape") return;
-            try { row.Entry.BoxedValue = none ? Monolith.Keys.NoKey(row.Entry) : Monolith.Keys.Taken(row.Entry, got); } catch { }
+            try { row.Entry.BoxedValue = none ? Monolith.Keys.NoKey(row.Entry) : Monolith.Keys.Taken(row.Entry, got); } catch (Exception e) { Warn("setting a keybind", e); }
         }
 
         private Rect SideRect(MenuPage page)
@@ -621,13 +674,13 @@ namespace Monolith
                     if (row == _armed) return "<color=" + Hot + ">" + Esc(Pad(act + Lang.T(_armedByClick ? ": click again" : ": E again"), cols)) + "</color>";
                     if (row.Take == null && row.Dyn != null)   // a line to read (credits): the text, its value on the right, nothing to press
                     {
-                        string v = ""; try { v = row.Dyn() ?? ""; } catch { }
+                        string v = ""; try { v = row.Dyn() ?? ""; } catch (Exception e) { Warn("a row's value", e); }
                         return "<color=" + Mint + ">" + Esc(Pad(act, cols - v.Length)) + "</color><color=" + Dim + ">" + Esc(v) + "</color>";
                     }
                     if (row.Take == null) return "<color=" + Dim + ">" + Esc(Fit(act, cols)) + "</color>";   // a line of text a mod put on its page
                     if (row.Dyn != null)
                     {
-                        string b = ""; try { b = row.Dyn() ?? ""; } catch { }
+                        string b = ""; try { b = row.Dyn() ?? ""; } catch (Exception e) { Warn("a row's value", e); }
                         return "<color=" + Mint + ">" + Esc(Pad(act, cols - b.Length)) + "</color><color=" + Dim + ">" + Esc(b) + "</color>";
                     }
                     // done on the spot: no ►, which means a page opens
@@ -742,7 +795,7 @@ namespace Monolith
                     PropertyInfo min = av != null ? av.GetType().GetProperty("MinValue") : null, max = av != null ? av.GetType().GetProperty("MaxValue") : null;
                     if (min != null && max != null) v = new Vector2(Convert.ToSingle(min.GetValue(av, null)), Convert.ToSingle(max.GetValue(av, null)));
                 }
-                catch { }
+                catch (Exception ex) { Warn("a setting's range", ex); }
                 Ranges[e] = v;
             }
             if (float.IsNaN(v.x) || v.y <= v.x) return false;
@@ -788,7 +841,7 @@ namespace Monolith
                 if (row.Entry.SettingType == typeof(int)) row.Entry.BoxedValue = Mathf.Clamp(Mathf.RoundToInt(v), (int)a, (int)b);
                 else row.Entry.BoxedValue = Mathf.Round(Mathf.Clamp(v, a, b) * 1000f) / 1000f;
             }
-            catch { }
+            catch (Exception e) { Warn("dragging a slider", e); }
         }
 
         private bool OnBar(MenuRow row, float mouseX, MenuPage page)
@@ -835,13 +888,13 @@ namespace Monolith
             // put a text in the info panel, which is this line
             if (row != _hovered)
             {
-                try { if (_hovered != null && _hovered.Unhover != null) _hovered.Unhover(); if (row.Hover != null) row.Hover(); } catch { }
+                try { if (_hovered != null && _hovered.Unhover != null) _hovered.Unhover(); if (row.Hover != null) row.Hover(); } catch (Exception e) { Warn("a mod's hover", e); }
                 _hovered = row;
             }
             if (row.Says != null)
             {
                 string said = null;
-                try { said = row.Says(); } catch { }
+                try { said = row.Says(); } catch (Exception e) { Warn("a mod's info text", e); }
                 if (!string.IsNullOrEmpty(said)) return said;
             }
             switch (row.Kind)
@@ -1013,7 +1066,7 @@ namespace Monolith
                 if (row.Kind == RowKind.Entry && row.Entry != null) return !AtDefault(row.Entry);
                 if (row.Kind == RowKind.Group) foreach (ConfigEntryBase e in row.Parts) if (!AtDefault(e)) return true;
             }
-            catch { }
+            catch (Exception e) { Warn("reading a default", e); }
             return false;
         }
 
@@ -1029,7 +1082,7 @@ namespace Monolith
                 if (row.Kind == RowKind.Entry) row.Entry.BoxedValue = row.Entry.DefaultValue;
                 else if (row.Kind == RowKind.Group) foreach (ConfigEntryBase e in row.Parts) e.BoxedValue = e.DefaultValue;
             }
-            catch { }
+            catch (Exception e) { Warn("resetting a setting", e); }
         }
 
         private void Keys(Event ev, MenuPage page, int ci)
@@ -1056,7 +1109,7 @@ namespace Monolith
                         else if (_editRow.Entry.SettingType == typeof(string)) _editRow.Entry.BoxedValue = KeyName(_editRow.Entry, set);
                         else _editRow.Entry.BoxedValue = new KeyboardShortcut(set);
                     }
-                    catch { }
+                    catch (Exception e) { Warn("setting a key", e); }
                     _editRow = null; _capture = false;
                 }
                 _modeFrame = Time.frameCount;
@@ -1071,7 +1124,7 @@ namespace Monolith
                     MenuRow done = _editRow;
                     _editRow = null; _modeFrame = Time.frameCount;
                     if (done.Take != null) Took(done, _edit);
-                    else try { done.Entry.SetSerializedValue(done.Entry.SettingType == typeof(Color) ? _edit.TrimStart('#') : _edit); } catch { }
+                    else SetTyped(done.Entry, _edit);
                 }
                 else if (k == KeyCode.Backspace) { if (_edit.Length > 0) _edit = _edit.Substring(0, _edit.Length - 1); }
                 else if (ch >= ' ' && ch != 127 && _edit.Length < EditMax) _edit += ch;
@@ -1137,7 +1190,7 @@ namespace Monolith
             if (_editRow != null)
             {
                 if (!_capture && _editRow.Take == null && _edit.Length > 0)
-                    try { _editRow.Entry.SetSerializedValue(_editRow.Entry.SettingType == typeof(Color) ? _edit.TrimStart('#') : _edit); } catch { }
+                    SetTyped(_editRow.Entry, _edit);
                 _editRow = null; _capture = false;
             }
             if (_navR.Contains(m))
@@ -1236,7 +1289,7 @@ namespace Monolith
             {
                 // empty first, then what the game has; a value that is not among them stays a choice
                 var pick = row.Fixed ? new List<object>() : new List<object> { "" };
-                string[] o = null; try { o = row.Options(); } catch { }
+                string[] o = null; try { o = row.Options(); } catch (Exception ex) { Warn("a row's choices", ex); }
                 if (o != null) foreach (string s in o) if (!string.IsNullOrEmpty(s) && !pick.Contains(s)) pick.Add(s);
                 object now = e.BoxedValue;
                 if (!pick.Contains(now)) pick.Add(now);
@@ -1348,10 +1401,10 @@ namespace Monolith
                 foreach (var p in info.Prefixes)
                 {
                     if (p.PatchMethod == null || p.PatchMethod.DeclaringType == typeof(MenuHooks)) continue;
-                    try { h.Patch(p.PatchMethod, wait); } catch { }
+                    try { h.Patch(p.PatchMethod, wait); } catch (Exception e) { BundleMenu.Warn("holding another mod's chat keys", e); }
                 }
             }
-            catch { }
+            catch (Exception e) { BundleMenu.Warn("holding other mods' chat keys", e); }
         }
 
         private static bool PausePrefix(PauseManager __instance)

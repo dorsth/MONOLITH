@@ -132,13 +132,13 @@ namespace Monolith
                     // keys and the game's settings are only set from a config that holds them
                     if (!p.Values.TryGetValue(it.Id, out want)) { if (it.Game || it.Key) continue; want = DefaultText(it.Entry); }
                     if (it.Entry.GetSerializedValue() == want) continue;
-                    try { it.Entry.SetSerializedValue(want); changed++; } catch { }
+                    try { it.Entry.SetSerializedValue(want); changed++; } catch (Exception e) { BundleMenu.Warn("loading a config value", e); }
                 }
             }
             finally
             {
                 CombatSounds.CombatSoundsPlugin.Quiet = false;
-                for (int i = 0; i < files.Count; i++) { files[i].SaveOnConfigSet = saved[i]; try { files[i].Save(); } catch { } }
+                for (int i = 0; i < files.Count; i++) { files[i].SaveOnConfigSet = saved[i]; try { files[i].Save(); } catch (Exception e) { BundleMenu.Warn("saving settings", e); } }
             }
             return changed + GameConfig.Apply(p.Values, keys);
         }
@@ -330,7 +330,7 @@ namespace Monolith
         internal static string ExportNow()
         {
             string name = "";
-            try { name = Clean(Steamworks.SteamFriends.GetPersonaName() ?? ""); } catch { }
+            try { name = Clean(Steamworks.SteamFriends.GetPersonaName() ?? ""); } catch (Exception e) { BundleMenu.Warn("reading your Steam name", e); }
             return Export(Capture(name.Length > 0 ? name : "shared"));
         }
 

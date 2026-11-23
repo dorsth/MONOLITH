@@ -1,5 +1,9 @@
 # MONOLITH changelog
 
+## 2.0.2
+- A problem in the menu is written to the log, once each. Before, it was skipped without a word.
+- Nothing looks or works differently. The menu code is easier to read: sizes have names, the long lines are split, and one helper sets a typed value.
+
 ## 2.0.1
 - Configs: a preset, Overwrite or Delete you clicked asks you to click again, not to press E again.
 
