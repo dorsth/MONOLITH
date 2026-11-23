@@ -449,8 +449,7 @@ namespace TrueSens
             if (label != null) { smiley.font = label.font; smiley.fontSharedMaterial = label.fontSharedMaterial; smiley.fontStyle = label.fontStyle; }
             smiley.color = Face;
             // a filled smiley face when the font has one, a ":)" turned on its side when it doesn't
-            bool face = false;
-            try { face = smiley.font != null && smiley.font.HasCharacter('\u263B', true, true); } catch { }
+            bool face = smiley.font != null && smiley.font.HasCharacter('\u263B', true, true);
             smiley.text = face ? "\u263B" : ":)";
             smiley.alignment = TextAlignmentOptions.Center;
             smiley.enableWordWrapping = false;
