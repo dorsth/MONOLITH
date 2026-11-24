@@ -1,5 +1,9 @@
 # MONOLITH changelog
 
+## 2.5.3
+- The page under an open dialog keeps its sliders.
+- Holds: CameraTweaks 1.2.4, CombatSounds 1.1.9, DorsthTweaks 1.4.8, MatchStats 1.0.6, NoGore 1.3.6, TrueSens 1.2.6, ViewmodelTweaks 2.0.8, ezCrosshair 1.3.6.
+
 ## 2.5.2
 - Dark and Light no longer jump a pixel back and forth while a dialog is dragged: a half pixel now always rounds up.
 - Holds: CameraTweaks 1.2.4, CombatSounds 1.1.9, DorsthTweaks 1.4.8, MatchStats 1.0.6, NoGore 1.3.6, TrueSens 1.2.6, ViewmodelTweaks 2.0.8, ezCrosshair 1.3.6.

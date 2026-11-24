@@ -760,6 +760,7 @@ namespace Monolith
                 if (row == parent.Cur) Fill(r, Bar);
                 if (row.Kind == RowKind.Header) Heading(r, Lang.T(row.Label), new Rect());
                 else Line(r.x + _cw * 0.5f, r.y, RowText(row, cols, row == parent.Cur));
+                Knob(row, r.y, cols, row == parent.Cur);
                 i++;
             }
         }
