@@ -498,13 +498,12 @@ namespace Monolith
                 int rows = Mathf.Min(_vis.Count, PanelRows - 4 - Mathf.CeilToInt(samples));
                 float dh = Mathf.Min((rows + 2 + samples) * _ch, _behindR.height - 2f * _ch), dw = Mathf.Min(DialogCols * _cw, _behindR.width - 4f * _cw);
                 if (_dlgFor != page) { _dlgFor = page; _dlgMoved = Vector2.zero; _dlgDrag = false; }
-                // follows the mouse while held, and settles on whole cells when let go, so its rows line up with the
-                // grid; never past the menu's window, and never down over the line under the panels, drawn after it
-                float mx = _dlgDrag ? _dlgMoved.x : Mathf.Round(_dlgMoved.x / _cw) * _cw, my = _dlgDrag ? _dlgMoved.y : Mathf.Round(_dlgMoved.y / _ch) * _ch;
+                // where it was dragged to, anywhere on the screen as long as it stays whole on it
+                float mx = Mathf.Round(_dlgMoved.x), my = Mathf.Round(_dlgMoved.y);
                 // in the middle of the whole menu window, as Far centers a dialog on the whole screen, on the page's grid
                 float x = _behindR.x + Mathf.Round((_win.center.x - dw * 0.5f - _behindR.x) / _cw) * _cw + mx;
                 float y = _behindR.y + Mathf.Round((_win.center.y - dh * 0.5f - _behindR.y) / _ch) * _ch + my;
-                _dlgR = new Rect(Mathf.Clamp(x, _win.x, _win.xMax - dw), Mathf.Clamp(y, _win.y, _behindR.yMax - dh), dw, dh);
+                _dlgR = new Rect(Mathf.Clamp(x, 0f, Screen.width - dw), Mathf.Clamp(y, 0f, Screen.height - dh), dw, dh);
                 // the rows a cell further in than on a page: Far keeps a cell and a half between a dialog's frame and
                 // what is in it, so the cursor bar and the pop-ups stay inside the frame
                 _pageR = new Rect(_dlgR.x + _cw, _dlgR.y, _dlgR.width - 2f * _cw, _dlgR.height);
@@ -571,6 +570,55 @@ namespace Monolith
 
             Fill(_win, Window);   // the ground between the panels
             Fill(_navR, Back); Fill(_behindR, Back);
+            // the box under the panels and the key bar: drawn first while a dialog is open, so it goes over them
+            bool dlgOpen = page.Dialog && !_searching;
+            void Foot()
+            {
+                // what the row under the cursor is
+                Rect info = new Rect(_navR.x, _navR.yMax + _ch * BoxGap, _win.width - 2 * _cw * SideMargin, _ch * InfoRows);
+                Fill(info, Back);
+                Box(info, null, false);
+                bool said = _say != null && Time.unscaledTime < _sayUntil;
+                MenuRow told = said ? null : over >= 0 && over < _vis.Count ? _vis[over] : overCat >= 0 || !pageOn ? null : ci >= 0 && ci < _vis.Count ? _vis[ci] : null;
+                string text = said ? _say : InfoText(over, overCat, pageOn, ci);
+                // the mouse went from a row down to this box (to click Reset): the box keeps telling about that row
+                if (!said && info.Contains(mouse) && _told != null && _vis.Contains(_told)) { told = _told; text = Describe(told); }
+                else _told = told;
+                // a changed setting: "Reset" at the end of the box, where its default is read (R does the same)
+                _resetRow = told != null && Changed(told) ? told : null;
+                string reset = Lang.T("Reset");
+                string[] lines = Wrap(_resetRow != null ? text + " " + reset : text, (int)(info.width / _cw) - 4, 3);
+                int last = lines.Length - 1;
+                bool link = _resetRow != null && last >= 0 && lines[last].EndsWith(reset, StringComparison.Ordinal);
+                if (!link) _resetRow = null;
+                for (int i = 0; i < lines.Length; i++)
+                {
+                    float y = info.y + _ch * 0.3f + i * _ch;
+                    string l = link && i == last ? lines[i].Substring(0, lines[i].Length - reset.Length) : lines[i];
+                    Line(info.x + _cw * 1.5f, y, "<color=" + (said ? Mint : Txt) + ">" + Esc(l) + "</color>");
+                    if (link && i == last)
+                    {
+                        _resetRect = new Rect(info.x + _cw * (1.5f + l.Length) - _cw * 0.5f, y, (reset.Length + 1) * _cw, _ch);
+                        if (_resetRect.Contains(mouse)) Fill(_resetRect, Hover);
+                        Line(info.x + _cw * (1.5f + l.Length), y, "<color=" + Hot + ">" + reset + "</color>");
+                    }
+                }
+
+                // the key bar
+                Rect kb = new Rect(_win.x, _win.yMax - _ch, _win.width, _ch);
+                Fill(kb, KeyBar);
+                string keys = _pop != null ? (_pop.Palette ? K("WASD", "move") : K("WS", "move")) + K("E", "take") + K("Q", "cancel") + (_pop.Palette ? K("R", "reset") + K("0-9", "hex value") : K("A-Z", "jump to a name"))
+                    : _bindRow != null ? K("Key", "press one") + K("Enter", "none") + K("Esc", "cancel")
+                    : _capture ? K("Key", "press one") + K("Esc", "cancel")
+                    : _editRow != null ? K("Enter", "ok") + K("Backspace", "delete") + K("Esc", "cancel")
+                    : _searching ? K("type", "to search") + K("Enter", "open") + K("Esc", "leave search")
+                    : _inNav ? K("WS", "move") + K("E", "open") + K("Tab", "switch panel") + K("/", "search") + K("Esc", "close")
+                    : K("WS", "move") + K("AD", "set") + K("E", "open") + K("Q", "back") + K("/", "search") + K("Esc", "close")
+                        // last, so the keys before it stay put when it comes and goes
+                        + ((over >= 0 && over < _vis.Count ? Changed(_vis[over]) : pageOn && ci >= 0 && ci < _vis.Count && Changed(_vis[ci])) ? K("R", "reset") : "");
+                Line(kb.x + _cw * 2f, kb.y, keys);   // on the same column as the text of the panels and of the box above it
+            }
+            if (dlgOpen) Foot();
             // the categories
             Box(_navR, "MONOLITH", !pageOn);
             for (int i = 0; i < _cats.Count; i++)
@@ -637,49 +685,8 @@ namespace Monolith
                 page.Draw(frame);
             }
 
-            // what the row under the cursor is
-            Rect info = new Rect(_navR.x, _navR.yMax + _ch * BoxGap, _win.width - 2 * _cw * SideMargin, _ch * InfoRows);
-            Fill(info, Back);
-            Box(info, null, false);
-            bool said = _say != null && Time.unscaledTime < _sayUntil;
-            MenuRow told = said ? null : over >= 0 && over < _vis.Count ? _vis[over] : overCat >= 0 || !pageOn ? null : ci >= 0 && ci < _vis.Count ? _vis[ci] : null;
-            string text = said ? _say : InfoText(over, overCat, pageOn, ci);
-            // the mouse went from a row down to this box (to click Reset): the box keeps telling about that row
-            if (!said && info.Contains(mouse) && _told != null && _vis.Contains(_told)) { told = _told; text = Describe(told); }
-            else _told = told;
-            // a changed setting: "Reset" at the end of the box, where its default is read (R does the same)
-            _resetRow = told != null && Changed(told) ? told : null;
-            string reset = Lang.T("Reset");
-            string[] lines = Wrap(_resetRow != null ? text + " " + reset : text, (int)(info.width / _cw) - 4, 3);
-            int last = lines.Length - 1;
-            bool link = _resetRow != null && last >= 0 && lines[last].EndsWith(reset, StringComparison.Ordinal);
-            if (!link) _resetRow = null;
-            for (int i = 0; i < lines.Length; i++)
-            {
-                float y = info.y + _ch * 0.3f + i * _ch;
-                string l = link && i == last ? lines[i].Substring(0, lines[i].Length - reset.Length) : lines[i];
-                Line(info.x + _cw * 1.5f, y, "<color=" + (said ? Mint : Txt) + ">" + Esc(l) + "</color>");
-                if (link && i == last)
-                {
-                    _resetRect = new Rect(info.x + _cw * (1.5f + l.Length) - _cw * 0.5f, y, (reset.Length + 1) * _cw, _ch);
-                    if (_resetRect.Contains(mouse)) Fill(_resetRect, Hover);
-                    Line(info.x + _cw * (1.5f + l.Length), y, "<color=" + Hot + ">" + reset + "</color>");
-                }
-            }
-
-            // the key bar
-            Rect kb = new Rect(_win.x, _win.yMax - _ch, _win.width, _ch);
-            Fill(kb, KeyBar);
-            string keys = _pop != null ? (_pop.Palette ? K("WASD", "move") : K("WS", "move")) + K("E", "take") + K("Q", "cancel") + (_pop.Palette ? K("R", "reset") + K("0-9", "hex value") : K("A-Z", "jump to a name"))
-                : _bindRow != null ? K("Key", "press one") + K("Enter", "none") + K("Esc", "cancel")
-                : _capture ? K("Key", "press one") + K("Esc", "cancel")
-                : _editRow != null ? K("Enter", "ok") + K("Backspace", "delete") + K("Esc", "cancel")
-                : _searching ? K("type", "to search") + K("Enter", "open") + K("Esc", "leave search")
-                : _inNav ? K("WS", "move") + K("E", "open") + K("Tab", "switch panel") + K("/", "search") + K("Esc", "close")
-                : K("WS", "move") + K("AD", "set") + K("E", "open") + K("Q", "back") + K("/", "search") + K("Esc", "close")
-                    // last, so the keys before it stay put when it comes and goes
-                    + ((over >= 0 && over < _vis.Count ? Changed(_vis[over]) : pageOn && ci >= 0 && ci < _vis.Count && Changed(_vis[ci])) ? K("R", "reset") : "");
-            Line(kb.x + _cw * 2f, kb.y, keys);   // on the same column as the text of the panels and of the box above it
+            // under an open dialog, so the dialog can be dragged over them
+            if (!dlgOpen) Foot();
             if (_pop != null) PopDraw(mouse, mouseMoved);
         }
 
