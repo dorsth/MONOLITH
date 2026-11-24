@@ -35,7 +35,7 @@ using PlanarReflection = UnityStandardAssets.Water.PlanarReflection;
 
 [assembly: AssemblyTitle("DorsthTweaks")]
 [assembly: AssemblyDescription("Small client-side tweaks for STRAFTAT: bullet trails, HUD, prompts, menus and performance.")]
-[assembly: AssemblyVersion("1.5.0.0")]
+[assembly: AssemblyVersion("1.5.1.0")]
 [assembly: AssemblyFileVersion("1.3.7.0")]
 
 // Only changes what you see on your own screen, so matchmaking with unmodded players still works.
@@ -49,7 +49,7 @@ namespace DorsthTweaks
     {
         public const string Guid = "dorsth.straftat.dorsthtweaks";
         public const string Name = "DorsthTweaks";
-        public const string Version = "1.5.0";
+        public const string Version = "1.5.1";
 
         internal static ManualLogSource Log;
         internal static ConfigEntry<bool> Detail;
@@ -166,7 +166,9 @@ namespace DorsthTweaks
             Install("reduce effects", Effects.Install);
             Install("quality settings", Quality.Install);
             Install("performance", Perf.Install);
+#if !DORSTH_BUNDLE
             Install("mod menu links", MenuLinks.Install);
+#endif
             Install("Ultimate Tweaks", () => UltimateTweaks.TweaksPlugin.Create(gameObject, UltimateTweaksOn, Logger));
             GameHook.RefreshAll();
             if (GameHook.Missing.Count > 0)
@@ -766,6 +768,7 @@ namespace DorsthTweaks
         }
     }
 
+#if !DORSTH_BUNDLE   // MONOLITH has its own menu and only a silent stand-in for Mod Menu: no list of it to hide rows in
     /// <summary>
     /// In Mod Menu, hides the settings that do nothing while another one is on (the hitmarker settings while hitmarkers
     /// are hidden, the trail color while both kinds of trails are). Mod Menu has no way to ask for this, so its option
@@ -878,6 +881,7 @@ namespace DorsthTweaks
             catch (Exception e) { DorsthTweaksPlugin.LogErrorOnce(e); }
         }
     }
+#endif
 
     // ==================================================================== hitmarkers
 

@@ -1,5 +1,10 @@
 # MONOLITH changelog
 
+## 2.6.0
+- Removed code that could not run: the page for the real Mod Menu, and the Mod Menu row hiding of DorsthTweaks and NoGore inside MONOLITH. Nothing changes in the menu.
+- MatchStats no longer reads its on/off switch from MONOLITH 1.1.8 or older.
+- Holds: CameraTweaks 1.2.4, CombatSounds 1.1.9, DorsthTweaks 1.5.1, MatchStats 1.0.7, NoGore 1.3.7, TrueSens 1.2.6, ViewmodelTweaks 2.0.8, ezCrosshair 1.3.6.
+
 ## 2.5.9
 - The Russian tips of the four sound lists show again; they did not match the English text.
 - Removed the old preview beside a page, now that every preview is in a dialog.

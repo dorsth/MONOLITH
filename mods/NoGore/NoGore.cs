@@ -25,7 +25,7 @@ using UnityEngine;
 
 [assembly: AssemblyTitle("NoGore")]
 [assembly: AssemblyDescription("Hides ragdolls, body pieces and hats that fall off players, and removes blood.")]
-[assembly: AssemblyVersion("1.3.6.0")]
+[assembly: AssemblyVersion("1.3.7.0")]
 
 // Only changes what you see on your own screen, so matchmaking with unmodded players still works.
 [assembly: StraftatMod(isVanillaCompatible: true)]
@@ -38,7 +38,7 @@ namespace NoGore
     {
         public const string Guid = "dorsth.straftat.nogore";
         public const string Name = "NoGore";
-        public const string Version = "1.3.6";
+        public const string Version = "1.3.7";
 
         internal static ManualLogSource Log;
         internal static ConfigEntry<bool> HideBodies, HideRagdolls, HideHats, NoBlood, NoHitBlood, NoDeathBlood, NoBloodStains;
@@ -83,7 +83,9 @@ namespace NoGore
             var harmony = new Harmony(Guid);
             Install("deaths", () => Deaths.Install(harmony));
             Install("blood", () => global::NoGore.Blood.Install(harmony));
+#if !DORSTH_BUNDLE
             Install("mod menu links", () => MenuLinks.Install(harmony));
+#endif
         }
 
         /// <summary>
@@ -488,6 +490,7 @@ namespace NoGore
 
     // ==================================================================== mod menu
 
+#if !DORSTH_BUNDLE   // MONOLITH has its own menu and only a silent stand-in for Mod Menu: no list of it to hide rows in
     /// <summary>
     /// In Mod Menu, a group's own switches are only listed while the group switch is off (Hide Ragdolls and Hide Hats under
     /// Hide Bodies, No Hit Blood, No Death Blood and No Blood Stains under No Blood). Mod Menu has no way to ask for this, so its option
@@ -580,4 +583,5 @@ namespace NoGore
             catch (Exception e) { NoGorePlugin.LogErrorOnce(e); }
         }
     }
+#endif
 }

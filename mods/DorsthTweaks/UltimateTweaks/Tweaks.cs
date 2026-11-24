@@ -457,16 +457,8 @@ namespace UltimateTweaks
         {
             var self = typeof(Patches); const BindingFlags bf = BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public;
             Func<string, HarmonyMethod> M = n => new HarmonyMethod(self.GetMethod(n, bf));
-            // ezCrosshair up to 1.2.0 hides the game's crosshair by switching its image off after Crosshair.Update. Applying
-            // "the game's last write" would then switch it back on, so this fix stays out of the way until ezCrosshair is 1.2.1+.
-            BepInEx.PluginInfo ez;
-            bool oldEz = BepInEx.Bootstrap.Chainloader.PluginInfos.TryGetValue("dorsth.straftat.ezcrosshair", out ez) && ez.Metadata.Version < new Version(1, 2, 1);
-            if (oldEz) TweaksPlugin.L.LogWarning("CrosshairFix is off: ezCrosshair older than 1.2.1 is installed. Update ezCrosshair to 1.2.1 (it no longer flips the game's crosshair every frame).");
-            else
-            {
-                Try("CrosshairFix (Crosshair)", () => h.Patch(AccessTools.Method(typeof(Crosshair), "Update"), transpiler: M("EnabledTr")));
-                Try("CrosshairFix (PauseManager)", () => h.Patch(AccessTools.Method(typeof(PauseManager), "Update"), transpiler: M("EnabledTr")));
-            }
+            Try("CrosshairFix (Crosshair)", () => h.Patch(AccessTools.Method(typeof(Crosshair), "Update"), transpiler: M("EnabledTr")));
+            Try("CrosshairFix (PauseManager)", () => h.Patch(AccessTools.Method(typeof(PauseManager), "Update"), transpiler: M("EnabledTr")));
             Try("LobbyListThrottle", () => h.Patch(AccessTools.Method(typeof(LobbyController), "Update"), prefix: M("LobbyPre")));
             Try("SteamRunningCheckThrottle", () => { var t = Type.GetType("HeathenEngineering.SteamworksIntegration.API.Api, Heathen.Steamworks", true); h.Patch(AccessTools.Method(t, "LateUpdate"), prefix: M("SteamCheckPre")); });
             Try("TrickShotLineNoGarbage", () =>
