@@ -343,8 +343,8 @@ namespace Monolith
             MenuPage on = Current();
             // filled as far as its frame goes: clipped to less than the frame, it showed the game through its lower part
             var room = p.Palette || (on.Dialog && !_searching) ? new Rect(0f, 0f, Screen.width, Screen.height) : new Rect(_pageR.x + pt, _pageR.y + pt, _pageR.width - 2f * pt, _pageR.height - 2f * pt);
-            // with the shadow the dialogs have
-            Clipped(ShadowOf(p.R), room, Shadow);
+            // with the shadow the dialogs have, over the page's frame too, as Far's shadow falls on whatever is under it
+            Clipped(ShadowOf(p.R), new Rect(0f, 0f, Screen.width, Screen.height), Shadow);
             Clipped(p.R, room, Panel);
             // the colors: a dialog, its double frame titled; a list: a Far dropdown, one line and no title, under its field
             if (p.Palette) Box(frame, Lang.T(p.Row.Label.Trim()), true, Panel);
