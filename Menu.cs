@@ -98,7 +98,7 @@ namespace Monolith
         // a dialog's width in cells: its rows and the two samples side by side fit, with the page around it
         private const int DialogCols = 48;
         // where a dialog was dragged by its top line, from the middle of the page; back in the middle when one opens
-        private Vector2 _dlgMoved; private MenuPage _dlgFor; private bool _dlgDrag; private Vector2 _dlgGrab;
+        private Vector2 _dlgMoved; private MenuPage _dlgFor; private float _dlgOpenH; private bool _dlgDrag; private Vector2 _dlgGrab;
         // the value a field opened with, not typed over yet: grey, and the first character typed replaces it, as in Far
         private bool _editFresh;
         private bool _capture;
@@ -519,12 +519,14 @@ namespace Monolith
                 // a first part's name sits on the line under the samples, so that line takes no row of its own
                 _dlgHeadFirst = samples > 0f && _vis.Count > 0 && _vis[0].Kind == RowKind.Header;
                 float dh = Mathf.Min((rows + (_dlgHeadFirst ? 1 : 2) + samples) * _ch, _behindR.height - 2f * _ch), dw = Mathf.Min(DialogCols * _cw, _behindR.width - 4f * _cw);
-                if (_dlgFor != page) { _dlgFor = page; _dlgMoved = Vector2.zero; _dlgDrag = false; }
+                if (_dlgFor != page) { _dlgFor = page; _dlgMoved = Vector2.zero; _dlgDrag = false; _dlgOpenH = dh; }
                 // where it was dragged to, anywhere on the screen as long as it stays whole on it
                 float mx = Mathf.Round(_dlgMoved.x), my = Mathf.Round(_dlgMoved.y);
                 // in the middle of the whole menu window, as Far centers a dialog on the whole screen, on the page's grid
                 float x = _behindR.x + Mathf.Round((_win.center.x - dw * 0.5f - _behindR.x) / _cw) * _cw + mx;
-                float y = _behindR.y + Mathf.Round((_win.center.y - dh * 0.5f - _behindR.y) / _ch) * _ch + my;
+                // centered at the height it opened with: a row that comes or goes makes it longer or shorter at the bottom,
+                // so the row under the mouse stays put
+                float y = _behindR.y + Mathf.Round((_win.center.y - _dlgOpenH * 0.5f - _behindR.y) / _ch) * _ch + my;
                 // on whole pixels, so its text does not shimmer while it is dragged
                 _dlgR = new Rect(Mathf.Round(Mathf.Clamp(x, 0f, Screen.width - dw)), Mathf.Round(Mathf.Clamp(y, 0f, Screen.height - dh)), dw, dh);
                 // the rows a cell further in than on a page: Far keeps a cell and a half between a dialog's frame and
