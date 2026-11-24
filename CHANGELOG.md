@@ -1,5 +1,9 @@
 # MONOLITH changelog
 
+## 2.6.3
+- The extra keys of 2.6.2 are gone again. The keys are WASD or the arrows, E, Q, R, Tab, / and Esc.
+- Holds: CameraTweaks 1.2.4, CombatSounds 1.1.9, DorsthTweaks 1.5.1, MatchStats 1.0.7, NoGore 1.3.7, TrueSens 1.2.6, ViewmodelTweaks 2.0.8, ezCrosshair 1.3.6.
+
 ## 2.6.2
 - The Far Manager keys work next to WASD, E and Q: Enter opens or takes, Home and End go to the first and last row, Ctrl+Down opens a list, Ctrl+PgUp goes back, Alt and a letter jumps to the next row or category that starts with it, F10 closes the menu.
 - Holds: CameraTweaks 1.2.4, CombatSounds 1.1.9, DorsthTweaks 1.5.1, MatchStats 1.0.7, NoGore 1.3.7, TrueSens 1.2.6, ViewmodelTweaks 2.0.8, ezCrosshair 1.3.6.

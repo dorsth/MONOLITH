@@ -119,7 +119,6 @@ namespace Monolith
         private bool _pauseBefore;
         private int _openFrame = -10, _modeFrame = -10;
         private bool _bindEnterUp;
-        private bool _enterUsed;            // Enter is down and has done its one thing: held on, it does not do the next
         private GameObject _block;
         private static int _escFrame = -10;
         internal static bool EscHeld;
@@ -1164,19 +1163,6 @@ namespace Monolith
             _armed = null; _say = null;
         }
 
-        private void Find(MenuPage page, int ci, char letter)
-        {
-            int n = _inNav ? _cats.Count : _vis.Count, from = _inNav ? _cat : ci;
-            for (int step = 1; step <= n; step++)
-            {
-                int i = ((from < 0 ? -1 : from) + step) % n;
-                string name = _inNav ? _cats[i].Path[_cats[i].Path.Length - 1] : _vis[i].Kind == RowKind.Header ? null : _vis[i].Label;
-                if (name == null || !Lang.T(name).TrimStart().StartsWith(letter.ToString(), StringComparison.OrdinalIgnoreCase)) continue;
-                if (_inNav) SetCat(i); else { page.Cur = _vis[i]; page.Last = i; _armed = null; _say = null; }
-                return;
-            }
-        }
-
         private void SetCat(int i)
         {
             i = Mathf.Clamp(i, 0, _cats.Count - 1);
@@ -1228,14 +1214,6 @@ namespace Monolith
             catch (Exception e) { Warn("resetting a setting", e); }
         }
 
-        // Enter opens a list and Enter takes from it, so a held Enter would run through both: it counts once per press
-        private bool FreshEnter()
-        {
-            if (!Monolith.Keys.EnterHeld()) _enterUsed = false;
-            bool fresh = !_enterUsed; _enterUsed = true;
-            return fresh;
-        }
-
         private void Keys(Event ev, MenuPage page, int ci)
         {
             KeyCode k = ev.keyCode; char ch = ev.character;
@@ -1245,7 +1223,6 @@ namespace Monolith
             if (k == KeyCode.None && Time.frameCount == _modeFrame) { ev.Use(); return; }
             // the escape that closed a menu opened from here (and brought this one back) is not for this one too
             if (k == KeyCode.Escape && Time.frameCount - _openFrame <= 1) { ev.Use(); return; }
-            if ((k == KeyCode.Return || k == KeyCode.KeypadEnter) && !FreshEnter()) { ev.Use(); return; }
             // a key being picked
             if (_capture)
             {
@@ -1301,21 +1278,10 @@ namespace Monolith
             // the menu's own key is read by the key watcher (once per press, not once per key repeat)
             if (k == Key.Value && k != KeyCode.None) { ev.Use(); return; }
             if (k == KeyCode.Tab) { _inNav = !_inNav; ev.Use(); return; }
-            // Alt and a letter, Far's quick find: the next row, or category, that starts with it. Read from the key, since
-            // with Alt down its character does not always come.
-            if (ev.alt)
-            {
-                if (k >= KeyCode.A && k <= KeyCode.Z) Find(page, ci, (char)('a' + (k - KeyCode.A)));
-                ev.Use(); return;
-            }
             if (k == KeyCode.W) k = KeyCode.UpArrow; else if (k == KeyCode.S) k = KeyCode.DownArrow; else if (k == KeyCode.A) k = KeyCode.LeftArrow; else if (k == KeyCode.D) k = KeyCode.RightArrow;
             else if (k == KeyCode.R) k = KeyCode.Delete;
-            // Q back and E open or take: they sit either side of W, so one hand does it all. Far's own keys do the same
-            // beside them: Enter opens or takes, Ctrl+Down opens a list, Ctrl+PgUp goes up a level, F10 quits.
-            else if (k == KeyCode.Return || k == KeyCode.KeypadEnter || (k == KeyCode.DownArrow && ev.control)) k = KeyCode.E;
-            else if (k == KeyCode.PageUp && ev.control) k = KeyCode.Q;
-            else if (k == KeyCode.F10) { Close(); ev.Use(); return; }
-            else if (k == KeyCode.Backspace) { ev.Use(); return; }
+            // Q back and E open or take: they sit either side of W, so one hand does it all (Backspace and Enter are not them)
+            else if (k == KeyCode.Backspace || k == KeyCode.Return || k == KeyCode.KeypadEnter) { ev.Use(); return; }
             // the search starts on the character, so it is the same key on every keyboard layout
             if (ch == '/' || k == KeyCode.Slash) { _searching = true; _query = ""; _searchPage = null; _modeFrame = Time.frameCount; ev.Use(); return; }
             // reset: the row under the mouse, wherever the keys are; without one, the cursor's row on the page
@@ -1330,8 +1296,6 @@ namespace Monolith
             {
                 if (k == KeyCode.UpArrow) SetCat(_cat - 1);
                 else if (k == KeyCode.DownArrow) SetCat(_cat + 1);
-                else if (k == KeyCode.Home || k == KeyCode.PageUp) SetCat(0);
-                else if (k == KeyCode.End || k == KeyCode.PageDown) SetCat(_cats.Count - 1);
                 else if (k == KeyCode.E || k == KeyCode.Space) _inNav = false;
                 else return;
                 ev.Use(); return;
@@ -1340,8 +1304,6 @@ namespace Monolith
             else if (k == KeyCode.DownArrow) Move(page, ci, 1);
             else if (k == KeyCode.PageUp) Move(page, ci, -Mathf.Max(1, _visRows - 1));
             else if (k == KeyCode.PageDown) Move(page, ci, Mathf.Max(1, _visRows - 1));
-            else if (k == KeyCode.Home) Move(page, ci, -_vis.Count);
-            else if (k == KeyCode.End) Move(page, ci, _vis.Count);
             else if (k == KeyCode.Q) GoBack();
             else if (k == KeyCode.LeftArrow) Nudge(row, -1, ev.shift);
             else if (k == KeyCode.RightArrow) Nudge(row, 1, ev.shift);
