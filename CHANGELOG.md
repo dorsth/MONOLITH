@@ -1,5 +1,9 @@
 # MONOLITH changelog
 
+## 2.1.7
+- The row a pop-up belongs to stays lit while the pop-up is open, as Far keeps a dropdown's field lit while its list is open. In 2.0.9 to 2.1.6 it was dimmed so far it looked unmarked.
+- Holds: CameraTweaks 1.2.4, CombatSounds 1.1.9, DorsthTweaks 1.4.7, MatchStats 1.0.6, NoGore 1.3.6, TrueSens 1.2.6, ViewmodelTweaks 2.0.8, ezCrosshair 1.3.6.
+
 ## 2.1.6
 - Typing works like Far's input fields: a field opens with its value in grey and the first key you type replaces it, typed text is bright instead of yellow, and a blinking mint cursor shows where you type. Backspace first keeps the value and edits it.
 - Holds: CameraTweaks 1.2.4, CombatSounds 1.1.9, DorsthTweaks 1.4.7, MatchStats 1.0.6, NoGore 1.3.6, TrueSens 1.2.6, ViewmodelTweaks 2.0.8, ezCrosshair 1.3.6.
