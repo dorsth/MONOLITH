@@ -48,18 +48,34 @@ namespace Monolith
             GUI.color = was;
         }
 
-        // Inside the preview dialog, two groups as in Far's Color dialog: single line boxes named on their top line, side
-        // by side or one under the other. Draws group i and returns where it shows its samples.
+        // Inside the preview dialog, two groups split the way Far's Color dialog splits its parts: a single line across
+        // (or down) the dialog, joined to its double frame, and each group's name as plain text on its first row. Draws
+        // group i and returns where it shows its samples.
         private Rect Part(Rect box, int i, string title, bool under = false)
         {
-            // half a row of room under the dialog's title before the first group's title, so the two titles don't stack
-            float t = Thin, frame = 3f * t, top = Mathf.Round(_ch * 1.75f);
-            var all = new Rect(box.x + frame + _cw, box.y + top, box.width - 2f * (frame + _cw), box.height - top - frame - Mathf.Round(_ch * 0.5f));
-            float w = under ? all.width : Mathf.Floor((all.width - 2f * _cw) / 2f), h = under ? Mathf.Floor((all.height - _ch) / 2f) : all.height;
-            var b = new Rect(Mathf.Round(under ? all.x : i == 0 ? all.x : all.xMax - w), Mathf.Round(under && i == 1 ? all.yMax - h : all.y), w, h);
-            Box(b, Lang.T(title), false, Panel, 1);
-            float pad = Mathf.Round(_cw * 0.8f), head = Mathf.Round(_ch * 0.5f) + pad * 0.5f;
-            return new Rect(b.x + t + pad, b.y + head, b.width - 2f * (t + pad), b.height - head - t - pad);
+            float t = Thin, frame = 3f * t, pad = Mathf.Round(_cw * 0.8f);
+            // text rows start half a cell below the frame line, as the dialog's title sits on that line
+            float top = box.y + Mathf.Round(_ch * 0.5f), bottom = box.yMax - Mathf.Round(_ch * 0.5f);
+            Rect g;
+            if (under)
+            {
+                int rows = Mathf.RoundToInt((bottom - top) / _ch), cut = rows / 2;
+                float lineY = Mathf.Round(top + cut * _ch + _ch * 0.5f - t * 0.5f);
+                if (i == 0) Fill(new Rect(box.x, lineY, box.width, t), Frame);
+                g = i == 0 ? new Rect(box.x + frame, top, box.width - 2f * frame, cut * _ch)
+                           : new Rect(box.x + frame, top + (cut + 1) * _ch, box.width - 2f * frame, bottom - top - (cut + 1) * _ch);
+            }
+            else
+            {
+                float lineX = Mathf.Round(box.x + box.width * 0.5f - t * 0.5f), half = lineX - box.x;
+                // from under the dialog's title, which sits in the middle of the top line, down into the bottom frame
+                float from = box.y + Mathf.Round(_ch * 0.5f) + 2f * t;
+                if (i == 0) Fill(new Rect(lineX, from, t, box.yMax - from), Frame);
+                g = i == 0 ? new Rect(box.x + frame, top, half - frame, bottom - top)
+                           : new Rect(lineX + t, top, box.xMax - frame - lineX - t, bottom - top);
+            }
+            GUI.Label(new Rect(g.x + _cw, g.y, g.width - _cw, _ch), "<color=" + Txt + ">" + Esc(Lang.T(title)) + "</color>", _st);
+            return new Rect(Mathf.Round(g.x + pad), Mathf.Round(g.y + _ch + pad * 0.5f), Mathf.Round(g.width - 2f * pad), Mathf.Round(g.height - _ch - pad));
         }
 
         // the dark group and the light group of a preview, filled
