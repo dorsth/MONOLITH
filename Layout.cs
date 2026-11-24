@@ -569,6 +569,7 @@ namespace Monolith
                 var p = new MenuPage(null, "Players", "How other players look and sound. Lobby options.");
                 // their look in a dialog with the two samples under it, as the crosshair's
                 var look = new MenuPage(p, "Players", "How other players look on your screen, from the next round.") { Dialog = true };
+                ConfigEntryBase gg = E(Tweaks, "Menus", "Auto GG");
                 look.Head("Enemies")
                  .Pick("Suit", Players.EnemyOutfit, Players.Outfits, "their own", "")
                  .Pick("Hat", Players.EnemyHat, Players.Hats, "their own", "")
@@ -586,6 +587,8 @@ namespace Monolith
                  .Head("Lobby")
                  .Set("Enemy outlines when I host", Players.HostOutlines, null, "The game's lobby option, kept between launches. In other lobbies the host decides.")
                  .Set("Friendly fire when I host", Players.HostFriendlyFire, null, "The game's lobby option, kept between launches. In other lobbies the host decides.")
+                 .Set("Auto GG", gg, null, "Says your message in the chat when a match ends.")
+                 .Set("  message", E(Tweaks, "Menus", "GG Message"), () => On(gg), "")
                  .Set("Join message", E(Tweaks, "Menus", "Join Message"), null, "The line everyone sees when you join a lobby. {name} is your name. Color, bold, italic, underline and strikethrough tags work. Up to 120 letters, tags not counted. Leave it empty for the game's line.");
                 if (p.Rows.Count > 0) cats.Add(p);
             }

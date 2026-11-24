@@ -35,7 +35,7 @@ using PlanarReflection = UnityStandardAssets.Water.PlanarReflection;
 
 [assembly: AssemblyTitle("DorsthTweaks")]
 [assembly: AssemblyDescription("Small client-side tweaks for STRAFTAT: bullet trails, HUD, prompts, menus and performance.")]
-[assembly: AssemblyVersion("1.4.9.0")]
+[assembly: AssemblyVersion("1.5.0.0")]
 [assembly: AssemblyFileVersion("1.3.7.0")]
 
 // Only changes what you see on your own screen, so matchmaking with unmodded players still works.
@@ -49,7 +49,7 @@ namespace DorsthTweaks
     {
         public const string Guid = "dorsth.straftat.dorsthtweaks";
         public const string Name = "DorsthTweaks";
-        public const string Version = "1.4.9";
+        public const string Version = "1.5.0";
 
         internal static ManualLogSource Log;
         internal static ConfigEntry<bool> Detail;
@@ -74,7 +74,8 @@ namespace DorsthTweaks
         internal enum SlideTimerStyle { Off, Text, Bar }
         internal static ConfigEntry<SlideTimerStyle> SlideTimer;
         internal static ConfigEntry<bool> ReduceUIAnimations;
-        internal static ConfigEntry<bool> MuteVoice, MuteText, MuteTaunts;
+        internal static ConfigEntry<bool> MuteVoice, MuteText, MuteTaunts, AutoGg;
+        internal static ConfigEntry<string> GgMessage;
         internal static ConfigEntry<bool> DisableRain, StaticTextures, WarmUpEffects, ReduceEffects, FewerEffects, NoPostProcessing, UltimateTweaksOn;
 
         private static void FromPerformance()
@@ -153,6 +154,7 @@ namespace DorsthTweaks
             Install("weapon highlight", WeaponHighlight.Install);
             Install("loose items", LooseItems.Install);
             Install("mute", Mute.Install);
+            Install("auto gg", GgLine.Install);
             Install("near miss vignette", NearMiss.Install);
             Install("idle camera effect", IdleCameraEffect.Install);
             Install("reduce UI animations", StaticUI.Install);
@@ -256,6 +258,8 @@ namespace DorsthTweaks
             MuteVoice = Config.Bind("Mute", "Voice Chat", false, "You don't hear other players talk.");
             MuteText = Config.Bind("Mute", "Text Chat", false, "Chat messages of other players are not shown. Yours still are.");
             MuteTaunts = Config.Bind("Mute", "Taunts", false, "You don't hear other players taunt. Yours you still hear.");
+            AutoGg = Config.Bind(Menus, "Auto GG", false, "Says your GG message in the chat when a match ends.");
+            GgMessage = Config.Bind(Menus, "GG Message", "gg", "What Auto GG says.");
 
             NoViewmodelClimb = Config.Bind(View, "No Viewmodel Climb", false, "Your gun stays in place while spraying.");
             NoBulletCasings = Config.Bind(View, "No Bullet Casings", false, "No casings or their sound.");
@@ -526,6 +530,24 @@ namespace DorsthTweaks
 
         // the one who taunts hears it from their own call, not from this one
         private static bool TauntPrefix(FirstPersonController __instance) { return __instance.IsOwner; }
+    }
+
+    /// <summary>Says the GG message in the lobby chat once the victory screen of a match is up.</summary>
+    internal static class GgLine
+    {
+        internal static void Install() { Scenes.Loaded += (scene, mode) => { if (scene.name == "VictoryScene" && DorsthTweaksPlugin.AutoGg.Value) Host.Run(Say()); }; }
+
+        private static System.Collections.IEnumerator Say()
+        {
+            // a moment after the screen comes up, so it reads as typed and lands after the game's own lines
+            yield return new WaitForSecondsRealtime(1.5f);
+            string text = (DorsthTweaksPlugin.GgMessage.Value ?? "").Replace("\r", " ").Replace("\n", " ").Trim();
+            if (text.Length == 0) yield break;
+            var chat = UnityEngine.Object.FindObjectOfType<HeathenEngineering.DEMO.LobbyChatUILogic>(true);
+            if (chat == null) { DorsthTweaksPlugin.Note("Auto GG: no lobby chat on the victory screen"); yield break; }
+            try { chat.SendChatMessage(text); }
+            catch (Exception e) { DorsthTweaksPlugin.LogErrorOnce(e); }
+        }
     }
 
     internal static class LooseItems
