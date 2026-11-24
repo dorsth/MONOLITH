@@ -421,7 +421,7 @@ namespace Monolith
                 // Default, the first of the list, is the game's own crosshair: nothing of ours to set then
                 Func<bool> own = () => pick != null && !Is(pick, EzCrosshair.Custom.Game);
                 // its look in a dialog with the samples under it, as Far's Color dialog
-                var look = new MenuPage(p, "Style") { Dialog = true };
+                var look = new MenuPage(p, "Crosshair") { Dialog = true };
                 look.Set("Style", pick, null, "Default is the game crosshair. The others are the PNGs in plugins/MONOLITH/Crosshairs. Add your own there and restart the game.")
                  .Set("Color", E(Cross, "Crosshair", "Color"), own, "White keeps the picture's own colors.")
                  .Set("Size", E(Cross, "Crosshair", "Scale"), own, "1 is the picture's own size at 1080p.")
