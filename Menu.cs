@@ -1342,6 +1342,15 @@ namespace Monolith
                 if (button == 0 && i >= 0 && i < _cats.Count) { _searching = false; _searchPage = null; SetCat(i); _inNav = true; }   // a click in a panel makes it the active one, as in Far
                 return;
             }
+            // a click beside a dialog closes it and goes to the page under it, so a row there is one click away
+            if (page.Dialog && !_searching && !_dlgR.Contains(m))
+            {
+                MenuPage under = Root(page);
+                _page = under; Lay(under);
+                _pageR = _behindR; _rowY0 = _pageR.y + _ch; _visRows = PanelRows - 2;
+                Click(m, under, button);
+                return;
+            }
             int at = RowAt(m, page);
             if (at < 0) return;
             MenuRow row = _vis[at];
