@@ -267,16 +267,16 @@ namespace Monolith
             // it shows the cursor, as every text being typed in the menu
             bool typing = p.Editing || p.Typed.Length > 0;
             Rect f = HexField(p);
-            GUI.Label(new Rect(hx + _cw, y0, 13f * _cw, _ch), "<color=" + Txt + ">RRGGBBAA</color>", _st);
+            Label(new Rect(hx + _cw, y0, 13f * _cw, _ch), "<color=" + Txt + ">RRGGBBAA</color>", _st);
             Fill(f, Well);
             // clicked into and nothing typed yet: the value it has, grey, until the first digit replaces it
             string shown = !typing ? "<color=" + Val + ">" + Esc(p.Row.Entry.GetSerializedValue()) + "</color>"
                 : p.Typed.Length == 0 ? Typing(p.Row.Entry.GetSerializedValue(), true) : Typing(p.Typed, false);
-            GUI.Label(new Rect(f.x + _cw, f.y, 10f * _cw, _ch), shown, _st);
+            Label(new Rect(f.x + _cw, f.y, 10f * _cw, _ch), shown, _st);
             Rect b = DefaultButton(p);
             bool over = b.Contains(Event.current.mousePosition);
             if (over) Fill(b, Badge);
-            GUI.Label(b, "<color=" + (over ? Ink : Txt) + ">[ " + Esc(Lang.T("Default")) + " ]</color>", _st);
+            Label(b, "<color=" + (over ? Ink : Txt) + ">[ " + Esc(Lang.T("Default")) + " ]</color>", _st);
         }
 
         private void Outline(Rect s, Color c)
@@ -364,7 +364,7 @@ namespace Monolith
                 Rect r = new Rect(inL, p.R.y + _ch + i * _ch, inR - inL, _ch);
                 bool cur = idx == p.Cur, was = Equals(p.Values[idx], p.Was);
                 if (cur) Fill(r, MenuBar);   // a list is a menu: its cursor is the menu one
-                GUI.Label(new Rect(r.x + _cw * 0.5f, r.y, r.width, _ch), "<color=" + Hot + ">" + (was ? "√ " : "  ") + "</color><color=" + (cur ? Val : Txt) + ">" + Esc(Fit(p.Labels[idx], cols)) + "</color>", _st);
+                Label(new Rect(r.x + _cw * 0.5f, r.y, r.width, _ch), "<color=" + Hot + ">" + (was ? "√ " : "  ") + "</color><color=" + (cur ? Val : Txt) + ">" + Esc(Fit(p.Labels[idx], cols)) + "</color>", _st);
             }
             // a long list has the scroll bar a long page has, on its right frame
             if (n > p.Shown) { Rect b = PopBar(p); ScrollBar(b.x, b.y, p.Top, p.Shown, n, Panel); }

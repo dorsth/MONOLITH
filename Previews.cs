@@ -19,7 +19,7 @@ namespace Monolith
 
         private void Put(float x, float y, string text, string color)
         {
-            GUI.Label(new Rect(Mathf.Round(x - text.Length * _cw * 0.5f), y, text.Length * _cw + 2f, _ch), "<color=" + color + ">" + text + "</color>", _st);
+            Label(new Rect(Mathf.Round(x - text.Length * _cw * 0.5f), y, text.Length * _cw + 2f, _ch), "<color=" + color + ">" + text + "</color>", _st);
         }
 
         // a note in the middle of a box: on two lines when one line would touch its sides

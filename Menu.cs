@@ -390,7 +390,7 @@ namespace Monolith
             bool badge = active && panel;
             // a badge is a whole cell; a plain title only hides the frame under it, so the ground above stays
             if (badge) Fill(new Rect(x, r.y - _ch * 0.5f + g, w, _ch), Badge); else Fill(new Rect(x, r.y, w, _ch * 0.5f + g), under);
-            GUI.Label(new Rect(x + _cw, r.y - _ch * 0.5f + g * 0.5f, w, _ch), "<b><color=" + (badge ? Ink : panel ? Head : lines == 2 ? Val : Txt) + ">" + Esc(title) + "</color></b>", _st);
+            Label(new Rect(x + _cw, r.y - _ch * 0.5f + g * 0.5f, w, _ch), "<b><color=" + (badge ? Ink : panel ? Head : lines == 2 ? Val : Txt) + ">" + Esc(title) + "</color></b>", _st);
         }
 
         // text being typed, as Far shows it: bright once typed in, grey while it is still the value the field opened
@@ -403,14 +403,18 @@ namespace Monolith
         }
 
         // a line of text, as far right as the screen goes: a dialog can be dragged out of the menu's window
-        private void Line(float x, float y, string rich) { GUI.Label(new Rect(x, y, Mathf.Max(_win.xMax, Screen.width) - x, _ch), rich, _st); }
+        // text on whole pixels: a dialog dragged by a fraction of a pixel moves its text a whole one or not at all, so
+        // the letters keep their shape instead of shimmering
+        private static void Label(Rect r, string rich, GUIStyle st) { GUI.Label(new Rect(Mathf.Round(r.x), Mathf.Round(r.y), r.width, r.height), rich, st); }
+
+        private void Line(float x, float y, string rich) { Label(new Rect(x, y, Mathf.Max(_win.xMax, Screen.width) - x, _ch), rich, _st); }
 
         // a word in the middle of a panel's bottom line, as Far puts its totals there
         private void Footer(Rect r, string text)
         {
             float g = Thin * 2f, w = (text.Length + 2) * _cw, x = Mathf.Round(r.x + (r.width - w) * 0.5f);
             Fill(new Rect(x, r.yMax - _ch * 0.5f - g, w, _ch * 0.5f + g), Back);   // over the frame only: below it is the ground
-            GUI.Label(new Rect(x + _cw, r.yMax - _ch * 0.5f - g * 0.5f - Thin, w, _ch), "<color=" + Dim + ">" + Esc(text) + "</color>", _st);
+            Label(new Rect(x + _cw, r.yMax - _ch * 0.5f - g * 0.5f - Thin, w, _ch), "<color=" + Dim + ">" + Esc(text) + "</color>", _st);
         }
 
         // A long page has a scroll bar inside its right frame, as Far draws one beside text in a panel: ▲ on the first
@@ -440,8 +444,8 @@ namespace Monolith
         {
             float h = shown * _ch, w = Mathf.Round(_cw * BarW), ax = Mathf.Round(x + (w - _cw) * 0.5f);
             Fill(new Rect(x, y0, w, h), under);
-            GUI.Label(new Rect(ax, y0, _cw * 2f, _ch), "<color=" + Head + ">▲</color>", _st);
-            GUI.Label(new Rect(ax, y0 + h - _ch, _cw * 2f, _ch), "<color=" + Head + ">▼</color>", _st);
+            Label(new Rect(ax, y0, _cw * 2f, _ch), "<color=" + Head + ">▲</color>", _st);
+            Label(new Rect(ax, y0 + h - _ch, _cw * 2f, _ch), "<color=" + Head + ">▼</color>", _st);
             float ty = y0 + _ch, th = h - 2f * _ch;
             if (th <= 0f) return;
             // the track: dots, as Far's light shade character
@@ -471,7 +475,7 @@ namespace Monolith
             title = " " + Fit(title, (int)(f.width / _cw) - 6) + " ";
             float w = title.Length * _cw, x = Mathf.Round(f.x + (f.width - w) * 0.5f);
             Fill(new Rect(x, y, w, _ch), Panel);
-            GUI.Label(new Rect(x, y, w + 2f, _ch), "<color=" + Txt + ">" + Esc(title) + "</color>", _st);
+            Label(new Rect(x, y, w + 2f, _ch), "<color=" + Txt + ">" + Esc(title) + "</color>", _st);
         }
 
         private void Heading(Rect row, string title, Rect side)
@@ -480,7 +484,7 @@ namespace Monolith
             float x0 = _pageR.x + _cw, x1 = beside ? side.x : _pageR.xMax - _cw;
             title = Fit(title, (int)((x1 - x0) / _cw) - 2);
             float w = title.Length * _cw, x = Mathf.Round((x0 + x1 - w) * 0.5f);
-            GUI.Label(new Rect(x, row.y, w + 2f, _ch), "<b><color=" + Hot + ">" + Esc(title) + "</color></b>", _st);
+            Label(new Rect(x, row.y, w + 2f, _ch), "<b><color=" + Hot + ">" + Esc(title) + "</color></b>", _st);
         }
 
         // long enough for a join message with color tags in it
@@ -668,7 +672,7 @@ namespace Monolith
             string clock = DateTime.Now.ToShortTimeString();
             float cx = _pageR.xMax - (clock.Length + 1) * _cw;
             Fill(new Rect(cx, _pageR.y, (clock.Length + 1) * _cw, _ch * 0.5f + Thin * 2f), Back);   // over the frame only: above it is the ground
-            GUI.Label(new Rect(cx + _cw, _pageR.y - _ch * 0.5f + Thin, (clock.Length + 1) * _cw, _ch), "<b><color=" + Hot + ">" + Esc(clock) + "</color></b>", _st);
+            Label(new Rect(cx + _cw, _pageR.y - _ch * 0.5f + Thin, (clock.Length + 1) * _cw, _ch), "<b><color=" + Hot + ">" + Esc(clock) + "</color></b>", _st);
             if (dialog)
             {
                 // a dialog opened from a dialog takes its place, over the page they both came from
