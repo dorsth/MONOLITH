@@ -92,12 +92,12 @@ namespace Monolith
             catch (Exception) { }
         }
 
-        // ---- hitmarkers: bodyshot, headshot and (when it is on) kill color, each on dark and on light, at the size on screen
+        // ---- hitmarkers: bodyshot and headshot, each on dark and on light, at the size on screen
 
         private static GameObject _marker; private static float _markerAt = -99f;
 
-        // how many rows of the box each hitmarker has: one more hitmarker makes the box this much higher and moves nothing
-        internal const float MarkerRows = 3.5f;
+        // how many rows of the box each hitmarker has
+        private const float MarkerRows = 3.5f;
 
         // the hitmarker most guns use: the mod knows it once a weapon is in the map; before that, any weapon the game has loaded
         private static GameObject Marker()
@@ -139,7 +139,7 @@ namespace Monolith
                     DorsthTweaks.GapKept.Made made = DorsthTweaks.GapKept.Get(sp, DorsthTweaks.Hitmarkers.Width, DorsthTweaks.Hitmarkers.Gap, DorsthTweaks.Hitmarkers.Length, px);
                     if (made != null && made.Sprite != null) { sp = made.Sprite; px *= made.GrowX; py *= made.GrowY; }
                 }
-                int n = DorsthTweaks.Hitmarkers.KillOn ? 3 : 2;
+                const int n = 2;
                 for (int tone = 0; tone < 2; tone++)
                 {
                     Rect s = Tone(r, tone);
@@ -147,7 +147,7 @@ namespace Monolith
                     GUI.BeginGroup(s);
                     for (int i = 0; i < n; i++)
                     {
-                        Color c = (i == 0 ? DorsthTweaks.DorsthTweaksPlugin.BodyshotColor : i == 1 ? DorsthTweaks.DorsthTweaksPlugin.HeadshotColor : DorsthTweaks.DorsthTweaksPlugin.KillColor).Color;
+                        Color c = (i == 0 ? DorsthTweaks.DorsthTweaksPlugin.BodyshotColor : DorsthTweaks.DorsthTweaksPlugin.HeadshotColor).Color;
                         Pic(new Rect(0f, y0 + i * cell, s.width, cell), sp, c, px, py);
                     }
                     GUI.EndGroup();

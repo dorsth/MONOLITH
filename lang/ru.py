@@ -70,7 +70,7 @@ T = [
 ('Same headshot animation', 'Обычная анимация хедшота', 'L27'),
 ('Headshots pop like bodyshots.', 'Анимация хедшота такая же, как при попадании в тело.', 'tip'),
 ('Bodyshot color', 'Цвет по телу', 'L17'), ('Headshot color', 'Цвет хедшота', 'L17'),
-('Kill hitmarker', 'Хитмаркер убийства', 'L27'), ('The hit that kills shows in the kill color.', 'Попадание, которое убивает, показывается цветом убийства.', 'tip'), ('Kill color', 'Цвет убийства', 'L17'),
+
 ('hidden', 'скрыты', 'W16'), ('static', 'статичные', 'W16'),
 # ---- hud: prompts and the rest
 ('Hide prompts', 'Скрыть подсказки', 'L52'), ('On weapons, doors and buttons.', 'На оружии, дверях и кнопках.', 'info'),

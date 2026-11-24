@@ -1,5 +1,9 @@
 # MONOLITH changelog
 
+## 2.5.1
+- Kill hitmarker and Kill color are gone (DorsthTweaks 1.4.8).
+- Holds: CameraTweaks 1.2.4, CombatSounds 1.1.9, DorsthTweaks 1.4.8, MatchStats 1.0.6, NoGore 1.3.6, TrueSens 1.2.6, ViewmodelTweaks 2.0.8, ezCrosshair 1.3.6.
+
 ## 2.5.0
 - A dialog is as tall as its rows need, up to the screen's height, so it has no scroll bar.
 - Samples that get taller (Kill hitmarker on) grow the dialog upward, so the row under the mouse stays put.

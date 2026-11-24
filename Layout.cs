@@ -432,7 +432,7 @@ namespace Monolith
                 p.Set("Custom crosshair", on, null, "Off: the game crosshair.").Go(look, null, own);
 
                 var hm = new MenuPage(p, "Hitmarkers", "Shape, size, animation, colors.") { Dialog = true };
-                ConfigEntryBase noHm = E(Tweaks, "HUD", "Hide Hitmarkers"), still = E(Tweaks, "HUD", "Static Hitmarkers"), kill = E(Tweaks, "HUD", "Kill Hitmarker");
+                ConfigEntryBase noHm = E(Tweaks, "HUD", "Hide Hitmarkers"), still = E(Tweaks, "HUD", "Static Hitmarkers");
                 Func<bool> shown = () => !On(noHm);
                 hm.Set("Hide hitmarkers", noHm, null, "")
                   .Set("Line ends", E(Tweaks, "HUD", "Hitmarker Shape"), shown, "")
@@ -443,10 +443,8 @@ namespace Monolith
                   .Set("Animation", E(Tweaks, "HUD", "Hitmarker Animation"), () => !On(noHm) && !On(still), "How far they pop.")
                   .Set("Same headshot animation", E(Tweaks, "HUD", "Same Headshot Animation"), () => !On(noHm) && !On(still), "Headshots pop like bodyshots.")
                   .Set("Bodyshot color", E(Tweaks, "HUD", "Hitmarker Bodyshot Color"), shown, "")
-                  .Set("Headshot color", E(Tweaks, "HUD", "Hitmarker Headshot Color"), shown, "")
-                  .Set("Kill hitmarker", kill, shown, "The hit that kills shows in the kill color.")
-                  .Set("Kill color", E(Tweaks, "HUD", "Hitmarker Kill Color"), () => !On(noHm) && On(kill), "");
-                if (noHm != null) { hm.Draw = r => BundleMenu.I.HitmarkerPreview(r); hm.SideRows = () => 11f + (On(kill) ? BundleMenu.MarkerRows : 0f); }
+                  .Set("Headshot color", E(Tweaks, "HUD", "Hitmarker Headshot Color"), shown, "");
+                if (noHm != null) { hm.Draw = r => BundleMenu.I.HitmarkerPreview(r); hm.SideRows = () => 11f; }
                 p.Go(hm, () => On(noHm) ? "hidden" : On(still) ? "static" : "");
                 if (p.Rows.Count > 0) cats.Add(p);
             }

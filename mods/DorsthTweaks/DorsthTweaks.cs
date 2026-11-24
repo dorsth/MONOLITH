@@ -35,7 +35,7 @@ using PlanarReflection = UnityStandardAssets.Water.PlanarReflection;
 
 [assembly: AssemblyTitle("DorsthTweaks")]
 [assembly: AssemblyDescription("Small client-side tweaks for STRAFTAT: bullet trails, HUD, prompts, menus and performance.")]
-[assembly: AssemblyVersion("1.4.7.0")]
+[assembly: AssemblyVersion("1.4.8.0")]
 [assembly: AssemblyFileVersion("1.3.7.0")]
 
 // Only changes what you see on your own screen, so matchmaking with unmodded players still works.
@@ -49,7 +49,7 @@ namespace DorsthTweaks
     {
         public const string Guid = "dorsth.straftat.dorsthtweaks";
         public const string Name = "DorsthTweaks";
-        public const string Version = "1.4.7";
+        public const string Version = "1.4.8";
 
         internal static ManualLogSource Log;
         internal static ConfigEntry<bool> Detail;
@@ -57,11 +57,11 @@ namespace DorsthTweaks
         internal static void Note(string s) { if (Detail != null && Detail.Value) Log.LogInfo(s); }
         internal static Harmony Harmony;
 
-        internal static ConfigEntry<bool> StaticHitmarkers, HideHitmarkers, HeadPopLikeBody, KillHitmarker;
+        internal static ConfigEntry<bool> StaticHitmarkers, HideHitmarkers, HeadPopLikeBody;
         internal static ConfigEntry<float> HitmarkerGap, HitmarkerLength, HitmarkerWidth, HitmarkerPop;
         internal enum LineEnds { Default, Squared, Rounded, Spiked }
         internal static ConfigEntry<LineEnds> HitmarkerEnds;
-        internal static ColorSetting BodyshotColor, HeadshotColor, KillColor, BulletTrailColor;
+        internal static ColorSetting BodyshotColor, HeadshotColor, BulletTrailColor;
         internal static ConfigEntry<bool> NoViewmodelClimb;
         internal static ConfigEntry<bool> NoBulletCasings;
         internal static ConfigEntry<bool> HideMyTrails, HideOthersTrails;
@@ -230,8 +230,6 @@ namespace DorsthTweaks
             Carry(HeadPopLikeBody, Hud, "Small Headshot Pop");
             BodyshotColor = new ColorSetting(Config, Hud, "Hitmarker Bodyshot Color", new Color32(255, 255, 255, 255), "Bodyshot hitmarkers, on every gun.");
             HeadshotColor = new ColorSetting(Config, Hud, "Hitmarker Headshot Color", new Color32(255, 0, 0, 255), "Headshot hitmarkers, on every gun.");
-            KillHitmarker = Config.Bind(Hud, "Kill Hitmarker", false, "The hit that kills shows in the kill color.");
-            KillColor = new ColorSetting(Config, Hud, "Hitmarker Kill Color", new Color32(255, 221, 0, 255), "The hitmarker of the hit that kills, with Kill Hitmarker on.");
             MinimalHudColor = new ColorSetting(Config, Hud, "Minimal HUD Color", new Color32(255, 255, 255, 255), "Minimal HUD, speedometer and slide cooldown timer.");
             HideFps = Config.Bind(Hud, "Hide FPS", false, "Hides the FPS counter.");
             HidePing = Config.Bind(Hud, "Hide Ping", false, "Hides the ping counter.");
@@ -750,10 +748,8 @@ namespace DorsthTweaks
                 DorsthTweaksPlugin.HitmarkerEnds, DorsthTweaksPlugin.HitmarkerLength, DorsthTweaksPlugin.HitmarkerWidth,
                 DorsthTweaksPlugin.HitmarkerGap, DorsthTweaksPlugin.StaticHitmarkers, DorsthTweaksPlugin.HitmarkerPop,
                 DorsthTweaksPlugin.HeadPopLikeBody, DorsthTweaksPlugin.BodyshotColor.Entry, DorsthTweaksPlugin.HeadshotColor.Entry,
-                DorsthTweaksPlugin.KillHitmarker, DorsthTweaksPlugin.KillColor.Entry,
             };
             Add(() => DorsthTweaksPlugin.HideHitmarkers.Value, hitmarkers);
-            Add(() => !DorsthTweaksPlugin.KillHitmarker.Value, DorsthTweaksPlugin.KillColor.Entry);
             Add(() => DorsthTweaksPlugin.StaticHitmarkers.Value, DorsthTweaksPlugin.HitmarkerPop, DorsthTweaksPlugin.HeadPopLikeBody);
             Add(() => DorsthTweaksPlugin.HideMyTrails.Value && DorsthTweaksPlugin.HideOthersTrails.Value,
                 DorsthTweaksPlugin.BulletTrailColor.Entry, DorsthTweaksPlugin.TrailWidth, DorsthTweaksPlugin.TrailOpacity);
@@ -869,22 +865,6 @@ namespace DorsthTweaks
             DorsthTweaksPlugin.HitmarkerEnds.SettingChanged += (sender, args) => GameHook.RefreshAll();
             DorsthTweaksPlugin.BodyshotColor.Changed += GameHook.RefreshAll;
             DorsthTweaksPlugin.HeadshotColor.Changed += GameHook.RefreshAll;
-            GameHook.Add(typeof(Settings), "IncreaseKillsAmount", null, typeof(Hitmarkers), null, "KillPostfix", () => KillOn && !Hidden);
-            DorsthTweaksPlugin.KillHitmarker.SettingChanged += (sender, args) => GameHook.RefreshAll();
-        }
-
-        internal static bool KillOn { get { return DorsthTweaksPlugin.KillHitmarker.Value; } }
-
-        // The game counts a kill on the hit that makes it. A gun counts it just before it shows its hitmarker; an
-        // explosion can count it a moment before or after. So a kill colors the hitmarker shown within this long of it.
-        private const float KillWindow = 0.1f;
-        private static float _killAt = -9f, _shownAt = -9f;
-        private static Graphic _shown;
-
-        private static void KillPostfix()
-        {
-            _killAt = Time.unscaledTime;
-            if (_shown != null && _killAt - _shownAt <= KillWindow) PaintSoon(_shown, DorsthTweaksPlugin.KillColor);
         }
 
         // colored just before the frame is drawn, after the game has set its own color
@@ -949,8 +929,7 @@ namespace DorsthTweaks
                 bool head = punch.x > 2f;
                 // the shotgun and a few other guns have their own black hitmarker
                 bool shotgun = IsDarkMarker(target);
-                bool kill = KillOn && Time.unscaledTime - _killAt <= KillWindow;
-                ColorSetting color = kill ? DorsthTweaksPlugin.KillColor : head ? DorsthTweaksPlugin.HeadshotColor : DorsthTweaksPlugin.BodyshotColor;
+                ColorSetting color = head ? DorsthTweaksPlugin.HeadshotColor : DorsthTweaksPlugin.BodyshotColor;
                 // A black picture can't be tinted (the game's own red for a headshot stays black on it), so such a gun
                 // gets the common picture and is colored like any other.
                 if (shotgun) MatchCommon(target);
@@ -979,15 +958,14 @@ namespace DorsthTweaks
                 }
                 // (at its default a color is the game's own, except on the swapped picture, which the game left white or red)
                 Graphic graphic = target.GetComponent<Graphic>();
-                _shown = graphic; _shownAt = Time.unscaledTime;
-                if (graphic == null || (color.IsDefault && !shotgun && !kill)) return;
+                if (graphic == null || (color.IsDefault && !shotgun)) return;
                 PaintSoon(graphic, color);
             }
             catch (Exception e) { DorsthTweaksPlugin.LogErrorOnce(e); }
         }
 
         // A static hitmarker's end: full for 0.2 s, faded out over 0.1 s, then removed. Only how see-through it is
-        // changes, so its color (body, head, kill) stays.
+        // changes, so its color (body or head) stays.
         private sealed class FadeOut : MonoBehaviour
         {
             private const float Hold = 0.2f, Fade = 0.1f;
