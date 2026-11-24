@@ -1,5 +1,9 @@
 # MONOLITH changelog
 
+## 2.3.3
+- In a dialog, parts are split as modern Far splits its dialogs: a line across it joined to the frame, with the part's name in the middle. A dialog no longer starts with a heading under its title.
+- Holds: CameraTweaks 1.2.4, CombatSounds 1.1.9, DorsthTweaks 1.4.7, MatchStats 1.0.6, NoGore 1.3.6, TrueSens 1.2.6, ViewmodelTweaks 2.0.8, ezCrosshair 1.3.6.
+
 ## 2.3.2
 - A dialog without samples (the other mods) is a row taller, so its last row no longer sits on its bottom frame.
 - A dialog sits on whole pixels while you drag it, so its text no longer shakes.

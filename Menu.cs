@@ -281,6 +281,8 @@ namespace Monolith
             // a heading with nothing under it
             for (int i = _vis.Count - 1; i >= 0; i--)
                 if (_vis[i].Kind == RowKind.Header && (i == _vis.Count - 1 || _vis[i + 1].Kind == RowKind.Header)) _vis.RemoveAt(i);
+            // a dialog opens straight on its first part: its title already says what it is, as Far's dialogs do
+            if (p.Dialog && _vis.Count > 0 && _vis[0].Kind == RowKind.Header) _vis.RemoveAt(0);
             int ci = p.Cur != null ? _vis.IndexOf(p.Cur) : -1;
             if (ci < 0 && _vis.Count > 0)
             {
@@ -455,6 +457,18 @@ namespace Monolith
 
         // A section heading as Far heads a column: its name alone, in the middle, in the color of a column title.
         // Beside a preview it is in the middle of the rows.
+        // a part of a dialog starts at a line across it joined to its frame, its name in the middle of the line, as
+        // modern Far splits its dialogs (╟──── Markers ────╢)
+        private void Divider(float y, string title)
+        {
+            Rect f = DialogFrame(); float t = Thin, lineY = Mathf.Round(y + _ch * 0.5f - t * 0.5f);
+            Fill(new Rect(f.x + 2f * t, lineY, f.width - 4f * t, t), Frame);
+            title = " " + Fit(title, (int)(f.width / _cw) - 6) + " ";
+            float w = title.Length * _cw, x = Mathf.Round(f.x + (f.width - w) * 0.5f);
+            Fill(new Rect(x, y, w, _ch), Panel);
+            GUI.Label(new Rect(x, y, w + 2f, _ch), "<color=" + Txt + ">" + Esc(title) + "</color>", _st);
+        }
+
         private void Heading(Rect row, string title, Rect side)
         {
             bool beside = side.width > 0f && row.y + _ch * 0.5f >= side.y && row.y <= side.yMax;
@@ -659,7 +673,8 @@ namespace Monolith
                 bool cur = idx == ci && pageOn && !_byMouse;
                 // stays lit under an open pop-up, as a Far combobox keeps its focus while its list is open
                 if (cur) Fill(r, Bar); else if (idx == over && row.Kind != RowKind.Header) Fill(r, Hover);
-                if (row.Kind == RowKind.Header) Heading(r, Lang.T(row.Label), page.Side ? SideRect(page) : new Rect());
+                if (row.Kind == RowKind.Header && dialog) Divider(r.y, Lang.T(row.Label));
+                else if (row.Kind == RowKind.Header) Heading(r, Lang.T(row.Label), page.Side ? SideRect(page) : new Rect());
                 else Line(r.x + _cw * 0.5f, r.y, RowText(row, cols, cur));
                 Knob(row, r.y, cols, cur);
             }
