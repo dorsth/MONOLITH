@@ -91,8 +91,10 @@ namespace Monolith
         private string _edit;
         // the page panel itself while a dialog page takes _pageR
         private Rect _behindR;
+        // an open dialog's whole box, its frame and the ground around it; _pageR is where its rows go
+        private Rect _dlgR;
         // a dialog's width in cells: its rows and the two samples side by side fit, with the page around it
-        private const int DialogCols = 46;
+        private const int DialogCols = 48;
         // where a dialog was dragged by its top line, from the middle of the page; back in the middle when one opens
         private Vector2 _dlgMoved; private MenuPage _dlgFor; private bool _dlgDrag; private Vector2 _dlgGrab;
         // the value a field opened with, not typed over yet: grey, and the first character typed replaces it, as in Far
@@ -492,16 +494,20 @@ namespace Monolith
             _behindR = _pageR;
             if (page != null && page.Dialog && !_searching)
             {
-                // a box in the middle of the page, as Far centers its dialogs, on the same grid of cells as the rows;
-                // its rows one under the other and the samples under them
+                // a box over the menu, its rows one under the other and the samples under them
                 float samples = page.Draw != null ? page.SideRows() : -1f;
                 int rows = Mathf.Min(_vis.Count, PanelRows - 4 - Mathf.CeilToInt(samples));
                 float dh = Mathf.Min((rows + 2 + samples) * _ch, _behindR.height - 2f * _ch), dw = Mathf.Min(DialogCols * _cw, _behindR.width - 4f * _cw);
                 if (_dlgFor != page) { _dlgFor = page; _dlgMoved = Vector2.zero; _dlgDrag = false; }
                 // dragged whole cells at a time, and never past the menu's window
                 float mx = Mathf.Round(_dlgMoved.x / _cw) * _cw, my = Mathf.Round(_dlgMoved.y / _ch) * _ch;
-                float x = _behindR.x + Mathf.Round((_behindR.width - dw) * 0.5f / _cw) * _cw + mx, y = _behindR.y + Mathf.Round((_behindR.height - dh) * 0.5f / _ch) * _ch + my;
-                _pageR = new Rect(Mathf.Clamp(x, _win.x, _win.xMax - dw), Mathf.Clamp(y, _win.y, _win.yMax - dh), dw, dh);
+                // in the middle of the whole menu window, as Far centers a dialog on the whole screen, on the page's grid
+                float x = _behindR.x + Mathf.Round((_win.center.x - dw * 0.5f - _behindR.x) / _cw) * _cw + mx;
+                float y = _behindR.y + Mathf.Round((_win.center.y - dh * 0.5f - _behindR.y) / _ch) * _ch + my;
+                _dlgR = new Rect(Mathf.Clamp(x, _win.x, _win.xMax - dw), Mathf.Clamp(y, _win.y, _win.yMax - dh), dw, dh);
+                // the rows a cell further in than on a page: Far keeps a cell and a half between a dialog's frame and
+                // what is in it, so the cursor bar and the pop-ups stay inside the frame
+                _pageR = new Rect(_dlgR.x + _cw, _dlgR.y, _dlgR.width - 2f * _cw, _dlgR.height);
                 _rowY0 = _pageR.y + _ch;
                 _visRows = rows;
             }
@@ -589,8 +595,8 @@ namespace Monolith
             {
                 Behind(page.Parent);
                 _pageR = pageR;
-                Fill(new Rect(_pageR.x + _cw * 0.5f, _pageR.y + _ch * 0.5f, _pageR.width, _pageR.height), Shadow);
-                Fill(_pageR, Panel);
+                Fill(new Rect(_dlgR.x + _cw * 0.5f, _dlgR.y + _ch * 0.5f, _dlgR.width, _dlgR.height), Shadow);
+                Fill(_dlgR, Panel);
                 Box(DialogFrame(), Lang.T(page.Path[page.Path.Length - 1]), false, Panel);
             }
             _pageR = pageR;
@@ -706,10 +712,10 @@ namespace Monolith
         }
 
         // where a dialog is held to drag it: its top line, as Far's dialogs move by their frame
-        private Rect DialogGrip() { return new Rect(_pageR.x, _pageR.y, _pageR.width, _ch); }
+        private Rect DialogGrip() { return new Rect(_dlgR.x, _dlgR.y, _dlgR.width, _ch); }
 
         // a dialog's double frame: half a cell in from its filled ground, as Far draws one
-        private Rect DialogFrame() { return new Rect(_pageR.x + _cw * 0.5f, _pageR.y + _ch * 0.5f, _pageR.width - _cw, _pageR.height - _ch); }
+        private Rect DialogFrame() { return new Rect(_dlgR.x + _cw * 0.5f, _dlgR.y + _ch * 0.5f, _dlgR.width - _cw, _dlgR.height - _ch); }
 
         private Rect SideRect(MenuPage page)
         {

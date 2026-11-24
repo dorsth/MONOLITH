@@ -1,5 +1,10 @@
 # MONOLITH changelog
 
+## 2.2.4
+- In a dialog the cursor bar and the pop-ups stay inside its double frame: its rows sit a cell further in, as Far keeps them.
+- A dialog opens in the middle of the whole menu window, as Far centers a dialog on the whole screen.
+- Holds: CameraTweaks 1.2.4, CombatSounds 1.1.9, DorsthTweaks 1.4.7, MatchStats 1.0.6, NoGore 1.3.6, TrueSens 1.2.6, ViewmodelTweaks 2.0.8, ezCrosshair 1.3.6.
+
 ## 2.2.3
 - Esc closes an open dialog, as in Far, and a second Esc closes the menu.
 - Holds: CameraTweaks 1.2.4, CombatSounds 1.1.9, DorsthTweaks 1.4.7, MatchStats 1.0.6, NoGore 1.3.6, TrueSens 1.2.6, ViewmodelTweaks 2.0.8, ezCrosshair 1.3.6.
