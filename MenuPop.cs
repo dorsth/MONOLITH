@@ -317,8 +317,16 @@ namespace Monolith
             float edge = _cw * 0.5f;
             float x = Mathf.Clamp(p.AnchorRight - w, _pageR.x + edge, _pageR.xMax - w - edge), y = p.AnchorY;
             // held by the menu's window, or by the screen when it hangs from a dialog dragged out of the menu
-            Rect hold = Current().Dialog && !_searching ? new Rect(0f, 0f, Screen.width, Screen.height + _ch * 1.5f) : _win;
+            bool outside = Current().Dialog && !_searching && !_win.Contains(_dlgR.center);
+            Rect hold = outside ? new Rect(0f, 0f, Screen.width, Screen.height + _ch * 1.5f) : _win;
             x = Mathf.Clamp(x, hold.x + _cw, hold.xMax - w - _cw);
+            // a list near the bottom shows fewer names rather than hang out of the menu, as long as 4 still fit; only
+            // then it opens above its row (where in a dialog it would cover the samples)
+            if (!p.Palette)
+            {
+                int fit = Mathf.FloorToInt((hold.yMax - _ch * 1.5f - p.AnchorY) / _ch) - 2;
+                if (fit >= 4 && fit < p.Shown) { p.Shown = fit; h = (p.Shown + 2) * _ch; }
+            }
             if (y + h > hold.yMax - _ch * 1.5f) y = Mathf.Max(hold.y + _ch * 0.5f, p.AnchorY - _rowStep - h);
             // the colors are a dialog of their own, as Far's Color dialog; it opens under its row as a list does, so in
             // a dialog it covers the rows below and never the samples above them
