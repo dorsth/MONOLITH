@@ -322,7 +322,10 @@ namespace Monolith
             // a filled panel with half a cell of room around its frame, as Far draws a dialog; never over the page's own lines
             var frame = new Rect(p.R.x + _cw * 0.5f, p.R.y + _ch * 0.5f, p.R.width - _cw, p.R.height - _ch);
             float pt = Thin * 3f;
-            var room = new Rect(_pageR.x + pt, _pageR.y + pt, _pageR.width - 2f * pt, _pageR.height - 2f * pt);
+            // from a dialog it may hang out of it, as a Far dropdown is a menu of its own over the screen: then only the
+            // menu's window holds it, and it is filled and framed wherever it goes
+            MenuPage on = Current();
+            var room = on.Dialog && !_searching ? _win : new Rect(_pageR.x + pt, _pageR.y + pt, _pageR.width - 2f * pt, _pageR.height - 2f * pt);
             // with the shadow the dialogs have
             Clipped(ShadowOf(p.R), room, Shadow);
             Clipped(p.R, room, Panel);
