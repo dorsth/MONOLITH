@@ -494,7 +494,8 @@ namespace Monolith
             if (page != null && page.Dialog && !_searching)
             {
                 // a box over the menu, its rows one under the other and the samples under them
-                float samples = page.Draw != null ? page.SideRows() : -1f;
+                // the frame takes a row above the rows and one under them; samples take their rows and a line more
+                float samples = page.Draw != null ? page.SideRows() : 0f;
                 int rows = Mathf.Min(_vis.Count, PanelRows - 4 - Mathf.CeilToInt(samples));
                 float dh = Mathf.Min((rows + 2 + samples) * _ch, _behindR.height - 2f * _ch), dw = Mathf.Min(DialogCols * _cw, _behindR.width - 4f * _cw);
                 if (_dlgFor != page) { _dlgFor = page; _dlgMoved = Vector2.zero; _dlgDrag = false; }
@@ -503,7 +504,8 @@ namespace Monolith
                 // in the middle of the whole menu window, as Far centers a dialog on the whole screen, on the page's grid
                 float x = _behindR.x + Mathf.Round((_win.center.x - dw * 0.5f - _behindR.x) / _cw) * _cw + mx;
                 float y = _behindR.y + Mathf.Round((_win.center.y - dh * 0.5f - _behindR.y) / _ch) * _ch + my;
-                _dlgR = new Rect(Mathf.Clamp(x, 0f, Screen.width - dw), Mathf.Clamp(y, 0f, Screen.height - dh), dw, dh);
+                // on whole pixels, so its text does not shimmer while it is dragged
+                _dlgR = new Rect(Mathf.Round(Mathf.Clamp(x, 0f, Screen.width - dw)), Mathf.Round(Mathf.Clamp(y, 0f, Screen.height - dh)), dw, dh);
                 // the rows a cell further in than on a page: Far keeps a cell and a half between a dialog's frame and
                 // what is in it, so the cursor bar and the pop-ups stay inside the frame
                 _pageR = new Rect(_dlgR.x + _cw, _dlgR.y, _dlgR.width - 2f * _cw, _dlgR.height);
