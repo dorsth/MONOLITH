@@ -1,5 +1,9 @@
 # MONOLITH changelog
 
+## 2.4.0
+- The Color dialog opens under its row instead of in the middle of the menu, so it no longer covers the samples of the dialog it was opened from.
+- Holds: CameraTweaks 1.2.4, CombatSounds 1.1.9, DorsthTweaks 1.4.7, MatchStats 1.0.6, NoGore 1.3.6, TrueSens 1.2.6, ViewmodelTweaks 2.0.8, ezCrosshair 1.3.6.
+
 ## 2.3.9
 - In a dialog the samples sit on top and the settings under them, so a dropdown never covers the samples: you see each choice on them as you go through the list.
 - In the Players dialog, Enemies is named again, on the line under the samples.

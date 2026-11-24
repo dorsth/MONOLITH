@@ -320,8 +320,8 @@ namespace Monolith
             Rect hold = Current().Dialog && !_searching ? new Rect(0f, 0f, Screen.width, Screen.height + _ch * 1.5f) : _win;
             x = Mathf.Clamp(x, hold.x + _cw, hold.xMax - w - _cw);
             if (y + h > hold.yMax - _ch * 1.5f) y = Mathf.Max(hold.y + _ch * 0.5f, p.AnchorY - _rowStep - h);
-            // the colors are a dialog of their own, as Far's Color dialog: in the middle of the menu, over everything
-            if (p.Palette) { x = _win.center.x - w * 0.5f; y = _win.center.y - h * 0.5f; }
+            // the colors are a dialog of their own, as Far's Color dialog; it opens under its row as a list does, so in
+            // a dialog it covers the rows below and never the samples above them
             p.R = new Rect(Mathf.Round(x), Mathf.Round(y), w, h);
             if (mouseMoved && !p.Palette && !p.Dragging && !(p.Values.Length > p.Shown && PopBar(p).Contains(mouse))) { int at = PopAt(mouse); if (at >= 0) PopMove(at); }
 
