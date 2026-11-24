@@ -625,8 +625,9 @@ namespace Monolith
                 if (!said && info.Contains(mouse) && _told != null && _vis.Contains(_told)) { told = _told; text = Describe(told); }
                 else _told = told;
                 // a changed setting: "Reset" at the end of the box, where its default is read (R does the same)
-                _resetRow = told != null && Changed(told) ? told : null;
-                string reset = Lang.T(_resetRow != null && Removable(_resetRow) ? "Remove" : "Reset");
+                // a weapon in Per weapon is taken out with R only: the box keeps telling what the row is
+                _resetRow = told != null && Changed(told) && !Removable(told) ? told : null;
+                string reset = Lang.T("Reset");
                 string[] lines = Wrap(_resetRow != null ? text + " " + reset : text, (int)(info.width / _cw) - 4, 3);
                 int last = lines.Length - 1;
                 bool link = _resetRow != null && last >= 0 && lines[last].EndsWith(reset, StringComparison.Ordinal);

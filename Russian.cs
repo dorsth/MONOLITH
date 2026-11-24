@@ -5,7 +5,7 @@ namespace Monolith
 {
     internal static partial class Lang
     {
-        private static readonly Dictionary<string, string> Table = new Dictionary<string, string>(319)
+        private static readonly Dictionary<string, string> Table = new Dictionary<string, string>(318)
         {
             { "Crosshair", "Прицел" },
             { "Viewmodel", "Вьюмодель" },
@@ -293,7 +293,6 @@ namespace Monolith
             { "reset", "сброс" },
             { "Reset", "Сброс" },
             { "remove", "убрать" },
-            { "Remove", "Убрать" },
             { "move", "выбор" },
             { "set", "изменить" },
             { "open", "открыть" },
