@@ -22,7 +22,7 @@ T = [
 ('Tracers, casings, bodies, blood, vignette.', 'Трассеры, гильзы, тела, кровь, виньетка.', 'info'), ('The dark edge when a shot passes close.', 'Тёмный край экрана, когда пуля пролетает рядом.', 'tip'),
 ('How other players look on your screen, from the next round.', 'Как другие игроки выглядят на вашем экране, со следующего раунда.', 'info'),
 ('How other players look and sound. Lobby options.', 'Как другие игроки выглядят и звучат. Настройки лобби.', 'info'),
-('Mute', 'Без звука', 'L30'), ('Auto GG', 'Авто GG', 'L27'), ('Says your message in the chat when a match ends.', 'Пишет ваше сообщение в чат, когда матч заканчивается.', 'tip'), ('Voice chat', 'Голосовой чат', 'L27'), ('Text chat', 'Текстовый чат', 'L27'),
+('Mute', 'Без звука', 'L30'), ('Appearance', 'Внешний вид', 'L30'), ('Auto GG', 'Авто GG', 'L27'), ('Says your message in the chat when a match ends.', 'Пишет ваше сообщение в чат, когда матч заканчивается.', 'tip'), ('Voice chat', 'Голосовой чат', 'L27'), ('Text chat', 'Текстовый чат', 'L27'),
 ("You don't hear other players talk.", 'Вы не слышите, как говорят другие игроки.', 'tip'),
 ('Chat messages of other players are not shown. Yours still are.', 'Сообщения других игроков в чате не показываются. Ваши видны.', 'tip'),
 ("You don't hear other players taunt. Yours you still hear.", 'Вы не слышите насмешки других игроков. Свои слышите.', 'tip'),

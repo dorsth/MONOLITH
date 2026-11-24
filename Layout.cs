@@ -568,7 +568,7 @@ namespace Monolith
             {
                 var p = new MenuPage(null, "Players", "How other players look and sound. Lobby options.");
                 // their look in a dialog with the two samples under it, as the crosshair's
-                var look = new MenuPage(p, "Players", "How other players look on your screen, from the next round.") { Dialog = true };
+                var look = new MenuPage(p, "Appearance", "How other players look on your screen, from the next round.") { Dialog = true };
                 ConfigEntryBase gg = E(Tweaks, "Menus", "Auto GG");
                 look.Head("Enemies")
                  .Pick("Suit", Players.EnemyOutfit, Players.Outfits, "their own", "")

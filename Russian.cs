@@ -5,7 +5,7 @@ namespace Monolith
 {
     internal static partial class Lang
     {
-        private static readonly Dictionary<string, string> Table = new Dictionary<string, string>(318)
+        private static readonly Dictionary<string, string> Table = new Dictionary<string, string>(319)
         {
             { "Crosshair", "Прицел" },
             { "Viewmodel", "Вьюмодель" },
@@ -37,6 +37,7 @@ namespace Monolith
             { "How other players look on your screen, from the next round.", "Как другие игроки выглядят на вашем экране, со следующего раунда." },
             { "How other players look and sound. Lobby options.", "Как другие игроки выглядят и звучат. Настройки лобби." },
             { "Mute", "Без звука" },
+            { "Appearance", "Внешний вид" },
             { "Auto GG", "Авто GG" },
             { "Says your message in the chat when a match ends.", "Пишет ваше сообщение в чат, когда матч заканчивается." },
             { "Voice chat", "Голосовой чат" },
