@@ -1,5 +1,9 @@
 # MONOLITH changelog
 
+## 2.1.4
+- The line that splits the preview box stops at the frame's inner line instead of cutting through the whole frame.
+- Holds: CameraTweaks 1.2.4, CombatSounds 1.1.9, DorsthTweaks 1.4.7, MatchStats 1.0.6, NoGore 1.3.6, TrueSens 1.2.6, ViewmodelTweaks 2.0.8, ezCrosshair 1.3.6.
+
 ## 2.1.3
 - The preview box is split like Far's Color dialog: one line across it (or down it) joined to its frame, and each part's name as plain text on its first row. No more boxes inside the box. On the Crosshair, Hitmarkers and Players pages.
 - Holds: CameraTweaks 1.2.4, CombatSounds 1.1.9, DorsthTweaks 1.4.7, MatchStats 1.0.6, NoGore 1.3.6, TrueSens 1.2.6, ViewmodelTweaks 2.0.8, ezCrosshair 1.3.6.

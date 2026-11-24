@@ -61,16 +61,17 @@ namespace Monolith
             {
                 int rows = Mathf.RoundToInt((bottom - top) / _ch), cut = rows / 2;
                 float lineY = Mathf.Round(top + cut * _ch + _ch * 0.5f - t * 0.5f);
-                if (i == 0) Fill(new Rect(box.x, lineY, box.width, t), Frame);
+                // from the frame's inner line to its inner line, as ╟─╢: the outer line stays whole
+                if (i == 0) Fill(new Rect(box.x + 2f * t, lineY, box.width - 4f * t, t), Frame);
                 g = i == 0 ? new Rect(box.x + frame, top, box.width - 2f * frame, cut * _ch)
                            : new Rect(box.x + frame, top + (cut + 1) * _ch, box.width - 2f * frame, bottom - top - (cut + 1) * _ch);
             }
             else
             {
                 float lineX = Mathf.Round(box.x + box.width * 0.5f - t * 0.5f), half = lineX - box.x;
-                // from under the dialog's title, which sits in the middle of the top line, down into the bottom frame
+                // from under the dialog's title, which sits in the middle of the top line, down to the bottom frame's inner line
                 float from = box.y + Mathf.Round(_ch * 0.5f) + 2f * t;
-                if (i == 0) Fill(new Rect(lineX, from, t, box.yMax - from), Frame);
+                if (i == 0) Fill(new Rect(lineX, from, t, box.yMax - 2f * t - from), Frame);
                 g = i == 0 ? new Rect(box.x + frame, top, half - frame, bottom - top)
                            : new Rect(lineX + t, top, box.xMax - frame - lineX - t, bottom - top);
             }
