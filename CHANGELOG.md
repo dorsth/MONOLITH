@@ -1,5 +1,9 @@
 # MONOLITH changelog
 
+## 2.3.1
+- The dark ground around and between the menu's panels is gone: the game shows there.
+- Holds: CameraTweaks 1.2.4, CombatSounds 1.1.9, DorsthTweaks 1.4.7, MatchStats 1.0.6, NoGore 1.3.6, TrueSens 1.2.6, ViewmodelTweaks 2.0.8, ezCrosshair 1.3.6.
+
 ## 2.3.0
 - A dialog stays exactly where you drop it, and can be dragged anywhere on the screen, out of the menu too. It goes over the box under the panels and the key bar.
 - Holds: CameraTweaks 1.2.4, CombatSounds 1.1.9, DorsthTweaks 1.4.7, MatchStats 1.0.6, NoGore 1.3.6, TrueSens 1.2.6, ViewmodelTweaks 2.0.8, ezCrosshair 1.3.6.

@@ -329,7 +329,7 @@ namespace Monolith
         // the STRAFTAT theme for Far (straftat-lobby, STRAFCOLORS), measured off Far with it: panel glass, gunmetal-sage
         // frames (lighter on dialogs), the active title on a mint badge, yellow column titles and keys. The panels are the
         // theme's dark glass and dialogs (the preview and pop-ups) its dialog ground, as Far shows them with the theme
-        private static readonly Color Back = new Color32(0x09, 0x0A, 0x05, 0xFF), Frame = new Color32(0x8F, 0xA5, 0x9B, 0xFF), Bar = new Color32(0x34, 0x45, 0x32, 0xFF), MenuBar = new Color32(0x2B, 0x39, 0x29, 0xFF), Window = new Color32(0x13, 0x14, 0x11, 0xFF),
+        private static readonly Color Back = new Color32(0x09, 0x0A, 0x05, 0xFF), Frame = new Color32(0x8F, 0xA5, 0x9B, 0xFF), Bar = new Color32(0x34, 0x45, 0x32, 0xFF), MenuBar = new Color32(0x2B, 0x39, 0x29, 0xFF),
             FrameDim = new Color32(0x6F, 0x85, 0x7B, 0xFF), Panel = new Color32(0x13, 0x18, 0x0F, 0xFF),
             BarDim = new Color32(0x13, 0x18, 0x10, 0xFF), Shadow = new Color(0f, 0f, 0f, 0.72f), Hover = new Color32(0x1A, 0x22, 0x17, 0xFF), KeyBar = new Color32(0x17, 0x1C, 0x13, 0xFF),
             Well = new Color32(0x07, 0x08, 0x03, 0xFF), Badge = new Color32(0xB4, 0xF6, 0xB7, 0xFF);
@@ -568,7 +568,7 @@ namespace Monolith
             // a heading just above the first row shown is shown with it
             if (page.Top == 1 && _vis.Count > 0 && _vis[0].Kind == RowKind.Header) page.Top = 0;
 
-            Fill(_win, Window);   // the ground between the panels
+            // no ground of its own: the game shows between and around the panels
             Fill(_navR, Back); Fill(_behindR, Back);
             // the box under the panels and the key bar: drawn first while a dialog is open, so it goes over them
             bool dlgOpen = page.Dialog && !_searching;
