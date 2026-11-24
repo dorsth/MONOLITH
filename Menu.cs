@@ -1264,7 +1264,7 @@ namespace Monolith
                 if (k == KeyCode.Escape) { _searching = false; _searchPage = null; }
                 else if (k == KeyCode.UpArrow) Move(page, ci, -1);
                 else if (k == KeyCode.DownArrow) Move(page, ci, 1);
-                else if (k == KeyCode.LeftArrow || k == KeyCode.RightArrow) { if (row != null) Change(row, k == KeyCode.RightArrow ? 1 : -1, ev.shift); }
+                else if (k == KeyCode.LeftArrow || k == KeyCode.RightArrow) Nudge(row, k == KeyCode.RightArrow ? 1 : -1, ev.shift);
                 else if (k == KeyCode.Return || k == KeyCode.KeypadEnter) { if (row != null) Activate(row); }
                 else if (k == KeyCode.Delete) { MenuRow r = ResetTarget(_lastMouse, page, row); if (r != null) Default(r); }
                 else if (k == KeyCode.Backspace) { if (_query.Length > 0) { _query = _query.Substring(0, _query.Length - 1); _searchPage = null; } }
@@ -1296,7 +1296,7 @@ namespace Monolith
             {
                 if (k == KeyCode.UpArrow) SetCat(_cat - 1);
                 else if (k == KeyCode.DownArrow) SetCat(_cat + 1);
-                else if (k == KeyCode.RightArrow || k == KeyCode.E || k == KeyCode.Space) _inNav = false;
+                else if (k == KeyCode.E || k == KeyCode.Space) _inNav = false;
                 else return;
                 ev.Use(); return;
             }
@@ -1305,8 +1305,8 @@ namespace Monolith
             else if (k == KeyCode.PageUp) Move(page, ci, -Mathf.Max(1, _visRows - 1));
             else if (k == KeyCode.PageDown) Move(page, ci, Mathf.Max(1, _visRows - 1));
             else if (k == KeyCode.Q) GoBack();
-            else if (k == KeyCode.LeftArrow) { if (row == null || row.Kind == RowKind.Up) GoBack(); else Change(row, -1, ev.shift); }
-            else if (k == KeyCode.RightArrow) { if (row != null) { if (row.Kind == RowKind.Link) Activate(row); else Change(row, 1, ev.shift); } }
+            else if (k == KeyCode.LeftArrow) Nudge(row, -1, ev.shift);
+            else if (k == KeyCode.RightArrow) Nudge(row, 1, ev.shift);
             else if (k == KeyCode.E || k == KeyCode.Space) { if (row != null) Activate(row); }
             else return;
             ev.Use();
@@ -1352,6 +1352,14 @@ namespace Monolith
             if (OnBar(row, m.x, page)) { _dragRow = row; Slide(row, m.x, page); return; }
             _clicking = true;
             try { Activate(row); } finally { _clicking = false; }
+        }
+
+        // A and D, as Left and Right in Far: they only move a value along (a slider, the choice of a list). A switch is
+        // flipped and a page opened or left with E and Q alone, so each key has one job.
+        private void Nudge(MenuRow row, int dir, bool shift)
+        {
+            if (row == null || row.Kind != RowKind.Entry || row.Entry == null || row.Entry.SettingType == typeof(bool)) return;
+            Change(row, dir, shift);
         }
 
         private void Activate(MenuRow row)
@@ -1474,7 +1482,6 @@ namespace Monolith
                 }
                 if (row.Kind != RowKind.Entry) return false;
                 ConfigEntryBase e = row.Entry; Type t = e.SettingType;
-                if (t == typeof(bool)) { e.BoxedValue = dir > 0; return true; }
                 object[] c = Choices(row);
                 if (c != null && c.Length > 0)
                 {
