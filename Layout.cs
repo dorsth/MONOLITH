@@ -429,7 +429,7 @@ namespace Monolith
                  .Set("Hide viewmodel", gone, null, "Hides your weapon and arms.");
 
                 // per weapon: the ones you added, and one empty row to add the next
-                var per = new MenuPage(p, "Per weapon", "A weapon listed here uses its own FOV and position.");
+                var per = new MenuPage(p, "Per weapon", "A weapon listed here uses its own FOV and position.") { Dialog = true };
                 var picks = new List<ConfigEntryBase>();
                 ConfigFile vf = File(View);
                 for (int i = 1; i <= 32 && vf != null; i++)
@@ -442,7 +442,7 @@ namespace Monolith
                 {
                     int me = i; string s = "Weapon " + (i + 1); ConfigEntryBase pick = picks[i];
                     Func<bool> used = () => !Is(pick, "None");
-                    var slot = new MenuPage(per, s, "Pick a weapon, then its own FOV and position.");
+                    var slot = new MenuPage(per, s, "Pick a weapon, then its own FOV and position.") { Dialog = true };
                     slot.Set("Weapon", pick, null, "None leaves this slot empty.")
                         .Set("FOV", E(View, s, "Viewmodel FOV"), used, "")
                         .Set("Left / right", E(View, s, "Viewmodel X Offset"), used, "")
@@ -476,7 +476,7 @@ namespace Monolith
             {
                 var p = new MenuPage(null, "HUD", "Hitmarkers, prompts, counters.");
 
-                var hm = new MenuPage(p, "Hitmarkers", "Shape, size, animation, colors.");
+                var hm = new MenuPage(p, "Hitmarkers", "Shape, size, animation, colors.") { Dialog = true };
                 ConfigEntryBase noHm = E(Tweaks, "HUD", "Hide Hitmarkers"), still = E(Tweaks, "HUD", "Static Hitmarkers"), kill = E(Tweaks, "HUD", "Kill Hitmarker");
                 Func<bool> shown = () => !On(noHm);
                 hm.Set("Hide hitmarkers", noHm, null, "")
@@ -491,9 +491,9 @@ namespace Monolith
                   .Set("Headshot color", E(Tweaks, "HUD", "Hitmarker Headshot Color"), shown, "")
                   .Set("Kill hitmarker", kill, shown, "The hit that kills shows in the kill color.")
                   .Set("Kill color", E(Tweaks, "HUD", "Hitmarker Kill Color"), () => !On(noHm) && On(kill), "");
-                if (noHm != null) { hm.Draw = r => BundleMenu.I.HitmarkerPreview(r); hm.SideCols = 24; hm.SideRows = () => 11f + (On(kill) ? BundleMenu.MarkerRows : 0f); }
+                if (noHm != null) { hm.Draw = r => BundleMenu.I.HitmarkerPreview(r); hm.SideRows = () => 11f + (On(kill) ? BundleMenu.MarkerRows : 0f); }
 
-                var pr = new MenuPage(p, "Prompts", "The texts on weapons, doors and buttons.");
+                var pr = new MenuPage(p, "Prompts", "The texts on weapons, doors and buttons.") { Dialog = true };
                 ConfigEntryBase noPick = E(Tweaks, "Interaction", "Hide Pickup Prompts"), noUse = E(Tweaks, "Interaction", "Hide Interaction Prompts");
                 Func<bool> some = () => !(On(noPick) && On(noUse));
                 pr.All("Hide prompts", "On weapons, doors and buttons.", null, noPick, noUse)
@@ -595,7 +595,7 @@ namespace Monolith
                  .Key("Third jump key", Keys.Jump2, "not set", "Put scroll up on one and scroll down on the other to jump with the whole wheel." + how)
                  .Key("Swap weapons", Keys.Swap, "scroll wheel", "Same as Swap in the game's settings. Press E, then a key or mouse button, or scroll to use the wheel.");
                 if (p.Rows.Count > 0 && p.Rows[p.Rows.Count - 1].Entry == Keys.Swap) p.Rows[p.Rows.Count - 1].If = Keys.SyncSwap;   // shows what the game's settings have now
-                var t = new MenuPage(p, "Taunts", "Move a taunt to another key, or switch it off.");
+                var t = new MenuPage(p, "Taunts", "Move a taunt to another key, or switch it off.") { Dialog = true };
                 for (int i = 0; i < Keys.Taunt.Length; i++) t.Key("Taunt " + (i + 1), Keys.Taunt[i], "key " + ((i + 1) % 10), "Press E, then its new key. Enter sets no key.");
                 p.Go(t, () => { int n = 0; foreach (var e in Keys.Taunt) if (e != null && e.Value.Length > 0) n++; return n == 0 ? "number keys" : Lang.Count(n, " changed", " changed", "changed: "); });
                 if (p.Rows.Count > 2) cats.Add(p);

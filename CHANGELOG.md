@@ -1,5 +1,9 @@
 # MONOLITH changelog
 
+## 2.3.6
+- Every page opened from another page is a dialog now: Hitmarkers (with its Dark and Light samples under it) and Prompts on the HUD page, Per weapon and each weapon slot on the Viewmodel page, and Taunts on the Controls page. A dialog opened from a dialog takes its place.
+- Holds: CameraTweaks 1.2.4, CombatSounds 1.1.9, DorsthTweaks 1.4.7, MatchStats 1.0.6, NoGore 1.3.6, TrueSens 1.2.6, ViewmodelTweaks 2.0.8, ezCrosshair 1.3.6.
+
 ## 2.3.5
 - Lists drop down as Far's do: a single line box with no title, right under their row.
 - Colors are picked in a Color dialog of their own in the middle of the menu, as in Far, instead of under the row.

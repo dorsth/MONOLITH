@@ -650,7 +650,7 @@ namespace Monolith
             Footer(_navR, BundlePlugin.Version);
             bool dialog = page.Dialog && !_searching;
             Rect pageR = _pageR; _pageR = _behindR;
-            string title = _searching ? Lang.T("search: ") + _query + "_" : PathText(dialog ? page.Parent : page);
+            string title = _searching ? Lang.T("search: ") + _query + "_" : PathText(dialog ? Root(page) : page);
             Box(_pageR, Fit(title, (int)(_pageR.width / _cw) - 24), pageOn);   // room on the right for the clock
             // the clock on the top frame, as Far shows it: over the corner, its last letter on the frame's outer edge
             string clock = DateTime.Now.ToShortTimeString();
@@ -659,7 +659,8 @@ namespace Monolith
             GUI.Label(new Rect(cx + _cw, _pageR.y - _ch * 0.5f + Thin, (clock.Length + 1) * _cw, _ch), "<b><color=" + Hot + ">" + Esc(clock) + "</color></b>", _st);
             if (dialog)
             {
-                Behind(page.Parent);
+                // a dialog opened from a dialog takes its place, over the page they both came from
+                Behind(Root(page));
                 _pageR = pageR;
                 Fill(ShadowOf(_dlgR), Shadow);
                 Fill(_dlgR, Panel);
@@ -744,6 +745,9 @@ namespace Monolith
 
         // Far's shadow: two cells to the right and one row down, over which what is under it stays readable but dark
         private Rect ShadowOf(Rect r) { return new Rect(r.x + 2f * _cw, r.y + _ch, r.width, r.height); }
+
+        // the page a dialog (or a dialog opened from one) was opened from
+        private static MenuPage Root(MenuPage page) { while (page.Dialog && page.Parent != null) page = page.Parent; return page; }
 
         // a dialog's double frame: half a cell in from its filled ground, as Far draws one
         private Rect DialogFrame() { return new Rect(_dlgR.x + _cw * 0.5f, _dlgR.y + _ch * 0.5f, _dlgR.width - _cw, _dlgR.height - _ch); }
