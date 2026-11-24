@@ -399,7 +399,8 @@ namespace Monolith
             return "<color=" + (fresh ? Unchanged : Val) + ">" + Esc(text) + "</color>" + cursor;
         }
 
-        private void Line(float x, float y, string rich) { GUI.Label(new Rect(x, y, _win.xMax - x, _ch), rich, _st); }
+        // a line of text, as far right as the screen goes: a dialog can be dragged out of the menu's window
+        private void Line(float x, float y, string rich) { GUI.Label(new Rect(x, y, Mathf.Max(_win.xMax, Screen.width) - x, _ch), rich, _st); }
 
         // a word in the middle of a panel's bottom line, as Far puts its totals there
         private void Footer(Rect r, string text)

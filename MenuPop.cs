@@ -315,8 +315,10 @@ namespace Monolith
             // room stops just inside the double line of the page.
             float edge = _cw * 0.5f;
             float x = Mathf.Clamp(p.AnchorRight - w, _pageR.x + edge, _pageR.xMax - w - edge), y = p.AnchorY;
-            x = Mathf.Clamp(x, _win.x + _cw, _win.xMax - w - _cw);
-            if (y + h > _win.yMax - _ch * 1.5f) y = Mathf.Max(_win.y + _ch * 0.5f, p.AnchorY - _rowStep - h);
+            // held by the menu's window, or by the screen when it hangs from a dialog dragged out of the menu
+            Rect hold = Current().Dialog && !_searching ? new Rect(0f, 0f, Screen.width, Screen.height + _ch * 1.5f) : _win;
+            x = Mathf.Clamp(x, hold.x + _cw, hold.xMax - w - _cw);
+            if (y + h > hold.yMax - _ch * 1.5f) y = Mathf.Max(hold.y + _ch * 0.5f, p.AnchorY - _rowStep - h);
             // the colors are a dialog of their own, as Far's Color dialog: in the middle of the menu, over everything
             if (p.Palette) { x = _win.center.x - w * 0.5f; y = _win.center.y - h * 0.5f; }
             p.R = new Rect(Mathf.Round(x), Mathf.Round(y), w, h);

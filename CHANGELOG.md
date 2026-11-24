@@ -1,5 +1,9 @@
 # MONOLITH changelog
 
+## 2.3.8
+- A dialog dragged out of the menu shows its whole rows: their names and values were cut off at the menu's edge. Its dropdowns open beside it there too, instead of being pulled back into the menu.
+- Holds: CameraTweaks 1.2.4, CombatSounds 1.1.9, DorsthTweaks 1.4.7, MatchStats 1.0.6, NoGore 1.3.6, TrueSens 1.2.6, ViewmodelTweaks 2.0.8, ezCrosshair 1.3.6.
+
 ## 2.3.7
 - A dropdown shows up to 8 names at a time, as Far's do, so a long list (suits, hats) opens under its row instead of jumping up over the whole menu. The rest scroll.
 - Holds: CameraTweaks 1.2.4, CombatSounds 1.1.9, DorsthTweaks 1.4.7, MatchStats 1.0.6, NoGore 1.3.6, TrueSens 1.2.6, ViewmodelTweaks 2.0.8, ezCrosshair 1.3.6.
