@@ -1,5 +1,9 @@
 # MONOLITH changelog
 
+## 2.6.2
+- The Far Manager keys work next to WASD, E and Q: Enter opens or takes, Home and End go to the first and last row, Ctrl+Down opens a list, Ctrl+PgUp goes back, Alt and a letter jumps to the next row or category that starts with it, F10 closes the menu.
+- Holds: CameraTweaks 1.2.4, CombatSounds 1.1.9, DorsthTweaks 1.5.1, MatchStats 1.0.7, NoGore 1.3.7, TrueSens 1.2.6, ViewmodelTweaks 2.0.8, ezCrosshair 1.3.6.
+
 ## 2.6.1
 - A and D only change a value (a slider, the choice of a list), as Left and Right in Far. E flips a switch and opens a page, Q goes back, Tab or E moves from the categories to the page.
 - Holds: CameraTweaks 1.2.4, CombatSounds 1.1.9, DorsthTweaks 1.5.1, MatchStats 1.0.7, NoGore 1.3.7, TrueSens 1.2.6, ViewmodelTweaks 2.0.8, ezCrosshair 1.3.6.

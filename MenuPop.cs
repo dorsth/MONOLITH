@@ -105,6 +105,7 @@ namespace Monolith
         {
             Pop p = _pop; KeyCode k = ev.keyCode; char ch = ev.character;
             if (k == KeyCode.None && Time.frameCount == _modeFrame) { ev.Use(); return; }
+            if ((k == KeyCode.Return || k == KeyCode.KeypadEnter) && !FreshEnter()) { ev.Use(); return; }
             // the menu's own keys work here too: WASD move, E takes, Q cancels, R resets a color. In the hex field, once
             // clicked or started with a digit, A, D and E are hex digits instead
             bool hex = p.Palette && p.Editing;

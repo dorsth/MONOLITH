@@ -36,6 +36,8 @@ Match stats show kills, deaths and damage between rounds and after the match. Th
 
 **F2** opens it. W and S move, A and D change a setting, E opens or picks, Q goes back, R resets, `/` searches every setting, Esc closes. The same keys work in lists and the color picker. The mouse works too. Settings save at once.
 
+The Far Manager keys work as well: arrows, Enter, Tab, Home, End, PgUp, PgDn, Del to reset, Ctrl+Down to open a list, Ctrl+PgUp to go back, Alt and a letter to jump to a row, F10 to close.
+
 The menu is in English or Russian (General, Language).
 
 ## Updates
