@@ -35,7 +35,7 @@ using PlanarReflection = UnityStandardAssets.Water.PlanarReflection;
 
 [assembly: AssemblyTitle("DorsthTweaks")]
 [assembly: AssemblyDescription("Small client-side tweaks for STRAFTAT: bullet trails, HUD, prompts, menus and performance.")]
-[assembly: AssemblyVersion("1.4.8.0")]
+[assembly: AssemblyVersion("1.4.9.0")]
 [assembly: AssemblyFileVersion("1.3.7.0")]
 
 // Only changes what you see on your own screen, so matchmaking with unmodded players still works.
@@ -49,7 +49,7 @@ namespace DorsthTweaks
     {
         public const string Guid = "dorsth.straftat.dorsthtweaks";
         public const string Name = "DorsthTweaks";
-        public const string Version = "1.4.8";
+        public const string Version = "1.4.9";
 
         internal static ManualLogSource Log;
         internal static ConfigEntry<bool> Detail;
@@ -74,6 +74,7 @@ namespace DorsthTweaks
         internal enum SlideTimerStyle { Off, Text, Bar }
         internal static ConfigEntry<SlideTimerStyle> SlideTimer;
         internal static ConfigEntry<bool> ReduceUIAnimations;
+        internal static ConfigEntry<bool> MuteVoice, MuteText, MuteTaunts;
         internal static ConfigEntry<bool> DisableRain, StaticTextures, WarmUpEffects, ReduceEffects, FewerEffects, NoPostProcessing, UltimateTweaksOn;
 
         private static void FromPerformance()
@@ -151,6 +152,7 @@ namespace DorsthTweaks
             Install("slide cooldown timer", SlideClock.Install);
             Install("weapon highlight", WeaponHighlight.Install);
             Install("loose items", LooseItems.Install);
+            Install("mute", Mute.Install);
             Install("near miss vignette", NearMiss.Install);
             Install("idle camera effect", IdleCameraEffect.Install);
             Install("reduce UI animations", StaticUI.Install);
@@ -251,6 +253,9 @@ namespace DorsthTweaks
             Carry(JoinMessage, "Lobby", "Join Message");
             HideDefaultPlaylists = Config.Bind(Menus, "Hide Default Playlists", false, "Hides the game's playlists.");
             ReduceUIAnimations = Config.Bind(Menus, "Reduce UI Animations", false, "No animations in the menus and on the HUD.");
+            MuteVoice = Config.Bind("Mute", "Voice Chat", false, "You don't hear other players talk.");
+            MuteText = Config.Bind("Mute", "Text Chat", false, "Chat messages of other players are not shown. Yours still are.");
+            MuteTaunts = Config.Bind("Mute", "Taunts", false, "You don't hear other players taunt. Yours you still hear.");
 
             NoViewmodelClimb = Config.Bind(View, "No Viewmodel Climb", false, "Your gun stays in place while spraying.");
             NoBulletCasings = Config.Bind(View, "No Bullet Casings", false, "No casings or their sound.");
@@ -496,6 +501,33 @@ namespace DorsthTweaks
     /// ItemBehaviour.Start throw on transform.parent.up and skip the rest of its setup. Its floating bob is skipped
     /// for the moment Start runs and started here instead, with the world's up.
     /// </summary>
+    /// <summary>Mutes other players: their voice, their chat messages and their taunts. Only what reaches you changes.</summary>
+    internal static class Mute
+    {
+        internal static void Install()
+        {
+            ConfigEntry<bool> voice = DorsthTweaksPlugin.MuteVoice, text = DorsthTweaksPlugin.MuteText, taunts = DorsthTweaksPlugin.MuteTaunts;
+            // the voice of another player arrives in one of these two: in the menus on the player's ClientInstance, in a
+            // match on the player's body. The names carry the network library's hash of the call.
+            GameHook.Add(typeof(ClientInstance), "RpcLogic___PlayVoiceChatObservers_3345084894", null, typeof(Mute), "Skip", null, () => voice.Value);
+            GameHook.Add(typeof(FirstPersonController), "RpcLogic___PlayVoiceChatObservers_3345084894", null, typeof(Mute), "Skip", null, () => voice.Value);
+            GameHook.Add(typeof(HeathenEngineering.DEMO.LobbyChatUILogic), "HandleChatMessage", null, typeof(Mute), "TextPrefix", null, () => text.Value);
+            GameHook.Add(typeof(FirstPersonController), "RpcLogic___AboubiPlayObservers_3316948804", null, typeof(Mute), "TauntPrefix", null, () => taunts.Value);
+            foreach (ConfigEntry<bool> e in new[] { voice, text, taunts }) e.SettingChanged += (sender, args) => GameHook.RefreshAll();
+            GameHook.RefreshAll();
+        }
+
+        private static bool Skip() { return false; }
+
+        private static bool TextPrefix(HeathenEngineering.SteamworksIntegration.LobbyChatMsg message)
+        {
+            return message.sender == HeathenEngineering.SteamworksIntegration.UserData.Me;
+        }
+
+        // the one who taunts hears it from their own call, not from this one
+        private static bool TauntPrefix(FirstPersonController __instance) { return __instance.IsOwner; }
+    }
+
     internal static class LooseItems
     {
         internal static void Install()

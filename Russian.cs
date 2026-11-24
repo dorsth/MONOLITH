@@ -5,7 +5,7 @@ namespace Monolith
 {
     internal static partial class Lang
     {
-        private static readonly Dictionary<string, string> Table = new Dictionary<string, string>(308)
+        private static readonly Dictionary<string, string> Table = new Dictionary<string, string>(315)
         {
             { "Crosshair", "Прицел" },
             { "Viewmodel", "Вьюмодель" },
@@ -34,7 +34,14 @@ namespace Monolith
             { "The texts on weapons, doors and buttons.", "Надписи на оружии, дверях и кнопках." },
             { "Tracers, casings, bodies, blood, vignette.", "Трассеры, гильзы, тела, кровь, виньетка." },
             { "The dark edge when a shot passes close.", "Тёмный край экрана, когда пуля пролетает рядом." },
-            { "How other players look on your screen, from the next round. Lobby options.", "Как другие игроки выглядят на вашем экране, со следующего раунда. Настройки лобби." },
+            { "How other players look on your screen, from the next round.", "Как другие игроки выглядят на вашем экране, со следующего раунда." },
+            { "How other players look and sound. Lobby options.", "Как другие игроки выглядят и звучат. Настройки лобби." },
+            { "Mute", "Без звука" },
+            { "Voice chat", "Голосовой чат" },
+            { "Text chat", "Текстовый чат" },
+            { "You don't hear other players talk.", "Вы не слышите, как говорят другие игроки." },
+            { "Chat messages of other players are not shown. Yours still are.", "Сообщения других игроков в чате не показываются. Ваши видны." },
+            { "You don't hear other players taunt. Yours you still hear.", "Вы не слышите насмешки других игроков. Свои слышите." },
             { "Hitsounds, killsounds, gun volume.", "Хитсаунды, киллсаунды, громкость оружия." },
             { "Sensitivity in cm/360, extra keybinds, taunts.", "Чувствительность в см/360, доп. клавиши, насмешки." },
             { "Only your own playlists show when you host.", "При создании лобби видны только ваши плейлисты." },

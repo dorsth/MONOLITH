@@ -566,9 +566,9 @@ namespace Monolith
 
             // ---------------------------------------------------------------- players
             {
-                var p = new MenuPage(null, "Players", "How other players look on your screen, from the next round. Lobby options.");
+                var p = new MenuPage(null, "Players", "How other players look and sound. Lobby options.");
                 // their look in a dialog with the two samples under it, as the crosshair's
-                var look = new MenuPage(p, "Players") { Dialog = true };
+                var look = new MenuPage(p, "Players", "How other players look on your screen, from the next round.") { Dialog = true };
                 look.Head("Enemies")
                  .Pick("Suit", Players.EnemyOutfit, Players.Outfits, "their own", "")
                  .Pick("Hat", Players.EnemyHat, Players.Hats, "their own", "")
@@ -579,6 +579,10 @@ namespace Monolith
                  .Set("Outline color", Players.TeamOutline, null, "The same setting as in the game.");
                 look.Draw = r => BundleMenu.I.PlayersPreview(r); look.SideRows = () => 8f;
                 p.Go(look)
+                 .Head("Mute")
+                 .Set("Voice chat", E(Tweaks, "Mute", "Voice Chat"), null, "You don't hear other players talk.")
+                 .Set("Text chat", E(Tweaks, "Mute", "Text Chat"), null, "Chat messages of other players are not shown. Yours still are.")
+                 .Set("Taunts", E(Tweaks, "Mute", "Taunts"), null, "You don't hear other players taunt. Yours you still hear.")
                  .Head("Lobby")
                  .Set("Enemy outlines when I host", Players.HostOutlines, null, "The game's lobby option, kept between launches. In other lobbies the host decides.")
                  .Set("Friendly fire when I host", Players.HostFriendlyFire, null, "The game's lobby option, kept between launches. In other lobbies the host decides.")
