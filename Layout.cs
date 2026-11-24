@@ -417,11 +417,11 @@ namespace Monolith
 
             // ---------------------------------------------------------------- crosshair
             {
-                var p = new MenuPage(null, "Crosshair", "Style, color, size.");
+                var p = new MenuPage(null, "Crosshair", "Crosshair and hitmarkers.");
                 ConfigEntryBase on = E(Cross, "Crosshair", "Enabled"), hit = E(Cross, "Crosshair", "Hit Color");
                 Func<bool> own = () => On(on);
                 // its look in a dialog with the samples under it, as Far's Color dialog
-                var look = new MenuPage(p, "Crosshair") { Dialog = true };
+                var look = new MenuPage(p, "Style") { Dialog = true };
                 look.Set("Style", E(Cross, "Crosshair", "Crosshair"), own, "Every PNG in plugins/MONOLITH/Crosshairs. Add your own there and restart the game.")
                  .Set("Color", E(Cross, "Crosshair", "Color"), own, "White keeps the picture's own colors.")
                  .Set("Size", E(Cross, "Crosshair", "Scale"), own, "1 is the picture's own size at 1080p.")
@@ -430,6 +430,24 @@ namespace Monolith
                  .Set("  color", E(Cross, "Crosshair", "Hit Color Value"), () => On(on) && On(hit), "");
                 if (on != null) { look.Draw = r => BundleMenu.I.CrosshairPreview(r); look.SideRows = () => 8f; }
                 p.Set("Custom crosshair", on, null, "Off: the game crosshair.").Go(look, null, own);
+
+                var hm = new MenuPage(p, "Hitmarkers", "Shape, size, animation, colors.") { Dialog = true };
+                ConfigEntryBase noHm = E(Tweaks, "HUD", "Hide Hitmarkers"), still = E(Tweaks, "HUD", "Static Hitmarkers"), kill = E(Tweaks, "HUD", "Kill Hitmarker");
+                Func<bool> shown = () => !On(noHm);
+                hm.Set("Hide hitmarkers", noHm, null, "")
+                  .Set("Line ends", E(Tweaks, "HUD", "Hitmarker Shape"), shown, "")
+                  .Set("Length", E(Tweaks, "HUD", "Hitmarker Length"), shown, "")
+                  .Set("Thickness", E(Tweaks, "HUD", "Hitmarker Width"), shown, "")
+                  .Set("Gap", E(Tweaks, "HUD", "Hitmarker Gap"), shown, "")
+                  .Set("Static hitmarkers", still, shown, "They fade out without popping.")
+                  .Set("Animation", E(Tweaks, "HUD", "Hitmarker Animation"), () => !On(noHm) && !On(still), "How far they pop.")
+                  .Set("Same headshot animation", E(Tweaks, "HUD", "Same Headshot Animation"), () => !On(noHm) && !On(still), "Headshots pop like bodyshots.")
+                  .Set("Bodyshot color", E(Tweaks, "HUD", "Hitmarker Bodyshot Color"), shown, "")
+                  .Set("Headshot color", E(Tweaks, "HUD", "Hitmarker Headshot Color"), shown, "")
+                  .Set("Kill hitmarker", kill, shown, "The hit that kills shows in the kill color.")
+                  .Set("Kill color", E(Tweaks, "HUD", "Hitmarker Kill Color"), () => !On(noHm) && On(kill), "");
+                if (noHm != null) { hm.Draw = r => BundleMenu.I.HitmarkerPreview(r); hm.SideRows = () => 11f + (On(kill) ? BundleMenu.MarkerRows : 0f); }
+                p.Go(hm, () => On(noHm) ? "hidden" : On(still) ? "static" : "");
                 if (p.Rows.Count > 0) cats.Add(p);
             }
 
@@ -500,24 +518,7 @@ namespace Monolith
 
             // ---------------------------------------------------------------- hud
             {
-                var p = new MenuPage(null, "HUD", "Hitmarkers, prompts, counters.");
-
-                var hm = new MenuPage(p, "Hitmarkers", "Shape, size, animation, colors.") { Dialog = true };
-                ConfigEntryBase noHm = E(Tweaks, "HUD", "Hide Hitmarkers"), still = E(Tweaks, "HUD", "Static Hitmarkers"), kill = E(Tweaks, "HUD", "Kill Hitmarker");
-                Func<bool> shown = () => !On(noHm);
-                hm.Set("Hide hitmarkers", noHm, null, "")
-                  .Set("Line ends", E(Tweaks, "HUD", "Hitmarker Shape"), shown, "")
-                  .Set("Length", E(Tweaks, "HUD", "Hitmarker Length"), shown, "")
-                  .Set("Thickness", E(Tweaks, "HUD", "Hitmarker Width"), shown, "")
-                  .Set("Gap", E(Tweaks, "HUD", "Hitmarker Gap"), shown, "")
-                  .Set("Static hitmarkers", still, shown, "They fade out without popping.")
-                  .Set("Animation", E(Tweaks, "HUD", "Hitmarker Animation"), () => !On(noHm) && !On(still), "How far they pop.")
-                  .Set("Same headshot animation", E(Tweaks, "HUD", "Same Headshot Animation"), () => !On(noHm) && !On(still), "Headshots pop like bodyshots.")
-                  .Set("Bodyshot color", E(Tweaks, "HUD", "Hitmarker Bodyshot Color"), shown, "")
-                  .Set("Headshot color", E(Tweaks, "HUD", "Hitmarker Headshot Color"), shown, "")
-                  .Set("Kill hitmarker", kill, shown, "The hit that kills shows in the kill color.")
-                  .Set("Kill color", E(Tweaks, "HUD", "Hitmarker Kill Color"), () => !On(noHm) && On(kill), "");
-                if (noHm != null) { hm.Draw = r => BundleMenu.I.HitmarkerPreview(r); hm.SideRows = () => 11f + (On(kill) ? BundleMenu.MarkerRows : 0f); }
+                var p = new MenuPage(null, "HUD", "Prompts, counters.");
 
                 var pr = new MenuPage(p, "Prompts", "The texts on weapons, doors and buttons.") { Dialog = true };
                 ConfigEntryBase noPick = E(Tweaks, "Interaction", "Hide Pickup Prompts"), noUse = E(Tweaks, "Interaction", "Hide Interaction Prompts");
@@ -530,8 +531,7 @@ namespace Monolith
                   .Set("Down / up", E(Tweaks, "Interaction", "Prompt Y Offset"), some, "")
                   .Set("Weapon highlight color", E(Tweaks, "Interaction", "Weapon Highlight Color"), null, "The outline of the weapon you look at.");
 
-                p.Go(hm, () => On(noHm) ? "hidden" : On(still) ? "static" : "")
-                 .Go(pr, () => On(noPick) && On(noUse) ? "hidden" : "")
+                p.Go(pr, () => On(noPick) && On(noUse) ? "hidden" : "")
                  .Set("Match stats", E(Match, "Match Stats", "Enabled"), null, "Kills, deaths and damage of each round on the round-end screen, the match so far over each name on the Tab screen, and a full board after the match.")
                  .Set("Hide FPS", E(Tweaks, "HUD", "Hide FPS"), null, "")
                  .Set("Hide ping", E(Tweaks, "HUD", "Hide Ping"), null, "")

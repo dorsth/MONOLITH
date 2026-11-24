@@ -1,5 +1,9 @@
 # MONOLITH changelog
 
+## 2.4.6
+- Hitmarkers moved from HUD to the Crosshair page. The crosshair's dialog is called Style.
+- Holds: CameraTweaks 1.2.4, CombatSounds 1.1.9, DorsthTweaks 1.4.7, MatchStats 1.0.6, NoGore 1.3.6, TrueSens 1.2.6, ViewmodelTweaks 2.0.8, ezCrosshair 1.3.6.
+
 ## 2.4.5
 - R on a weapon in Per weapon removes it, and the box under the page has a Remove link for it. The weapons under it move up one.
 - Holds: CameraTweaks 1.2.4, CombatSounds 1.1.9, DorsthTweaks 1.4.7, MatchStats 1.0.6, NoGore 1.3.6, TrueSens 1.2.6, ViewmodelTweaks 2.0.8, ezCrosshair 1.3.6.
