@@ -1,5 +1,9 @@
 # MONOLITH changelog
 
+## 2.2.9
+- A dialog follows the mouse smoothly while you drag it, and settles on the grid when you let go.
+- Holds: CameraTweaks 1.2.4, CombatSounds 1.1.9, DorsthTweaks 1.4.7, MatchStats 1.0.6, NoGore 1.3.6, TrueSens 1.2.6, ViewmodelTweaks 2.0.8, ezCrosshair 1.3.6.
+
 ## 2.2.8
 - A dropdown opened in a dialog is filled and has its shadow when it hangs out of the dialog, as a Far dropdown is its own menu over the screen. Before, the part outside the dialog had no background.
 - Holds: CameraTweaks 1.2.4, CombatSounds 1.1.9, DorsthTweaks 1.4.7, MatchStats 1.0.6, NoGore 1.3.6, TrueSens 1.2.6, ViewmodelTweaks 2.0.8, ezCrosshair 1.3.6.

@@ -498,9 +498,9 @@ namespace Monolith
                 int rows = Mathf.Min(_vis.Count, PanelRows - 4 - Mathf.CeilToInt(samples));
                 float dh = Mathf.Min((rows + 2 + samples) * _ch, _behindR.height - 2f * _ch), dw = Mathf.Min(DialogCols * _cw, _behindR.width - 4f * _cw);
                 if (_dlgFor != page) { _dlgFor = page; _dlgMoved = Vector2.zero; _dlgDrag = false; }
-                // dragged whole cells at a time, as Far moves a dialog by its character cells; never past the menu's
-                // window, and never down over the line under the panels, which is drawn after the dialog
-                float mx = Mathf.Round(_dlgMoved.x / _cw) * _cw, my = Mathf.Round(_dlgMoved.y / _ch) * _ch;
+                // follows the mouse while held, and settles on whole cells when let go, so its rows line up with the
+                // grid; never past the menu's window, and never down over the line under the panels, drawn after it
+                float mx = _dlgDrag ? _dlgMoved.x : Mathf.Round(_dlgMoved.x / _cw) * _cw, my = _dlgDrag ? _dlgMoved.y : Mathf.Round(_dlgMoved.y / _ch) * _ch;
                 // in the middle of the whole menu window, as Far centers a dialog on the whole screen, on the page's grid
                 float x = _behindR.x + Mathf.Round((_win.center.x - dw * 0.5f - _behindR.x) / _cw) * _cw + mx;
                 float y = _behindR.y + Mathf.Round((_win.center.y - dh * 0.5f - _behindR.y) / _ch) * _ch + my;
