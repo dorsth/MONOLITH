@@ -285,7 +285,7 @@ namespace Monolith
         }
 
         // the pop-up under its row, centered on it: its frame half a cell in from each end of the row, so its filled room
-        // ends on the row's ends and stops short of a preview beside the row
+        // ends on the row's ends and its shadow stops short of a preview beside the row
         private float Span(Pop p) { return p.AnchorRight - _pageR.x - _cw; }
 
         private void Clipped(Rect r, Rect room, Color c)
@@ -323,6 +323,8 @@ namespace Monolith
             var frame = new Rect(p.R.x + _cw * 0.5f, p.R.y + _ch * 0.5f, p.R.width - _cw, p.R.height - _ch);
             float pt = Thin * 3f;
             var room = new Rect(_pageR.x + pt, _pageR.y + pt, _pageR.width - 2f * pt, _pageR.height - 2f * pt);
+            // with the shadow the preview dialog has, half a cell down and to the right
+            Clipped(new Rect(p.R.x + _cw * 0.5f, p.R.y + _ch * 0.5f, p.R.width, p.R.height), room, Shadow);
             Clipped(p.R, room, Panel);
             Box(frame, Lang.T(p.Row.Label.Trim()), true, Panel);
             if (p.Palette) { PaletteDraw(p); return; }
