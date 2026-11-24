@@ -197,7 +197,8 @@ namespace Monolith
             foreach (var kv in list)
             {
                 PluginInfo pi = kv.Value;
-                var mod = new MenuPage(page, kv.Key, about[pi]);
+                // each mod's settings in a dialog of its own over the list, as Far opens a plugin's settings
+                var mod = new MenuPage(page, kv.Key, about[pi]) { Dialog = true };
                 string sec = null;
                 ConfigFile f = pi.Instance.Config;
                 if (f != null)
