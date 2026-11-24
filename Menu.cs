@@ -89,6 +89,8 @@ namespace Monolith
         // an edit in progress
         private MenuRow _editRow;
         private string _edit;
+        // the value a field opened with, not typed over yet: grey, and the first character typed replaces it, as in Far
+        private bool _editFresh;
         private bool _capture;
         // a key being set by pressing it (read from the input system: it knows mouse buttons and the wheel too)
         private MenuRow _bindRow;
@@ -324,7 +326,7 @@ namespace Monolith
             FrameDim = new Color32(0x6F, 0x85, 0x7B, 0xFF), Panel = new Color32(0x1A, 0x21, 0x16, 0xFF),
             BarDim = new Color32(0x13, 0x18, 0x10, 0xFF), Hover = new Color32(0x1A, 0x22, 0x17, 0xFF), KeyBar = new Color32(0x17, 0x1C, 0x13, 0xFF),
             Well = new Color32(0x07, 0x08, 0x03, 0xFF), Badge = new Color32(0xB4, 0xF6, 0xB7, 0xFF);
-        private const string Txt = "#ADB3AC", Dim = "#909790", Hot = "#F0FC9D", Mint = "#B4F6B7", Val = "#FCFEF9", Head = "#8FA59B", Faint = "#5F605D", Ink = "#070803";
+        private const string Txt = "#ADB3AC", Dim = "#909790", Hot = "#F0FC9D", Mint = "#B4F6B7", Val = "#FCFEF9", Head = "#8FA59B", Faint = "#5F605D", Ink = "#070803", Unchanged = "#8F8F8E";
 
         private void Style()
         {
@@ -376,6 +378,14 @@ namespace Monolith
             // a badge is a whole cell; a plain title only hides the frame under it, so the ground above stays
             if (badge) Fill(new Rect(x, r.y - _ch * 0.5f + g, w, _ch), Badge); else Fill(new Rect(x, r.y, w, _ch * 0.5f + g), under);
             GUI.Label(new Rect(x + _cw, r.y - _ch * 0.5f + g * 0.5f, w, _ch), "<b><color=" + (badge ? Ink : panel ? Head : lines == 2 ? Val : Txt) + ">" + Esc(title) + "</color></b>", _st);
+        }
+
+        // text being typed, as Far shows it: bright once typed in, grey while it is still the value the field opened
+        // with, and a blinking mint cursor after it
+        private static string Typing(string text, bool fresh)
+        {
+            string cursor = Time.unscaledTime % 1f < 0.5f ? "<color=" + Mint + ">_</color>" : " ";
+            return "<color=" + (fresh ? Unchanged : Val) + ">" + Esc(text) + "</color>" + cursor;
         }
 
         private void Line(float x, float y, string rich) { GUI.Label(new Rect(x, y, _win.xMax - x, _ch), rich, _st); }
@@ -672,7 +682,7 @@ namespace Monolith
                 case RowKind.Action:
                 {
                     string act = Lang.T(row.Label);
-                    if (row == _editRow) return "<color=" + Mint + ">" + Esc(act) + ": </color><color=" + Hot + ">" + Esc(Fit(_edit, cols - act.Length - 4)) + "_</color>";
+                    if (row == _editRow) return "<color=" + Mint + ">" + Esc(act) + ": </color>" + Typing(Fit(_edit, cols - act.Length - 4), false);
                     if (row == _armed) return "<color=" + Hot + ">" + Esc(Pad(act + Lang.T(_armedByClick ? ": click again" : ": E again"), cols)) + "</color>";
                     if (row.Take == null && row.Dyn != null)   // a line to read (credits): the text, its value on the right, nothing to press
                     {
@@ -718,7 +728,8 @@ namespace Monolith
             string v;
             int room = Mathf.Clamp(cols - Lang.T(row.Label).Length - 3, 4, cols / 2);   // cells a list or text value may take
             if (row == _bindRow) { v = Lang.T("press a key…"); used = v.Length; return "<color=" + Hot + ">" + v + "</color>"; }
-            if (row == _editRow) { v = Fit(_capture ? Lang.T("press a key…") : _edit + "_", room + 2); used = v.Length; return "<color=" + Hot + ">" + Esc(v) + "</color>"; }
+            if (row == _editRow && _capture) { v = Lang.T("press a key…"); used = v.Length; return "<color=" + Hot + ">" + Esc(v) + "</color>"; }
+            if (row == _editRow) { v = Fit(_edit, room + 1); used = v.Length + 1; return Typing(v, _editFresh); }
             if (row.Bind) { v = Lang.T(Monolith.Keys.Name(e.GetSerializedValue(), row.Empty)); used = v.Length; return "<color=" + Val + ">" + Esc(v) + "</color>"; }
             if (t == typeof(Color))
             {
@@ -1128,8 +1139,8 @@ namespace Monolith
                     if (done.Take != null) Took(done, _edit);
                     else SetTyped(done.Entry, _edit);
                 }
-                else if (k == KeyCode.Backspace) { if (_edit.Length > 0) _edit = _edit.Substring(0, _edit.Length - 1); }
-                else if (ch >= ' ' && ch != 127 && _edit.Length < EditMax) _edit += ch;
+                else if (k == KeyCode.Backspace) { _editFresh = false; if (_edit.Length > 0) _edit = _edit.Substring(0, _edit.Length - 1); }
+                else if (ch >= ' ' && ch != 127) { if (_editFresh) { _edit = ""; _editFresh = false; } if (_edit.Length < EditMax) _edit += ch; }
                 ev.Use(); return;
             }
             if (_searching)
@@ -1230,7 +1241,7 @@ namespace Monolith
                 {
                     if (row.Take != null)
                     {
-                        if (row.Ask != null) { _editRow = row; _capture = false; _edit = ""; _modeFrame = Time.frameCount; return; }
+                        if (row.Ask != null) { _editRow = row; _capture = false; _edit = ""; _editFresh = false; _modeFrame = Time.frameCount; return; }
                         if (row.Confirm && _armed != row) { _armed = row; _armedByClick = _clicking; return; }
                         Took(row, null);
                         return;
@@ -1261,6 +1272,7 @@ namespace Monolith
             }
             _editRow = row; _capture = false; _modeFrame = Time.frameCount;
             _edit = t == typeof(float) ? ((float)e.BoxedValue).ToString("0.###", CultureInfo.InvariantCulture) : e.GetSerializedValue();
+            _editFresh = true;
         }
 
         // a row's own action: its answer is shown, and a page that it took away is left

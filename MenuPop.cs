@@ -263,12 +263,15 @@ namespace Monolith
                 if (i == p.Cur) Outline(s, KnobCur);
             }
             // any other color: its hex value in a sunken field as Far's, under the order of its digits. Clicked or typed in,
-            // it is written in yellow with the _ after it, as every text being typed in the menu
+            // it shows the cursor, as every text being typed in the menu
             bool typing = p.Editing || p.Typed.Length > 0;
             Rect f = HexField(p);
             GUI.Label(new Rect(hx + _cw, y0, 13f * _cw, _ch), "<color=" + Txt + ">RRGGBBAA</color>", _st);
             Fill(f, Well);
-            GUI.Label(new Rect(f.x + _cw, f.y, 10f * _cw, _ch), typing ? "<color=" + Hot + ">" + Esc(p.Typed) + "_</color>" : "<color=" + Val + ">" + Esc(p.Row.Entry.GetSerializedValue()) + "</color>", _st);
+            // clicked into and nothing typed yet: the value it has, grey, until the first digit replaces it
+            string shown = !typing ? "<color=" + Val + ">" + Esc(p.Row.Entry.GetSerializedValue()) + "</color>"
+                : p.Typed.Length == 0 ? Typing(p.Row.Entry.GetSerializedValue(), true) : Typing(p.Typed, false);
+            GUI.Label(new Rect(f.x + _cw, f.y, 10f * _cw, _ch), shown, _st);
             Rect b = DefaultButton(p);
             bool over = b.Contains(Event.current.mousePosition);
             if (over) Fill(b, Badge);
