@@ -48,9 +48,10 @@ namespace Monolith
             GUI.color = was;
         }
 
-        // Inside the preview dialog, two groups split the way Far's Color dialog splits its parts: a single line across
-        // (or down) the dialog, joined to its double frame, and each group's name as plain text on its first row. Draws
-        // group i and returns where it shows its samples.
+        // Inside the preview dialog, two groups. Side by side each is a single line box named on its top line, as in Far's
+        // Color dialog. One under the other they would stack their names under the dialog's, so a line across the dialog,
+        // joined to its frame, splits them and each name is plain text on its group's first row. Draws group i and
+        // returns where it shows its samples.
         private Rect Part(Rect box, int i, string title, bool under = false)
         {
             float t = Thin, frame = 3f * t, pad = Mathf.Round(_cw * 0.8f);
@@ -68,12 +69,14 @@ namespace Monolith
             }
             else
             {
-                float lineX = Mathf.Round(box.x + box.width * 0.5f - t * 0.5f), half = lineX - box.x;
-                // from under the dialog's title, which sits in the middle of the top line, down to the bottom frame's inner line
-                float from = box.y + Mathf.Round(_ch * 0.5f) + 2f * t;
-                if (i == 0) Fill(new Rect(lineX, from, t, box.yMax - 2f * t - from), Frame);
-                g = i == 0 ? new Rect(box.x + frame, top, half - frame, bottom - top)
-                           : new Rect(lineX + t, top, box.xMax - frame - lineX - t, bottom - top);
+                // side by side: a single line box each, named on its top line, as Far's Color dialog has Foreground
+                // and Background
+                var all = new Rect(box.x + frame + _cw, box.y + Mathf.Round(_ch * 1.25f), box.width - 2f * (frame + _cw), box.height - Mathf.Round(_ch * 1.25f) - frame - Mathf.Round(_ch * 0.5f));
+                float w = Mathf.Floor((all.width - 2f * _cw) / 2f);
+                var b = new Rect(Mathf.Round(i == 0 ? all.x : all.xMax - w), Mathf.Round(all.y), w, all.height);
+                Box(b, Lang.T(title), false, Panel, 1);
+                float head = Mathf.Round(_ch * 0.5f) + pad * 0.5f;
+                return new Rect(b.x + t + pad, b.y + head, b.width - 2f * (t + pad), b.height - head - t - pad);
             }
             GUI.Label(new Rect(g.x + _cw, g.y, g.width - _cw, _ch), "<color=" + Txt + ">" + Esc(Lang.T(title)) + "</color>", _st);
             return new Rect(Mathf.Round(g.x + pad), Mathf.Round(g.y + _ch + pad * 0.5f), Mathf.Round(g.width - 2f * pad), Mathf.Round(g.height - _ch - pad));
