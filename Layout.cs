@@ -163,6 +163,7 @@ namespace Monolith
         internal static IEnumerable<ConfigEntryBase> Inert()
         {
             yield return Find(View, "Viewmodel", "One Camera Hides Weapon Effects");
+            yield return Find(Cross, "Crosshair", "Enabled");   // Default in the Style list stands for it
         }
 
         private static bool On(ConfigEntryBase e) { return e != null && e.BoxedValue is bool && (bool)e.BoxedValue; }
@@ -416,18 +417,19 @@ namespace Monolith
             // ---------------------------------------------------------------- crosshair
             {
                 var p = new MenuPage(null, "Crosshair", "Crosshair and hitmarkers.");
-                ConfigEntryBase on = E(Cross, "Crosshair", "Enabled"), hit = E(Cross, "Crosshair", "Hit Color");
-                Func<bool> own = () => On(on);
+                ConfigEntryBase pick = E(Cross, "Crosshair", "Crosshair"), hit = E(Cross, "Crosshair", "Hit Color");
+                // Default, the first of the list, is the game's own crosshair: nothing of ours to set then
+                Func<bool> own = () => pick != null && !Is(pick, EzCrosshair.Custom.Game);
                 // its look in a dialog with the samples under it, as Far's Color dialog
                 var look = new MenuPage(p, "Style") { Dialog = true };
-                look.Set("Style", E(Cross, "Crosshair", "Crosshair"), own, "Every PNG in plugins/MONOLITH/Crosshairs. Add your own there and restart the game.")
+                look.Set("Style", pick, null, "Default is the game crosshair. The others are the PNGs in plugins/MONOLITH/Crosshairs. Add your own there and restart the game.")
                  .Set("Color", E(Cross, "Crosshair", "Color"), own, "White keeps the picture's own colors.")
                  .Set("Size", E(Cross, "Crosshair", "Scale"), own, "1 is the picture's own size at 1080p.")
                  .Set("Show when scoped", E(Cross, "Crosshair", "Show While Scoped"), own, "")
                  .Set("Hit color", hit, own, "The crosshair changes color for a moment on a hit.")
-                 .Set("  color", E(Cross, "Crosshair", "Hit Color Value"), () => On(on) && On(hit), "");
-                if (on != null) { look.Draw = r => BundleMenu.I.CrosshairPreview(r); look.SampleRows = () => 8f; }
-                p.Set("Custom crosshair", on, null, "Off: the game crosshair.").Go(look, null, own);
+                 .Set("  color", E(Cross, "Crosshair", "Hit Color Value"), () => own() && On(hit), "");
+                if (pick != null) { look.Draw = r => BundleMenu.I.CrosshairPreview(r); look.SampleRows = () => 8f; }
+                p.Go(look, () => pick != null ? pick.GetSerializedValue() : "");
 
                 var hm = new MenuPage(p, "Hitmarkers", "Shape, size, animation, colors.") { Dialog = true };
                 ConfigEntryBase noHm = E(Tweaks, "HUD", "Hide Hitmarkers"), still = E(Tweaks, "HUD", "Static Hitmarkers");

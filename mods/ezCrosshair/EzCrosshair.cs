@@ -20,8 +20,8 @@ using UnityEngine.UI;
 
 [assembly: AssemblyTitle("ezCrosshair")]
 [assembly: AssemblyDescription("Pick your own crosshair, its color and size.")]
-[assembly: AssemblyVersion("1.3.6.0")]
-[assembly: AssemblyFileVersion("1.2.1.0")]
+[assembly: AssemblyVersion("1.3.7.0")]
+[assembly: AssemblyFileVersion("1.3.7.0")]
 
 // Only changes what you see on your own screen, so matchmaking with unmodded players still works.
 [assembly: StraftatMod(isVanillaCompatible: true)]
@@ -34,7 +34,7 @@ namespace EzCrosshair
     {
         public const string Guid = "dorsth.straftat.ezcrosshair";
         public const string Name = "ezCrosshair";
-        public const string Version = "1.3.6";
+        public const string Version = "1.3.7";
         internal const string ModMenuGuid = "kestrel.straftat.modmenu";
 
         // in the order they're shown (Images.cs has each one's picture)
@@ -69,7 +69,12 @@ namespace EzCrosshair
             On = Config.Bind("Crosshair", "Enabled", true, "Shows your crosshair instead of the game's.");
 #if DORSTH_BUNDLE
             Custom.Read(Config);
-            Pick = Config.Bind("Crosshair", "Crosshair", Array.IndexOf(Custom.All, Names[0]) >= 0 ? Names[0] : Custom.All[0], new ConfigDescription("Which crosshair: every PNG in " + Custom.Folder + ". Add your own there.", new AcceptableValueList<string>(Custom.All)));
+            Pick = Config.Bind("Crosshair", "Crosshair", Array.IndexOf(Custom.All, Names[0]) >= 0 ? Names[0] : Custom.All[Custom.All.Length - 1], new ConfigDescription("Which crosshair: every PNG in " + Custom.Folder + ". Add your own there.", new AcceptableValueList<string>(Custom.All)));
+            // MONOLITH's menu has no on/off switch: the game's crosshair is the first choice of the list. A crosshair
+            // that is switched off (in an older settings file, or by a config that is loaded) becomes that choice.
+            Action fold = () => { if (!On.Value) { Pick.Value = Custom.Game; On.Value = true; } };
+            fold();
+            On.SettingChanged += (sender, args) => fold();
 #else
             Pick = Config.Bind("Crosshair", "Crosshair", Names[0], new ConfigDescription("Which crosshair.", new AcceptableValueList<string>(Names)));
 #endif
@@ -143,12 +148,22 @@ namespace EzCrosshair
         // off here meant off and on again each frame, and the whole HUD was laid out and redrawn each frame for it.
         private static bool _hidGame;
 
+        /// <summary>Whether a crosshair of this mod is shown in place of the game's.</summary>
+        internal static bool Ours
+        {
+#if DORSTH_BUNDLE
+            get { return On.Value && Pick.Value != Custom.Game; }
+#else
+            get { return On.Value; }
+#endif
+        }
+
         private static void GameCrosshairPostfix(Crosshair __instance)
         {
             var image = __instance.image;
             if (image == null) return;
             CanvasRenderer r = image.canvasRenderer;
-            if (On.Value)
+            if (Ours)
             {
                 _hidGame = true;
                 if (r.GetAlpha() != 0f) r.SetAlpha(0f);
@@ -169,7 +184,15 @@ namespace EzCrosshair
     {
         internal const int Largest = 256;
         internal static readonly Dictionary<string, string> Files = new Dictionary<string, string>();
-        internal static string[] All = EzCrosshairPlugin.Names;
+        internal const string Game = "Default";   // the choice that leaves the game's own crosshair on
+        internal static string[] All = WithGame(EzCrosshairPlugin.Names);
+
+        private static string[] WithGame(IList<string> names)
+        {
+            var all = new List<string> { Game };
+            foreach (string n in names) if (n != Game) all.Add(n);
+            return all.ToArray();
+        }
         internal static string Folder { get { return System.IO.Path.Combine(Paths.PluginPath, "MONOLITH", "Crosshairs"); } }
 
         internal static void Read(ConfigFile config)
@@ -204,7 +227,7 @@ namespace EzCrosshair
                     string name = System.IO.Path.GetFileNameWithoutExtension(f);
                     if (name.Length > 0 && !all.Contains(name)) { all.Add(name); own++; }
                 }
-                if (all.Count > 0) All = all.ToArray();   // an empty folder: the ones in the dll
+                if (all.Count > 0) All = WithGame(all);   // an empty folder: the ones in the dll
                 EzCrosshairPlugin.Log.LogInfo(all.Count + " crosshairs in " + Folder + (own > 0 ? " (" + own + " of your own)." : "."));
             }
             catch (Exception e) { EzCrosshairPlugin.Log.LogWarning("The crosshair folder was not read, the built-in ones are used: " + e.Message); }
@@ -357,7 +380,7 @@ namespace EzCrosshair
         // null when it shows, otherwise why not
         private static string WhyHidden()
         {
-            if (!EzCrosshairPlugin.On.Value) return "turned off";
+            if (!EzCrosshairPlugin.Ours) return "turned off";
             Crosshair c = Crosshair.Instance;
             if (c == null || c.image == null) return "no game crosshair yet";
             if (!c.isActiveAndEnabled) return "the game's crosshair is switched off";

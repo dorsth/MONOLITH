@@ -37,9 +37,9 @@ T = [
 ('A weapon listed here uses its own FOV and position.', 'У оружия из этого списка свои FOV и положение.', 'info'),
 ('Pick a weapon, then its own FOV and position.', 'Выберите оружие, затем его FOV и положение.', 'info'),
 # ---- crosshair
-('Custom crosshair', 'Свой прицел', 'L27'), ('Off: the game crosshair.', 'Выкл: прицел игры.', 'tip'),
+
 ('Style', 'Стиль', 'L15'),
-('Every PNG in plugins/MONOLITH/Crosshairs. Add your own there and restart the game.', 'Каждый PNG в plugins/MONOLITH/Crosshairs. Добавьте свои туда и перезапустите игру.', 'tip'),
+('Default is the game crosshair. The others are the PNGs in plugins/MONOLITH/Crosshairs. Add your own there and restart the game.', 'Стандарт это прицел игры. Остальные это PNG в plugins/MONOLITH/Crosshairs. Добавьте свои туда и перезапустите игру.', 'tip'),
 ('Color', 'Цвет', 'L17'), ("White keeps the picture's own colors.", 'Белый сохраняет цвета картинки.', 'tip'),
 ('Size', 'Размер', 'L13'),
 ("1 is the picture's own size at 1080p.", '1: размер самой картинки при 1080p.', 'tip'),

@@ -5,7 +5,7 @@ namespace Monolith
 {
     internal static partial class Lang
     {
-        private static readonly Dictionary<string, string> Table = new Dictionary<string, string>(317)
+        private static readonly Dictionary<string, string> Table = new Dictionary<string, string>(315)
         {
             { "Crosshair", "Прицел" },
             { "Viewmodel", "Вьюмодель" },
@@ -56,10 +56,8 @@ namespace Monolith
             { "Language, the menu key, menu animations, playlists.", "Язык, клавиша меню, анимации меню, плейлисты." },
             { "A weapon listed here uses its own FOV and position.", "У оружия из этого списка свои FOV и положение." },
             { "Pick a weapon, then its own FOV and position.", "Выберите оружие, затем его FOV и положение." },
-            { "Custom crosshair", "Свой прицел" },
-            { "Off: the game crosshair.", "Выкл: прицел игры." },
             { "Style", "Стиль" },
-            { "Every PNG in plugins/MONOLITH/Crosshairs. Add your own there and restart the game.", "Каждый PNG в plugins/MONOLITH/Crosshairs. Добавьте свои туда и перезапустите игру." },
+            { "Default is the game crosshair. The others are the PNGs in plugins/MONOLITH/Crosshairs. Add your own there and restart the game.", "Стандарт это прицел игры. Остальные это PNG в plugins/MONOLITH/Crosshairs. Добавьте свои туда и перезапустите игру." },
             { "Color", "Цвет" },
             { "White keeps the picture's own colors.", "Белый сохраняет цвета картинки." },
             { "Size", "Размер" },

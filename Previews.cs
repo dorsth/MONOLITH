@@ -76,15 +76,31 @@ namespace Monolith
             try
             {
                 if (EzCrosshair.EzCrosshairPlugin.Pick == null) return;
-                Texture2D tex = EzCrosshair.Pictures.Get(EzCrosshair.EzCrosshairPlugin.Pick.Value);
-                Vector2Int size = tex != null ? EzCrosshair.Overlay.ScreenSize(tex, Mathf.Clamp(EzCrosshair.EzCrosshairPlugin.Scale.Value, 0f, 2f)) : Vector2Int.zero;
+                bool game = EzCrosshair.EzCrosshairPlugin.Pick.Value == EzCrosshair.Custom.Game;
+                Texture tex = null; Vector2 size = Vector2.zero; Rect part = new Rect(0f, 0f, 1f, 1f); Color tint = Color.white;
+                if (game)
+                {
+                    // the game's own crosshair as it is right now, when a map is loaded
+                    var image = Crosshair.Instance != null ? Crosshair.Instance.image as UnityEngine.UI.Image : null;
+                    if (image != null && image.sprite != null)
+                    {
+                        Rect t = image.sprite.textureRect; tex = image.sprite.texture;
+                        part = new Rect(t.x / tex.width, t.y / tex.height, t.width / tex.width, t.height / tex.height);
+                        size = image.rectTransform.rect.size * image.canvas.scaleFactor; tint = image.color;
+                    }
+                }
+                else
+                {
+                    Texture2D own = EzCrosshair.Pictures.Get(EzCrosshair.EzCrosshairPlugin.Pick.Value);
+                    if (own != null) { tex = own; size = EzCrosshair.Overlay.ScreenSize(own, Mathf.Clamp(EzCrosshair.EzCrosshairPlugin.Scale.Value, 0f, 2f)); tint = EzCrosshair.EzCrosshairPlugin.Tint.Value; }
+                }
                 for (int i = 0; i < 2; i++)
                 {
                     Rect s = Tone(r, i);
                     if (tex == null) continue;
                     GUI.BeginGroup(s);
-                    Color was = GUI.color; GUI.color = EzCrosshair.EzCrosshairPlugin.Tint.Value;
-                    GUI.DrawTexture(new Rect(Mathf.Floor((s.width - size.x) / 2f), Mathf.Floor((s.height - size.y) / 2f), size.x, size.y), tex);
+                    Color was = GUI.color; GUI.color = tint;
+                    GUI.DrawTextureWithTexCoords(new Rect(Mathf.Floor((s.width - size.x) / 2f), Mathf.Floor((s.height - size.y) / 2f), Mathf.Round(size.x), Mathf.Round(size.y)), tex, part);
                     GUI.color = was;
                     GUI.EndGroup();
                 }
