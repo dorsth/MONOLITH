@@ -52,7 +52,8 @@ namespace Monolith
         // by side or one under the other. Draws group i and returns where it shows its samples.
         private Rect Part(Rect box, int i, string title, bool under = false)
         {
-            float t = Thin, frame = 3f * t, top = Mathf.Round(_ch * 1.25f);
+            // half a row of room under the dialog's title before the first group's title, so the two titles don't stack
+            float t = Thin, frame = 3f * t, top = Mathf.Round(_ch * 1.75f);
             var all = new Rect(box.x + frame + _cw, box.y + top, box.width - 2f * (frame + _cw), box.height - top - frame - Mathf.Round(_ch * 0.5f));
             float w = under ? all.width : Mathf.Floor((all.width - 2f * _cw) / 2f), h = under ? Mathf.Floor((all.height - _ch) / 2f) : all.height;
             var b = new Rect(Mathf.Round(under ? all.x : i == 0 ? all.x : all.xMax - w), Mathf.Round(under && i == 1 ? all.yMax - h : all.y), w, h);
