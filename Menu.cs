@@ -616,7 +616,7 @@ namespace Monolith
                 else _told = told;
                 // a changed setting: "Reset" at the end of the box, where its default is read (R does the same)
                 _resetRow = told != null && Changed(told) ? told : null;
-                string reset = Lang.T("Reset");
+                string reset = Lang.T(_resetRow != null && Removable(_resetRow) ? "Remove" : "Reset");
                 string[] lines = Wrap(_resetRow != null ? text + " " + reset : text, (int)(info.width / _cw) - 4, 3);
                 int last = lines.Length - 1;
                 bool link = _resetRow != null && last >= 0 && lines[last].EndsWith(reset, StringComparison.Ordinal);
@@ -645,7 +645,7 @@ namespace Monolith
                     : _inNav ? K("WS", "move") + K("E", "open") + K("Tab", "switch panel") + K("/", "search") + K("Esc", "close")
                     : K("WS", "move") + K("AD", "set") + K("E", "open") + K("Q", "back") + K("/", "search") + K("Esc", "close")
                         // last, so the keys before it stay put when it comes and goes
-                        + ((over >= 0 && over < _vis.Count ? Changed(_vis[over]) : pageOn && ci >= 0 && ci < _vis.Count && Changed(_vis[ci])) ? K("R", "reset") : "");
+                        + RKey(over >= 0 && over < _vis.Count ? _vis[over] : pageOn && ci >= 0 && ci < _vis.Count ? _vis[ci] : null);
                 Line(kb.x + _cw * 2f, kb.y, keys);   // on the same column as the text of the panels and of the box above it
             }
             if (dlgOpen) Foot();
@@ -772,6 +772,9 @@ namespace Monolith
             // a cell of room on its left, and a cell and a half between it and the page frame on its right
             return new Rect(_pageR.xMax - (page.SideCols + 1.5f) * _cw, _pageR.y + _ch - Thin, (page.SideCols - 0.5f) * _cw, page.SideRows() * _ch);
         }
+
+        // R on the key bar while it does something: reset a changed setting, or remove a weapon from Per weapon
+        private static string RKey(MenuRow row) { return row == null || !Changed(row) ? "" : K("R", Removable(row) ? "remove" : "reset"); }
 
         private static string K(string key, string what) { return "<color=" + Hot + ">" + Lang.T(key) + "</color><color=" + Txt + "> " + Lang.T(what) + "</color>  "; }
 
@@ -1197,6 +1200,7 @@ namespace Monolith
         {
             try
             {
+                if (Removable(row)) return true;
                 if (row.Kind == RowKind.Entry && row.Entry != null) return !AtDefault(row.Entry);
                 if (row.Kind == RowKind.Group) foreach (ConfigEntryBase e in row.Parts) if (!AtDefault(e)) return true;
             }
@@ -1209,10 +1213,13 @@ namespace Monolith
             return e.GetSerializedValue() == TomlTypeConverter.ConvertToString(e.DefaultValue, e.SettingType);
         }
 
+        private static bool Removable(MenuRow row) { return row.Remove != null && (row.CanRemove == null || row.CanRemove()); }
+
         private static void Default(MenuRow row)
         {
             try
             {
+                if (Removable(row)) { row.Remove(); return; }
                 if (row.Kind == RowKind.Entry) row.Entry.BoxedValue = row.Entry.DefaultValue;
                 else if (row.Kind == RowKind.Group) foreach (ConfigEntryBase e in row.Parts) e.BoxedValue = e.DefaultValue;
             }

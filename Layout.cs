@@ -41,6 +41,8 @@ namespace Monolith
         public bool Fixed;                  // Entry (text): Options are all the choices (no empty one first)
         public Action Hover, Unhover;       // a row a mod made with Mod Menu's API: told when the cursor is on it
         public Func<string> Says;           // what that mod puts in the line under the page while it is
+        public Action Remove;               // Link: what R does on it instead of a reset (a weapon out of Per weapon)
+        public Func<bool> CanRemove;
     }
 
     internal sealed class MenuPage
@@ -114,6 +116,25 @@ namespace Monolith
         internal static readonly string[] Mods = { Cross, View, Cam, Tweaks, Gore, Sounds, Sens, Match };
 
         private static readonly List<string> Missing = new List<string>();
+
+        private static readonly string[] SlotKeys = { "Weapon", "Viewmodel FOV", "Viewmodel X Offset", "Viewmodel Y Offset", "Viewmodel Z Offset", "Invisible Arms" };
+
+        /// <summary>Takes weapon slot `at` out of Per weapon: the slots after it move up one, so the list has no gap.</summary>
+        private static void RemoveWeapon(int count, int at)
+        {
+            ConfigFile f = File(View);
+            if (f == null) return;
+            for (int i = at; i < count; i++)
+                foreach (string key in SlotKeys)
+                {
+                    var here = new ConfigDefinition("Weapon " + (i + 1), key);
+                    var next = new ConfigDefinition("Weapon " + (i + 2), key);
+                    if (!f.ContainsKey(here)) continue;
+                    ConfigEntryBase e = f[here];
+                    if (i + 1 < count && f.ContainsKey(next)) e.SetSerializedValue(f[next].GetSerializedValue());
+                    else e.BoxedValue = e.DefaultValue;
+                }
+        }
 
         internal static ConfigFile File(string mod)
         {
@@ -455,6 +476,11 @@ namespace Monolith
                         for (int k = 0; k < me; k++) if (Is(picks[k], "None")) return false;   // only the first empty one
                         return true;
                     });
+                    if (per.Rows.Count > 0 && per.Rows[per.Rows.Count - 1].To == slot)
+                    {
+                        per.Rows[per.Rows.Count - 1].Remove = () => RemoveWeapon(picks.Count, me);
+                        per.Rows[per.Rows.Count - 1].CanRemove = used;
+                    }
                 }
                 p.Go(per, () => { int n = 0; foreach (ConfigEntryBase e in picks) if (!Is(e, "None")) n++; return n == 0 ? "none" : Lang.Count(n, " weapon", " weapons", "weapons: "); }, seen);
                 if (p.Rows.Count > 0) cats.Add(p);

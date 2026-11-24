@@ -182,7 +182,7 @@ T = [
 ('back to ', 'назад: ', ''), ('Back one page.', 'На страницу назад.', 'info'), ('Default: ', 'По умолчанию: ', ''),
 ('on', 'вкл', ''), ('empty', 'пусто', ''), ('(empty)', '(пусто)', 'W15'), ('Nothing found.', 'Ничего не найдено.', 'info'),
 ('search: ', 'поиск: ', ''), ('press a key…', 'нажмите клавишу…', 'W17'), ('Did not work: ', 'Не получилось: ', ''),
-('reset', 'сброс', ''), ('Reset', 'Сброс', 'W8'), ('move', 'выбор', ''), ('set', 'изменить', ''), ('open', 'открыть', ''), ('default', 'сброс', ''), ('back', 'назад', ''),
+('reset', 'сброс', ''), ('Reset', 'Сброс', 'W8'), ('remove', 'убрать', ''), ('Remove', 'Убрать', 'W8'), ('move', 'выбор', ''), ('set', 'изменить', ''), ('open', 'открыть', ''), ('default', 'сброс', ''), ('back', 'назад', ''),
 ('close', 'закрыть', ''), ('take', 'выбрать', ''), ('cancel', 'отмена', ''), ('hex value', 'hex-код', ''),
 ('jump to a name', 'переход по имени', ''), ('A-Z', 'А-Я', ''), ('Key', 'Клавиша', ''), ('press one', 'нажмите', ''),
 ('ok', 'ок', ''), ('switch panel', 'сменить панель', ''), ('delete', 'стереть', ''), ('type', 'текст', ''), ('to search', 'для поиска', ''), ('leave search', 'выйти из поиска', ''),
@@ -197,6 +197,7 @@ for folder in ['HitSounds', 'HeadHitSounds', 'KillSounds', 'MeleeKillSounds']:
 # the key bars as the menu puts them together: (keys and words, in order)
 BARS = [
  [('WS','move'),('AD','set'),('E','open'),('R','reset'),('Q','back'),('/','search'),('Esc','close')],
+ [('WS','move'),('AD','set'),('E','open'),('Q','back'),('/','search'),('Esc','close'),('R','remove')],
  [('WASD','move'),('E','take'),('Q','cancel'),('R','reset'),('0-9','hex value')],
  [('WS','move'),('E','take'),('Q','cancel'),('A-Z','jump to a name')],
  [('WS','move'),('E','open'),('Tab','switch panel'),('/','search'),('Esc','close')],
