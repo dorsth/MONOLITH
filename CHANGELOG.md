@@ -1,5 +1,9 @@
 # MONOLITH changelog
 
+## 2.4.3
+- A dropdown in a dialog opens downward even when the dialog sits low in the menu: it may go past the menu's bottom, down to the screen's edge, instead of opening upward over the samples.
+- Holds: CameraTweaks 1.2.4, CombatSounds 1.1.9, DorsthTweaks 1.4.7, MatchStats 1.0.6, NoGore 1.3.6, TrueSens 1.2.6, ViewmodelTweaks 2.0.8, ezCrosshair 1.3.6.
+
 ## 2.4.2
 - The Color dialog sits centered on the dialog it was opened from, under its row, instead of lined up with the row's right end.
 - A dropdown or Color dialog that reaches past the menu is filled down to its frame; its lower part showed the game through it.
