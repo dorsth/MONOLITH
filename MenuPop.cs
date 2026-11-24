@@ -308,8 +308,9 @@ namespace Monolith
                 int longest = Mathf.Max(8, title.Length);   // never narrower than its own title
                 foreach (string s in p.Labels) if (s.Length > longest) longest = s.Length;
                 p.Shown = Mathf.Min(n, ListRows);
-                // as wide as the row, so it hides whole rows and never half of a name; wider only for a long name
-                w = Mathf.Max(Span(p), (Mathf.Min(longest, 40) + 6) * _cw); h = (p.Shown + 2) * _ch;
+                // as Far's dropdowns: under the value, as wide as its longest name (at least 22 cells), so it covers
+                // as little as it can; never wider than the row
+                w = Mathf.Min(Span(p), Mathf.Max(22, Mathf.Min(longest, 40) + 6) * _cw); h = (p.Shown + 2) * _ch;
             }
             // inside the page; under the row, or above it when there is no room under it. Its half cell of filled
             // room stops just inside the double line of the page.

@@ -93,6 +93,8 @@ namespace Monolith
         private Rect _behindR;
         // an open dialog's whole box, its frame and the ground around it; _pageR is where its rows go
         private Rect _dlgR;
+        // how many rows an open dialog's samples take at its top
+        private float _dlgSamples; private bool _dlgHeadFirst;
         // a dialog's width in cells: its rows and the two samples side by side fit, with the page around it
         private const int DialogCols = 48;
         // where a dialog was dragged by its top line, from the middle of the page; back in the middle when one opens
@@ -281,8 +283,9 @@ namespace Monolith
             // a heading with nothing under it
             for (int i = _vis.Count - 1; i >= 0; i--)
                 if (_vis[i].Kind == RowKind.Header && (i == _vis.Count - 1 || _vis[i + 1].Kind == RowKind.Header)) _vis.RemoveAt(i);
-            // a dialog opens straight on its first part: its title already says what it is, as Far's dialogs do
-            if (p.Dialog && _vis.Count > 0 && _vis[0].Kind == RowKind.Header) _vis.RemoveAt(0);
+            // a dialog opens straight on its first part: its title already says what it is, as Far's dialogs do. One
+            // with samples keeps it: its name goes on the line under the samples
+            if (p.Dialog && p.Draw == null && _vis.Count > 0 && _vis[0].Kind == RowKind.Header) _vis.RemoveAt(0);
             int ci = p.Cur != null ? _vis.IndexOf(p.Cur) : -1;
             if (ci < 0 && _vis.Count > 0)
             {
@@ -513,7 +516,9 @@ namespace Monolith
                 // the frame takes a row above the rows and one under them; samples take their rows and a line more
                 float samples = page.Draw != null ? page.SideRows() : 0f;
                 int rows = Mathf.Min(_vis.Count, PanelRows - 4 - Mathf.CeilToInt(samples));
-                float dh = Mathf.Min((rows + 2 + samples) * _ch, _behindR.height - 2f * _ch), dw = Mathf.Min(DialogCols * _cw, _behindR.width - 4f * _cw);
+                // a first part's name sits on the line under the samples, so that line takes no row of its own
+                _dlgHeadFirst = samples > 0f && _vis.Count > 0 && _vis[0].Kind == RowKind.Header;
+                float dh = Mathf.Min((rows + (_dlgHeadFirst ? 1 : 2) + samples) * _ch, _behindR.height - 2f * _ch), dw = Mathf.Min(DialogCols * _cw, _behindR.width - 4f * _cw);
                 if (_dlgFor != page) { _dlgFor = page; _dlgMoved = Vector2.zero; _dlgDrag = false; }
                 // where it was dragged to, anywhere on the screen as long as it stays whole on it
                 float mx = Mathf.Round(_dlgMoved.x), my = Mathf.Round(_dlgMoved.y);
@@ -524,7 +529,11 @@ namespace Monolith
                 _dlgR = new Rect(Mathf.Round(Mathf.Clamp(x, 0f, Screen.width - dw)), Mathf.Round(Mathf.Clamp(y, 0f, Screen.height - dh)), dw, dh);
                 // the rows a cell further in than on a page: Far keeps a cell and a half between a dialog's frame and
                 // what is in it, so the cursor bar and the pop-ups stay inside the frame
-                _pageR = new Rect(_dlgR.x + _cw, _dlgR.y, _dlgR.width - 2f * _cw, _dlgR.height);
+                // the samples on top, the rows under them: a dropdown hangs down over the rows below its own and never
+                // over the samples, so what a choice looks like stays in view while you go through a list
+                _dlgSamples = Mathf.Max(0f, samples);
+                float rowsTop = _dlgR.y + (_dlgSamples - (_dlgHeadFirst ? 1f : 0f)) * _ch;
+                _pageR = new Rect(_dlgR.x + _cw, rowsTop, _dlgR.width - 2f * _cw, _dlgR.yMax - rowsTop);
                 _rowY0 = _pageR.y + _ch;
                 _visRows = rows;
             }
@@ -688,11 +697,13 @@ namespace Monolith
             // menus), its own lighter ground and a double frame, the samples in named groups inside it
             if (page.Dialog && page.Draw != null && !_searching)
             {
-                // the samples under the rows, split from them by a line joined to the frame, as in Far's Color dialog
-                float t = Thin, lineY = Mathf.Round(_pageR.y + (_visRows + 1) * _ch + _ch * 0.5f - t * 0.5f);
+                // the samples above the rows, split from them by a line joined to the frame, as Far's Color dialog
+                // splits its parts
+                float t = Thin;
                 Rect frame = DialogFrame();
-                Fill(new Rect(frame.x + 2f * t, lineY, frame.width - 4f * t, t), Frame);
-                page.Draw(new Rect(frame.x, lineY, frame.width, frame.yMax - lineY));
+                float lineY = Mathf.Round(frame.y + _dlgSamples * _ch - t * 0.5f);
+                if (!_dlgHeadFirst || page.Top > 0) Fill(new Rect(frame.x + 2f * t, lineY, frame.width - 4f * t, t), Frame);
+                page.Draw(new Rect(frame.x, frame.y, frame.width, lineY - frame.y));
             }
             else if (page.Draw != null)
             {

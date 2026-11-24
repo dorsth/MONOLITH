@@ -1,5 +1,11 @@
 # MONOLITH changelog
 
+## 2.3.9
+- In a dialog the samples sit on top and the settings under them, so a dropdown never covers the samples: you see each choice on them as you go through the list.
+- In the Players dialog, Enemies is named again, on the line under the samples.
+- Dropdowns are only as wide as their longest name (at least 22 cells), under the value, as Far's are, so they cover less.
+- Holds: CameraTweaks 1.2.4, CombatSounds 1.1.9, DorsthTweaks 1.4.7, MatchStats 1.0.6, NoGore 1.3.6, TrueSens 1.2.6, ViewmodelTweaks 2.0.8, ezCrosshair 1.3.6.
+
 ## 2.3.8
 - A dialog dragged out of the menu shows its whole rows: their names and values were cut off at the menu's edge. Its dropdowns open beside it there too, instead of being pulled back into the menu.
 - Holds: CameraTweaks 1.2.4, CombatSounds 1.1.9, DorsthTweaks 1.4.7, MatchStats 1.0.6, NoGore 1.3.6, TrueSens 1.2.6, ViewmodelTweaks 2.0.8, ezCrosshair 1.3.6.
