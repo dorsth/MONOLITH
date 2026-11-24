@@ -1222,7 +1222,9 @@ namespace Monolith
                 else if (ch >= ' ' && ch != 127 && _query.Length < 40) { _query += ch; _searchPage = null; }
                 ev.Use(); return;
             }
-            if (k == KeyCode.Escape) { EscHeld = true; _escFrame = Time.frameCount; Close(); ev.Use(); return; }
+            // Esc closes a dialog, as in Far, and only the menu itself when no dialog is open; held until let go either
+            // way, so the game never sees it
+            if (k == KeyCode.Escape) { EscHeld = true; _escFrame = Time.frameCount; if (page.Dialog) GoBack(); else Close(); ev.Use(); return; }
             // the menu's own key is read by the key watcher (once per press, not once per key repeat)
             if (k == Key.Value && k != KeyCode.None) { ev.Use(); return; }
             if (k == KeyCode.Tab) { _inNav = !_inNav; ev.Use(); return; }
