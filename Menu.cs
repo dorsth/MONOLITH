@@ -352,7 +352,7 @@ namespace Monolith
             _st = new GUIStyle { font = _font, fontSize = size, richText = true, wordWrap = false, alignment = TextAnchor.MiddleLeft, clipping = TextClipping.Clip };
             _st.normal.textColor = Color.white;
             // the font leaves more room above a capital than under it: one pixel up (at 1080p) puts a row's text in the middle of its bar
-            _st.contentOffset = new Vector2(0f, -Mathf.Max(1f, Mathf.Round(size / 18f)));
+            _st.contentOffset = new Vector2(0f, -Mathf.Max(1f, Px(size / 18f)));
             _cw = _st.CalcSize(new GUIContent("MMMMMMMMMMMMMMMMMMMM")).x / 20f;
             _ch = Mathf.Ceil(size * 1.32f);
             float thin = _st.CalcSize(new GUIContent("iiiiiiiiiiiiiiiiiiii")).x / 20f;
@@ -366,7 +366,7 @@ namespace Monolith
         private void Fill(Rect r, Color c) { Color o = GUI.color; GUI.color = c; GUI.DrawTexture(r, _white); GUI.color = o; }
 
         // how thick a frame line is
-        private float Thin { get { return Mathf.Max(1f, Mathf.Round(_ch / 14f)); } }
+        private float Thin { get { return Mathf.Max(1f, Px(_ch / 14f)); } }
 
         // a double frame, as the panels of a text-mode file manager have, drawn as lines (no gaps between rows);
         // a box inside a panel has one line
@@ -385,7 +385,7 @@ namespace Monolith
                 Fill(new Rect(q.x, q.y, t, q.height), c); Fill(new Rect(q.xMax - t, q.y, t, q.height), c);
             }
             if (string.IsNullOrEmpty(title)) return;
-            float w = (title.Length + 2) * _cw, x = Mathf.Round(r.x + (r.width - w) * 0.5f);
+            float w = (title.Length + 2) * _cw, x = Px(r.x + (r.width - w) * 0.5f);
             // the title of the panel that has the keys sits on a mint badge, as in the theme; a dialog's is bright. Titles are bold, as Far's
             bool badge = active && panel;
             // a badge is a whole cell; a plain title only hides the frame under it, so the ground above stays
@@ -403,16 +403,20 @@ namespace Monolith
         }
 
         // a line of text, as far right as the screen goes: a dialog can be dragged out of the menu's window
+        // to the nearest whole pixel, a half always up: Mathf.Round takes a half to the even number, so a box whose middle
+        // falls on a half pixel jumped a pixel back and forth with every pixel the dialog moved
+        private static float Px(float v) { return Mathf.Floor(v + 0.5f); }
+
         // text on whole pixels: a dialog dragged by a fraction of a pixel moves its text a whole one or not at all, so
         // the letters keep their shape instead of shimmering
-        private static void Label(Rect r, string rich, GUIStyle st) { GUI.Label(new Rect(Mathf.Round(r.x), Mathf.Round(r.y), r.width, r.height), rich, st); }
+        private static void Label(Rect r, string rich, GUIStyle st) { GUI.Label(new Rect(Px(r.x), Px(r.y), r.width, r.height), rich, st); }
 
         private void Line(float x, float y, string rich) { Label(new Rect(x, y, Mathf.Max(_win.xMax, Screen.width) - x, _ch), rich, _st); }
 
         // a word in the middle of a panel's bottom line, as Far puts its totals there
         private void Footer(Rect r, string text)
         {
-            float g = Thin * 2f, w = (text.Length + 2) * _cw, x = Mathf.Round(r.x + (r.width - w) * 0.5f);
+            float g = Thin * 2f, w = (text.Length + 2) * _cw, x = Px(r.x + (r.width - w) * 0.5f);
             Fill(new Rect(x, r.yMax - _ch * 0.5f - g, w, _ch * 0.5f + g), Back);   // over the frame only: below it is the ground
             Label(new Rect(x + _cw, r.yMax - _ch * 0.5f - g * 0.5f - Thin, w, _ch), "<color=" + Dim + ">" + Esc(text) + "</color>", _st);
         }
@@ -425,8 +429,8 @@ namespace Monolith
         // line and the bar, and between the bar and the rows. Gap is also what a pop-up has above its first row and
         // below its last, so its rows have the same room on all four sides.
         private const float BarW = 0.8f;
-        private float Gap { get { return Mathf.Round(_ch * 0.5f - Thin * 3f); } }
-        private float BarX(float right) { return Mathf.Round(right - Thin * 3f - Gap - _cw * BarW); }
+        private float Gap { get { return Px(_ch * 0.5f - Thin * 3f); } }
+        private float BarX(float right) { return Px(right - Thin * 3f - Gap - _cw * BarW); }
         private bool Scrolls { get { return _vis.Count > _visRows; } }
 
         // a page's scroll bar, held with the mouse: the cursor goes to the row at that height of the bar
@@ -442,7 +446,7 @@ namespace Monolith
         // a scroll bar one cell wide at x, over the rows from y0 down (a page's, or a list's in a pop-up)
         private void ScrollBar(float x, float y0, int top, int shown, int count, Color under)
         {
-            float h = shown * _ch, w = Mathf.Round(_cw * BarW), ax = Mathf.Round(x + (w - _cw) * 0.5f);
+            float h = shown * _ch, w = Px(_cw * BarW), ax = Px(x + (w - _cw) * 0.5f);
             Fill(new Rect(x, y0, w, h), under);
             Label(new Rect(ax, y0, _cw * 2f, _ch), "<color=" + Head + ">▲</color>", _st);
             Label(new Rect(ax, y0 + h - _ch, _cw * 2f, _ch), "<color=" + Head + ">▼</color>", _st);
@@ -461,7 +465,7 @@ namespace Monolith
             GUI.DrawTextureWithTexCoords(new Rect(x, ty, w, th), _dots, new Rect((1f - first) / 3f, 0f, w / 3f, th / 3f));
             GUI.color = was;
             float bh = Mathf.Max(_ch * 0.5f, th * shown / count), by = ty + (th - bh) * top / Mathf.Max(1, count - shown);
-            Fill(new Rect(x, Mathf.Round(by), w, Mathf.Round(bh)), Frame);
+            Fill(new Rect(x, Px(by), w, Px(bh)), Frame);
         }
 
         // A section heading as Far heads a column: its name alone, in the middle, in the color of a column title.
@@ -470,10 +474,10 @@ namespace Monolith
         // modern Far splits its dialogs (╟──── Markers ────╢)
         private void Divider(float y, string title)
         {
-            Rect f = DialogFrame(); float t = Thin, lineY = Mathf.Round(y + _ch * 0.5f - t * 0.5f);
+            Rect f = DialogFrame(); float t = Thin, lineY = Px(y + _ch * 0.5f - t * 0.5f);
             Fill(new Rect(f.x + 2f * t, lineY, f.width - 4f * t, t), Frame);
             title = " " + Fit(title, (int)(f.width / _cw) - 6) + " ";
-            float w = title.Length * _cw, x = Mathf.Round(f.x + (f.width - w) * 0.5f);
+            float w = title.Length * _cw, x = Px(f.x + (f.width - w) * 0.5f);
             Fill(new Rect(x, y, w, _ch), Panel);
             Label(new Rect(x, y, w + 2f, _ch), "<color=" + Txt + ">" + Esc(title) + "</color>", _st);
         }
@@ -483,7 +487,7 @@ namespace Monolith
             bool beside = side.width > 0f && row.y + _ch * 0.5f >= side.y && row.y <= side.yMax;
             float x0 = _pageR.x + _cw, x1 = beside ? side.x : _pageR.xMax - _cw;
             title = Fit(title, (int)((x1 - x0) / _cw) - 2);
-            float w = title.Length * _cw, x = Mathf.Round((x0 + x1 - w) * 0.5f);
+            float w = title.Length * _cw, x = Px((x0 + x1 - w) * 0.5f);
             Label(new Rect(x, row.y, w + 2f, _ch), "<b><color=" + Hot + ">" + Esc(title) + "</color></b>", _st);
         }
 
@@ -500,9 +504,9 @@ namespace Monolith
             Event ev = Event.current;
             MenuPage page = Current(); int ci = Lay(page);
             float w = Cols * _cw;
-            float h = Mathf.Round(WindowRows * _ch);
+            float h = Px(WindowRows * _ch);
             float left = Mathf.Min(Screen.width * ScreenLeft, Mathf.Max(0f, Screen.width - w));
-            _win = new Rect(Mathf.Round(left), Mathf.Round((Screen.height - h) * 0.5f), w, h);
+            _win = new Rect(Px(left), Px((Screen.height - h) * 0.5f), w, h);
             _navR = new Rect(_win.x + _cw * SideMargin, _win.y + _ch * TopMargin, NavCols * _cw, PanelRows * _ch);
             // a whole cell between the panels: the page is 59 cells wide, every column of it on the same grid as the rest
             float pageX = _navR.xMax + _cw;
@@ -526,15 +530,15 @@ namespace Monolith
                 float dh = Mathf.Min((rows + (_dlgHeadFirst ? 1 : 2) + samples) * _ch, Screen.height), dw = Mathf.Min(DialogCols * _cw, _behindR.width - 4f * _cw);
                 if (_dlgFor != page) { _dlgFor = page; _dlgMoved = Vector2.zero; _dlgDrag = false; _dlgOpenH = dh; _dlgOpenSamples = samples; }
                 // where it was dragged to, anywhere on the screen as long as it stays whole on it
-                float mx = Mathf.Round(_dlgMoved.x), my = Mathf.Round(_dlgMoved.y);
+                float mx = Px(_dlgMoved.x), my = Px(_dlgMoved.y);
                 // in the middle of the whole menu window, as Far centers a dialog on the whole screen, on the page's grid
-                float x = _behindR.x + Mathf.Round((_win.center.x - dw * 0.5f - _behindR.x) / _cw) * _cw + mx;
+                float x = _behindR.x + Px((_win.center.x - dw * 0.5f - _behindR.x) / _cw) * _cw + mx;
                 // centered at the height it opened with: a row that comes or goes makes it longer or shorter at the bottom,
                 // so the row under the mouse stays put
                 // samples that get taller (Kill hitmarker on adds a row of them) grow it upward, so the rows under them stay put too
-                float y = _behindR.y + Mathf.Round((_win.center.y - _dlgOpenH * 0.5f - _behindR.y) / _ch) * _ch + my - (samples - _dlgOpenSamples) * _ch;
+                float y = _behindR.y + Px((_win.center.y - _dlgOpenH * 0.5f - _behindR.y) / _ch) * _ch + my - (samples - _dlgOpenSamples) * _ch;
                 // on whole pixels, so its text does not shimmer while it is dragged
-                _dlgR = new Rect(Mathf.Round(Mathf.Clamp(x, 0f, Screen.width - dw)), Mathf.Round(Mathf.Clamp(y, 0f, Screen.height - dh)), dw, dh);
+                _dlgR = new Rect(Px(Mathf.Clamp(x, 0f, Screen.width - dw)), Px(Mathf.Clamp(y, 0f, Screen.height - dh)), dw, dh);
                 // the rows a cell further in than on a page: Far keeps a cell and a half between a dialog's frame and
                 // what is in it, so the cursor bar and the pop-ups stay inside the frame
                 // the samples on top, the rows under them: a dropdown hangs down over the rows below its own and never
@@ -709,7 +713,7 @@ namespace Monolith
                 // splits its parts
                 float t = Thin;
                 Rect frame = DialogFrame();
-                float lineY = Mathf.Round(frame.y + _dlgSamples * _ch - t * 0.5f);
+                float lineY = Px(frame.y + _dlgSamples * _ch - t * 0.5f);
                 if (!_dlgHeadFirst || page.Top > 0) Fill(new Rect(frame.x + 2f * t, lineY, frame.width - 4f * t, t), Frame);
                 page.Draw(new Rect(frame.x, frame.y, frame.width, lineY - frame.y));
             }
@@ -960,13 +964,13 @@ namespace Monolith
         {
             float a, b;
             if (!IsSlider(row, out a, out b)) return;
-            float x = SliderX(cols), travel = (BarCells - 1) * _cw, t = Mathf.Max(2f, Mathf.Round(_ch / 12f)), mid = Mathf.Round(y + _ch * 0.5f);
+            float x = SliderX(cols), travel = (BarCells - 1) * _cw, t = Mathf.Max(2f, Px(_ch / 12f)), mid = Px(y + _ch * 0.5f);
             float f = Mathf.Clamp01((Convert.ToSingle(row.Entry.BoxedValue) - a) / (b - a)), df = Mathf.Clamp01((Convert.ToSingle(row.Entry.DefaultValue) - a) / (b - a));
-            float kx = Mathf.Round(x + f * travel);
+            float kx = Px(x + f * travel);
             Fill(new Rect(x, mid - t * 0.5f, BarCells * _cw, t), LineRest);
             Fill(new Rect(x, mid - t * 0.5f, kx - x + _cw * 0.5f, t), Color.white);
-            Fill(new Rect(Mathf.Round(x + _cw * 0.5f + df * travel - t * 0.5f), mid + _ch * 0.2f, t, Mathf.Round(_ch * 0.2f)), Tick);
-            Fill(new Rect(kx, Mathf.Round(y + _ch * 0.17f), _cw, Mathf.Round(_ch * 0.66f)), cur ? KnobCur : KnobRest);
+            Fill(new Rect(Px(x + _cw * 0.5f + df * travel - t * 0.5f), mid + _ch * 0.2f, t, Px(_ch * 0.2f)), Tick);
+            Fill(new Rect(kx, Px(y + _ch * 0.17f), _cw, Px(_ch * 0.66f)), cur ? KnobCur : KnobRest);
         }
 
         // the mouse on a slider: the knob goes where the mouse is, in whole steps, and onto the default when it is close to it
@@ -980,9 +984,9 @@ namespace Monolith
             try
             {
                 if (Mathf.Abs(f - df) * travel <= _cw * 0.4f) { row.Entry.BoxedValue = row.Entry.DefaultValue; return; }
-                float step = Nice((b - a) / 100f), v = a + Mathf.Round(f * (b - a) / step) * step;
+                float step = Nice((b - a) / 100f), v = a + Px(f * (b - a) / step) * step;
                 if (row.Entry.SettingType == typeof(int)) row.Entry.BoxedValue = Mathf.Clamp(Mathf.RoundToInt(v), (int)a, (int)b);
-                else row.Entry.BoxedValue = Mathf.Round(Mathf.Clamp(v, a, b) * 1000f) / 1000f;
+                else row.Entry.BoxedValue = Px(Mathf.Clamp(v, a, b) * 1000f) / 1000f;
             }
             catch (Exception e) { Warn("dragging a slider", e); }
         }
@@ -1515,7 +1519,7 @@ namespace Monolith
                     float v = (float)e.BoxedValue, a = ranged ? (float)min.GetValue(av, null) : float.MinValue, b = ranged ? (float)max.GetValue(av, null) : float.MaxValue;
                     float step = ranged ? Nice((b - a) / 100f) : Nice(Mathf.Max(Mathf.Abs(v), 0.2f) / 20f);
                     v = Mathf.Clamp(v + dir * step * (big ? 10f : 1f), a, b);
-                    e.BoxedValue = Mathf.Round(v * 1000f) / 1000f;
+                    e.BoxedValue = Px(v * 1000f) / 1000f;
                 }
                 return true;
             }

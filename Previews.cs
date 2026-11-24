@@ -19,7 +19,7 @@ namespace Monolith
 
         private void Put(float x, float y, string text, string color)
         {
-            Label(new Rect(Mathf.Round(x - text.Length * _cw * 0.5f), y, text.Length * _cw + 2f, _ch), "<color=" + color + ">" + text + "</color>", _st);
+            Label(new Rect(Px(x - text.Length * _cw * 0.5f), y, text.Length * _cw + 2f, _ch), "<color=" + color + ">" + text + "</color>", _st);
         }
 
         // a note in the middle of a box: on two lines when one line would touch its sides
@@ -42,7 +42,7 @@ namespace Monolith
             Texture2D t = s.texture; Rect tr = s.textureRect;
             if (t == null || tr.width <= 0f || tr.height <= 0f) return;
             if (w <= 0f) { float k = Mathf.Min(box.width / tr.width, box.height / tr.height); w = tr.width * k; h = tr.height * k; }
-            var at = new Rect(Mathf.Round(box.x + (box.width - w) * 0.5f), Mathf.Round(box.y + (box.height - h) * 0.5f), Mathf.Round(w), Mathf.Round(h));
+            var at = new Rect(Px(box.x + (box.width - w) * 0.5f), Px(box.y + (box.height - h) * 0.5f), Px(w), Px(h));
             Color was = GUI.color; GUI.color = tint;
             GUI.DrawTextureWithTexCoords(at, t, new Rect(tr.x / t.width, tr.y / t.height, tr.width / t.width, tr.height / t.height), true);
             GUI.color = was;
@@ -52,12 +52,12 @@ namespace Monolith
         // dialog has Foreground and Background. Draws group i and returns where it shows its samples.
         private Rect Part(Rect box, int i, string title)
         {
-            float t = Thin, frame = 3f * t, pad = Mathf.Round(_cw * 0.8f), top = Mathf.Round(_ch * 1.25f);
-            var all = new Rect(box.x + frame + _cw, box.y + top, box.width - 2f * (frame + _cw), box.height - top - frame - Mathf.Round(_ch * 0.5f));
+            float t = Thin, frame = 3f * t, pad = Px(_cw * 0.8f), top = Px(_ch * 1.25f);
+            var all = new Rect(box.x + frame + _cw, box.y + top, box.width - 2f * (frame + _cw), box.height - top - frame - Px(_ch * 0.5f));
             float w = Mathf.Floor((all.width - 2f * _cw) / 2f);
-            var b = new Rect(Mathf.Round(i == 0 ? all.x : all.xMax - w), Mathf.Round(all.y), w, all.height);
+            var b = new Rect(Px(i == 0 ? all.x : all.xMax - w), Px(all.y), w, all.height);
             Box(b, Lang.T(title), false, Panel, 1);
-            float head = Mathf.Round(_ch * 0.5f) + pad * 0.5f;
+            float head = Px(_ch * 0.5f) + pad * 0.5f;
             return new Rect(b.x + t + pad, b.y + head, b.width - 2f * (t + pad), b.height - head - t - pad);
         }
 
@@ -143,7 +143,7 @@ namespace Monolith
                 for (int tone = 0; tone < 2; tone++)
                 {
                     Rect s = Tone(r, tone);
-                    float cell = MarkerRows * _ch, y0 = Mathf.Round((s.height - n * cell) / 2f);
+                    float cell = MarkerRows * _ch, y0 = Px((s.height - n * cell) / 2f);
                     GUI.BeginGroup(s);
                     for (int i = 0; i < n; i++)
                     {

@@ -249,7 +249,7 @@ namespace Monolith
             float hexW = 14f * _cw, gap = 2f * _cw;
             sw = Mathf.Floor(Mathf.Min(3f * _cw, (p.R.width - 3f * _cw - gap - hexW) / PaletteCols));
             float all = PaletteCols * sw + gap + hexW;
-            gx = Mathf.Round(p.R.x + (p.R.width - all) * 0.5f); hx = gx + PaletteCols * sw + gap;
+            gx = Px(p.R.x + (p.R.width - all) * 0.5f); hx = gx + PaletteCols * sw + gap;
         }
 
         private void PaletteDraw(Pop p)
@@ -332,7 +332,7 @@ namespace Monolith
             // the colors are a dialog of their own, as Far's Color dialog. Far centers that on the screen; here it is
             // centered on the dialog it came from, under the row, so it never covers that dialog's samples above it
             if (p.Palette && Current().Dialog && !_searching) x = _dlgR.center.x - w * 0.5f;
-            p.R = new Rect(Mathf.Round(x), Mathf.Round(y), w, h);
+            p.R = new Rect(Px(x), Px(y), w, h);
             if (mouseMoved && !p.Palette && !p.Dragging && !(p.Values.Length > p.Shown && PopBar(p).Contains(mouse))) { int at = PopAt(mouse); if (at >= 0) PopMove(at); }
 
             // a filled panel with half a cell of room around its frame, as Far draws a dialog; never over the page's own lines
