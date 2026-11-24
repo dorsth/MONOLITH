@@ -1,5 +1,10 @@
 # MONOLITH changelog
 
+## 2.5.0
+- A dialog is as tall as its rows need, up to the screen's height, so it has no scroll bar.
+- Samples that get taller (Kill hitmarker on) grow the dialog upward, so the row under the mouse stays put.
+- Holds: CameraTweaks 1.2.4, CombatSounds 1.1.9, DorsthTweaks 1.4.7, MatchStats 1.0.6, NoGore 1.3.6, TrueSens 1.2.6, ViewmodelTweaks 2.0.8, ezCrosshair 1.3.6.
+
 ## 2.4.9
 - The whole menu is #090A05, the panel color of the STRAFCOLORS theme.
 - Holds: CameraTweaks 1.2.4, CombatSounds 1.1.9, DorsthTweaks 1.4.7, MatchStats 1.0.6, NoGore 1.3.6, TrueSens 1.2.6, ViewmodelTweaks 2.0.8, ezCrosshair 1.3.6.

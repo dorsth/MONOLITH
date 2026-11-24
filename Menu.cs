@@ -98,7 +98,7 @@ namespace Monolith
         // a dialog's width in cells: its rows and the two samples side by side fit, with the page around it
         private const int DialogCols = 48;
         // where a dialog was dragged by its top line, from the middle of the page; back in the middle when one opens
-        private Vector2 _dlgMoved; private MenuPage _dlgFor; private float _dlgOpenH; private bool _dlgDrag; private Vector2 _dlgGrab;
+        private Vector2 _dlgMoved; private MenuPage _dlgFor; private float _dlgOpenH, _dlgOpenSamples; private bool _dlgDrag; private Vector2 _dlgGrab;
         // the value a field opened with, not typed over yet: grey, and the first character typed replaces it, as in Far
         private bool _editFresh;
         private bool _capture;
@@ -519,18 +519,20 @@ namespace Monolith
                 // a box over the menu, its rows one under the other and the samples under them
                 // the frame takes a row above the rows and one under them; samples take their rows and a line more
                 float samples = page.Draw != null ? page.SideRows() : 0f;
-                int rows = Mathf.Min(_vis.Count, PanelRows - 4 - Mathf.CeilToInt(samples));
+                // as tall as its rows need, up to the screen's height: no scroll bar in a dialog
+                int rows = Mathf.Min(_vis.Count, Mathf.FloorToInt(Screen.height / _ch) - 3 - Mathf.CeilToInt(samples));
                 // a first part's name sits on the line under the samples, so that line takes no row of its own
                 _dlgHeadFirst = samples > 0f && _vis.Count > 0 && _vis[0].Kind == RowKind.Header;
-                float dh = Mathf.Min((rows + (_dlgHeadFirst ? 1 : 2) + samples) * _ch, _behindR.height - 2f * _ch), dw = Mathf.Min(DialogCols * _cw, _behindR.width - 4f * _cw);
-                if (_dlgFor != page) { _dlgFor = page; _dlgMoved = Vector2.zero; _dlgDrag = false; _dlgOpenH = dh; }
+                float dh = Mathf.Min((rows + (_dlgHeadFirst ? 1 : 2) + samples) * _ch, Screen.height), dw = Mathf.Min(DialogCols * _cw, _behindR.width - 4f * _cw);
+                if (_dlgFor != page) { _dlgFor = page; _dlgMoved = Vector2.zero; _dlgDrag = false; _dlgOpenH = dh; _dlgOpenSamples = samples; }
                 // where it was dragged to, anywhere on the screen as long as it stays whole on it
                 float mx = Mathf.Round(_dlgMoved.x), my = Mathf.Round(_dlgMoved.y);
                 // in the middle of the whole menu window, as Far centers a dialog on the whole screen, on the page's grid
                 float x = _behindR.x + Mathf.Round((_win.center.x - dw * 0.5f - _behindR.x) / _cw) * _cw + mx;
                 // centered at the height it opened with: a row that comes or goes makes it longer or shorter at the bottom,
                 // so the row under the mouse stays put
-                float y = _behindR.y + Mathf.Round((_win.center.y - _dlgOpenH * 0.5f - _behindR.y) / _ch) * _ch + my;
+                // samples that get taller (Kill hitmarker on adds a row of them) grow it upward, so the rows under them stay put too
+                float y = _behindR.y + Mathf.Round((_win.center.y - _dlgOpenH * 0.5f - _behindR.y) / _ch) * _ch + my - (samples - _dlgOpenSamples) * _ch;
                 // on whole pixels, so its text does not shimmer while it is dragged
                 _dlgR = new Rect(Mathf.Round(Mathf.Clamp(x, 0f, Screen.width - dw)), Mathf.Round(Mathf.Clamp(y, 0f, Screen.height - dh)), dw, dh);
                 // the rows a cell further in than on a page: Far keeps a cell and a half between a dialog's frame and
