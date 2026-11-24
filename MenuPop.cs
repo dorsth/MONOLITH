@@ -328,8 +328,9 @@ namespace Monolith
                 if (fit >= 4 && fit < p.Shown) { p.Shown = fit; h = (p.Shown + 2) * _ch; }
             }
             if (y + h > hold.yMax - _ch * 1.5f) y = Mathf.Max(hold.y + _ch * 0.5f, p.AnchorY - _rowStep - h);
-            // the colors are a dialog of their own, as Far's Color dialog; it opens under its row as a list does, so in
-            // a dialog it covers the rows below and never the samples above them
+            // the colors are a dialog of their own, as Far's Color dialog. Far centers that on the screen; here it is
+            // centered on the dialog it came from, under the row, so it never covers that dialog's samples above it
+            if (p.Palette && Current().Dialog && !_searching) x = _dlgR.center.x - w * 0.5f;
             p.R = new Rect(Mathf.Round(x), Mathf.Round(y), w, h);
             if (mouseMoved && !p.Palette && !p.Dragging && !(p.Values.Length > p.Shown && PopBar(p).Contains(mouse))) { int at = PopAt(mouse); if (at >= 0) PopMove(at); }
 
@@ -339,7 +340,8 @@ namespace Monolith
             // from a dialog it may hang out of it, as a Far dropdown is a menu of its own over the screen: then only the
             // menu's window holds it, and it is filled and framed wherever it goes
             MenuPage on = Current();
-            var room = p.Palette || (on.Dialog && !_searching) ? _win : new Rect(_pageR.x + pt, _pageR.y + pt, _pageR.width - 2f * pt, _pageR.height - 2f * pt);
+            // filled as far as its frame goes: clipped to less than the frame, it showed the game through its lower part
+            var room = p.Palette || (on.Dialog && !_searching) ? new Rect(0f, 0f, Screen.width, Screen.height) : new Rect(_pageR.x + pt, _pageR.y + pt, _pageR.width - 2f * pt, _pageR.height - 2f * pt);
             // with the shadow the dialogs have
             Clipped(ShadowOf(p.R), room, Shadow);
             Clipped(p.R, room, Panel);

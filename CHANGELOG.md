@@ -1,5 +1,10 @@
 # MONOLITH changelog
 
+## 2.4.2
+- The Color dialog sits centered on the dialog it was opened from, under its row, instead of lined up with the row's right end.
+- A dropdown or Color dialog that reaches past the menu is filled down to its frame; its lower part showed the game through it.
+- Holds: CameraTweaks 1.2.4, CombatSounds 1.1.9, DorsthTweaks 1.4.7, MatchStats 1.0.6, NoGore 1.3.6, TrueSens 1.2.6, ViewmodelTweaks 2.0.8, ezCrosshair 1.3.6.
+
 ## 2.4.1
 - A dropdown near the bottom of the menu shows fewer names (down to 4) instead of hanging out of the menu over the key bar. The rest scroll.
 - Holds: CameraTweaks 1.2.4, CombatSounds 1.1.9, DorsthTweaks 1.4.7, MatchStats 1.0.6, NoGore 1.3.6, TrueSens 1.2.6, ViewmodelTweaks 2.0.8, ezCrosshair 1.3.6.
