@@ -86,7 +86,12 @@ namespace Monolith
                     {
                         Rect t = image.sprite.textureRect; tex = image.sprite.texture;
                         part = new Rect(t.x / tex.width, t.y / tex.height, t.width / tex.width, t.height / tex.height);
-                        size = image.rectTransform.rect.size * image.canvas.scaleFactor; tint = image.color;
+                        // its size on screen, from where its corners are drawn
+                        var corners = new Vector3[4]; image.rectTransform.GetWorldCorners(corners);
+                        Canvas root = image.canvas.rootCanvas;
+                        Camera cam = root.renderMode == RenderMode.ScreenSpaceOverlay ? null : root.worldCamera;
+                        Vector2 low = RectTransformUtility.WorldToScreenPoint(cam, corners[0]), high = RectTransformUtility.WorldToScreenPoint(cam, corners[2]);
+                        size = new Vector2(Mathf.Abs(high.x - low.x), Mathf.Abs(high.y - low.y)); tint = image.color;
                     }
                 }
                 else
@@ -97,7 +102,7 @@ namespace Monolith
                 for (int i = 0; i < 2; i++)
                 {
                     Rect s = Tone(r, i);
-                    if (tex == null) continue;
+                    if (tex == null || size.x < 1f || size.y < 1f) continue;
                     GUI.BeginGroup(s);
                     Color was = GUI.color; GUI.color = tint;
                     GUI.DrawTextureWithTexCoords(new Rect(Mathf.Floor((s.width - size.x) / 2f), Mathf.Floor((s.height - size.y) / 2f), Mathf.Round(size.x), Mathf.Round(size.y)), tex, part);

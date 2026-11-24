@@ -1,5 +1,9 @@
 # MONOLITH changelog
 
+## 2.6.5
+- The sample of the Default crosshair is the size it has on screen. It was drawn many times too large.
+- Holds: CameraTweaks 1.2.4, CombatSounds 1.1.9, DorsthTweaks 1.5.1, MatchStats 1.0.7, NoGore 1.3.7, TrueSens 1.2.6, ViewmodelTweaks 2.0.8, ezCrosshair 1.3.7.
+
 ## 2.6.4
 - The Custom crosshair switch is gone. Default, the first choice of the Style list, is the game crosshair. A crosshair that was switched off is set to Default.
 - Holds: CameraTweaks 1.2.4, CombatSounds 1.1.9, DorsthTweaks 1.5.1, MatchStats 1.0.7, NoGore 1.3.7, TrueSens 1.2.6, ViewmodelTweaks 2.0.8, ezCrosshair 1.3.7.
