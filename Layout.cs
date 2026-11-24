@@ -53,12 +53,10 @@ namespace Monolith
         public readonly List<MenuRow> Rows = new List<MenuRow>();
         public MenuRow Cur; public int Last, Top;
         public bool Outside;                // not part of MONOLITH (the other mods you have): dimmer in the list
-        // a box on the right of the page that the page draws itself (the crosshair): its size in cells, its title
-        public Action<UnityEngine.Rect> Draw; public int SideCols; public Func<float> SideRows;
-        // opened from its parent page as a Far dialog over it: its rows on top, Draw's samples at the bottom (SideRows
-        // high), as Far's Color dialog has its sample text under its settings
+        // opened from its parent page as a Far dialog over it
         public bool Dialog;
-        public bool Side { get { return Draw != null && !Dialog; } }
+        // samples the dialog draws itself above its rows (the crosshair on dark and light), SampleRows high
+        public Action<UnityEngine.Rect> Draw; public Func<float> SampleRows;
 
         public MenuPage(MenuPage parent, string name, string info = null)
         {
@@ -428,7 +426,7 @@ namespace Monolith
                  .Set("Show when scoped", E(Cross, "Crosshair", "Show While Scoped"), own, "")
                  .Set("Hit color", hit, own, "The crosshair changes color for a moment on a hit.")
                  .Set("  color", E(Cross, "Crosshair", "Hit Color Value"), () => On(on) && On(hit), "");
-                if (on != null) { look.Draw = r => BundleMenu.I.CrosshairPreview(r); look.SideRows = () => 8f; }
+                if (on != null) { look.Draw = r => BundleMenu.I.CrosshairPreview(r); look.SampleRows = () => 8f; }
                 p.Set("Custom crosshair", on, null, "Off: the game crosshair.").Go(look, null, own);
 
                 var hm = new MenuPage(p, "Hitmarkers", "Shape, size, animation, colors.") { Dialog = true };
@@ -444,7 +442,7 @@ namespace Monolith
                   .Set("Same headshot animation", E(Tweaks, "HUD", "Same Headshot Animation"), () => !On(noHm) && !On(still), "Headshots pop like bodyshots.")
                   .Set("Bodyshot color", E(Tweaks, "HUD", "Hitmarker Bodyshot Color"), shown, "")
                   .Set("Headshot color", E(Tweaks, "HUD", "Hitmarker Headshot Color"), shown, "");
-                if (noHm != null) { hm.Draw = r => BundleMenu.I.HitmarkerPreview(r); hm.SideRows = () => 11f; }
+                if (noHm != null) { hm.Draw = r => BundleMenu.I.HitmarkerPreview(r); hm.SampleRows = () => 11f; }
                 p.Go(hm, () => On(noHm) ? "hidden" : On(still) ? "static" : "");
                 if (p.Rows.Count > 0) cats.Add(p);
             }
@@ -578,7 +576,7 @@ namespace Monolith
                  .Pick("Suit", Players.TeamOutfit, Players.Outfits, "their own", "")
                  .Pick("Hat", Players.TeamHat, Players.Hats, "their own", "")
                  .Set("Outline color", Players.TeamOutline, null, "The same setting as in the game.");
-                look.Draw = r => BundleMenu.I.PlayersPreview(r); look.SideRows = () => 8f;
+                look.Draw = r => BundleMenu.I.PlayersPreview(r); look.SampleRows = () => 8f;
                 p.Go(look)
                  .Head("Mute")
                  .Set("Voice chat", E(Tweaks, "Mute", "Voice Chat"), null, "You don't hear other players talk.")

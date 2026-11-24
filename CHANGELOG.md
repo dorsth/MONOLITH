@@ -1,5 +1,10 @@
 # MONOLITH changelog
 
+## 2.5.9
+- The Russian tips of the four sound lists show again; they did not match the English text.
+- Removed the old preview beside a page, now that every preview is in a dialog.
+- Holds: CameraTweaks 1.2.4, CombatSounds 1.1.9, DorsthTweaks 1.5.0, MatchStats 1.0.6, NoGore 1.3.6, TrueSens 1.2.6, ViewmodelTweaks 2.0.8, ezCrosshair 1.3.6.
+
 ## 2.5.8
 - No Remove link in the box under the page for a weapon in Per weapon. R still removes it.
 - Holds: CameraTweaks 1.2.4, CombatSounds 1.1.9, DorsthTweaks 1.5.0, MatchStats 1.0.6, NoGore 1.3.6, TrueSens 1.2.6, ViewmodelTweaks 2.0.8, ezCrosshair 1.3.6.

@@ -45,7 +45,7 @@ T = [
 ("1 is the picture's own size at 1080p.", '1: размер самой картинки при 1080p.', 'tip'),
 ('Show when scoped', 'Показывать в оптике', 'L27'), ('Hit color', 'Цвет при попадании', 'L27'),
 ('The crosshair changes color for a moment on a hit.', 'При попадании прицел на мгновение меняет цвет.', 'tip'),
-('color', 'цвет', 'L15'), ('message', 'сообщение', 'L15'), ('Preview', 'Превью', 'W16'), ('Dark', 'Темно', 'W7'), ('Light', 'Светло', 'W7'),
+('color', 'цвет', 'L15'), ('message', 'сообщение', 'L15'), ('Dark', 'Темно', 'W7'), ('Light', 'Светло', 'W7'),
 # ---- viewmodel
 ('FOV', 'FOV', 'L38'), ('Left / right', 'Влево / вправо', 'L38'), ('Down / up', 'Вниз / вверх', 'L38'), ('Back / forward', 'Назад / вперёд', 'L38'),
 ('Sway', 'Покачивание', 'L38'),
@@ -197,7 +197,7 @@ T = [
     (' is out. Close the game, then update it in ', ' вышел. Закройте игру и обновите в ', ''), (' is out. Click to get it on Thunderstore, and close the game before you install it.', ' вышел. Нажмите, чтобы открыть Thunderstore, и устанавливайте при закрытой игре.', ''), ('your mod manager', 'ваш менеджер модов', ''),
 ]
 for folder in ['HitSounds', 'HeadHitSounds', 'KillSounds', 'MeleeKillSounds']:
-    T.append(('You hear each one in the list. Add yours: a sound file in plugins/MONOLITH/' + folder + '.',
+    T.append(('You hear each one as you go through the list. Add your own sound files to plugins/MONOLITH/' + folder + '.',
               'В списке каждый звук можно услышать. Свои звуки кладите в plugins/MONOLITH/' + folder + '.', 'tip'))
 # the key bars as the menu puts them together: (keys and words, in order)
 BARS = [

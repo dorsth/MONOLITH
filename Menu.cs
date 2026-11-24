@@ -307,7 +307,7 @@ namespace Monolith
         private static readonly MenuRow UpRow = new MenuRow { Kind = RowKind.Up, Label = ".." };
         private MenuRow _dragRow; private Vector2 _lastMouse;
         // a long page gives its scroll bar a cell
-        private int ColsFor(MenuPage page) { return Mathf.RoundToInt((_pageR.width - 2 * _cw) / _cw) - 1 - (page.Side ? page.SideCols + 1 : 0) - (Scrolls ? 2 : 0); }
+        private int ColsFor(MenuPage page) { return Mathf.RoundToInt((_pageR.width - 2 * _cw) / _cw) - 1 - (Scrolls ? 2 : 0); }
 
         // ---- drawing
 
@@ -333,8 +333,7 @@ namespace Monolith
 
         // the STRAFTAT theme for Far (straftat-lobby, STRAFCOLORS), measured off Far with it: panel glass, gunmetal-sage
         // frames (lighter on dialogs), the active title on a mint badge, yellow column titles and keys. The panels share the
-        // theme's window ground (no darker glass inside their frames) and dialogs (the preview and pop-ups) have its
-        // dialog ground
+        // theme's window ground and dialogs and pop-ups have its dialog ground
         private static readonly Color Back = new Color32(0x09, 0x0A, 0x05, 0xFF), Frame = new Color32(0x8F, 0xA5, 0x9B, 0xFF), Bar = new Color32(0x34, 0x45, 0x32, 0xFF), MenuBar = new Color32(0x2B, 0x39, 0x29, 0xFF),
             FrameDim = new Color32(0x6F, 0x85, 0x7B, 0xFF), Panel = new Color32(0x13, 0x18, 0x0F, 0xFF),
             BarDim = new Color32(0x13, 0x18, 0x10, 0xFF), Shadow = new Color(0f, 0f, 0f, 0.72f), Hover = new Color32(0x1A, 0x22, 0x17, 0xFF), KeyBar = new Color32(0x17, 0x1C, 0x13, 0xFF),
@@ -469,7 +468,6 @@ namespace Monolith
         }
 
         // A section heading as Far heads a column: its name alone, in the middle, in the color of a column title.
-        // Beside a preview it is in the middle of the rows.
         // a part of a dialog starts at a line across it joined to its frame, its name in the middle of the line, as
         // modern Far splits its dialogs (╟──── Markers ────╢)
         private void Divider(float y, string title)
@@ -482,10 +480,9 @@ namespace Monolith
             Label(new Rect(x, y, w + 2f, _ch), "<color=" + Txt + ">" + Esc(title) + "</color>", _st);
         }
 
-        private void Heading(Rect row, string title, Rect side)
+        private void Heading(Rect row, string title)
         {
-            bool beside = side.width > 0f && row.y + _ch * 0.5f >= side.y && row.y <= side.yMax;
-            float x0 = _pageR.x + _cw, x1 = beside ? side.x : _pageR.xMax - _cw;
+            float x0 = _pageR.x + _cw, x1 = _pageR.xMax - _cw;
             title = Fit(title, (int)((x1 - x0) / _cw) - 2);
             float w = title.Length * _cw, x = Px((x0 + x1 - w) * 0.5f);
             Label(new Rect(x, row.y, w + 2f, _ch), "<b><color=" + Hot + ">" + Esc(title) + "</color></b>", _st);
@@ -522,7 +519,7 @@ namespace Monolith
             {
                 // a box over the menu, its rows one under the other and the samples under them
                 // the frame takes a row above the rows and one under them; samples take their rows and a line more
-                float samples = page.Draw != null ? page.SideRows() : 0f;
+                float samples = page.Draw != null ? page.SampleRows() : 0f;
                 // as tall as its rows need, up to the screen's height: no scroll bar in a dialog
                 int rows = Mathf.Min(_vis.Count, Mathf.FloorToInt(Screen.height / _ch) - 3 - Mathf.CeilToInt(samples));
                 // a first part's name sits on the line under the samples, so that line takes no row of its own
@@ -690,24 +687,22 @@ namespace Monolith
                 Box(DialogFrame(), Lang.T(page.Path[page.Path.Length - 1]), false, Panel);
             }
             _pageR = pageR;
-            int side = page.Side ? page.SideCols + 1 : 0;
             int cols = ColsFor(page), vis = _visRows;
             for (int i = 0; i < vis && page.Top + i < _vis.Count; i++)
             {
                 int idx = page.Top + i; MenuRow row = _vis[idx];
-                Rect r = new Rect(_pageR.x + _cw, _pageR.y + (i + 1) * _ch, Scrolls ? BarX(_pageR.xMax) - Gap - _pageR.x - _cw : _pageR.width - 2 * _cw - side * _cw, _ch);
+                Rect r = new Rect(_pageR.x + _cw, _pageR.y + (i + 1) * _ch, Scrolls ? BarX(_pageR.xMax) - Gap - _pageR.x - _cw : _pageR.width - 2 * _cw, _ch);
                 bool cur = idx == ci && pageOn && !_byMouse;
                 // stays lit under an open pop-up, as a Far combobox keeps its focus while its list is open
                 if (cur) Fill(r, Bar); else if (idx == over && row.Kind != RowKind.Header) Fill(r, Hover);
                 if (row.Kind == RowKind.Header && dialog) Divider(r.y, Lang.T(row.Label));
-                else if (row.Kind == RowKind.Header) Heading(r, Lang.T(row.Label), page.Side ? SideRect(page) : new Rect());
+                else if (row.Kind == RowKind.Header) Heading(r, Lang.T(row.Label));
                 else Line(r.x + _cw * 0.5f, r.y, RowText(row, cols, cur));
                 Knob(row, r.y, cols, cur);
             }
             if (_vis.Count > vis) ScrollBar(page.Top, vis, _vis.Count);
 
-            // the preview: a Far dialog over the page beside the rows, with its shadow (as Far gives dialogs and pop-up
-            // menus), its own lighter ground and a double frame, the samples in named groups inside it
+            // a dialog's samples, in named groups
             if (page.Dialog && page.Draw != null && !_searching)
             {
                 // the samples above the rows, split from them by a line joined to the frame, as Far's Color dialog
@@ -717,17 +712,6 @@ namespace Monolith
                 float lineY = Px(frame.y + _dlgSamples * _ch - t * 0.5f);
                 if (!_dlgHeadFirst || page.Top > 0) Fill(new Rect(frame.x + 2f * t, lineY, frame.width - 4f * t, t), Frame);
                 page.Draw(new Rect(frame.x, frame.y, frame.width, lineY - frame.y));
-            }
-            else if (page.Draw != null)
-            {
-                Rect sr = SideRect(page);
-                // its shadow stops at the page's frame, as a pop-up's does
-                float pt = Thin * 3f;
-                Clipped(ShadowOf(sr), new Rect(_pageR.x + pt, _pageR.y + pt, _pageR.width - 2f * pt, _pageR.height - 2f * pt), Shadow);
-                Fill(sr, Panel);
-                var frame = new Rect(sr.x + _cw * 0.5f, sr.y + _ch * 0.5f, sr.width - _cw, sr.height - _ch);
-                Box(frame, Lang.T("Preview"), false, Panel);
-                page.Draw(frame);
             }
 
             // under an open dialog, so the dialog can be dragged over them
@@ -759,7 +743,7 @@ namespace Monolith
                 if (!Shows(row) || i >= PanelRows - 2) continue;
                 Rect r = new Rect(_behindR.x + _cw, _behindR.y + (i + 1) * _ch, _behindR.width - 2 * _cw, _ch);
                 if (row == parent.Cur) Fill(r, Bar);
-                if (row.Kind == RowKind.Header) Heading(r, Lang.T(row.Label), new Rect());
+                if (row.Kind == RowKind.Header) Heading(r, Lang.T(row.Label));
                 else Line(r.x + _cw * 0.5f, r.y, RowText(row, cols, row == parent.Cur));
                 Knob(row, r.y, cols, row == parent.Cur);
                 i++;
@@ -777,13 +761,6 @@ namespace Monolith
 
         // a dialog's double frame: half a cell in from its filled ground, as Far draws one
         private Rect DialogFrame() { return new Rect(_dlgR.x + _cw * 0.5f, _dlgR.y + _ch * 0.5f, _dlgR.width - _cw, _dlgR.height - _ch); }
-
-        private Rect SideRect(MenuPage page)
-        {
-            // the dialog with its half cell of ground around the frame: the title on the frame comes level with the first row
-            // a cell of room on its left, and a cell and a half between it and the page frame on its right
-            return new Rect(_pageR.xMax - (page.SideCols + 1.5f) * _cw, _pageR.y + _ch - Thin, (page.SideCols - 0.5f) * _cw, page.SideRows() * _ch);
-        }
 
         // R on the key bar while it does something: reset a changed setting, or remove a weapon from Per weapon
         private static string RKey(MenuRow row) { return row == null || !Changed(row) ? "" : K("R", Removable(row) ? "remove" : "reset"); }
@@ -1004,7 +981,6 @@ namespace Monolith
         private int RowAt(Vector2 m, MenuPage page)
         {
             if (!_pageR.Contains(m) || m.y < _rowY0) return -1;
-            if (page.Side && m.x >= SideRect(page).x - 10f) return -1;
             int i = page.Top + Mathf.FloorToInt((m.y - _rowY0) / _rowStep);
             if (i < 0 || i >= _vis.Count || i >= page.Top + _visRows || _vis[i].Kind == RowKind.Header) return -1;
             return i;

@@ -5,7 +5,7 @@ namespace Monolith
 {
     internal static partial class Lang
     {
-        private static readonly Dictionary<string, string> Table = new Dictionary<string, string>(318)
+        private static readonly Dictionary<string, string> Table = new Dictionary<string, string>(317)
         {
             { "Crosshair", "Прицел" },
             { "Viewmodel", "Вьюмодель" },
@@ -69,7 +69,6 @@ namespace Monolith
             { "The crosshair changes color for a moment on a hit.", "При попадании прицел на мгновение меняет цвет." },
             { "color", "цвет" },
             { "message", "сообщение" },
-            { "Preview", "Превью" },
             { "Dark", "Темно" },
             { "Light", "Светло" },
             { "FOV", "FOV" },
@@ -321,10 +320,10 @@ namespace Monolith
             { " is out. Close the game, then update it in ", " вышел. Закройте игру и обновите в " },
             { " is out. Click to get it on Thunderstore, and close the game before you install it.", " вышел. Нажмите, чтобы открыть Thunderstore, и устанавливайте при закрытой игре." },
             { "your mod manager", "ваш менеджер модов" },
-            { "You hear each one in the list. Add yours: a sound file in plugins/MONOLITH/HitSounds.", "В списке каждый звук можно услышать. Свои звуки кладите в plugins/MONOLITH/HitSounds." },
-            { "You hear each one in the list. Add yours: a sound file in plugins/MONOLITH/HeadHitSounds.", "В списке каждый звук можно услышать. Свои звуки кладите в plugins/MONOLITH/HeadHitSounds." },
-            { "You hear each one in the list. Add yours: a sound file in plugins/MONOLITH/KillSounds.", "В списке каждый звук можно услышать. Свои звуки кладите в plugins/MONOLITH/KillSounds." },
-            { "You hear each one in the list. Add yours: a sound file in plugins/MONOLITH/MeleeKillSounds.", "В списке каждый звук можно услышать. Свои звуки кладите в plugins/MONOLITH/MeleeKillSounds." },
+            { "You hear each one as you go through the list. Add your own sound files to plugins/MONOLITH/HitSounds.", "В списке каждый звук можно услышать. Свои звуки кладите в plugins/MONOLITH/HitSounds." },
+            { "You hear each one as you go through the list. Add your own sound files to plugins/MONOLITH/HeadHitSounds.", "В списке каждый звук можно услышать. Свои звуки кладите в plugins/MONOLITH/HeadHitSounds." },
+            { "You hear each one as you go through the list. Add your own sound files to plugins/MONOLITH/KillSounds.", "В списке каждый звук можно услышать. Свои звуки кладите в plugins/MONOLITH/KillSounds." },
+            { "You hear each one as you go through the list. Add your own sound files to plugins/MONOLITH/MeleeKillSounds.", "В списке каждый звук можно услышать. Свои звуки кладите в plugins/MONOLITH/MeleeKillSounds." },
         };
     }
 }
