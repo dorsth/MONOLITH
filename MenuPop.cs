@@ -316,6 +316,8 @@ namespace Monolith
             float x = Mathf.Clamp(p.AnchorRight - w, _pageR.x + edge, _pageR.xMax - w - edge), y = p.AnchorY;
             x = Mathf.Clamp(x, _win.x + _cw, _win.xMax - w - _cw);
             if (y + h > _win.yMax - _ch * 1.5f) y = Mathf.Max(_win.y + _ch * 0.5f, p.AnchorY - _rowStep - h);
+            // the colors are a dialog of their own, as Far's Color dialog: in the middle of the menu, over everything
+            if (p.Palette) { x = _win.center.x - w * 0.5f; y = _win.center.y - h * 0.5f; }
             p.R = new Rect(Mathf.Round(x), Mathf.Round(y), w, h);
             if (mouseMoved && !p.Palette && !p.Dragging && !(p.Values.Length > p.Shown && PopBar(p).Contains(mouse))) { int at = PopAt(mouse); if (at >= 0) PopMove(at); }
 
@@ -325,11 +327,13 @@ namespace Monolith
             // from a dialog it may hang out of it, as a Far dropdown is a menu of its own over the screen: then only the
             // menu's window holds it, and it is filled and framed wherever it goes
             MenuPage on = Current();
-            var room = on.Dialog && !_searching ? _win : new Rect(_pageR.x + pt, _pageR.y + pt, _pageR.width - 2f * pt, _pageR.height - 2f * pt);
+            var room = p.Palette || (on.Dialog && !_searching) ? _win : new Rect(_pageR.x + pt, _pageR.y + pt, _pageR.width - 2f * pt, _pageR.height - 2f * pt);
             // with the shadow the dialogs have
             Clipped(ShadowOf(p.R), room, Shadow);
             Clipped(p.R, room, Panel);
-            Box(frame, Lang.T(p.Row.Label.Trim()), true, Panel);
+            // the colors: a dialog, its double frame titled; a list: a Far dropdown, one line and no title, under its field
+            if (p.Palette) Box(frame, Lang.T(p.Row.Label.Trim()), true, Panel);
+            else Box(frame, null, true, Panel, 1);
             if (p.Palette) { PaletteDraw(p); return; }
             // the cursor is kept in view, unless the list was scrolled away from it
             if (!p.Free && p.Cur < p.Top) p.Top = p.Cur;
