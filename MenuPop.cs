@@ -26,7 +26,8 @@ namespace Monolith
         }
 
         private Pop _pop;
-        private const int PaletteCols = 8, PaletteRows = 3, ListRows = 14, DefaultSlot = PaletteCols * PaletteRows;
+        // a list shows up to 8 names at a time, as Far's dropdowns (CBoxMaxHeight), so it stays near its row
+        private const int PaletteCols = 8, PaletteRows = 3, ListRows = 8, DefaultSlot = PaletteCols * PaletteRows;
         // the 16 colors of Far's Color dialog, in its order: the dark eight, then the bright eight; then eight between them
         private static readonly Color32[] Swatches =
         {
