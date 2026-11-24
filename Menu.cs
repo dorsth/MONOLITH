@@ -91,6 +91,8 @@ namespace Monolith
         private string _edit;
         // the page panel itself while a dialog page takes _pageR
         private Rect _behindR;
+        // a dialog's width in cells: its rows and the two samples side by side fit, with the page around it
+        private const int DialogCols = 46;
         // the value a field opened with, not typed over yet: grey, and the first character typed replaces it, as in Far
         private bool _editFresh;
         private bool _capture;
@@ -488,12 +490,12 @@ namespace Monolith
             _behindR = _pageR;
             if (page != null && page.Dialog && !_searching)
             {
-                // a box over the parent page, its rows one under the other and the samples under them; the page
-                // behind keeps its left columns in view
+                // a box in the middle of the page, as Far centers its dialogs, on the same grid of cells as the rows;
+                // its rows one under the other and the samples under them
                 float samples = page.Draw != null ? page.SideRows() : -1f;
                 int rows = Mathf.Min(_vis.Count, PanelRows - 4 - Mathf.CeilToInt(samples));
-                float dh = (rows + 2 + samples) * _ch;
-                _pageR = new Rect(_behindR.x + 6f * _cw, _behindR.y + 2f * _ch, _behindR.width - 8f * _cw, Mathf.Min(dh, _behindR.height - _ch));
+                float dh = Mathf.Min((rows + 2 + samples) * _ch, _behindR.height - 2f * _ch), dw = Mathf.Min(DialogCols * _cw, _behindR.width - 4f * _cw);
+                _pageR = new Rect(_behindR.x + Mathf.Round((_behindR.width - dw) * 0.5f / _cw) * _cw, _behindR.y + Mathf.Round((_behindR.height - dh) * 0.5f / _ch) * _ch, dw, dh);
                 _rowY0 = _pageR.y + _ch;
                 _visRows = rows;
             }
