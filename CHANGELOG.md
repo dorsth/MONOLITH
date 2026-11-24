@@ -1,5 +1,10 @@
 # MONOLITH changelog
 
+## 2.2.2
+- The look of other players is set in a dialog too: the Players page has a Players row, which opens a box with the Enemies and Teammates suits, hats and outline colors, and both samples side by side under them. The Lobby options stay on the page.
+- A dialog can be dragged by its top line, as in Far. It opens in the middle of the page again next time.
+- Holds: CameraTweaks 1.2.4, CombatSounds 1.1.9, DorsthTweaks 1.4.7, MatchStats 1.0.6, NoGore 1.3.6, TrueSens 1.2.6, ViewmodelTweaks 2.0.8, ezCrosshair 1.3.6.
+
 ## 2.2.1
 - The Crosshair dialog sits in the middle of the page, as Far centers its dialogs, instead of over the row that opens it.
 - Holds: CameraTweaks 1.2.4, CombatSounds 1.1.9, DorsthTweaks 1.4.7, MatchStats 1.0.6, NoGore 1.3.6, TrueSens 1.2.6, ViewmodelTweaks 2.0.8, ezCrosshair 1.3.6.

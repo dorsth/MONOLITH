@@ -48,38 +48,17 @@ namespace Monolith
             GUI.color = was;
         }
 
-        // Inside the preview dialog, two groups. Side by side each is a single line box named on its top line, as in Far's
-        // Color dialog. One under the other they would stack their names under the dialog's, so a line across the dialog,
-        // joined to its frame, splits them and each name is plain text on its group's first row. Draws group i and
-        // returns where it shows its samples.
-        private Rect Part(Rect box, int i, string title, bool under = false)
+        // Inside the preview, two groups side by side: a single line box each, named on its top line, as Far's Color
+        // dialog has Foreground and Background. Draws group i and returns where it shows its samples.
+        private Rect Part(Rect box, int i, string title)
         {
-            float t = Thin, frame = 3f * t, pad = Mathf.Round(_cw * 0.8f);
-            // text rows start half a cell below the frame line, as the dialog's title sits on that line
-            float top = box.y + Mathf.Round(_ch * 0.5f), bottom = box.yMax - Mathf.Round(_ch * 0.5f);
-            Rect g;
-            if (under)
-            {
-                int rows = Mathf.RoundToInt((bottom - top) / _ch), cut = rows / 2;
-                float lineY = Mathf.Round(top + cut * _ch + _ch * 0.5f - t * 0.5f);
-                // from the frame's inner line to its inner line, as ╟─╢: the outer line stays whole
-                if (i == 0) Fill(new Rect(box.x + 2f * t, lineY, box.width - 4f * t, t), Frame);
-                g = i == 0 ? new Rect(box.x + frame, top, box.width - 2f * frame, cut * _ch)
-                           : new Rect(box.x + frame, top + (cut + 1) * _ch, box.width - 2f * frame, bottom - top - (cut + 1) * _ch);
-            }
-            else
-            {
-                // side by side: a single line box each, named on its top line, as Far's Color dialog has Foreground
-                // and Background
-                var all = new Rect(box.x + frame + _cw, box.y + Mathf.Round(_ch * 1.25f), box.width - 2f * (frame + _cw), box.height - Mathf.Round(_ch * 1.25f) - frame - Mathf.Round(_ch * 0.5f));
-                float w = Mathf.Floor((all.width - 2f * _cw) / 2f);
-                var b = new Rect(Mathf.Round(i == 0 ? all.x : all.xMax - w), Mathf.Round(all.y), w, all.height);
-                Box(b, Lang.T(title), false, Panel, 1);
-                float head = Mathf.Round(_ch * 0.5f) + pad * 0.5f;
-                return new Rect(b.x + t + pad, b.y + head, b.width - 2f * (t + pad), b.height - head - t - pad);
-            }
-            GUI.Label(new Rect(g.x + _cw, g.y, g.width - _cw, _ch), "<color=" + Txt + ">" + Esc(Lang.T(title)) + "</color>", _st);
-            return new Rect(Mathf.Round(g.x + pad), Mathf.Round(g.y + _ch + pad * 0.5f), Mathf.Round(g.width - 2f * pad), Mathf.Round(g.height - _ch - pad));
+            float t = Thin, frame = 3f * t, pad = Mathf.Round(_cw * 0.8f), top = Mathf.Round(_ch * 1.25f);
+            var all = new Rect(box.x + frame + _cw, box.y + top, box.width - 2f * (frame + _cw), box.height - top - frame - Mathf.Round(_ch * 0.5f));
+            float w = Mathf.Floor((all.width - 2f * _cw) / 2f);
+            var b = new Rect(Mathf.Round(i == 0 ? all.x : all.xMax - w), Mathf.Round(all.y), w, all.height);
+            Box(b, Lang.T(title), false, Panel, 1);
+            float head = Mathf.Round(_ch * 0.5f) + pad * 0.5f;
+            return new Rect(b.x + t + pad, b.y + head, b.width - 2f * (t + pad), b.height - head - t - pad);
         }
 
         // the dark group and the light group of a preview, filled
@@ -183,10 +162,10 @@ namespace Monolith
         {
             try
             {
-                // enemies in the upper group and teammates in the lower, each a suit and a hat
+                // enemies and teammates side by side under the dialog's rows, each a suit and a hat
                 for (int side = 0; side < 2; side++)
                 {
-                    Rect s = Part(r, side, side == 0 ? "Enemies" : "Teammates", true);
+                    Rect s = Part(r, side, side == 0 ? "Enemies" : "Teammates");
                     string suit = (side == 0 ? Players.EnemyOutfit : Players.TeamOutfit).Value, top = (side == 0 ? Players.EnemyHat : Players.TeamHat).Value;
                     // nothing picked for either: said once, not once for the suit and once for the hat
                     if (string.IsNullOrEmpty(suit) && string.IsNullOrEmpty(top)) { NoteIn(s, "their own", Dim); continue; }

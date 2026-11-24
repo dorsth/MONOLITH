@@ -542,19 +542,23 @@ namespace Monolith
             // ---------------------------------------------------------------- players
             {
                 var p = new MenuPage(null, "Players", "How other players look on your screen, from the next round. Lobby options.");
-                p.Head("Enemies")
+                // their look in a dialog with the two samples under it, as the crosshair's
+                var look = new MenuPage(p, "Players") { Dialog = true };
+                look.Head("Enemies")
                  .Pick("Suit", Players.EnemyOutfit, Players.Outfits, "their own", "")
                  .Pick("Hat", Players.EnemyHat, Players.Hats, "their own", "")
                  .Set("Outline color", Players.EnemyOutline, null, "The same setting as in the game. Only in lobbies with enemy outlines on.")
                  .Head("Teammates")
                  .Pick("Suit", Players.TeamOutfit, Players.Outfits, "their own", "")
                  .Pick("Hat", Players.TeamHat, Players.Hats, "their own", "")
-                 .Set("Outline color", Players.TeamOutline, null, "The same setting as in the game.")
+                 .Set("Outline color", Players.TeamOutline, null, "The same setting as in the game.");
+                look.Draw = r => BundleMenu.I.PlayersPreview(r); look.SideRows = () => 8f;
+                p.Go(look)
                  .Head("Lobby")
                  .Set("Enemy outlines when I host", Players.HostOutlines, null, "The game's lobby option, kept between launches. In other lobbies the host decides.")
                  .Set("Friendly fire when I host", Players.HostFriendlyFire, null, "The game's lobby option, kept between launches. In other lobbies the host decides.")
                  .Set("Join message", E(Tweaks, "Menus", "Join Message"), null, "The line everyone sees when you join a lobby. {name} is your name. Color, bold, italic, underline and strikethrough tags work. Up to 120 letters, tags not counted. Leave it empty for the game's line.");
-                if (p.Rows.Count > 2) { p.Draw = r => BundleMenu.I.PlayersPreview(r); p.SideCols = 24; p.SideRows = () => 16f; cats.Add(p); }
+                if (p.Rows.Count > 0) cats.Add(p);
             }
 
             // ---------------------------------------------------------------- sound

@@ -93,6 +93,8 @@ namespace Monolith
         private Rect _behindR;
         // a dialog's width in cells: its rows and the two samples side by side fit, with the page around it
         private const int DialogCols = 46;
+        // where a dialog was dragged by its top line, from the middle of the page; back in the middle when one opens
+        private Vector2 _dlgMoved; private MenuPage _dlgFor; private bool _dlgDrag; private Vector2 _dlgGrab;
         // the value a field opened with, not typed over yet: grey, and the first character typed replaces it, as in Far
         private bool _editFresh;
         private bool _capture;
@@ -495,7 +497,11 @@ namespace Monolith
                 float samples = page.Draw != null ? page.SideRows() : -1f;
                 int rows = Mathf.Min(_vis.Count, PanelRows - 4 - Mathf.CeilToInt(samples));
                 float dh = Mathf.Min((rows + 2 + samples) * _ch, _behindR.height - 2f * _ch), dw = Mathf.Min(DialogCols * _cw, _behindR.width - 4f * _cw);
-                _pageR = new Rect(_behindR.x + Mathf.Round((_behindR.width - dw) * 0.5f / _cw) * _cw, _behindR.y + Mathf.Round((_behindR.height - dh) * 0.5f / _ch) * _ch, dw, dh);
+                if (_dlgFor != page) { _dlgFor = page; _dlgMoved = Vector2.zero; _dlgDrag = false; }
+                // dragged whole cells at a time, and never past the menu's window
+                float mx = Mathf.Round(_dlgMoved.x / _cw) * _cw, my = Mathf.Round(_dlgMoved.y / _ch) * _ch;
+                float x = _behindR.x + Mathf.Round((_behindR.width - dw) * 0.5f / _cw) * _cw + mx, y = _behindR.y + Mathf.Round((_behindR.height - dh) * 0.5f / _ch) * _ch + my;
+                _pageR = new Rect(Mathf.Clamp(x, _win.x, _win.xMax - dw), Mathf.Clamp(y, _win.y, _win.yMax - dh), dw, dh);
                 _rowY0 = _pageR.y + _ch;
                 _visRows = rows;
             }
@@ -535,10 +541,12 @@ namespace Monolith
                 if (!Opened) return;
             }
             else if (ev.type == EventType.ScrollWheel) { if (!binding) Wheel(page, ci, ev.delta.y > 0 ? 3 : -3, ev.mousePosition); ev.Use(); }
+            else if (ev.type == EventType.MouseDown && ev.button == 0 && !binding && page.Dialog && !_searching && DialogGrip().Contains(ev.mousePosition)) { _dlgDrag = true; _dlgGrab = ev.mousePosition - _dlgMoved; ev.Use(); }
             else if (ev.type == EventType.MouseDown && ev.button == 0 && !binding && PageBar(page).Contains(ev.mousePosition)) { _barHeld = true; BarTo(page, ci, ev.mousePosition.y); ev.Use(); }
             else if (ev.type == EventType.MouseDown) { if (!binding) Click(ev.mousePosition, page, ev.button); ev.Use(); if (!Opened) return; }
+            else if (ev.type == EventType.MouseDrag && _dlgDrag) { _dlgMoved = ev.mousePosition - _dlgGrab; ev.Use(); }
             else if (ev.type == EventType.MouseDrag) { if (_barHeld) BarTo(page, ci, ev.mousePosition.y); else if (_dragRow != null) Slide(_dragRow, ev.mousePosition.x, page); ev.Use(); }
-            else if (ev.type == EventType.MouseUp) { _dragRow = null; _barHeld = false; }
+            else if (ev.type == EventType.MouseUp) { _dragRow = null; _barHeld = false; _dlgDrag = false; }
             if (ev.type != EventType.Repaint) return;
             page = Current(); ci = Lay(page);
             // As in Far Manager, the mouse moves the cursor only with a click, never by passing over a row.
@@ -696,6 +704,9 @@ namespace Monolith
                 i++;
             }
         }
+
+        // where a dialog is held to drag it: its top line, as Far's dialogs move by their frame
+        private Rect DialogGrip() { return new Rect(_pageR.x, _pageR.y, _pageR.width, _ch); }
 
         // a dialog's double frame: half a cell in from its filled ground, as Far draws one
         private Rect DialogFrame() { return new Rect(_pageR.x + _cw * 0.5f, _pageR.y + _ch * 0.5f, _pageR.width - _cw, _pageR.height - _ch); }
