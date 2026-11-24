@@ -1,5 +1,9 @@
 # MONOLITH changelog
 
+## 2.4.9
+- The whole menu is #090A05, the panel color of the STRAFCOLORS theme.
+- Holds: CameraTweaks 1.2.4, CombatSounds 1.1.9, DorsthTweaks 1.4.7, MatchStats 1.0.6, NoGore 1.3.6, TrueSens 1.2.6, ViewmodelTweaks 2.0.8, ezCrosshair 1.3.6.
+
 ## 2.4.8
 - All menu text sits on whole pixels, so the names of the samples (Dark, Light) no longer shake while a dialog is dragged.
 - Holds: CameraTweaks 1.2.4, CombatSounds 1.1.9, DorsthTweaks 1.4.7, MatchStats 1.0.6, NoGore 1.3.6, TrueSens 1.2.6, ViewmodelTweaks 2.0.8, ezCrosshair 1.3.6.
