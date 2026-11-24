@@ -1,5 +1,10 @@
 # MONOLITH changelog
 
+## 2.2.5
+- Shadows are drawn as Far draws them: two cells to the right and one row down, darker, with what is under them still readable.
+- The panels and dialogs have the STRAFTAT theme's own colors again (#090A05 and #13180F), as Far shows them.
+- Holds: CameraTweaks 1.2.4, CombatSounds 1.1.9, DorsthTweaks 1.4.7, MatchStats 1.0.6, NoGore 1.3.6, TrueSens 1.2.6, ViewmodelTweaks 2.0.8, ezCrosshair 1.3.6.
+
 ## 2.2.4
 - In a dialog the cursor bar and the pop-ups stay inside its double frame: its rows sit a cell further in, as Far keeps them.
 - A dialog opens in the middle of the whole menu window, as Far centers a dialog on the whole screen.
