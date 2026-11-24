@@ -381,10 +381,11 @@ namespace Monolith
         }
 
         // text being typed, as Far shows it: bright once typed in, grey while it is still the value the field opened
-        // with, and a blinking mint cursor after it
+        // with, and a blinking mint cursor after it. Far's cursor in insert mode is a bar along the bottom of the cell,
+        // 15% of its height (CursorSize1 in its config.cpp); ▁, an eighth of the cell, is the nearest character
         private static string Typing(string text, bool fresh)
         {
-            string cursor = Time.unscaledTime % 1f < 0.5f ? "<color=" + Mint + ">_</color>" : " ";
+            string cursor = Time.unscaledTime % 1f < 0.5f ? "<color=" + Mint + ">▁</color>" : " ";
             return "<color=" + (fresh ? Unchanged : Val) + ">" + Esc(text) + "</color>" + cursor;
         }
 

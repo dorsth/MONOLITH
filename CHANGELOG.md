@@ -1,5 +1,9 @@
 # MONOLITH changelog
 
+## 2.1.9
+- The typing cursor is a bar along the bottom of the cell, as Far's insert cursor, instead of an underscore.
+- Holds: CameraTweaks 1.2.4, CombatSounds 1.1.9, DorsthTweaks 1.4.7, MatchStats 1.0.6, NoGore 1.3.6, TrueSens 1.2.6, ViewmodelTweaks 2.0.8, ezCrosshair 1.3.6.
+
 ## 2.1.8
 - The drop shadow is back under the preview box and pop-ups, as Far draws one under dialogs and pop-up menus.
 - Holds: CameraTweaks 1.2.4, CombatSounds 1.1.9, DorsthTweaks 1.4.7, MatchStats 1.0.6, NoGore 1.3.6, TrueSens 1.2.6, ViewmodelTweaks 2.0.8, ezCrosshair 1.3.6.
