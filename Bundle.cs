@@ -20,7 +20,7 @@ namespace Monolith
     [BepInDependency(ModMenuGuid, BepInDependency.DependencyFlags.SoftDependency)]
     public sealed class BundlePlugin : BaseUnityPlugin
     {
-        public const string Guid = "dorsth.straftat.monolith", Name = "MONOLITH", Version = "2.3.3";
+        public const string Guid = "dorsth.straftat.monolith", Name = "MONOLITH", Version = "2.3.4";
         // filled in by build.sh: the mods and versions this file was built from
         internal const string Contents = "@CONTENTS@";
 
