@@ -1,5 +1,9 @@
 # MONOLITH changelog
 
+## 2.2.7
+- A dialog can no longer be dragged down under the line at the bottom of the menu, where its lower part was hidden.
+- Holds: CameraTweaks 1.2.4, CombatSounds 1.1.9, DorsthTweaks 1.4.7, MatchStats 1.0.6, NoGore 1.3.6, TrueSens 1.2.6, ViewmodelTweaks 2.0.8, ezCrosshair 1.3.6.
+
 ## 2.2.6
 - Each mod on the Other mods page opens its settings in a dialog of its own over the list, as Far opens a plugin's settings.
 - Holds: CameraTweaks 1.2.4, CombatSounds 1.1.9, DorsthTweaks 1.4.7, MatchStats 1.0.6, NoGore 1.3.6, TrueSens 1.2.6, ViewmodelTweaks 2.0.8, ezCrosshair 1.3.6.
