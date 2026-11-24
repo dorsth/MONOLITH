@@ -1,5 +1,9 @@
 # MONOLITH changelog
 
+## 2.1.1
+- The preview box and pop-ups are slightly lighter.
+- Holds: CameraTweaks 1.2.4, CombatSounds 1.1.9, DorsthTweaks 1.4.7, MatchStats 1.0.6, NoGore 1.3.6, TrueSens 1.2.6, ViewmodelTweaks 2.0.8, ezCrosshair 1.3.6.
+
 ## 2.1.0
 - The menu panels are a little lighter and the preview box and pop-ups a little lighter too, between 2.0.7 and 2.0.9.
 - Holds: CameraTweaks 1.2.4, CombatSounds 1.1.9, DorsthTweaks 1.4.7, MatchStats 1.0.6, NoGore 1.3.6, TrueSens 1.2.6, ViewmodelTweaks 2.0.8, ezCrosshair 1.3.6.
