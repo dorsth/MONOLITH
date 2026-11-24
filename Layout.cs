@@ -53,6 +53,10 @@ namespace Monolith
         public bool Outside;                // not part of MONOLITH (the other mods you have): dimmer in the list
         // a box on the right of the page that the page draws itself (the crosshair): its size in cells, its title
         public Action<UnityEngine.Rect> Draw; public int SideCols; public Func<float> SideRows;
+        // opened from its parent page as a Far dialog over it: its rows on top, Draw's samples at the bottom (SideRows
+        // high), as Far's Color dialog has its sample text under its settings
+        public bool Dialog;
+        public bool Side { get { return Draw != null && !Dialog; } }
 
         public MenuPage(MenuPage parent, string name, string info = null)
         {
@@ -394,14 +398,16 @@ namespace Monolith
                 var p = new MenuPage(null, "Crosshair", "Style, color, size.");
                 ConfigEntryBase on = E(Cross, "Crosshair", "Enabled"), hit = E(Cross, "Crosshair", "Hit Color");
                 Func<bool> own = () => On(on);
-                p.Set("Custom crosshair", on, null, "Off: the game crosshair.")
-                 .Set("Style", E(Cross, "Crosshair", "Crosshair"), own, "Every PNG in plugins/MONOLITH/Crosshairs. Add your own there and restart the game.")
+                // its look in a dialog with the samples under it, as Far's Color dialog
+                var look = new MenuPage(p, "Crosshair") { Dialog = true };
+                look.Set("Style", E(Cross, "Crosshair", "Crosshair"), own, "Every PNG in plugins/MONOLITH/Crosshairs. Add your own there and restart the game.")
                  .Set("Color", E(Cross, "Crosshair", "Color"), own, "White keeps the picture's own colors.")
                  .Set("Size", E(Cross, "Crosshair", "Scale"), own, "1 is the picture's own size at 1080p.")
                  .Set("Show when scoped", E(Cross, "Crosshair", "Show While Scoped"), own, "")
                  .Set("Hit color", hit, own, "The crosshair changes color for a moment on a hit.")
                  .Set("  color", E(Cross, "Crosshair", "Hit Color Value"), () => On(on) && On(hit), "");
-                if (on != null) { p.Draw = r => BundleMenu.I.CrosshairPreview(r); p.SideCols = 24; p.SideRows = () => 11f; }
+                if (on != null) { look.Draw = r => BundleMenu.I.CrosshairPreview(r); look.SideRows = () => 8f; }
+                p.Set("Custom crosshair", on, null, "Off: the game crosshair.").Go(look, null, own);
                 if (p.Rows.Count > 0) cats.Add(p);
             }
 

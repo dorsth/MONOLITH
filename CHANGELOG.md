@@ -1,5 +1,9 @@
 # MONOLITH changelog
 
+## 2.2.0
+- The crosshair's look is set in a dialog, as Far sets things: the Crosshair page has Custom crosshair and a Crosshair row, which opens a box over the page with Style, Color, Size and the rest, and the Dark and Light samples under them as in Far's Color dialog. Q closes it. The page has its full width back.
+- Holds: CameraTweaks 1.2.4, CombatSounds 1.1.9, DorsthTweaks 1.4.7, MatchStats 1.0.6, NoGore 1.3.6, TrueSens 1.2.6, ViewmodelTweaks 2.0.8, ezCrosshair 1.3.6.
+
 ## 2.1.9
 - The typing cursor is a bar along the bottom of the cell, as Far's insert cursor, instead of an underscore.
 - Holds: CameraTweaks 1.2.4, CombatSounds 1.1.9, DorsthTweaks 1.4.7, MatchStats 1.0.6, NoGore 1.3.6, TrueSens 1.2.6, ViewmodelTweaks 2.0.8, ezCrosshair 1.3.6.

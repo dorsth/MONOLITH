@@ -89,6 +89,8 @@ namespace Monolith
         // an edit in progress
         private MenuRow _editRow;
         private string _edit;
+        // the page panel itself while a dialog page takes _pageR
+        private Rect _behindR;
         // the value a field opened with, not typed over yet: grey, and the first character typed replaces it, as in Far
         private bool _editFresh;
         private bool _capture;
@@ -268,7 +270,7 @@ namespace Monolith
         private int Lay(MenuPage p)
         {
             _vis.Clear();
-            if (p.Parent != null) _vis.Add(UpRow);
+            if (p.Parent != null && !p.Dialog) _vis.Add(UpRow);
             foreach (MenuRow r in p.Rows) if (Shows(r)) _vis.Add(r);
             // a heading with nothing under it
             for (int i = _vis.Count - 1; i >= 0; i--)
@@ -294,7 +296,7 @@ namespace Monolith
         private static readonly MenuRow UpRow = new MenuRow { Kind = RowKind.Up, Label = ".." };
         private MenuRow _dragRow; private Vector2 _lastMouse;
         // a long page gives its scroll bar a cell
-        private int ColsFor(MenuPage page) { return Mathf.RoundToInt((_pageR.width - 2 * _cw) / _cw) - 1 - (page.Draw != null ? page.SideCols + 1 : 0) - (Scrolls ? 2 : 0); }
+        private int ColsFor(MenuPage page) { return Mathf.RoundToInt((_pageR.width - 2 * _cw) / _cw) - 1 - (page.Side ? page.SideCols + 1 : 0) - (Scrolls ? 2 : 0); }
 
         // ---- drawing
 
@@ -483,6 +485,18 @@ namespace Monolith
             _rowY0 = _pageR.y + _ch;
             _rowStep = _ch;
             _visRows = PanelRows - 2;
+            _behindR = _pageR;
+            if (page != null && page.Dialog && !_searching)
+            {
+                // a box over the parent page, its rows one under the other and the samples under them; the page
+                // behind keeps its left columns in view
+                float samples = page.Draw != null ? page.SideRows() : -1f;
+                int rows = Mathf.Min(_vis.Count, PanelRows - 4 - Mathf.CeilToInt(samples));
+                float dh = (rows + 2 + samples) * _ch;
+                _pageR = new Rect(_behindR.x + 6f * _cw, _behindR.y + 2f * _ch, _behindR.width - 8f * _cw, Mathf.Min(dh, _behindR.height - _ch));
+                _rowY0 = _pageR.y + _ch;
+                _visRows = rows;
+            }
 
             // the mouse in use: the page shows no cursor, only the row under the mouse; a key brings the cursor back
             bool wasMouse = _byMouse;
@@ -540,7 +554,7 @@ namespace Monolith
             if (page.Top == 1 && _vis.Count > 0 && _vis[0].Kind == RowKind.Header) page.Top = 0;
 
             Fill(_win, Window);   // the ground between the panels
-            Fill(_navR, Back); Fill(_pageR, Back);
+            Fill(_navR, Back); Fill(_behindR, Back);
             // the categories
             Box(_navR, "MONOLITH", !pageOn);
             for (int i = 0; i < _cats.Count; i++)
@@ -552,14 +566,25 @@ namespace Monolith
                 Line(r.x + _cw * 0.5f, r.y, "<color=" + (cur ? Val : _cats[i].Outside ? Faint : Txt) + ">" + Pad(Lang.T(_cats[i].Path[0]), NavCols - 3) + "</color>");
             }
             Footer(_navR, BundlePlugin.Version);
-            string title = _searching ? Lang.T("search: ") + _query + "_" : PathText(page);
+            bool dialog = page.Dialog && !_searching;
+            Rect pageR = _pageR; _pageR = _behindR;
+            string title = _searching ? Lang.T("search: ") + _query + "_" : PathText(dialog ? page.Parent : page);
             Box(_pageR, Fit(title, (int)(_pageR.width / _cw) - 24), pageOn);   // room on the right for the clock
             // the clock on the top frame, as Far shows it: over the corner, its last letter on the frame's outer edge
             string clock = DateTime.Now.ToShortTimeString();
             float cx = _pageR.xMax - (clock.Length + 1) * _cw;
             Fill(new Rect(cx, _pageR.y, (clock.Length + 1) * _cw, _ch * 0.5f + Thin * 2f), Back);   // over the frame only: above it is the ground
             GUI.Label(new Rect(cx + _cw, _pageR.y - _ch * 0.5f + Thin, (clock.Length + 1) * _cw, _ch), "<b><color=" + Hot + ">" + Esc(clock) + "</color></b>", _st);
-            int side = page.Draw != null ? page.SideCols + 1 : 0;
+            if (dialog)
+            {
+                Behind(page.Parent);
+                _pageR = pageR;
+                Fill(new Rect(_pageR.x + _cw * 0.5f, _pageR.y + _ch * 0.5f, _pageR.width, _pageR.height), Shadow);
+                Fill(_pageR, Panel);
+                Box(DialogFrame(), Lang.T(page.Path[page.Path.Length - 1]), false, Panel);
+            }
+            _pageR = pageR;
+            int side = page.Side ? page.SideCols + 1 : 0;
             int cols = ColsFor(page), vis = _visRows;
             for (int i = 0; i < vis && page.Top + i < _vis.Count; i++)
             {
@@ -568,7 +593,7 @@ namespace Monolith
                 bool cur = idx == ci && pageOn && !_byMouse;
                 // stays lit under an open pop-up, as a Far combobox keeps its focus while its list is open
                 if (cur) Fill(r, Bar); else if (idx == over && row.Kind != RowKind.Header) Fill(r, Hover);
-                if (row.Kind == RowKind.Header) Heading(r, Lang.T(row.Label), page.Draw != null ? SideRect(page) : new Rect());
+                if (row.Kind == RowKind.Header) Heading(r, Lang.T(row.Label), page.Side ? SideRect(page) : new Rect());
                 else Line(r.x + _cw * 0.5f, r.y, RowText(row, cols, cur));
                 Knob(row, r.y, cols, cur);
             }
@@ -576,7 +601,15 @@ namespace Monolith
 
             // the preview: a Far dialog over the page beside the rows, with its shadow (as Far gives dialogs and pop-up
             // menus), its own lighter ground and a double frame, the samples in named groups inside it
-            if (page.Draw != null)
+            if (page.Dialog && page.Draw != null && !_searching)
+            {
+                // the samples under the rows, split from them by a line joined to the frame, as in Far's Color dialog
+                float t = Thin, lineY = Mathf.Round(_pageR.y + (_visRows + 1) * _ch + _ch * 0.5f - t * 0.5f);
+                Rect frame = DialogFrame();
+                Fill(new Rect(frame.x + 2f * t, lineY, frame.width - 4f * t, t), Frame);
+                page.Draw(new Rect(frame.x, lineY, frame.width, frame.yMax - lineY));
+            }
+            else if (page.Draw != null)
             {
                 Rect sr = SideRect(page);
                 Fill(new Rect(sr.x + _cw * 0.5f, sr.y + _ch * 0.5f, sr.width, sr.height), Shadow);
@@ -646,6 +679,24 @@ namespace Monolith
             if (got == "<Keyboard>/escape") return;
             try { row.Entry.BoxedValue = none ? Monolith.Keys.NoKey(row.Entry) : Monolith.Keys.Taken(row.Entry, got); } catch (Exception e) { Warn("setting a keybind", e); }
         }
+
+        // the page a dialog was opened from, as it was: its rows under the dialog, the one that opened it still lit
+        private void Behind(MenuPage parent)
+        {
+            int cols = Mathf.RoundToInt((_behindR.width - 2 * _cw) / _cw) - 1, i = 0;
+            foreach (MenuRow row in parent.Rows)
+            {
+                if (!Shows(row) || i >= PanelRows - 2) continue;
+                Rect r = new Rect(_behindR.x + _cw, _behindR.y + (i + 1) * _ch, _behindR.width - 2 * _cw, _ch);
+                if (row == parent.Cur) Fill(r, Bar);
+                if (row.Kind == RowKind.Header) Heading(r, Lang.T(row.Label), new Rect());
+                else Line(r.x + _cw * 0.5f, r.y, RowText(row, cols, row == parent.Cur));
+                i++;
+            }
+        }
+
+        // a dialog's double frame: half a cell in from its filled ground, as Far draws one
+        private Rect DialogFrame() { return new Rect(_pageR.x + _cw * 0.5f, _pageR.y + _ch * 0.5f, _pageR.width - _cw, _pageR.height - _ch); }
 
         private Rect SideRect(MenuPage page)
         {
@@ -870,7 +921,7 @@ namespace Monolith
         private int RowAt(Vector2 m, MenuPage page)
         {
             if (!_pageR.Contains(m) || m.y < _rowY0) return -1;
-            if (page.Draw != null && m.x >= SideRect(page).x - 10f) return -1;
+            if (page.Side && m.x >= SideRect(page).x - 10f) return -1;
             int i = page.Top + Mathf.FloorToInt((m.y - _rowY0) / _rowStep);
             if (i < 0 || i >= _vis.Count || i >= page.Top + _visRows || _vis[i].Kind == RowKind.Header) return -1;
             return i;
