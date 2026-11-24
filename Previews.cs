@@ -92,6 +92,10 @@ namespace Monolith
                         Camera cam = root.renderMode == RenderMode.ScreenSpaceOverlay ? null : root.worldCamera;
                         Vector2 low = RectTransformUtility.WorldToScreenPoint(cam, corners[0]), high = RectTransformUtility.WorldToScreenPoint(cam, corners[2]);
                         size = new Vector2(Mathf.Abs(high.x - low.x), Mathf.Abs(high.y - low.y)); tint = image.color;
+                        // the picture has empty room around the lines, which the texture leaves out: only the part with the
+                        // lines is drawn here, so it gets that part's share of the size
+                        Rect whole = image.sprite.rect;
+                        if (whole.width > 0f && whole.height > 0f) size = new Vector2(size.x * t.width / whole.width, size.y * t.height / whole.height);
                     }
                 }
                 else
